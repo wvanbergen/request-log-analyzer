@@ -69,3 +69,10 @@ puts "=============================================================="
 summarizer.sort_actions_by(:mean_time, 100).reverse[0, 10].each do |a|
   puts "#{a[0].ljust(30)}: %10.03fs [%d requests]" % [a[1][:mean_time], a[1][:count]]
 end
+
+puts
+puts "Process blockers"
+puts "=============================================================="
+summarizer.sort_blockers_by(:count).reverse[0, 10].each do |a|
+  puts "#{a[0].ljust(30)}: %d requests" % [a[1][:mean_time], a[1][:count]]
+end

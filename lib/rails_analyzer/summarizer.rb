@@ -3,14 +3,15 @@ module RailsAnalyzer
   class Summarizer
 
     attr_reader :actions
-    attr_reader :methods
     attr_reader :request_count
     attr_reader :first_request_at
     attr_reader :last_request_at
    
+    BLOCKER_DURATION = 1.0
+   
     def initialize
       @actions = {}
-      @methods = {}
+      @blockers = {}
       @request_count = 0
     end
    
@@ -35,16 +36,29 @@ module RailsAnalyzer
       
       @actions[hash][:mean_db_time] = @actions[hash][:total_db_time] / @actions[hash][:count].to_f      
       @actions[hash][:mean_rendering_time] = @actions[hash][:total_rendering_time] / @actions[hash][:count].to_f            
+      
+      if request[:duration] > BLOCKER_DURATION
+        @blockers[hash] ||= { :count => 0}
+        @blockers[hash][:count]  += 1
+      end
+      
     end
     
     def sort_actions_by(field, min_count = nil)
       actions = min_count.nil? ? @actions.to_a : @actions.delete_if { |k, v| v[:count] < min_count}.to_a
       actions.to_a.sort { |a, b| (a[1][field.to_sym] <=> b[1][field.to_sym]) }
     end
+
+    def sort_blockers_by(field, min_count = nil)
+      blockers = min_count.nil? ? @blockers.to_a : @blockers.delete_if { |k, v| v[:count] < min_count}.to_a
+      blockers.to_a.sort { |a, b| (a[1][field.to_sym] <=> b[1][field.to_sym]) }     
+    end
+
     
     def duration
       (@last_request_at - @first_request_at).round
     end
+    
 
   end
 end 
