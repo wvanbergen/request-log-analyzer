@@ -14,12 +14,13 @@ module RailsAnalyzer
       @request_count = 0
     end
    
-    def summarize(request)
+    def group(request, &block)
       @request_count += 1
       @first_request_at ||= request[:timestamp] # assume time-based order
       @last_request_at  = request[:timestamp]   # assume time-based order
       
-      hash = self.request_hash(request)
+      hash = block_given? ? yield(request) : request.hash
+
       @actions[hash] ||= {:count => 0, :total_time => 0.0, :total_db_time => 0.0, :total_rendering_time => 0.0, 
                             :min_time => request[:duration], :max_time => request[:duration]  }
                             
@@ -31,26 +32,19 @@ module RailsAnalyzer
       @actions[hash][:min_time] = [@actions[hash][:min_time], request[:duration]].min
       @actions[hash][:max_time] = [@actions[hash][:min_time], request[:duration]].max
       @actions[hash][:mean_time] = @actions[hash][:total_time] / @actions[hash][:count].to_f
+      
+      @actions[hash][:mean_db_time] = @actions[hash][:total_db_time] / @actions[hash][:count].to_f      
+      @actions[hash][:mean_rendering_time] = @actions[hash][:total_rendering_time] / @actions[hash][:count].to_f            
     end
     
-    def sort_actions_by(field)
-      @actions.to_a.sort { |a, b| (a[1][field.to_sym] <=> b[1][field.to_sym]) }
+    def sort_actions_by(field, min_count = nil)
+      actions = min_count.nil? ? @actions.to_a : @actions.delete_if { |k, v| v[:count] < min_count}.to_a
+      actions.to_a.sort { |a, b| (a[1][field.to_sym] <=> b[1][field.to_sym]) }
     end
     
     def duration
       (@last_request_at - @first_request_at).round
     end
-    
-    protected
-    
-    def request_hash(request)
-      if request[:url]
-        request[:url].split('?').first
-      elsif request[:controller] && request[:action]
-        "#{request[:controller]}##{request[:action]}"
-      else
-        raise 'Cannot hash this request! ' + request.inspect
-      end
-    end
+
   end
 end 
