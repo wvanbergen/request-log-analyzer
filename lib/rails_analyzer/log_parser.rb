@@ -6,7 +6,7 @@ module RailsAnalyzer
     FIRST_LINE_REGEXP = /^Processing (\w+)#(\w+) \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
     
     LAST_LINE_TEST    = /^Completed/
-    LAST_LINE_REGEXP  = /^Completed in (\d+\.\d{5}) \(\d+ reqs\/sec\) (\| Rendering: (\d+\.\d{5}) \(\d+\%\) )?\| DB: (\d+\.\d{5}) \(\d+\%\) \| (\d\d\d).+\[(http.+)\]/
+    LAST_LINE_REGEXP  = /^Completed in (\d+\.\d{5}) \(\d+ reqs\/sec\) (\| Rendering: (\d+\.\d{5}) \(\d+\%\) )?(\| DB: (\d+\.\d{5}) \(\d+\%\) )?\| (\d\d\d).+\[(http.+)\]/
     
     attr_reader :open_errors
     attr_reader :close_errors
@@ -21,10 +21,10 @@ module RailsAnalyzer
           
           if LAST_LINE_TEST =~ line
             if LAST_LINE_REGEXP =~ line
-              request = {:url => $6, :duration => $1.to_f, :rendering => $3.to_f, :db => $4.to_f}
+              request = {:url => $7, :status => $6.to_i, :duration => $1.to_f, :rendering => $3.to_f, :db => $5.to_f}
               yield(request) if block_given?         
             else
-              puts line
+              puts " -> Unparsable 'complete' line: " + line
             end
           end
 
