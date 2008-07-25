@@ -1,0 +1,9 @@
+Rails log analyzer
+--------------------------------
+
+This is a simple command line tool to analyze Rails log files. Its purpose is to find what 
+actions are best candidates for optimization.
+
+This tool will parse all requests in the Rails logfile and aggregate the information. Once 
+it is finished parsing the log file, it will show the requests that take op most server 
+time. Different metrics are used (cumulative time, average time, blockers, DB time, etc)
