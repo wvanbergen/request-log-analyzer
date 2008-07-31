@@ -17,7 +17,7 @@ def request_hasher(request)
     url.gsub!(/\/\d+\//, '/:id/') # replace identifiers in URLs
     
     # recognize hashes in floorplanner_current
-    url.gsub!(/^\/([A-z0-9]{6})\//) { |c| colliding_controllers.include?($1) ? "/#{$1}/" : '/:hash/' }
+    #url.gsub!(/^\/([A-z0-9]{6})\//) { |c| colliding_controllers.include?($1) ? "/#{$1}/" : '/:hash/' }
     
     return url
   elsif request[:controller] && request[:action]
