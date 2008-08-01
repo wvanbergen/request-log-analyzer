@@ -3,10 +3,10 @@ require 'date'
 module RailsAnalyzer
   class LogParser 
   
-    FIRST_LINE_REGEXP = /^Processing (\w+)#(\w+) \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
+    FIRST_LINE_REGEXP = /Processing (\w+)#(\w+) \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
     
-    LAST_LINE_TEST    = /^Completed/
-    LAST_LINE_REGEXP  = /^Completed in (\d+\.\d{5}) \(\d+ reqs\/sec\) (\| Rendering: (\d+\.\d{5}) \(\d+\%\) )?(\| DB: (\d+\.\d{5}) \(\d+\%\) )?\| (\d\d\d).+\[(http.+)\]/
+    LAST_LINE_TEST    = /Completed/
+    LAST_LINE_REGEXP  = /Completed in (\d+\.\d{5}) \(\d+ reqs\/sec\) (\| Rendering: (\d+\.\d{5}) \(\d+\%\) )?(\| DB: (\d+\.\d{5}) \(\d+\%\) )?\| (\d\d\d).+\[(http.+)\]/
     
     attr_reader :open_errors
     attr_reader :close_errors
