@@ -2,7 +2,16 @@
 require 'lib/rails_analyzer/log_parser'
 require 'lib/rails_analyzer/summarizer'
 
-raise "Please provide a path to a rails log file" if $*.length == 0
+if $*.length == 0
+  puts "Usage: ruby analyze.rb [FILE] [OPTION]"
+  puts "Analyze the given log FILE with the given OPTION"
+  puts "Example: ruby analyze.rb mongrel.log"
+  puts ""
+  puts "Options:"
+  puts " -c, --calculate-database     Calculate database times if they are 0 in your log."
+  puts ""
+  return 0
+end
 
 parser = RailsAnalyzer::LogParser.new($*.first)
 summarizer = RailsAnalyzer::Summarizer.new
