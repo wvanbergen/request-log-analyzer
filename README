@@ -8,8 +8,11 @@ This tool will parse all requests in the Rails logfile and aggregate the informa
 it is finished parsing the log file, it will show the requests that take op most server 
 time. Different metrics are used (cumulative time, average time, blockers, DB time, etc)
 
+
+
 Usage
 --------------------------------
+
 Usage: ruby analyze.rb [FILE] [OPTION]
 Analyze the given log FILE with the given OPTION
 Example: ruby analyze.rb mongrel.log
@@ -17,3 +20,93 @@ Example: ruby analyze.rb mongrel.log
 Options:
  -g, --guess-database-time     Guess database times if they are not explicitly logged.
  -f, --fast                    Only parse 'Completed' log lines (displays less information).
+
+
+
+
+Example
+--------------------------------
+
+Note that this example was shortened for your viewing pleasure.
+$ ruby analyze.rb /var/log/my_app.log
+
+Rails log analyzer, by Willem 'Gadget' van Bergen / Bart ten Brinke
+
+Processing all log lines...
+========================================================================
+Successfully analyzed 58908 requests from log file
+
+Timestamp first request: 2008-07-13T06:25:58+00:00
+Timestamp last request:  2008-07-20T06:18:53+00:00
+Total time analyzed: 7 days
+
+Top 10 most requested actions
+========================================================================
+/overview/:date/                                  : 19359 requests
+/overview/day/:date/                              : 6365 requests
+/overview/:date/set/                              : 5589 requests
+/overview/                                        : 3985 requests
+/clients/:id/                                     : 1976 requests
+........
+
+Top 10 actions by time - cumulative
+========================================================================
+/overview/:date/                                  :   9044.582s [19359 requests]
+/overview/                                        :   8478.767s [3985 requests]
+/overview/:date/set/                              :   3309.041s [5589 requests]
+/clients/:id/products/:id/                        :   1479.911s [924 requests]
+/clients/:id/                                     :    750.080s [1976 requests]
+........
+
+Top 10 actions by time - per request mean
+========================================================================
+/overview/                                        :      2.128s [3985 requests]
+/clients/:id/products/:id/                        :      1.602s [924 requests]
+/overview/:date/set/                              :      0.592s [5589 requests]
+/overview/:date/                                  :      0.467s [19359 requests]
+/clients/:id/                                     :      0.380s [1976 requests]
+........
+
+Top 10 worst DB offenders - cumulative time
+========================================================================
+/overview/:date/                                  :   8773.993s [19359 requests]
+/overview/                                        :   8394.754s [3985 requests]
+/overview/:date/set/                              :   3307.928s [5589 requests]
+/clients/:id/products/:id/                        :   1425.220s [924 requests]
+/clients/:id/                                     :    535.229s [1976 requests]
+........
+
+Top 10 worst DB offenders - mean time
+========================================================================
+/overview/:id/:id/:id/print/                      :      6.994s [448 requests]
+/overview/                                        :      2.128s [3985 requests]
+/clients/:id/products/:id/                        :      1.602s [924 requests]
+/overview/:date/set/                              :      0.592s [5589 requests]
+/overview/:date/                                  :      0.467s [19359 requests]
+........
+
+Mongrel process blockers (> 1.0 seconds) - frequency
+========================================================================
+/overview/:date/                                  :   7494.233s [3144 requests]
+/overview/                                        :   8320.293s [1549 requests]
+/overview/:date/set/                              :   1149.235s [803 requests]
+/overview/:id/:id/:id/print/new/                  :    613.693s [341 requests]
+/clients/:id/products/:id/                        :   1370.693s [313 requests]
+........
+
+Requests graph - per hour
+========================================================================
+         ........
+         7:00 - 2731                 : XXXXXXX
+         8:00 - 6139                 : XXXXXXXXXXXXXXXX
+         9:00 - 7465                 : XXXXXXXXXXXXXXXXXXXX
+        10:00 - 7118                 : XXXXXXXXXXXXXXXXXXX
+        11:00 - 7409                 : XXXXXXXXXXXXXXXXXXX
+        12:00 - 6450                 : XXXXXXXXXXXXXXXXX
+        13:00 - 5377                 : XXXXXXXXXXXXXX
+        14:00 - 6058                 : XXXXXXXXXXXXXXXX
+        15:00 - 4156                 : XXXXXXXXXXX
+        16:00 - 2767                 : XXXXXXX
+        17:00 - 1598                 : XXXX
+        18:00 - 792                  : XX
+        ........
