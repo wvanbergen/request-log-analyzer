@@ -7,3 +7,13 @@ actions are best candidates for optimization.
 This tool will parse all requests in the Rails logfile and aggregate the information. Once 
 it is finished parsing the log file, it will show the requests that take op most server 
 time. Different metrics are used (cumulative time, average time, blockers, DB time, etc)
+
+Usage
+--------------------------------
+Usage: ruby analyze.rb [FILE] [OPTION]
+Analyze the given log FILE with the given OPTION
+Example: ruby analyze.rb mongrel.log
+
+Options:
+ -g, --guess-database-time     Guess database times if they are not explicitly logged.
+ -f, --fast                    Only parse 'Completed' log lines (displays less information).
