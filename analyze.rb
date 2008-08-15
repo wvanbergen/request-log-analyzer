@@ -48,7 +48,7 @@ rescue CommandLine::Error => e
   exit(0) 
 end
 
-summarizer = RailsAnalyzer::Summarizer.new
+summarizer = RailsAnalyzer::Summarizer.new(:calculate_database => $arguments[:guess_database_time])
 summarizer.blocker_duration = 1.0
 
 $arguments.files.each do |log_file|
@@ -66,9 +66,6 @@ $arguments.files.each do |log_file|
     end
   end  
 end
-
-
-
 
 
 puts "========================================================================"
