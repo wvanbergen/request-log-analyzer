@@ -1,19 +1,15 @@
 TODO items for Rails-log-analyzer
 =================================
-Please contact willem AT vanbergen DOT org if you want to help out with the development.
+Contact willem AT vanbergen DOT org if you want to help out with the development.
 
 
 Parser:
 - Link request processing line to request completed line
-- Refactor what lines should be returned (--fast mode)
-
+- Use routes.rb from rails app to parse URLs
 
 Summarizer:
 - Output via ERB templating
 - Optional coloring of output
 
-
 Database:
 - Add database queries for the resulting database
-
-

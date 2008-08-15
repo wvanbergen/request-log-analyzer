@@ -51,20 +51,13 @@ end
 summarizer = RailsAnalyzer::Summarizer.new(:calculate_database => $arguments[:guess_database_time])
 summarizer.blocker_duration = 1.0
 
-$arguments.files.each do |log_file|
-  parser = RailsAnalyzer::LogParser.new(log_file)  
+line_types = $arguments[:fast] ? [:completed] : [:started, :completed]
 
-  if $arguments[:fast]
-    puts "Processing 'Completed' log lines from #{log_file}..."
-    parser.each_completed_request do |request|
-      summarizer.group(request)  { |r| request_hasher(r) }
-    end
-  else
-    puts "Processing all log lines from #{log_file}..."
-    parser.each_request do |request|
-      summarizer.group(request)  { |r| request_hasher(r) }
-    end
-  end  
+$arguments.files.each do |log_file|
+  puts "Processing #{line_types.join(', ')} log lines from #{log_file}..."
+  parser = RailsAnalyzer::LogParser.new(log_file).each(*line_types) do |request|
+    summarizer.group(request)  { |r| request_hasher(r) }
+  end
 end
 
 

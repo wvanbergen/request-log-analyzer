@@ -49,7 +49,7 @@ RailsAnalyzer::RecordInserter.insert_batch_into(db_file) do |db|
     puts "Processing all log lines from #{log_file}..."
     parser = RailsAnalyzer::LogParser.new(log_file)
     
-    parser.each_request do |request| 
+    parser.each(:started, :completed) do |request| 
       db.insert(request) 
       records_inserted += 1
     end
