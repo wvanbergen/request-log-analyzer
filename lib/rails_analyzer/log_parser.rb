@@ -28,7 +28,7 @@ module RailsAnalyzer
 
           if LAST_LINE_REGEXP_QUICK =~ line
             if LAST_LINE_REGEXP =~ line
-              request = {:url => $7, :status => $6.to_i, :duration => $1.to_f, :rendering => $3.to_f, :db => $5.to_f}
+              request = {:type => :completed, :url => $7, :status => $6.to_i, :duration => $1.to_f, :rendering => $3.to_f, :db => $5.to_f}
               yield(request) if block_given?         
             else
               puts " -> Unparsable 'complete' line: " + line
@@ -46,7 +46,7 @@ module RailsAnalyzer
           if FIRST_LINE_REGEXP_QUICK =~ line
             if FIRST_LINE_REGEXP =~ line
               #@close_errors += 1 unless request.nil?
-              request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => $4}
+              request = {:type => :started, :controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => $4}
               yield(request) if block_given?         
             else
               puts " -> Unparsable 'processing' line: " + line
@@ -64,15 +64,14 @@ module RailsAnalyzer
 
           if LAST_LINE_REGEXP_QUICK =~ line
             if LAST_LINE_REGEXP =~ line
-              request = {:url => $7, :status => $6.to_i, :duration => $1.to_f, :rendering => $3.to_f, :db => $5.to_f}
+              request = {:type => :completed, :url => $7, :status => $6.to_i, :duration => $1.to_f, :rendering => $3.to_f, :db => $5.to_f}
               yield(request) if block_given?         
             else
               puts " -> Unparsable 'complete' line: " + line
             end
           elsif FIRST_LINE_REGEXP_QUICK =~ line
             if FIRST_LINE_REGEXP =~ line
-              #request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => DateTime.strptime($4, '%Y-%m-%d %H:%M:%S')}
-              request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => $4}
+              request = {:type => :started, :controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => $4}
               yield(request) if block_given?         
             else
               puts " -> Unparsable 'processing' line: " + line

@@ -3,7 +3,7 @@ require 'lib/rails_analyzer/log_parser'
 require 'lib/rails_analyzer/summarizer'
 
 puts 
-puts "Rails log analyzer, by Willem 'Gadget' van Bergen / Bart ten Brinke"
+puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke"
 puts 
 
 # Parse attributes
@@ -17,7 +17,7 @@ if $*.length == 0
   puts " -g, --guess-database-time     Guess database times if they are not explicitly logged."
   puts " -f, --fast                    Only parse 'Completed' log lines (displays less information)."
   puts ""
-  return 0
+  exit(0)
 end
 
 fast_parsing = $*.include?('-f') || $*.include?('--fast')
@@ -26,8 +26,6 @@ summarizer = RailsAnalyzer::Summarizer.new
 summarizer.blocker_duration = 1.0
 
 def request_hasher(request)
-  colliding_controllers = ['weblog', 'apidoc', 'logout']
-  
   if request[:url]
     url = request[:url].downcase.split(/^http[s]?:\/\/[A-z0-9\.-]+/).last.split('?').first # only the relevant URL part
     url << '/' if url[-1] != '/'[0] && url.length > 1 # pad a trailing slash for consistency
@@ -35,10 +33,7 @@ def request_hasher(request)
     url.gsub!(/\/\d+-\d+-\d+/, '/:date') # Combine all (year-month-day) queries
     url.gsub!(/\/\d+-\d+/, '/:month') # Combine all date (year-month) queries
     url.gsub!(/\/\d+/, '/:id') # replace identifiers in URLs
-    
-    # recognize hashes in floorplanner_current
-    #url.gsub!(/^\/([A-z0-9]{6})\//) { |c| colliding_controllers.include?($1) ? "/#{$1}/" : '/:hash/' }
-    
+        
     return url
   elsif request[:controller] && request[:action]
     return "#{request[:controller]}##{request[:action]}"
