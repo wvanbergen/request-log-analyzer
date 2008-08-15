@@ -46,7 +46,7 @@ module RailsAnalyzer
           if FIRST_LINE_REGEXP_QUICK =~ line
             if FIRST_LINE_REGEXP =~ line
               #@close_errors += 1 unless request.nil?
-              request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => DateTime.parse($4)}
+              request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => $4}
               yield(request) if block_given?         
             else
               puts " -> Unparsable 'processing' line: " + line
@@ -71,8 +71,8 @@ module RailsAnalyzer
             end
           elsif FIRST_LINE_REGEXP_QUICK =~ line
             if FIRST_LINE_REGEXP =~ line
-              #@close_errors += 1 unless request.nil?
-              request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => DateTime.parse($4)}
+              #request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => DateTime.strptime($4, '%Y-%m-%d %H:%M:%S')}
+              request = {:controller => $1, :action => $2, :ip => $3, :method => $5.to_s, :timestamp => $4}
               yield(request) if block_given?         
             else
               puts " -> Unparsable 'processing' line: " + line

@@ -26,7 +26,7 @@ module RailsAnalyzer
       if request[:timestamp]      
         @first_request_at ||= request[:timestamp] # assume time-based order
         @last_request_at  = request[:timestamp]   # assume time-based order
-        @request_time_graph[request[:timestamp].hour] +=1
+        @request_time_graph[request[:timestamp][11..12].to_i] +=1
       end
       
       if request[:url]
@@ -72,7 +72,7 @@ module RailsAnalyzer
     
     def duration
       return 0 unless @last_request_at && @first_request_at
-      return (@last_request_at - @first_request_at).round
+      return (DateTime.parse(@last_request_at) - DateTime.parse(@first_request_at)).round
     end
     
     def request_time_graph?
