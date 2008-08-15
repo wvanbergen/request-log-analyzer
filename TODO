@@ -1,0 +1,5 @@
+TODO:
+- More flexible file and parameter parsing
+- Output via erb templating
+- Optional Coloring of output
+- Database fancyness
