@@ -1,29 +1,10 @@
 #!/usr/bin/ruby
+require 'lib/command_line/arguments'
 require 'lib/rails_analyzer/log_parser'
 require 'lib/rails_analyzer/summarizer'
 
-puts 
 puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke"
 puts 
-
-# Parse attributes
-if $*.length == 0
-  puts ""
-  puts "Usage: ruby analyze.rb [FILE] [OPTION]"
-  puts "Analyze the given log FILE with the given OPTION"
-  puts "Example: ruby analyze.rb mongrel.log"
-  puts ""
-  puts "Options:"
-  puts " -g, --guess-database-time     Guess database times if they are not explicitly logged."
-  puts " -f, --fast                    Only parse 'Completed' log lines (displays less information)."
-  puts ""
-  exit(0)
-end
-
-fast_parsing = $*.include?('-f') || $*.include?('--fast')
-parser = RailsAnalyzer::LogParser.new($*.first)
-summarizer = RailsAnalyzer::Summarizer.new
-summarizer.blocker_duration = 1.0
 
 def request_hasher(request)
   if request[:url]
@@ -42,23 +23,58 @@ def request_hasher(request)
   end
 end
 
-if fast_parsing
-  puts "Processing 'Completed' log lines from #{$*.first}."
-  parser.each_completed_request do |request|
-    summarizer.group(request)  { |r| request_hasher(r) }
+begin
+  
+  $arguments = CommandLine::Arguments.parse do |command_line|
+    command_line.switch(:guess_database_time, :g)
+    command_line.switch(:fast, :f)
+    command_line.required_files = 1
   end
-else
-  puts "Processing all log lines from #{$*.first}."
-  parser.each_request do |request|
-    summarizer.group(request)  { |r| request_hasher(r) }
-  end
+  
+rescue CommandLine::Error => e
+  puts "ARGUMENT ERROR: " + e.message
+  puts
+  puts "Usage: ruby parsetodb.rb [LOGFILES*] <OPTIONS>"
+  puts
+  puts "Options:"
+  puts "  --fast, -t:                 Only use completed requests"
+  puts "  --guess-database-time, -g:  Guesses the database duration of requests"      
+  puts
+  puts "Examples:"
+  puts "  ./analyze.rb development.log"
+  puts "  ./analyze.rb mongrel.0.log mongrel.1.log mongrel.2.log -g -f"
+  puts 
+   
+  exit(0) 
+end
+
+summarizer = RailsAnalyzer::Summarizer.new
+summarizer.blocker_duration = 1.0
+
+$arguments.files.each do |log_file|
+  parser = RailsAnalyzer::LogParser.new(log_file)  
+
+  if $arguments[:fast]
+    puts "Processing 'Completed' log lines from #{log_file}..."
+    parser.each_completed_request do |request|
+      summarizer.group(request)  { |r| request_hasher(r) }
+    end
+  else
+    puts "Processing all log lines from #{log_file}..."
+    parser.each_request do |request|
+      summarizer.group(request)  { |r| request_hasher(r) }
+    end
+  end  
 end
 
 
+
+
+
 puts "========================================================================"
-puts "Parsing problems: open/close mismatch: #{parser.open_errors}/#{parser.close_errors}" if parser.open_errors && parser.close_errors
-puts "Successfully analyzed #{summarizer.request_count} requests from log file"
-puts
+#puts "Parsing problems: open/close mismatch: #{parser.open_errors}/#{parser.close_errors}" if parser.open_errors && parser.close_errors
+#puts "Successfully analyzed #{summarizer.request_count} requests from log file"
+#puts
 puts "Timestamp first request: #{summarizer.first_request_at}" if summarizer.first_request_at
 puts "Timestamp last request:  #{summarizer.last_request_at}" if summarizer.last_request_at
 puts "Total time analyzed: #{summarizer.duration} days" if summarizer.duration

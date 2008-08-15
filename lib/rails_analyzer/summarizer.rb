@@ -11,12 +11,12 @@ module RailsAnalyzer
     attr_accessor :blocker_duration
     DEFAULT_BLOCKER_DURATION = 1.0
    
-    def initialize
+    def initialize(options = {})
       @actions  = {}
       @blockers = {}
       @request_count = 0
       @blocker_duration = DEFAULT_BLOCKER_DURATION
-      @calculate_database = $*.include?('-g') || $*.include?('--guess-databas-time')    
+      @calculate_database = options[:calculate_database]
       @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     end
    

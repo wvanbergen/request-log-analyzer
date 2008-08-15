@@ -1,5 +1,19 @@
-TODO:
-- More flexible file and parameter parsing
-- Output via erb templating
-- Optional Coloring of output
-- Database fancyness
+TODO items for Rails-log-analyzer
+=================================
+Please contact willem AT vanbergen DOT org if you want to help out with the development.
+
+
+Parser:
+- Link request processing line to request completed line
+- Refactor what lines should be returned (--fast mode)
+
+
+Summarizer:
+- Output via ERB templating
+- Optional coloring of output
+
+
+Database:
+- Add database queries for the resulting database
+
+
