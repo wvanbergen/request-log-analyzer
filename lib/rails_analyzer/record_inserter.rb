@@ -16,7 +16,7 @@ module RailsAnalyzer
     def self.insert_batch_into(db_file, &block)
       db = RecordInserter.new(db_file)
       db.insert_batch(&block)
-      return self
+      return db
     end
     
     def calculate_db_durations!
