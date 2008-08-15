@@ -20,6 +20,10 @@ module RailsAnalyzer
       @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     end
    
+    def has_timestamps?
+      !@first_request_at.nil?
+    end
+   
     def group(request, &block)
       request[:duration] ||= 0
       
