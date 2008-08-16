@@ -55,13 +55,15 @@ module CommandLine
     end
     
     # If called argument list must begin with a command.
-    def begins_with_command!
-      @begins_with_command = true
+    # <tt>begins_w_command</tt> Defaults to true.
+    def begins_with_command!(begins_w_command=true)
+      @begins_with_command = begins_w_command
     end
     
-    # If called unkown flags will be silently ignored.
-    def ignore_unknown_flags!
-      @ignore_unknown_flags = true
+    # Unknown flags will be silently ignored.
+    # <tt>ignore</tt> Defaults to true.
+    def ignore_unknown_flags!(ignore = true)
+      @ignore_unknown_flags = ignore
     end
   
     def [](name)

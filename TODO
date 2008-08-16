@@ -5,6 +5,7 @@ Contact willem AT vanbergen DOT org if you want to help out with the development
 
 Parser:
 - Link request processing line to request completed line
+- Progress bar when parsing large file(s)
 
 Summarizer:
 - Output via ERB templating
