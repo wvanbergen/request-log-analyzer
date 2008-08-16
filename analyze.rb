@@ -2,6 +2,7 @@
 require 'lib/command_line/arguments'
 require 'lib/rails_analyzer/log_parser'
 require 'lib/rails_analyzer/summarizer'
+require 'output/colorizer'
 
 puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke"
 puts 
@@ -47,6 +48,7 @@ begin
   $arguments = CommandLine::Arguments.parse do |command_line|
     command_line.switch(:guess_database_time, :g)
     command_line.switch(:fast, :f)
+    command_line.switch(:colorize, :z)
     command_line.flag(:output, :alias => :o)
     command_line.flag(:amount, :alias => :c)
     command_line.required_files = 1

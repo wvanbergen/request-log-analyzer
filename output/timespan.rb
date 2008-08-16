@@ -1,4 +1,4 @@
-puts "========================================================================"
+puts green("========================================================================")
 
 if $summarizer.has_timestamps?
   puts "Timestamp first request: #{$summarizer.first_request_at}"
