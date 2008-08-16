@@ -1,6 +1,7 @@
 require 'date'
 
 module RailsAnalyzer
+  # Parse a rails log file
   class LogParser 
 
     LOG_LINES = {
@@ -20,14 +21,21 @@ module RailsAnalyzer
     attr_reader :open_errors
     attr_reader :close_errors
     
+    # Output a warning
+    # <tt>message</tt> The warning message
     def warn(message)
       puts " -> " + message.to_s
     end  
         
+    # LogParser initializer
+    # <tt>file</tt> The fileobject this LogParser wil operate on.
     def initialize(file)
       @file_name = file
     end
 
+    # Finds a log line and then parses the information in the line.
+    # Yields a hash containing the information found. 
+    # <tt>*line_types</tt> The log line types to look for (defaults to LOG_LINES.keys).
     def each(*line_types, &block)
 
       # parse everything by default 

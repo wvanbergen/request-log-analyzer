@@ -8,7 +8,7 @@ class LogParserTest < Test::Unit::TestCase
     "#{File.dirname(__FILE__)}/log_fragments/fragment_#{number}.log"
   end
   
-  def test_parse_log_fragment
+  def test_parse_mongrel_log_fragment
     count = 0
     parser = RailsAnalyzer::LogParser.new(fragment_file(1)).each(:started) { count += 1 }
     assert_equal 4, count
@@ -37,7 +37,7 @@ class LogParserTest < Test::Unit::TestCase
   end
   
   def test_parse_syslog_fragment_content
-    # this test only works because there is only one requets in the fragment
+    # this test only works because there is only one requests in the fragment
     parser = RailsAnalyzer::LogParser.new(fragment_file(2)).each(:started) do |request|
       assert_equal "EmployeeController", request[:controller]
       assert_equal "index", request[:action]      

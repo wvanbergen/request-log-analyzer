@@ -19,9 +19,9 @@ Example: ruby analyze.rb mongrel.log
 
 Options:
  -g, --guess-database-time     Guess database times if they are not explicitly logged.
- -f, --fast                    Only parse 'Completed' log lines (displays less information).
+ -f, --fast                    Parse 'Completed' log lines only (displays less information).
  -c, --amount <number>         The amount of results per category. Defaults to 10.
- -o, --output <reports*>        A comma separated list of the reports you want. Defaults to all.
+ -o, --output <reports*>       A comma separated list of the reports you want. Defaults to all.
 
 
 
