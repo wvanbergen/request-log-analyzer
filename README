@@ -20,7 +20,8 @@ Example: ruby analyze.rb mongrel.log
 Options:
  -g, --guess-database-time     Guess database times if they are not explicitly logged.
  -f, --fast                    Only parse 'Completed' log lines (displays less information).
-
+ -c, --amount <number>         The amount of results per category. Defaults to 10.
+ -o, --output <reports*>        A comma separated list of the reports you want. Defaults to all.
 
 
 
@@ -30,7 +31,7 @@ Example
 Note that this example was shortened for your viewing pleasure.
 $ ruby analyze.rb /var/log/my_app.log
 
-Rails log analyzer, by Willem 'Gadget' van Bergen / Bart ten Brinke
+Rails log analyzer, by Willem van Bergen and  Bart ten Brinke
 
 Processing all log lines...
 ========================================================================
