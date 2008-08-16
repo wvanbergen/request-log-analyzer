@@ -7,7 +7,7 @@ if $summarizer.request_time_graph?
   (0..23).each do |a|
     times = $summarizer.request_time_graph[a]
     display_chars = times / deviation
-   puts "#{a.to_s.rjust(10)}:00 - #{times.to_s.ljust(20)} : #{red('X' * display_chars)}"
+   puts "#{a.to_s.rjust(10)}:00 - #{times.to_s.ljust(20)} : #{blue('X' * display_chars)}"
   end  
 else
   puts

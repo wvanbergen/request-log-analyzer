@@ -20,6 +20,16 @@ def green(text)
   colorize(text, "\e[32m")
 end
 
+# Draw a Yellow line of text
+def yellow(text)
+  colorize(text, "\e[33m")
+end
+
+# Draw a Yellow line of text
+def blue(text)
+  colorize(text, "\e[34m")
+end
+
 
 #STYLE = {
 #      :default    =>    “33[0m”,
