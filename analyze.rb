@@ -9,7 +9,7 @@ puts
 # Substitutes variable elements in a url (like the id field) with a fixed string (like ":id")
 # This is used to aggregate simular requests.
 # <tt>request</tt> The request to evaluate.
-# Returns an url string.
+# Returns uniformed url string.
 # Raises on mailformed request.
 def request_hasher(request)
   if request[:url]
