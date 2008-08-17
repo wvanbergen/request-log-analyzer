@@ -27,7 +27,7 @@ module RailsAnalyzer
     end
 
     # Output a warning
-    # <tt>message</tt> The warning message
+    # <tt>message</tt> The warning message (object)
     def warn(message)
       puts " -> " + message.to_s
     end  

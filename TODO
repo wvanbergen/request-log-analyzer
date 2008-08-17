@@ -4,7 +4,7 @@ Contact willem AT vanbergen DOT org if you want to help out with the development
 
 
 Parser:
-- Link request processing line to request completed line
+- Link request processing line to request completed line (do we really want this?)
 - Progress bar when parsing large file(s)
 
 Summarizer:
@@ -19,4 +19,4 @@ Database:
 Rails integration:
 - Embed into gem
 - Create rake tasks (rake log:requests:analyze, log:requests:createdb)
-- Optianally use a routes.rb file to parse URLs
+- Optionally use a routes.rb file to parse URLs

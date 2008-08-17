@@ -3,6 +3,7 @@ if $summarizer.request_time_graph?
 
   max_request_graph = $summarizer.request_time_graph.max / $summarizer.duration
   deviation         = max_request_graph / 20
+  deviation         = 1 if deviation == 0
   color_cutoff      = 15
   
   puts
