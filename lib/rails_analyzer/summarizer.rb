@@ -27,12 +27,13 @@ module RailsAnalyzer
    
     # Check if any of the request parsed had a timestamp.
     def has_timestamps?
-      !@first_request_at.nil?
+      @first_request_at
     end
    
     # Parse a request string into a hash containing all keys found in the string.
-    # Yields the hash found.
+    # Yields the hash found to the block operator.
     # <tt>request</tt> The request string to parse.
+    # <tt>&block</tt> Block operator
     def group(request, &block)
       request[:duration] ||= 0
       
@@ -79,24 +80,24 @@ module RailsAnalyzer
       actions.sort { |a, b| (a[1][field.to_sym] <=> b[1][field.to_sym]) }
     end
 
-    # Return a list of request blockers sorted on a specific field
+    # Returns a list of request blockers sorted by a specific field
     # <tt>field</tt> The action field to sort by.
-    # <tt>min_count</tt> Values which fall below this amount are not returned (default nil).
-    def sort_blockers_by(field, min_count = nil)
+    # <tt>min_count</tt> Values which fall below this amount are not returned (default @blocker_duration).
+    def sort_blockers_by(field, min_count = @blocker_duration)
       blockers = min_count.nil? ? @blockers.to_a : @blockers.delete_if { |k, v| v[:count] < min_count}.to_a
       blockers.sort { |a, b| a[1][field.to_sym] <=> b[1][field.to_sym] } 
     end
 
     # Calculate the duration of a request
-    # Returns a DateTime object if possible, else 0.
+    # Returns a DateTime object if possible, 0 otherwise.
     def duration
       return 0 unless @last_request_at && @first_request_at
       return (DateTime.parse(@last_request_at) - DateTime.parse(@first_request_at)).round
     end
     
-    # Check if the request time graph contains any data.
+    # Check if the request time graph usable data.
     def request_time_graph?
-      @request_time_graph.uniq != [0]
+      @request_time_graph.uniq != [0] && duration > 0
     end
 
   end

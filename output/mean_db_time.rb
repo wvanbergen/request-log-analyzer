@@ -1,3 +1,4 @@
+# Prints a table sorted by the highest database times.
 amount = $arguments[:amount] || 10
 puts
 puts "Top #{amount} worst DB offenders - mean time"

@@ -1,3 +1,4 @@
+# Prints the total timespan found in the parsed log files.
 puts green("========================================================================")
 
 if $summarizer.has_timestamps?

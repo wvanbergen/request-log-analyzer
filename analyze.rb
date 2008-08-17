@@ -35,11 +35,10 @@ end
 # <tt>amount</tt> The length of the table (defaults to 20)
 def print_table(summarizer, field, amount = 20)
   summarizer.sort_actions_by(field).reverse[0, amount.to_i].each do |a|
-    if field == :count
-      puts "#{a[0].ljust(50)}: %d requests" % a[1][:count]
-    else
-      puts "#{a[0].ljust(50)}: %10.03fs [%d requests]" % [a[1][field], a[1][:count]]
-    end
+    # As we show count by default, show totaltime if we sort by count
+    field = :total_time if field == :count
+    
+    puts "#{a[0].ljust(50)}: %10.03fs [#{green("%d requests")}]" % [a[1][field], a[1][:count]]
   end
 end
 
@@ -75,7 +74,7 @@ $arguments.files.each do |log_file|
 end
 
 # Select the reports to output and generate them.
-output_reports = $arguments[:output].split(',') rescue [:timespan, :most_requested, :total_time, :mean_time, :total_db_time, :mean_db_time, :blockers, :hourly_spread] 
+output_reports = $arguments[:output].split(',') rescue [:timespan, :most_requested, :total_time, :mean_time, :total_db_time, :mean_db_time, :mean_rendering_time, :blockers, :hourly_spread] 
 
 output_reports.each do |report|
   if File.exist?("output/#{report}.rb")

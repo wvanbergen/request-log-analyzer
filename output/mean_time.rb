@@ -1,3 +1,4 @@
+# Prints  table sorted by the duration of the requests
 amount = $arguments[:amount] || 10
 puts
 puts "Top #{amount} actions by time - per request mean"

@@ -1,3 +1,4 @@
+# Prints a list of the actions that spend most of their time waiting for database results.
 amount = $arguments[:amount] || 10
 puts
 puts "Top #{amount} worst DB offenders - cumulative time"
