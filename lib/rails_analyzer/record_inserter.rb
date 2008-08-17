@@ -15,16 +15,7 @@ module RailsAnalyzer
       @insert_statements = nil
       create_tables_if_needed!
     end
-    
-    # Insert a batch of files into the database.
-    # <tt>db_file</tt> The filename of the database file to use.
-    # Returns the created database.
-    def self.insert_batch_into(db_file, &block)
-      db = RecordInserter.new(db_file)
-      db.insert_batch(&block)
-      return db
-    end
-    
+        
     # Calculate the database durations of the requests currenty in the database.
     # Used if a logfile does contain any database durations.
     def calculate_db_durations!
@@ -105,6 +96,15 @@ module RailsAnalyzer
           db FLOAT
         )
       ");    
+    end
+
+    # Insert a batch of files into the database.
+    # <tt>db_file</tt> The filename of the database file to use.
+    # Returns the created database.
+    def self.insert_batch_into(db_file, &block)
+      db = RecordInserter.new(db_file)
+      db.insert_batch(&block)
+      return db
     end
     
   end

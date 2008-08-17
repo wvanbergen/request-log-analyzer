@@ -91,8 +91,7 @@ module RailsAnalyzer
     # Calculate the duration of a request
     # Returns a DateTime object if possible, 0 otherwise.
     def duration
-      return 0 unless @last_request_at && @first_request_at
-      return (DateTime.parse(@last_request_at) - DateTime.parse(@first_request_at)).round
+      (@last_request_at && @first_request_at) ? (DateTime.parse(@last_request_at) - DateTime.parse(@first_request_at)).round : 0
     end
     
     # Check if the request time graph usable data.
