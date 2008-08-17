@@ -2,7 +2,7 @@
 require 'lib/command_line/arguments'
 require 'lib/rails_analyzer/log_parser'
 require 'lib/rails_analyzer/summarizer'
-require 'output/colorizer'
+require 'lib/bashcolorizer'
 
 puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke"
 puts 

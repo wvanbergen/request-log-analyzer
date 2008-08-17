@@ -10,11 +10,13 @@ Parser:
 Summarizer:
 - Output via ERB templating
 - Optional coloring of output
+- Gather Error statistics
+- Look at request types (GET / POST)
 
 Database:
 - Add query functionality for the resulting database file
 
 Rails integration:
-- Embed into gem/rails plugin
+- Embed into gem
 - Create rake tasks (rake log:requests:analyze, log:requests:createdb)
-- Use routes.rb from rails app to parse URLs
+- Optianally use a routes.rb file to parse URLs

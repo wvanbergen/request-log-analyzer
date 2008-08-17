@@ -3,11 +3,7 @@
 # <tt>color_code</tt> The color code string to set
 # <tt>color</tt> Does not color if false. Defaults to ($arguments && $arguments[:colorize])
 def colorize(text, color_code, color = $arguments && $arguments[:colorize])
-  if color
-    return "#{color_code}#{text}\e[0m"
-  else
-    return text
-  end
+  color ? "#{color_code}#{text}\e[0m" : text
 end
 
 # Draw a red line of text
