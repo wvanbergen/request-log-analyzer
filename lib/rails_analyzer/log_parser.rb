@@ -1,5 +1,5 @@
-#Jul 14 14:34:08 10.1.1.51 moves_zuwe_p [14147]: RuntimeError (Cannot destroy rule before it was created):     /app/models/rule.rb:198:in `destroy_on_period'     /v...n'     /usr/lib/ruby/gems/1.8/gems/mongrel-1.1.4/bin/mongrel_rails:281     /usr/bin/mongrel_rails:19:in `load'     /usr/bin/mongrel_rails:19
-#Jul 14 14:52:33 10.1.1.51 moves_zuwe_p [14150]: ActiveRecord::StatementInvalid (Mysql::Error: Deadlock found when trying to get lock; try restarting transaction:  $
+#RuntimeError (Cannot destroy rule before it was created):     /app/models/rule.rb:198:in `destroy_on_period'     /v...n'     /usr/lib/ruby/gems/1.8/gems/mongrel-1.1.4/bin/mongrel_rails:281     /usr/bin/mongrel_rails:19:in `load'     /usr/bin/mongrel_rails:19
+#ActiveRecord::StatementInvalid (Mysql::Error: Deadlock found when trying to get lock; try restarting transaction:  $
 #ActiveRecord::StaleObjectError (Attempted to update a stale object):
 #ArgumentError (invalid date):     /usr/lib/ruby/1.8/date.rb:931:in `new_by_frags'     /usr
 require 'date'
