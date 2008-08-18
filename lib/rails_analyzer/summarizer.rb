@@ -37,38 +37,41 @@ module RailsAnalyzer
     def group(request, &block)
       request[:duration] ||= 0
       
-      if request[:timestamp]      
-        @first_request_at ||= request[:timestamp] # assume time-based order
-        @last_request_at  = request[:timestamp]   # assume time-based order
-        @request_time_graph[request[:timestamp][11..12].to_i] +=1
-      end
-      
-      if request[:url]
-        @request_count += 1 
-        hash = block_given? ? yield(request) : request.hash
+      case request[:type]   
+        when :started      
+          @first_request_at ||= request[:timestamp] # assume time-based order of file
+          @last_request_at  = request[:timestamp]   # assume time-based order of file
+          @request_time_graph[request[:timestamp][11..12].to_i] +=1
 
-        @actions[hash] ||= {:count => 0, :total_time => 0.0, :total_db_time => 0.0, :total_rendering_time => 0.0, 
-                              :min_time => request[:duration], :max_time => request[:duration] }
+        when :completed
+          @request_count += 1 
+          hash = block_given? ? yield(request) : request.hash
+
+          @actions[hash] ||= {:count => 0, :total_time => 0.0, :total_db_time => 0.0, :total_rendering_time => 0.0, 
+                                :min_time => request[:duration], :max_time => request[:duration] }
                             
-        @actions[hash][:count] += 1
-        @actions[hash][:total_time] += request[:duration]
-        @actions[hash][:total_db_time] += request[:db] if request[:db]
-        @actions[hash][:total_db_time] += request[:duration] - request[:rendering] if @calculate_database
+          @actions[hash][:count] += 1
+          @actions[hash][:total_time] += request[:duration]
+          @actions[hash][:total_db_time] += request[:db] if request[:db]
+          @actions[hash][:total_db_time] += request[:duration] - request[:rendering] if @calculate_database
 
-        @actions[hash][:total_rendering_time] += request[:rendering] if request[:rendering]
+          @actions[hash][:total_rendering_time] += request[:rendering] if request[:rendering]
       
-        @actions[hash][:min_time] = [@actions[hash][:min_time], request[:duration]].min
-        @actions[hash][:max_time] = [@actions[hash][:min_time], request[:duration]].max
-        @actions[hash][:mean_time] = @actions[hash][:total_time] / @actions[hash][:count].to_f
+          @actions[hash][:min_time] = [@actions[hash][:min_time], request[:duration]].min
+          @actions[hash][:max_time] = [@actions[hash][:min_time], request[:duration]].max
+          @actions[hash][:mean_time] = @actions[hash][:total_time] / @actions[hash][:count].to_f
       
-        @actions[hash][:mean_db_time] = @actions[hash][:total_db_time] / @actions[hash][:count].to_f      
-        @actions[hash][:mean_rendering_time] = @actions[hash][:total_rendering_time] / @actions[hash][:count].to_f            
+          @actions[hash][:mean_db_time] = @actions[hash][:total_db_time] / @actions[hash][:count].to_f      
+          @actions[hash][:mean_rendering_time] = @actions[hash][:total_rendering_time] / @actions[hash][:count].to_f            
       
-        if request[:duration] > @blocker_duration
-          @blockers[hash] ||= { :count => 0, :total_time => 0.0 }
-          @blockers[hash][:count]      += 1
-          @blockers[hash][:total_time] += request[:duration]
-        end
+          if request[:duration] > @blocker_duration
+            @blockers[hash] ||= { :count => 0, :total_time => 0.0 }
+            @blockers[hash][:count]      += 1
+            @blockers[hash][:total_time] += request[:duration]
+          end
+
+        when :failure
+          puts 'fail!'
       end
     end
     
