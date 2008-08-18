@@ -10,6 +10,11 @@ module RailsAnalyzer
         :regexp => /Processing (\w+)#(\w+) \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/,
         :params => { :controller => 1, :action => 2, :ip => 3, :method => 5, :timestamp => 4  }
       },
+      :failed => {
+        :teaser => /Rendering [\.\w\/]+ \(/,
+        :regexp => /Rendering [\.\w\/]+ \((.+)\)$/,
+        :params => { }
+      },
       :completed => {
         :teaser => /Completed/,
         :regexp => /Completed in (\d+\.\d{5}) \(\d+ reqs\/sec\) (\| Rendering: (\d+\.\d{5}) \(\d+\%\) )?(\| DB: (\d+\.\d{5}) \(\d+\%\) )?\| (\d\d\d).+\[(http.+)\]/,
@@ -40,14 +45,12 @@ module RailsAnalyzer
 
       # parse everything by default 
       line_types = LOG_LINES.keys if line_types.empty?
-      
       File.open(@file_name) do |file|
         file.each_line do |line|
           line_types.each do |line_type|
-            
             if LOG_LINES[line_type][:teaser] =~ line
               if LOG_LINES[line_type][:regexp] =~ line
-                request = { :type => line_type }
+                request = { :type => line_type, :line => file.lineno }
                 LOG_LINES[line_type][:params].each do |key, value|
                   request[key] = case value
                     when Numeric; $~[value]

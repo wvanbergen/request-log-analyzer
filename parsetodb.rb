@@ -37,19 +37,18 @@ end
 log_files  = $arguments.files
 db_file    = $arguments[:database] || log_files.first + '.db'
 
-
 if $arguments[:reset_database] && File.exist?(db_file) 
   File.delete(db_file) 
   puts "Database file cleared."
 end
 
 records_inserted = 0 
-RailsAnalyzer::RecordInserter.insert_batch_into(db_file) do |db|
+inserter = RailsAnalyzer::RecordInserter.insert_batch_into(db_file) do |db|
   log_files.each do |log_file|
     puts "Processing all log lines from #{log_file}..."
     parser = RailsAnalyzer::LogParser.new(log_file)
     
-    parser.each(:started, :completed) do |request| 
+    parser.each do |request| 
       db.insert(request) 
       records_inserted += 1
     end
@@ -61,5 +60,13 @@ RailsAnalyzer::RecordInserter.insert_batch_into(db_file) do |db|
   end
 end
 
+started   = inserter.count(:started)
+completed = inserter.count(:completed)
+failed    = inserter.count(:failed)
+
 puts 
 puts "Inserted #{records_inserted} records from #{log_files.length} files."
+puts
+puts "Requests started: #{started}"
+puts "Requests completed: #{completed}"
+puts "Requests failed: #{failed}"
