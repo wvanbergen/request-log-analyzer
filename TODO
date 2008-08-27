@@ -2,6 +2,8 @@ TODO items for Rails-log-analyzer
 =================================
 Contact willem AT vanbergen DOT org if you want to help out with the development.
 
+General:
+- Make it work from other paths / check relative paths
 
 Parser:
 - Link request processing line to request completed line (do we really want this?)
