@@ -16,7 +16,7 @@ module RailsAnalyzer
       },
       :failed => {
         :teaser => /Error/,
-        :regexp => /(RuntimeError|ActiveRecord::\w+|ArgumentError) \((\w+)\): (\w+)/,
+        :regexp => /(\w+)Error \((.*)\)\:(.*)/,
         :params => { :error => 1, :exception_string => 2, :stack_trace => 3 }
       },
       :completed => {
@@ -44,7 +44,7 @@ module RailsAnalyzer
     # Finds a log line and then parses the information in the line.
     # Yields a hash containing the information found. 
     # <tt>*line_types</tt> The log line types to look for (defaults to LOG_LINES.keys).
-    # <tt>&block</tt> Hash containing the information found in a line.
+    # Yeilds a Hash containing the information found in a line.
     def each(*line_types, &block)
 
       # parse everything by default 
@@ -61,10 +61,11 @@ module RailsAnalyzer
                     when Array;   $~[value.first].send(value.last)
                     else; nil
                   end
+                  
                 end
                 yield(request) if block_given?
               else
-                warn("Unparsable #{line_type} line: " + line)
+                warn("Unparsable #{line_type} line: " + line[0..100]) unless line_type == :failed
               end
             end
             

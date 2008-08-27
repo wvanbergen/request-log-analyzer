@@ -62,7 +62,7 @@ end
 $summarizer = RailsAnalyzer::Summarizer.new(:calculate_database => $arguments[:guess_database_time])
 $summarizer.blocker_duration = 1.0
 
-line_types = $arguments[:fast] ? [:completed] : [:started, :completed]
+line_types = $arguments[:fast] ? [:completed] : [:started, :completed, :failed]
 
 # Walk through al the files given via the arguments.
 $arguments.files.each do |log_file|
@@ -73,7 +73,7 @@ $arguments.files.each do |log_file|
 end
 
 # Select the reports to output and generate them.
-output_reports = $arguments[:output].split(',') rescue [:timespan, :most_requested, :total_time, :mean_time, :total_db_time, :mean_db_time, :mean_rendering_time, :blockers, :hourly_spread] 
+output_reports = $arguments[:output].split(',') rescue [:timespan, :most_requested, :total_time, :mean_time, :total_db_time, :mean_db_time, :mean_rendering_time, :blockers, :hourly_spread, :errors] 
 
 output_reports.each do |report|
   report_location = "#{File.dirname(__FILE__)}/output/#{report}.rb"

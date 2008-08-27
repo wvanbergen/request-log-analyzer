@@ -5,6 +5,7 @@ module RailsAnalyzer
   class Summarizer
 
     attr_reader :actions
+    attr_reader :errors
     attr_reader :request_count
     attr_reader :request_time_graph
     attr_reader :first_request_at
@@ -19,6 +20,7 @@ module RailsAnalyzer
     def initialize(options = {})
       @actions  = {}
       @blockers = {}
+      @errors   = {}
       @request_count = 0
       @blocker_duration = DEFAULT_BLOCKER_DURATION
       @calculate_database = options[:calculate_database]
@@ -70,8 +72,13 @@ module RailsAnalyzer
             @blockers[hash][:total_time] += request[:duration]
           end
 
-        when :failure
-          puts 'fail!'
+        when :failed
+          hash = request[:error]
+          @errors[hash] ||= {:count => 0, :exception_strings => {}}
+          @errors[hash][:count] +=1
+          
+          @errors[hash][:exception_strings][request[:exception_string]] ||= 0
+          @errors[hash][:exception_strings][request[:exception_string]] += 1
       end
     end
     
@@ -89,6 +96,14 @@ module RailsAnalyzer
     def sort_blockers_by(field, min_count = @blocker_duration)
       blockers = min_count.nil? ? @blockers.to_a : @blockers.delete_if { |k, v| v[:count] < min_count}.to_a
       blockers.sort { |a, b| a[1][field.to_sym] <=> b[1][field.to_sym] } 
+    end
+
+    # Returns a list of request blockers sorted by a specific field
+    # <tt>field</tt> The action field to sort by.
+    # <tt>min_count</tt> Values which fall below this amount are not returned (default @blocker_duration).
+    def sort_errors_by(field, min_count = nil)
+      errors = min_count.nil? ? @errors.to_a : @errors.delete_if { |k, v| v[:count] < min_count}.to_a
+      errors.sort { |a, b| a[1][field.to_sym] <=> b[1][field.to_sym] } 
     end
 
     # Calculate the duration of a request
