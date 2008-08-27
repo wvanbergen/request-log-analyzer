@@ -77,8 +77,10 @@ end
 output_reports = $arguments[:output].split(',') rescue [:timespan, :most_requested, :total_time, :mean_time, :total_db_time, :mean_db_time, :mean_rendering_time, :blockers, :hourly_spread] 
 
 output_reports.each do |report|
-  if File.exist?(File.dirname(__FILE__) + "/output/#{report}.rb")
-    load File.dirname(__FILE__) + "/output/#{report}.rb"
+  report_location = "#{File.dirname(__FILE__)}/output/#{report}.rb"
+
+  if File.exist?(report_location)
+    load report_location
   else
     puts "\nERROR: Output report #{report} not found!"
   end
