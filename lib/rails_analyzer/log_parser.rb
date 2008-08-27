@@ -65,7 +65,7 @@ module RailsAnalyzer
                 end
                 yield(request) if block_given?
               else
-                warn("Unparsable #{line_type} line: " + line[0..100]) unless line_type == :failed
+                warn("Unparsable #{line_type} line: " + line[0..79]) unless line_type == :failed
               end
             end
             
