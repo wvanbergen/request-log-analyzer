@@ -1,5 +1,5 @@
 # Prints usage table
-puts "Usage: ruby parsetodb.rb [LOGFILES*] <OPTIONS>"
+puts "Usage: ruby analyze.rb [LOGFILES*] <OPTIONS>"
 puts
 puts "Options:"
 puts "  --fast, -t:                 Only use completed requests"

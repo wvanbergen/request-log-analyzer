@@ -4,8 +4,7 @@ require File.dirname(__FILE__) + '/lib/rails_analyzer/log_parser'
 require File.dirname(__FILE__) + '/lib/rails_analyzer/summarizer'
 require File.dirname(__FILE__) + '/lib/bashcolorizer'
 
-puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke"
-puts 
+puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
 
 # Substitutes variable elements in a url (like the id field) with a fixed string (like ":id")
 # This is used to aggregate simular requests.
