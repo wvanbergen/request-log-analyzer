@@ -1,8 +1,8 @@
 #!/usr/bin/ruby
-require 'lib/command_line/arguments'
-require 'lib/rails_analyzer/log_parser'
-require 'lib/rails_analyzer/summarizer'
-require 'lib/bashcolorizer'
+require File.dirname(__FILE__) + '/lib/command_line/arguments'
+require File.dirname(__FILE__) + '/lib/rails_analyzer/log_parser'
+require File.dirname(__FILE__) + '/lib/rails_analyzer/summarizer'
+require File.dirname(__FILE__) + '/lib/bashcolorizer'
 
 puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke"
 puts 
@@ -77,8 +77,8 @@ end
 output_reports = $arguments[:output].split(',') rescue [:timespan, :most_requested, :total_time, :mean_time, :total_db_time, :mean_db_time, :mean_rendering_time, :blockers, :hourly_spread] 
 
 output_reports.each do |report|
-  if File.exist?("output/#{report}.rb")
-    load "output/#{report}.rb" 
+  if File.exist?(File.dirname(__FILE__) + "/output/#{report}.rb")
+    load File.dirname(__FILE__) + "/output/#{report}.rb"
   else
     puts "\nERROR: Output report #{report} not found!"
   end
