@@ -22,3 +22,4 @@ Rails integration:
 - Embed into gem
 - Create rake tasks (rake log:requests:analyze, log:requests:createdb)
 - Optionally use a routes.rb file to parse URLs
+- World domination
