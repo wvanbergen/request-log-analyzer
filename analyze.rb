@@ -56,7 +56,7 @@ begin
 rescue CommandLine::Error => e
   puts "ARGUMENT ERROR: " + e.message
   puts
-  load "output/usage.rb"
+  load File.dirname(__FILE__) + "/output/usage.rb"
   exit(0) 
 end
 
