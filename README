@@ -18,11 +18,11 @@ Usage: ruby analyze.rb [FILE] [OPTION]
 Analyze the given log FILE with the given OPTION
 Example: ruby analyze.rb mongrel.log
 
-Options:
- -g, --guess-database-time     Guess database times if they are not explicitly logged.
- -f, --fast                    Parse 'Completed' log lines only (displays less information).
- -c, --amount <number>         The amount of results per category. Defaults to 10.
- -o, --output <reports*>       A comma separated list of the reports you want. Defaults to all.
+  --fast, -t:                 Only use completed requests
+  --guess-database-time, -g:  Guesses the database duration of requests if they are not in the log
+  --output, -o:               Comma-separated list of reports to show    
+  --amount, -c:               Displays the top <amount> elements in the reports
+  --colorize, -z:             Fancy bash coloring
 
 
 
