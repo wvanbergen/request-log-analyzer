@@ -2,9 +2,6 @@ TODO items for Rails-log-analyzer
 =================================
 Contact willem AT vanbergen DOT org if you want to help out with the development.
 
-Parser:
-- Progress bar when parsing large file(s)
-
 Summarizer:
 - Look at request types (GET / POST)
 

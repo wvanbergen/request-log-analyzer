@@ -1,7 +1,3 @@
-#RuntimeError (Cannot destroy rule before it was created):     /app/models/rule.rb:198:in `destroy_on_period'     /v...n'     /usr/lib/ruby/gems/1.8/gems/mongrel-1.1.4/bin/mongrel_rails:281     /usr/bin/mongrel_rails:19:in `load'     /usr/bin/mongrel_rails:19
-#ActiveRecord::StatementInvalid (Mysql::Error: Deadlock found when trying to get lock; try restarting transaction:  $
-#ActiveRecord::StaleObjectError (Attempted to update a stale object):
-#ArgumentError (invalid date):     /usr/lib/ruby/1.8/date.rb:931:in `new_by_frags'     /usr
 require 'date'
 
 module RailsAnalyzer
@@ -9,25 +5,25 @@ module RailsAnalyzer
   class LogParser 
 
     LOG_LINES = {
+      # Processing EmployeeController#index (for 123.123.123.123 at 2008-07-13 06:00:00) [GET]
       :started => {
         :teaser => /Processing/,
         :regexp => /Processing (\w+)#(\w+) \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/,
-        :params => { :controller => 1, :action => 2, :ip => 3, :method => 5, :timestamp => 4  }
+        :params => { :controller => 1, :action => 2, :ip => 3, :timestamp => 4, :method => 5}
       },
+      # RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy' 
       :failed => {
         :teaser => /Error/,
-        :regexp => /(\w+)Error \((.*)\)\:(.*)/,
-        :params => { :error => 1, :exception_string => 2, :stack_trace => 3 }
+        :regexp => /(\w+)(Error|Invalid) \((.*)\)\:(.*)/,
+        :params => { :error => 1, :error_or_invalid => 2, :exception_string => 3, :stack_trace => 4 }
       },
+      # Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]
       :completed => {
         :teaser => /Completed/,
         :regexp => /Completed in (\d+\.\d{5}) \(\d+ reqs\/sec\) (\| Rendering: (\d+\.\d{5}) \(\d+\%\) )?(\| DB: (\d+\.\d{5}) \(\d+\%\) )?\| (\d\d\d).+\[(http.+)\]/,
         :params => { :url => 7, :status => [6, :to_i], :duration => [1, :to_f], :rendering => [3, :to_f], :db => [5, :to_f] }
       }
     }
-    
-    attr_reader :open_errors
-    attr_reader :close_errors
     
     # LogParser initializer
     # <tt>file</tt> The fileobject this LogParser wil operate on.
@@ -44,13 +40,21 @@ module RailsAnalyzer
     # Finds a log line and then parses the information in the line.
     # Yields a hash containing the information found. 
     # <tt>*line_types</tt> The log line types to look for (defaults to LOG_LINES.keys).
-    # Yeilds a Hash containing the information found in a line.
+    # Yeilds a Hash when it encounters a chunk of information.
     def each(*line_types, &block)
-
       # parse everything by default 
       line_types = LOG_LINES.keys if line_types.empty?
+
       File.open(@file_name) do |file|
+        
+        # Count lines in the file and create the progress bar
+        file.each_line{}
+        pbar = ProgressBar.new(green(@file_name), file.lineno)
+        file.rewind
+
         file.each_line do |line|
+          pbar.inc
+          
           line_types.each do |line_type|
             if LOG_LINES[line_type][:teaser] =~ line
               if LOG_LINES[line_type][:regexp] =~ line
@@ -71,6 +75,7 @@ module RailsAnalyzer
             
           end
         end
+        pbar.finish
       end      
     end
   end

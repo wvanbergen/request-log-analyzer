@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + '/lib/command_line/arguments'
 require File.dirname(__FILE__) + '/lib/rails_analyzer/log_parser'
 require File.dirname(__FILE__) + '/lib/rails_analyzer/summarizer'
 require File.dirname(__FILE__) + '/lib/bashcolorizer'
+require File.dirname(__FILE__) + '/lib/ruby-progressbar/progressbar.rb'
 
 puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
 
