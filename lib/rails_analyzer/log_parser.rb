@@ -55,7 +55,7 @@ module RailsAnalyzer
         end
 
         file.each_line do |line|
-          pbar.inc unless $arguments[:fast]
+          pbar.inc unless $arguments[:fast] # Update the progress bar
           
           line_types.each do |line_type|
             if LOG_LINES[line_type][:teaser] =~ line

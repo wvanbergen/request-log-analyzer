@@ -26,6 +26,10 @@ def blue(text)
   colorize(text, "\e[34m")
 end
 
+def white(text)
+  colorize(text, "\e[37m")
+end
+
 
 #STYLE = {
 #      :default    =>    “33[0m”,

@@ -37,7 +37,7 @@ class ProgressBar
   private
   def fmt_bar
     bar_width = do_percentage * @terminal_width / 100
-    sprintf("|%s%s|", 
+    sprintf("[%s%s]", 
             @bar_mark * bar_width, 
             " " *  (@terminal_width - bar_width))
   end
@@ -94,11 +94,11 @@ class ProgressBar
   # ETA stands for Estimated Time of Arrival.
   def eta
     if @current == 0
-      "ETA:  --:--:--"
+      white("ETA:  --:--:--")
     else
       elapsed = Time.now - @start_time
       eta = elapsed * @total / @current - elapsed;
-      sprintf("ETA:  %s", format_time(eta))
+      sprintf(white("ETA:  %s"), format_time(eta))
     end
   end
 
