@@ -48,12 +48,14 @@ module RailsAnalyzer
       File.open(@file_name) do |file|
         
         # Count lines in the file and create the progress bar
-        file.each_line{}
-        pbar = ProgressBar.new(green(@file_name), file.lineno)
-        file.rewind
+        unless $arguments[:fast]
+          file.each_line{}
+          pbar = ProgressBar.new(green(@file_name), file.lineno)
+          file.rewind
+        end
 
         file.each_line do |line|
-          pbar.inc
+          pbar.inc unless $arguments[:fast]
           
           line_types.each do |line_type|
             if LOG_LINES[line_type][:teaser] =~ line
@@ -75,7 +77,7 @@ module RailsAnalyzer
             
           end
         end
-        pbar.finish
+        pbar.finish unless $arguments[:fast]
       end      
     end
   end
