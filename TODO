@@ -3,7 +3,6 @@ TODO items for Rails-log-analyzer
 Contact willem AT vanbergen DOT org if you want to help out with the development.
 
 Parser:
-- Link request processing line to request completed line (do we really want this?)
 - Progress bar when parsing large file(s)
 
 Summarizer:
@@ -14,6 +13,7 @@ Summarizer:
 
 Database:
 - Add query functionality for the resulting database file
+- Link request processing line to request completed line
 
 Rails integration:
 - Embed into gem
