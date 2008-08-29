@@ -31,9 +31,7 @@ output/timespan.rb
 output/total_db_time.rb
 output/total_time.rb
 output/usage.rb
-tasks
 test
-test/database
 test/log_fragments
 test/log_fragments/fragment_1.log
 test/log_fragments/fragment_2.log

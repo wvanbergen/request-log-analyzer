@@ -5,7 +5,7 @@ require File.dirname(__FILE__) + '/../lib/rails_analyzer/summarizer'
 require File.dirname(__FILE__) + '/../lib/bashcolorizer'
 require File.dirname(__FILE__) + '/../lib/ruby-progressbar/progressbar.rb'
 
-puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
+puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
 
 # Substitutes variable elements in a url (like the id field) with a fixed string (like ":id")
 # This is used to aggregate simular requests.

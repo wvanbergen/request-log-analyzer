@@ -1,10 +1,11 @@
-Rails log analyzer
+Request log analyzer
 --------------------------------
 
-This is a simple command line tool to analyze Rails log files. Its purpose
-is to find what actions are best candidates for optimization.
+This is a simple command line tool to analyze request log files. At this moment,
+it only supports Rails log files, but Merb log files are planned to be supported
+as well. Its purpose is to find what actions are best candidates for optimization.
 
-This tool will parse all requests in the Rails logfile and aggregate the
+This tool will parse all requests in the logfile and aggregate the
 information. Once it is finished parsing the log file, it will show the
 requests that take op most server time. Different metrics are used (cumulative
 time, average time, blockers, DB time, etc)
@@ -12,7 +13,8 @@ time, average time, blockers, DB time, etc)
 
 Installation
 --------------------------------
-gem install rails-log-analyzer-0.1.0.gem
+gem sources -a http://gems.github.com
+gem install wvanbergen-request-log-analyzer
 
 
 Usage
@@ -36,7 +38,7 @@ Example
 Note that this example was shortened for your viewing pleasure.
 $ request-log-analyzer /var/log/my_app.log
 
-Rails log analyzer, by Willem van Bergen and  Bart ten Brinke
+Request log analyzer, by Willem van Bergen and  Bart ten Brinke
 
 Processing all log lines...
 ========================================================================
