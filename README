@@ -10,6 +10,10 @@ requests that take op most server time. Different metrics are used (cumulative
 time, average time, blockers, DB time, etc)
 
 
+Installation
+--------------------------------
+gem install rails-log-analyzer-0.1.0.gem
+
 
 Usage
 --------------------------------
