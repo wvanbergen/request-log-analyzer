@@ -15,6 +15,7 @@ Rails integration:
 - Add rake tasks to Rails application when included
 
 General:
+- Add install script
 - Add useful rake tasks
 - Add more tests
 - World domination
