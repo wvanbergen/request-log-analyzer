@@ -8,12 +8,14 @@ module RailsAnalyzer
     
     attr_reader :database
     attr_reader :current_request
+    attr_reader :warning_count
     
     # Initializer
     # <tt>db_file</tt> The file which will be used for the SQLite3 Database storage.
     def initialize(db_file)
       @database = SQLite3::Database.new(db_file)
       @insert_statements = nil
+      @warning_count = 0
       create_tables_if_needed!
     end
         
@@ -35,6 +37,11 @@ module RailsAnalyzer
       puts e.message
       @database.rollback
     end
+    
+    def insert_warning(line, warning)
+      @database.execute("INSERT INTO parse_warnings (line, warning) VALUES (:line, :warning)", :line => line, :warning => warning)
+      @warning_count += 1
+    end
         
     # Insert a request into the database.
     # <tt>request</tt> The request to insert.
@@ -47,14 +54,19 @@ module RailsAnalyzer
         
       if request[:type] && @insert_statements.has_key?(request[:type]) 
         if request[:type] == :started
-          warn("Unclosed request encountered on line #{request[:line]} (request started on line #{@current_request})") unless @current_request.nil?
+          insert_warning(request[:line], "Unclosed request encountered on line #{request[:line]} (request started on line #{@current_request})") unless @current_request.nil?
           @current_request = request[:line]
         elsif [:failed, :completed].include?(request[:type])
           @current_request = nil
         end
-        @insert_statements[request.delete(:type)].execute(request)
+        
+        begin
+          @insert_statements[request.delete(:type)].execute(request) 
+        rescue SQLite3::Exception => e
+          insert_warning(request[:line], "Could not save log line to database: " + e.message.to_s)
+        end        
       else
-        puts "Ignored unknown statement type"
+        insert_warning(request[:line], "Ignored unknown statement type")
       end
       
       close_prepared_statements! if close_statements
@@ -69,12 +81,10 @@ module RailsAnalyzer
       return db
     end    
     
-    
-    
     def count(type)
       @database.get_first_value("SELECT COUNT(*) FROM \"#{type}_requests\"").to_i
     end
-    
+        
     protected
     
     # Prepare insert statements.
@@ -85,8 +95,8 @@ module RailsAnalyzer
                                   VALUES (:line, :timestamp, :ip, :method, :controller, :action)"),
                                   
         :failed => @database.prepare("
-            INSERT INTO failed_requests ( line )
-                                 VALUES (:line )"),
+            INSERT INTO failed_requests ( line,  exception_string,  stack_trace,  error)
+                                 VALUES (:line, :exception_string, :stack_trace, :error)"),
                                  
         :completed => @database.prepare("
             INSERT INTO completed_requests ( line,  url,  status,  duration,  rendering_time,  database_time)
@@ -118,8 +128,10 @@ module RailsAnalyzer
           CREATE TABLE IF NOT EXISTS failed_requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             line INTEGER NOT NULL,            
-            started_request_id INTEGER,            
-            status INTEGER
+            started_request_id INTEGER,        
+            error VARCHAR(255),    
+            exception_string VARCHAR(255),
+            stack_trace TEXT
           )      
       ");
 
@@ -136,6 +148,13 @@ module RailsAnalyzer
           database_time FLOAT
         )
       ");    
+      
+      @database.execute("CREATE TABLE IF NOT EXISTS parse_warnings (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          line INTEGER NOT NULL,       
+          warning VARCHAR(255) NOT NULL
+        )
+      ");
     end
 
   end

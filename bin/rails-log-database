@@ -1,11 +1,13 @@
 #!/usr/bin/ruby
 
-require 'lib/rails_analyzer/log_parser'
-require 'lib/rails_analyzer/record_inserter'
-require 'lib/command_line/arguments'
+require File.dirname(__FILE__) + '/../lib/command_line/arguments'
+require File.dirname(__FILE__) + '/../lib/rails_analyzer/log_parser'
+require File.dirname(__FILE__) + '/../lib/rails_analyzer/record_inserter'
+require File.dirname(__FILE__) + '/../lib/bashcolorizer'
+require File.dirname(__FILE__) + '/../lib/ruby-progressbar/progressbar.rb'
 
-puts "Rails log parser, by Willem van Bergen and Bart ten Brinke"
-puts 
+
+puts "Rails log parser, by Willem van Bergen and Bart ten Brinke\n\n"
 
 begin
   
@@ -45,8 +47,12 @@ end
 records_inserted = 0 
 inserter = RailsAnalyzer::RecordInserter.insert_batch_into(db_file) do |db|
   log_files.each do |log_file|
+
     puts "Processing all log lines from #{log_file}..."
     parser = RailsAnalyzer::LogParser.new(log_file)
+    
+    pbar = ProgressBar.new(green(log_file), File.size(log_file))
+    parser.progress { |pos, total| (pos == :finished) ? pbar.finish : pbar.set(pos) }
     
     parser.each do |request| 
       db.insert(request) 
@@ -66,6 +72,7 @@ failed    = inserter.count(:failed)
 
 puts 
 puts "Inserted #{records_inserted} records from #{log_files.length} files."
+puts "Parse warnings: #{inserter.warning_count}. Check the parse_warnings table in the database for details."
 puts
 puts "Requests started: #{started}"
 puts "Requests completed: #{completed}"

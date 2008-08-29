@@ -73,9 +73,7 @@ $arguments.files.each do |log_file|
   # add progress bar 
   unless $arguments[:fast]
     pbar = ProgressBar.new(green(log_file), File.size(log_file))
-    parser.progress do |pos, total_size|
-      pos == :finished ? pbar.finish : pbar.set(pos)
-    end
+    parser.progress { |pos, total| (pos == :finished) ? pbar.finish : pbar.set(pos) }
   end
   
   parser.each(*line_types) do |request|

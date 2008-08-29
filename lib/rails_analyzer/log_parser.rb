@@ -15,7 +15,7 @@ module RailsAnalyzer
       :failed => {
         :teaser => /Error/,
         :regexp => /(\w+)(Error|Invalid) \((.*)\)\:(.*)/,
-        :params => { :error => 1, :error_or_invalid => 2, :exception_string => 3, :stack_trace => 4 }
+        :params => { :error => 1, :exception_string => 3, :stack_trace => 4 }
       },
       # Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]
       :completed => {
