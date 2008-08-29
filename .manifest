@@ -3,8 +3,8 @@ README
 Rakefile
 TODO
 bin
-bin/rails-log-analyzer
-bin/rails-log-database
+bin/request-log-analyzer
+bin/request-log-database
 lib
 lib/bashcolorizer.rb
 lib/command_line

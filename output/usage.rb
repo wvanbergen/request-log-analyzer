@@ -1,5 +1,5 @@
 # Prints usage table
-puts "Usage: rails-log-analyzer [LOGFILES*] <OPTIONS>"
+puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
 puts
 puts "Options:"
 puts "  --fast, -t:                 Only use completed requests"
@@ -9,6 +9,6 @@ puts "  --amount, -c:               Displays the top <amount> elements in the re
 puts "  --colorize, -z:             Fancy bash coloring"
 puts 
 puts "Examples:"
-puts "  rails-log-analyzer development.log"
-puts "  rails-log-analyzer mongrel.0.log mongrel.1.log mongrel.2.log -g -f -o mean_time,most_requested,blockers -c 20 -z"
+puts "  request-log-analyzer development.log"
+puts "  request-log-analyzer mongrel.0.log mongrel.1.log mongrel.2.log -g -f -o mean_time,most_requested,blockers -c 20 -z"
 puts

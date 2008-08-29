@@ -8,9 +8,9 @@ task :default => :test
 
 namespace :gem do
 
-  desc "Builds a ruby gem for rails-log-analyzer"
+  desc "Builds a ruby gem for request-log-analyzer"
   task :build => [:manifest] do
-    system %[gem build rails-log-analyzer.gemspec]
+    system %[gem build request-log-analyzer.gemspec]
   end
 
   desc %{Update ".manifest" with the latest list of project filenames. Respect\

@@ -10,7 +10,7 @@ Database:
 - Link request processing line to request completed line
 
 Rails integration:
-- Create script that calls rails-log-analyzer 
+- Create script that calls request-log-analyzer 
 - Optionally use local or specific routes.rb file to parse URLs
 - Add rake tasks to Rails application when included
 

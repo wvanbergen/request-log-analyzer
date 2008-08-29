@@ -14,9 +14,9 @@ time, average time, blockers, DB time, etc)
 Usage
 --------------------------------
 
-Usage: rails-log-analyzer [FILE] [OPTION]
+Usage: request-log-analyzer [FILE] [OPTION]
 Analyze the given log FILE with the given OPTION
-Example: rails-log-analyzer mongrel.log
+Example: request-log-analyzer mongrel.log
 
   --fast, -t:                 Only use completed requests
   --guess-database-time, -g:  Guesses the database duration of requests if they are not in the log
@@ -30,7 +30,7 @@ Example
 --------------------------------
 
 Note that this example was shortened for your viewing pleasure.
-$ rails-log-analyzer /var/log/my_app.log
+$ request-log-analyzer /var/log/my_app.log
 
 Rails log analyzer, by Willem van Bergen and  Bart ten Brinke
 
