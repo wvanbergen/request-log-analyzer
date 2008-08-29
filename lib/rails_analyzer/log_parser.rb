@@ -27,7 +27,7 @@ module RailsAnalyzer
     
     # LogParser initializer
     # <tt>file</tt> The fileobject this LogParser wil operate on.
-    def initialize(file, options = {:fast => false})
+    def initialize(file, options = {})
       @file_name = file
       @options = options
       @file_size = File.size(@file_name)

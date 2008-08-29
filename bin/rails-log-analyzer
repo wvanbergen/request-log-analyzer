@@ -68,7 +68,7 @@ line_types = $arguments[:fast] ? [:completed] : [:started, :completed, :failed]
 # Walk through al the files given via the arguments.
 $arguments.files.each do |log_file|
   puts "Processing #{line_types.join(', ')} log lines from #{log_file}..."
-  parser = RailsAnalyzer::LogParser.new(log_file, :fast => $arguments[:fast])
+  parser = RailsAnalyzer::LogParser.new(log_file)
   
   # add progress bar 
   unless $arguments[:fast]
