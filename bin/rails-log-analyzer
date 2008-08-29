@@ -1,9 +1,9 @@
 #!/usr/bin/ruby
-require File.dirname(__FILE__) + '/lib/command_line/arguments'
-require File.dirname(__FILE__) + '/lib/rails_analyzer/log_parser'
-require File.dirname(__FILE__) + '/lib/rails_analyzer/summarizer'
-require File.dirname(__FILE__) + '/lib/bashcolorizer'
-require File.dirname(__FILE__) + '/lib/ruby-progressbar/progressbar.rb'
+require File.dirname(__FILE__) + '/../lib/command_line/arguments'
+require File.dirname(__FILE__) + '/../lib/rails_analyzer/log_parser'
+require File.dirname(__FILE__) + '/../lib/rails_analyzer/summarizer'
+require File.dirname(__FILE__) + '/../lib/bashcolorizer'
+require File.dirname(__FILE__) + '/../lib/ruby-progressbar/progressbar.rb'
 
 puts "Rails log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
 
@@ -56,7 +56,7 @@ begin
 rescue CommandLine::Error => e
   puts "ARGUMENT ERROR: " + e.message
   puts
-  load File.dirname(__FILE__) + "/output/usage.rb"
+  load File.dirname(__FILE__) + "/../output/usage.rb"
   exit(0) 
 end
 
@@ -68,7 +68,17 @@ line_types = $arguments[:fast] ? [:completed] : [:started, :completed, :failed]
 # Walk through al the files given via the arguments.
 $arguments.files.each do |log_file|
   puts "Processing #{line_types.join(', ')} log lines from #{log_file}..."
-  parser = RailsAnalyzer::LogParser.new(log_file).each(*line_types) do |request|
+  parser = RailsAnalyzer::LogParser.new(log_file, :fast => $arguments[:fast])
+  
+  # add progress bar 
+  unless $arguments[:fast]
+    pbar = ProgressBar.new(green(log_file), File.size(log_file))
+    parser.progress do |pos, total_size|
+      pos == :finished ? pbar.finish : pbar.set(pos)
+    end
+  end
+  
+  parser.each(*line_types) do |request|
     $summarizer.group(request)  { |r| request_hasher(r) }
   end
 end
@@ -77,7 +87,7 @@ end
 output_reports = $arguments[:output].split(',') rescue [:timespan, :most_requested, :total_time, :mean_time, :total_db_time, :mean_db_time, :mean_rendering_time, :blockers, :hourly_spread, :errors] 
 
 output_reports.each do |report|
-  report_location = "#{File.dirname(__FILE__)}/output/#{report}.rb"
+  report_location = "#{File.dirname(__FILE__)}/../output/#{report}.rb"
 
   if File.exist?(report_location)
     load report_location

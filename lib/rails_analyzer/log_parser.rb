@@ -27,8 +27,14 @@ module RailsAnalyzer
     
     # LogParser initializer
     # <tt>file</tt> The fileobject this LogParser wil operate on.
-    def initialize(file)
+    def initialize(file, options = {:fast => false})
       @file_name = file
+      @options = options
+      @file_size = File.size(@file_name)
+    end
+    
+    def progress(&block)
+      @progress_handler = block
     end
 
     # Output a warning
@@ -47,15 +53,9 @@ module RailsAnalyzer
 
       File.open(@file_name) do |file|
         
-        # Count lines in the file and create the progress bar
-        unless $arguments[:fast]
-          file.each_line{}
-          pbar = ProgressBar.new(green(@file_name), file.lineno)
-          file.rewind
-        end
-
         file.each_line do |line|
-          pbar.inc unless $arguments[:fast] # Update the progress bar
+          
+          @progress_handler.call(file.pos, @file_size) if @progress_handler
           
           line_types.each do |line_type|
             if LOG_LINES[line_type][:teaser] =~ line
@@ -73,11 +73,10 @@ module RailsAnalyzer
               else
                 warn("Unparsable #{line_type} line: " + line[0..79]) unless line_type == :failed
               end
-            end
-            
+            end            
           end
         end
-        pbar.finish unless $arguments[:fast]
+        @progress_handler.call(:finished, @file_size) if @progress_handler
       end      
     end
   end

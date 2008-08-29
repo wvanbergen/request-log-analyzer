@@ -8,6 +8,32 @@ class LogParserTest < Test::Unit::TestCase
     "#{File.dirname(__FILE__)}/log_fragments/fragment_#{number}.log"
   end
   
+  
+  def test_progress_messages
+    log_file = fragment_file(1)
+
+    finished_encountered = false
+    file_size = File.size(log_file)
+    
+    previous_pos = -1
+    parser = RailsAnalyzer::LogParser.new(log_file)
+    parser.progress do |pos, total|
+      assert_equal file_size, total
+      if pos == :finished
+        finished_encountered = true 
+      else
+        assert pos <= total
+        assert pos > previous_pos
+        previous_pos = pos
+      end
+    end
+    
+    # now parse the file
+    parser.each(:started) { }
+    
+    assert finished_encountered, "A finished event should have been fired"
+  end
+  
   def test_parse_mongrel_log_fragment
     count = 0
     parser = RailsAnalyzer::LogParser.new(fragment_file(1)).each(:started) { count += 1 }
