@@ -14,8 +14,7 @@ time, average time, blockers, DB time, etc)
 Installation
 --------------------------------
 gem sources -a http://gems.github.com
-gem install wvanbergen-request-log-analyzer
-
+sudo gem install wvanbergen-request-log-analyzer
 
 Usage
 --------------------------------
