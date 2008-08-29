@@ -10,7 +10,11 @@ Database:
 - Link request processing line to request completed line
 
 Rails integration:
-- Embed into gem
-- Create script that calls analyze.rb 
+- Create script that calls rails-log-analyzer 
 - Optionally use local or specific routes.rb file to parse URLs
+- Add rake tasks to Rails application when included
+
+General:
+- Add useful rake tasks
+- Add more tests
 - World domination
