@@ -9,7 +9,7 @@ task :default => :test
 namespace :gem do
 
   desc "Sets the version and date of the gem"
-  task :spec_version do
+  task :version do
     
     require 'date'
     
@@ -24,7 +24,7 @@ namespace :gem do
     File.open(spec_file, 'w') { |f| f << spec }
   end
   
-  task :version => [:spec_version] do
+  task :tag => [:version] do
     
     new_version = ENV['VERSION']
     raise "VERSION is required" unless /\d+(\.\d+)*/ =~ new_version
