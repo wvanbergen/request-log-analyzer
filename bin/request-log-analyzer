@@ -38,7 +38,7 @@ def print_table(summarizer, field, amount = 20)
     # As we show count by default, show totaltime if we sort by count
     field = :total_time if field == :count
     
-    puts "#{a[0].ljust(50)}: %10.03fs [#{green("%d requests")}]" % [a[1][field], a[1][:count]]
+    puts "%-50s: %10.03fs [#{green("%d requests")}]" % [a[0], a[1][field], a[1][:count]]
   end
 end
 
