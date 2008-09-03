@@ -8,6 +8,33 @@ task :default => :test
 
 namespace :gem do
 
+  desc "Sets the version and date of the gem"
+  task :spec_version do
+    
+    require 'date'
+    
+    new_version = ENV['VERSION']
+    raise "VERSION is required" unless /\d+(\.\d+)*/ =~ new_version
+    
+    spec_file = Dir['*.gemspec'].first
+    
+    spec = File.read(spec_file)
+    spec.gsub!(/^(\s*s\.version\s*=\s*)('|")(.+)('|")(\s*)$/) { "#{$1}'#{new_version}'#{$5}" }
+    spec.gsub!(/^(\s*s\.date\s*=\s*)('|")(.+)('|")(\s*)$/) { "#{$1}'#{Date.today.strftime('%Y-%m-%d')}'#{$5}" }    
+    File.open(spec_file, 'w') { |f| f << spec }
+  end
+  
+  task :version => [:spec_version] do
+    
+    new_version = ENV['VERSION']
+    raise "VERSION is required" unless /\d+(\.\d+)*/ =~ new_version
+        
+    sh "git add request-log-analyzer.gemspec"
+    sh "git commit -m \"Set gem version to #{new_version}\""
+    sh "git tag -a -m \"Tagged version #{new_version}\""
+    sh "git push --tags"
+  end
+
   desc "Builds a ruby gem for request-log-analyzer"
   task :build => [:manifest] do
     system %[gem build request-log-analyzer.gemspec]
