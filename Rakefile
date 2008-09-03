@@ -31,7 +31,7 @@ namespace :gem do
         
     sh "git add request-log-analyzer.gemspec"
     sh "git commit -m \"Set gem version to #{new_version}\""
-    sh "git tag -a -m \"Tagged version #{new_version}\""
+    sh "git tag -a \"request-log-analyzer-#{new_version}\" -m \"Tagged version #{new_version}\""
     sh "git push --tags"
   end
 
