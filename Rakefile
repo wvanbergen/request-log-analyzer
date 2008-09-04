@@ -2,14 +2,14 @@ require 'rubygems'
 
 load 'test/tasks.rake'
  
-desc 'Default: run unit tests.'
+desc 'Default: run unit tests for request-log-analyzer.'
 task :default => :test
 
 
 namespace :gem do
 
-  desc "Sets the version and date of the gem"
-  task :version do
+  desc "Sets the version and date of the gem. Requires the VERSION environment variable."
+  task :version => [:manifest] do
     
     require 'date'
     
@@ -24,6 +24,7 @@ namespace :gem do
     File.open(spec_file, 'w') { |f| f << spec }
   end
   
+  desc "Creates a git tag for the provided VERSION"
   task :tag => [:version] do
     
     new_version = ENV['VERSION']
