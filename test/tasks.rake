@@ -1,6 +1,6 @@
 require 'rake/testtask'
  
-desc 'Test the will_paginate plugin.'
+desc 'Unit test request-log-analyzer.'
 Rake::TestTask.new(:test) do |t|
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
