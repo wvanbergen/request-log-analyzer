@@ -1,0 +1,84 @@
+~ Loaded DEVELOPMENT Environment...
+~ Connecting to database...
+~ loading gem 'merb_datamapper' ...
+~ loading gem 'gettext' ...
+~ loading gem 'merb_helpers' ...
+~ loading gem 'merb-assets' ...
+~ loading gem 'merb-action-args' ...
+~ loading gem 'merb-mailer' ...
+~ loading gem 'merb_param_protection' ...
+~ loading gem 'merb_has_flash' ...
+~ loading gem 'merb_forgery_protection' ...
+~ loading gem 'dm-validations' ...
+~ loading gem 'dm-timestamps' ...
+~ loading gem 'dm-migrations' ...
+~ loading gem 'dm-aggregates' ...
+~ loading gem 'dm-adjust' ...
+~ loading gem 'dm-serializer' ...
+~ loading gem 'dm-constraints' ...
+~ loading gem 'dm-timeline' ...
+~ loading gem 'dm-searchable' ...
+~ loading gem 'dm-audited' ...
+~ loading gem 'lib/extensions' ...
+~ loading gem 'lib/authenticated_system/authenticated_dependencies' ...
+~ Compiling routes...
+~ Using 'share-nothing' cookie sessions (4kb limit per client)
+~ Using Mongrel adapter
+~ Started request handling: Fri Aug 29 11:10:23 +0200 2008
+~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"destroy", "method"=>"delete", "controller"=>"session"}
+~ Cookie deleted: auth_token => nil
+~ Redirecting to: / (302)
+~ {:dispatch_time=>0.243424, :after_filters_time=>6.9e-05, :before_filters_time=>0.213213, :action_time=>0.241652}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:23 +0200 2008
+~ Params: {"action"=>"index", "controller"=>"dashboard"}
+~ Redirecting to: /login (302)
+~ {:dispatch_time=>0.002649, :after_filters_time=>7.4e-05, :action_time=>0.001951}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:23 +0200 2008
+~ Params: {"action"=>"create", "controller"=>"session"}
+~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:27 +0200 2008
+~ Params: {"authenticity_token"=>"[FILTERED]", "action"=>"create", "controller"=>"session", "login"=>"username", "password"=>"[FILTERED]", "remember_me"=>"0"}
+~ Redirecting to: / (302)
+~ {:dispatch_time=>0.006652, :after_filters_time=>0.000143, :before_filters_time=>0.000861, :action_time=>0.006171}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:27 +0200 2008
+~ Params: {"action"=>"index", "controller"=>"dashboard"}
+~ Redirecting to: /dashboard (302)
+~ {:dispatch_time=>0.008241, :after_filters_time=>0.000126, :before_filters_time=>0.002632, :action_time=>0.007711}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:27 +0200 2008
+~ Params: {"action"=>"index", "namespace"=>"dashboard", "controller"=>"dashboard"}
+~ {:dispatch_time=>0.009458, :after_filters_time=>0.000103, :before_filters_time=>0.00266, :action_time=>0.008742}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:29 +0200 2008
+~ Params: {"format"=>nil, "action"=>"index", "namespace"=>"dashboard", "controller"=>"employees"}
+~ {:dispatch_time=>0.102725, :after_filters_time=>0.000115, :before_filters_time=>0.00411, :action_time=>0.101836}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:30 +0200 2008
+~ Params: {"format"=>nil, "action"=>"index", "namespace"=>"dashboard", "controller"=>"organisations"}
+~ {:dispatch_time=>0.042575, :after_filters_time=>8.9e-05, :before_filters_time=>0.004267, :action_time=>0.041762}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:31 +0200 2008
+~ Params: {"action"=>"index", "namespace"=>"dashboard", "controller"=>"dashboard"}
+~ {:dispatch_time=>0.010311, :after_filters_time=>8.0e-05, :before_filters_time=>0.003195, :action_time=>0.009567}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:33 +0200 2008
+~ Params: {"format"=>nil, "action"=>"index", "namespace"=>"dashboard", "controller"=>"employees"}
+~ {:dispatch_time=>0.012913, :after_filters_time=>7.1e-05, :before_filters_time=>0.004422, :action_time=>0.012141}
+~ 
+
+~ Started request handling: Fri Aug 29 11:10:35 +0200 2008
+~ Params: {"action"=>"new", "namespace"=>"dashboard", "controller"=>"employees"}
+~ {:dispatch_time=>0.013051, :after_filters_time=>7.8e-05, :before_filters_time=>0.003576, :action_time=>0.011773}
