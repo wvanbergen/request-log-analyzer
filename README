@@ -46,6 +46,7 @@ Successfully analyzed 58908 requests from log file
 Timestamp first request: 2008-07-13T06:25:58+00:00
 Timestamp last request:  2008-07-20T06:18:53+00:00
 Total time analyzed: 7 days
+Methods: DELETE (1%), GET (50%), POST (22%), PUT (25%).
 
 Top 10 most requested actions
 ========================================================================
@@ -92,7 +93,7 @@ Top 10 worst DB offenders - mean time
 /overview/:date/                                  :      0.467s [19359 requests]
 ........
 
-Mongrel process blockers (> 1.0 seconds) - frequency
+Mongrel process blockers (> 1.0 seconds)
 ========================================================================
 /overview/:date/                                  :   7494.233s [3144 requests]
 /overview/                                        :   8320.293s [1549 requests]
@@ -117,3 +118,16 @@ Requests graph - per hour
         17:00 - 1598                 : XXXX
         18:00 - 792                  : XX
         ........
+
+Errors
+========================================================================
+ArgumentError: [237 requests]
+ -> invalid date
+StaleObjectError: [28 requests]
+ -> Attempted to update a stale object
+RuntimeError: [3 requests]
+ -> Cannot destroy rule before it was created
+StatementError: [2 requests]
+ -> Mysql::Error: Deadlock found when trying to get lock; try restarting transaction
+NoMethodError: [1 requests]
+ -> undefined method `code' for nil:NilClass

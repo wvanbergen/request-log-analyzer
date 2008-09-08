@@ -2,9 +2,6 @@ TODO items for Rails-log-analyzer
 =================================
 Contact willem AT vanbergen DOT org if you want to help out with the development.
 
-Summarizer:
-- Look at request types (GET / POST)
-
 Database:
 - Add query functionality for the resulting database file (interactive reports?)
 - Link request processing line to request completed line
