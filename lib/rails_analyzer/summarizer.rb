@@ -10,6 +10,7 @@ module RailsAnalyzer
     attr_reader :request_time_graph
     attr_reader :first_request_at
     attr_reader :last_request_at
+    attr_reader :methods
 
     attr_accessor :blocker_duration
     DEFAULT_BLOCKER_DURATION = 1.0
@@ -25,6 +26,7 @@ module RailsAnalyzer
       @blocker_duration = DEFAULT_BLOCKER_DURATION
       @calculate_database = options[:calculate_database]
       @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+      @methods = {:GET => 0, :POST => 0, :PUT => 0, :DELETE => 0}
     end
    
     # Check if any of the request parsed had a timestamp.
@@ -40,10 +42,11 @@ module RailsAnalyzer
       request[:duration] ||= 0
       
       case request[:type]   
-        when :started      
+        when :started 
           @first_request_at ||= request[:timestamp] # assume time-based order of file
           @last_request_at  = request[:timestamp]   # assume time-based order of file
           @request_time_graph[request[:timestamp][11..12].to_i] +=1
+          @methods[request[:method].to_sym] += 1
 
         when :completed
           @request_count += 1 
