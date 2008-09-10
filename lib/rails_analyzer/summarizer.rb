@@ -8,15 +8,8 @@ module RailsAnalyzer
     # Initializer. Sets global variables
     # Options
     # * <tt>:calculate_database</tt> Calculate the database times if they are not explicitly logged.
-    def initialize(options = {})
-      @actions  = {}
-      @blockers = {}
-      @errors   = {}
-      @request_count = 0
-      @blocker_duration = DEFAULT_BLOCKER_DURATION
+    def initialize_hook(options = {})
       @calculate_database = options[:calculate_database]
-      @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-      @methods = {:GET => 0, :POST => 0, :PUT => 0, :DELETE => 0}
     end
 
     # Parse a request string into a hash containing all keys found in the string.
@@ -70,29 +63,5 @@ module RailsAnalyzer
       end
     end
     
-    # Return a list of requests sorted on a specific action field
-    # <tt>field</tt> The action field to sort by.
-    # <tt>min_count</tt> Values which fall below this amount are not returned (default nil).
-    def sort_actions_by(field, min_count = nil)
-      actions = min_count.nil? ? @actions.to_a : @actions.delete_if { |k, v| v[:count] < min_count}.to_a
-      actions.sort { |a, b| (a[1][field.to_sym] <=> b[1][field.to_sym]) }
-    end
-
-    # Returns a list of request blockers sorted by a specific field
-    # <tt>field</tt> The action field to sort by.
-    # <tt>min_count</tt> Values which fall below this amount are not returned (default @blocker_duration).
-    def sort_blockers_by(field, min_count = @blocker_duration)
-      blockers = min_count.nil? ? @blockers.to_a : @blockers.delete_if { |k, v| v[:count] < min_count}.to_a
-      blockers.sort { |a, b| a[1][field.to_sym] <=> b[1][field.to_sym] } 
-    end
-
-    # Returns a list of request blockers sorted by a specific field
-    # <tt>field</tt> The action field to sort by.
-    # <tt>min_count</tt> Values which fall below this amount are not returned (default @blocker_duration).
-    def sort_errors_by(field, min_count = nil)
-      errors = min_count.nil? ? @errors.to_a : @errors.delete_if { |k, v| v[:count] < min_count}.to_a
-      errors.sort { |a, b| a[1][field.to_sym] <=> b[1][field.to_sym] } 
-    end
-
   end
 end 

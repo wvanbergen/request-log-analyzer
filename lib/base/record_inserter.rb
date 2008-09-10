@@ -12,11 +12,13 @@ module Base
     
     # Initializer
     # <tt>db_file</tt> The file which will be used for the SQLite3 Database storage.
-    def initialize(db_file)
+    def initialize(db_file, options = {})
       @database = SQLite3::Database.new(db_file)
       @insert_statements = nil
       @warning_count = 0
       create_tables_if_needed!
+
+      self.initialize_hook(options) if self.respond_to?(:initialize_hook)
     end
         
     # Calculate the database durations of the requests currenty in the database.

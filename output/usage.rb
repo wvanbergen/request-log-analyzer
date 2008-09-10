@@ -7,6 +7,7 @@ puts "  --guess-database-time, -g:  Guesses the database duration of requests"
 puts "  --output, -o:               Comma-separated list of reports to show"     
 puts "  --amount, -c:               Displays the top <amount> elements in the reports"     
 puts "  --colorize, -z:             Fancy bash coloring"
+puts "  --merb, -m:                 Parse merb logfiles"
 puts 
 puts "Examples:"
 puts "  request-log-analyzer development.log"

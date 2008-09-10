@@ -10,6 +10,8 @@ module Base
       @file_name = file
       @options = options
       @file_size = File.size(@file_name)
+      
+      self.initialize_hook(options) if self.respond_to?(:initialize_hook)
     end
   
     def progress(&block)
@@ -27,8 +29,8 @@ module Base
     # <tt>*line_types</tt> The log line types to look for (defaults to LOG_LINES.keys).
     # Yeilds a Hash when it encounters a chunk of information.
     def each(*line_types, &block)
-      
       log_lines_hash = self.class::LOG_LINES
+
       
       # parse everything by default 
       line_types = log_lines_hash.keys if line_types.empty?
@@ -37,8 +39,8 @@ module Base
       
         file.each_line do |line|
         
-          @progress_handler.call(file.pos, @file_size) if @progress_handler
-        
+          #@progress_handler.call(file.pos, @file_size) if @progress_handler
+          
           line_types.each do |line_type|
             if log_lines_hash[line_type][:teaser] =~ line
               if log_lines_hash[line_type][:regexp] =~ line
@@ -51,6 +53,7 @@ module Base
                   end
                 
                 end
+                
                 yield(request) if block_given?
               else
                 warn("Unparsable #{line_type} line: " + line[0..79]) unless line_type == :failed
