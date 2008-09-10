@@ -36,9 +36,10 @@ module MerbAnalyzer
           @actions[hash] ||= {:count => 0, :total_time => 0.0, :total_db_time => 0.0, :total_rendering_time => 0.0, 
                                  :min_time => request[:duration], :max_time => request[:duration] }
 
-          @actions[hash][:count] += 1        
-          @methods[request[:method].to_sym] += 1
-          
+          @actions[hash][:count] += 1
+          request[:method] = 'GET' unless request[:method]
+          @methods[request[:method].upcase.to_sym] += 1
+
           @hash_cache = hash
         when :completed
           @request_count += 1 
