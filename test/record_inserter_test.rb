@@ -1,5 +1,8 @@
 require 'test/unit'
 
+require "#{File.dirname(__FILE__)}/../lib/base/log_parser"
+require "#{File.dirname(__FILE__)}/../lib/base/record_inserter"
+
 require "#{File.dirname(__FILE__)}/../lib/rails_analyzer/log_parser"
 require "#{File.dirname(__FILE__)}/../lib/rails_analyzer/record_inserter"
 

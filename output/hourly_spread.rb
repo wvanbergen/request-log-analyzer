@@ -7,7 +7,7 @@ if $summarizer.request_time_graph?
   color_cutoff      = 15
   
   puts
-  puts "Requests graph - per hour"
+  puts "Requests graph - average per day per hour"
   puts green("========================================================================")
   
   (0..23).each do |a|
