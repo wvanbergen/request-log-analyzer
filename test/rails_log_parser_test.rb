@@ -3,7 +3,7 @@ require 'test/unit'
 require "#{File.dirname(__FILE__)}/../lib/base/log_parser"
 require "#{File.dirname(__FILE__)}/../lib/rails_analyzer/log_parser"
 
-class LogParserTest < Test::Unit::TestCase
+class RailsLogParserTest < Test::Unit::TestCase
   
   def fragment_file(number)
     "#{File.dirname(__FILE__)}/log_fragments/fragment_#{number}.log"
