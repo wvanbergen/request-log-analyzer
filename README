@@ -1,9 +1,8 @@
 Request log analyzer
 --------------------------------
 
-This is a simple command line tool to analyze request log files. At this moment,
-it only supports Rails log files, but Merb log files are planned to be supported
-as well. Its purpose is to find what actions are best candidates for optimization.
+This is a simple command line tool to analyze request log files of both Rails and
+Merb. Its purpose is to find what actions are best candidates for optimization.
 
 This tool will parse all requests in the logfile and aggregate the
 information. Once it is finished parsing the log file, it will show the
