@@ -44,11 +44,12 @@ module Base
           line_types.each do |line_type|
             if log_lines_hash[line_type][:teaser] =~ line
               if log_lines_hash[line_type][:regexp] =~ line
+                captures = $~.captures.compact
                 request = { :type => line_type, :line => file.lineno }
                 log_lines_hash[line_type][:params].each do |key, value|
                   request[key] = case value
-                    when Numeric; $~[value]
-                    when Array;   $~[value.first].send(value.last)
+                    when Numeric; captures[value - 1]
+                    when Array;   captures[value.first - 1].send(value.last)
                     else; nil
                   end
                 
