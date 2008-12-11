@@ -9,7 +9,8 @@ if $summarizer.has_timestamps?
 end
 
 methods_print_array = []
+methods_request_count = $summarizer.methods.inject(0) { |subtotal, (k, v)| subtotal + v }
 $summarizer.methods.each do |key, value|
-  methods_print_array << "%s (%s)" % [key, green(((value * 100) / $summarizer.request_count).to_s + '%')]
+  methods_print_array << "%s (%0.01f%%)" % [key, green((value * 100) / methods_request_count.to_f)]
 end
 puts 'Methods: ' + methods_print_array.join(', ') + '.'

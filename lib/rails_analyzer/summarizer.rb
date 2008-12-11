@@ -21,11 +21,17 @@ module RailsAnalyzer
       
       case request[:type]   
         when :started 
-          @first_request_at ||= request[:timestamp] # assume time-based order of file
-          @last_request_at  = request[:timestamp]   # assume time-based order of file
-          @request_time_graph[request[:timestamp][11..12].to_i] +=1
-          @methods[request[:method].to_sym] += 1
-
+          if request[:timestamp]
+            @first_request_at ||= request[:timestamp] # assume time-based order of file
+            @last_request_at  = request[:timestamp]   # assume time-based order of file
+            @request_time_graph[request[:timestamp][11..12].to_i] +=1 
+          end
+          if request[:method]
+            @methods[request[:method].to_sym] ||= 0
+            @methods[request[:method].to_sym] += 1
+          else
+            @methods[:unknown] += 1
+          end
         when :completed
           @request_count += 1 
           hash = block_given? ? yield(request) : request.hash

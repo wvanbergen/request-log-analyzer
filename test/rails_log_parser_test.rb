@@ -14,7 +14,7 @@ class RailsLogParserTest < Test::Unit::TestCase
     count = 0
     parser = RailsAnalyzer::LogParser.new(fragment_file(3)).each(:completed) do |request|
       count += 1
-      assert_equal 614, request[:duration]  # should be 0.614
+      assert_equal 0.614, request[:duration]  # should be 0.614
     end
     assert_equal 1, count  
   end
@@ -86,7 +86,7 @@ class RailsLogParserTest < Test::Unit::TestCase
       assert_equal "http://example.com/employee.xml", request[:url]
       assert_equal 200, request[:status]
       assert_equal 0.21665, request[:duration]
-      assert_equal 0.00926, request[:rendering]
+      assert_equal 0.00926, request[:rendering]      
       assert_equal 0.0, request[:db]
     end
   

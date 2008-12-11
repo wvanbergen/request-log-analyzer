@@ -24,6 +24,19 @@ module Base
       puts " -> " + message.to_s
     end  
 
+    def convert_value(value, type) 
+      return case type
+      when :string;    value.to_s
+      when :int;       value.to_i
+      when :sec;       value.to_f
+      when :msec;      value.to_f / 1000
+      when :timestamp; value.to_s # TODO: fix me?
+      else
+        warn("Unkwn type encountered: #{type}")
+        value
+      end
+    end
+
     # Finds a log line and then parses the information in the line.
     # Yields a hash containing the information found. 
     # <tt>*line_types</tt> The log line types to look for (defaults to LOG_LINES.keys).
@@ -39,20 +52,16 @@ module Base
       
         file.each_line do |line|
         
-          #@progress_handler.call(file.pos, @file_size) if @progress_handler
+          @progress_handler.call(file.pos, @file_size) if @progress_handler
           
           line_types.each do |line_type|
             if log_lines_hash[line_type][:teaser] =~ line
               if log_lines_hash[line_type][:regexp] =~ line
-                captures = $~.captures.compact
-                request = { :type => line_type, :line => file.lineno }
-                log_lines_hash[line_type][:params].each do |key, value|
-                  request[key] = case value
-                    when Numeric; captures[value - 1]
-                    when Array;   captures[value.first - 1].send(value.last)
-                    else; nil
-                  end
                 
+                captures = $~.captures
+                request = { :type => line_type, :line => file.lineno }
+                log_lines_hash[line_type][:params].each_with_index do |paramhash, index|              
+                  paramhash.each { |key, type| request[key] = convert_value(captures[index], type) } unless captures[index].nil?
                 end
                 
                 yield(request) if block_given?
