@@ -18,7 +18,7 @@ module MerbAnalyzer
       # ~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}
       :completed => {
         :teaser => /\{:dispatch_time/,
-        :regexp => /\{\:dispatch_time=>(.+), \:after_filters_time=>(.+), \:before_filters_time=>(.+), \:action_time=>(.+)\}/,
+        :regexp => /\{\:dispatch_time=>(.+), (?:\:after_filters_time=>(.+), )?(?:\:before_filters_time=>(.+), )?\:action_time=>(.+)\}/,
         :params => [ {:dispatch_time => :sec}, {:after_filters_time => :sec}, {:before_filters_time => :sec}, {:action_time => :sec} ]
       }
     }
