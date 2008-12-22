@@ -48,7 +48,7 @@ module RailsAnalyzer
           @actions[hash][:count] += 1
           @actions[hash][:total_time] += request[:duration]
           @actions[hash][:total_db_time] += request[:db] if request[:db]
-          @actions[hash][:total_db_time] += request[:duration] - request[:rendering] if @calculate_database
+          @actions[hash][:total_db_time] += request[:duration] - request[:rendering] if @calculate_database && request[:duration] && request[:rendering]
 
           @actions[hash][:total_rendering_time] += request[:rendering] if request[:rendering]
       
