@@ -22,7 +22,7 @@ Usage: request-log-analyzer [FILE] [OPTION]
 Analyze the given log FILE with the given OPTION
 Example: request-log-analyzer mongrel.log
 
-  --fast, -t:                 Only use completed requests
+  --fast, -f:                 Only use completed requests
   --guess-database-time, -g:  Guesses the database duration of requests if they are not in the log
   --output, -o:               Comma-separated list of reports to show    
   --amount, -c:               Displays the top <amount> elements in the reports
