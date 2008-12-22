@@ -67,5 +67,33 @@ module Base
       errors = min_count.nil? ? @errors.to_a : @errors.delete_if { |k, v| v[:count] < min_count}.to_a
       errors.sort { |a, b| a[1][field.to_sym] <=> b[1][field.to_sym] } 
     end
+    
+    # Compare date strings fast
+    # Assumes date formats: "2008-07-14 12:11:20"
+    # <tt>first_date</tt> The first date string
+    # <tt>second_date</tt> The second date string
+    # Returns -1 if first_date < second_date, 0 if equal
+    # and 1 if first_date > second_date
+    def compare_string_dates first_date, second_date
+      first_date = first_date[0..9]
+      second_date = second_date[0..9]
+      
+      first_year = first_date[0..3].to_i
+      second_year = second_date[0..3].to_i
+      return -1 if first_year < second_year
+      return 1 if first_year > second_year
+
+      first_month = first_date[5..6].to_i
+      second_month = second_date[5..6].to_i
+      return -1 if first_month < second_month
+      return 1 if first_month > second_month
+
+      first_day = first_date[8..9].to_i
+      second_day = second_date[8..9].to_i
+      return -1 if first_day < second_day
+      return 1 if first_day > second_day
+      
+      return 0
+    end
   end
 end 

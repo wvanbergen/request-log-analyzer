@@ -21,8 +21,14 @@ module RailsAnalyzer
       
       case request[:type]   
         when :started 
-          @first_request_at ||= request[:timestamp] # assume time-based order of file
-          @last_request_at  = request[:timestamp]   # assume time-based order of file
+          if @first_request_at.nil? || compare_string_dates(request[:timestamp], @first_request_at) == -1
+            @first_request_at = request[:timestamp]
+          end
+          
+          if @last_request_at.nil? || compare_string_dates(request[:timestamp], @last_request_at) == 1
+            @last_request_at = request[:timestamp]
+          end
+          
           @request_time_graph[request[:timestamp][11..12].to_i] +=1
           @methods[request[:method].to_sym] += 1
 
