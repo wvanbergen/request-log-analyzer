@@ -14,5 +14,5 @@ Rails integration:
 General:
 - Add useful rake tasks
 - Add more tests
-- World domination
 - Fix multiple file handling
+- World domination

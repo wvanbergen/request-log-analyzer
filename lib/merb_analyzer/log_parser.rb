@@ -6,20 +6,20 @@ module MerbAnalyzer
       :started => {
         :teaser => /Started/,
         :regexp => /Started request handling\:\ (.+)/,
-        :params => {:timestamp => 1}
+        :params => [{:timestamp => :timestamp}]
       },
       # ~ Params: {"action"=>"create", "controller"=>"session"}
       # ~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"d}
       :params => {
         :teaser => /Params/,
         :regexp => /Params\:\ \{(.+)\}/,
-        :params => { :raw_hash => 1 }
+        :params => [{:raw_hash => :string}]
       },
       # ~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}
       :completed => {
         :teaser => /\{:dispatch_time/,
-        :regexp => /\{\:dispatch_time=>(.+), \:after_filters_time=>(.+), \:before_filters_time=>(.+), \:action_time=>(.+)\}/,
-        :params => { :dispatch_time => [1, :to_f], :after_filters_time => [2, :to_f], :before_filters_time => [3, :to_f], :action_time => [4, :to_f] }
+        :regexp => /\{\:dispatch_time=>(.+), (?:\:after_filters_time=>(.+), )?(?:\:before_filters_time=>(.+), )?\:action_time=>(.+)\}/,
+        :params => [ {:dispatch_time => :sec}, {:after_filters_time => :sec}, {:before_filters_time => :sec}, {:action_time => :sec} ]
       }
     }
   end

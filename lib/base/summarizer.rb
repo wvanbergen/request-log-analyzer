@@ -23,7 +23,7 @@ module Base
       @request_count = 0
       @blocker_duration = DEFAULT_BLOCKER_DURATION
       @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-      @methods = {:GET => 0, :POST => 0, :PUT => 0, :DELETE => 0}
+      @methods = {:GET => 0, :POST => 0, :PUT => 0, :DELETE => 0, :unknown => 0}
       
       self.initialize_hook(options) if self.respond_to?(:initialize_hook)
     end

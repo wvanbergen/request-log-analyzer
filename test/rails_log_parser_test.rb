@@ -10,9 +10,18 @@ class RailsLogParserTest < Test::Unit::TestCase
   end
   
   
+  def test_rails_22_log_format
+    count = 0
+    parser = RailsAnalyzer::LogParser.new(fragment_file(3)).each(:completed) do |request|
+      count += 1
+      assert_equal 0.614, request[:duration]  # should be 0.614
+    end
+    assert_equal 1, count  
+  end
+  
   def test_progress_messages
     log_file = fragment_file(1)
-
+  
     finished_encountered = false
     file_size = File.size(log_file)
     
@@ -72,15 +81,15 @@ class RailsLogParserTest < Test::Unit::TestCase
       assert_equal '10.1.1.33', request[:ip]
       assert_equal '2008-07-13 06:25:58', request[:timestamp]            
     end
-
+  
     parser = RailsAnalyzer::LogParser.new(fragment_file(2)).each(:completed) do |request|
       assert_equal "http://example.com/employee.xml", request[:url]
       assert_equal 200, request[:status]
       assert_equal 0.21665, request[:duration]
-      assert_equal 0.00926, request[:rendering]
+      assert_equal 0.00926, request[:rendering]      
       assert_equal 0.0, request[:db]
     end
-
+  
   end
   
 end
