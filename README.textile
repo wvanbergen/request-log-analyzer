@@ -27,6 +27,7 @@ Example: request-log-analyzer mongrel.log
   --output, -o:               Comma-separated list of reports to show    
   --amount, -c:               Displays the top <amount> elements in the reports
   --colorize, -z:             Fancy bash coloring
+  --install rails, -i rails:  Install Rails task rake log:analyze
 </pre>
 
 

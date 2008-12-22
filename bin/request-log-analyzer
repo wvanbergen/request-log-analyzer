@@ -71,10 +71,11 @@ if $arguments[:install]
     require 'ftools'
     if File.directory?('./lib/tasks/')
       File.copy(File.dirname(__FILE__) + '/../tasks/request_log_analyzer.rake', './lib/tasks/request_log_analyze.rake')
-      puts "Installed rake taks run:"
-      puts "rake rails:analyze_log"
+      puts "Installed rake tasks."
+      puts "To use, run: rake log:analyze"
     else
       puts "Cannot find /lib/tasks folder. Are you in your Rails directory?"
+      puts "Installation aborted."
     end
   end
   exit(0)
