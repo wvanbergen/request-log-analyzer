@@ -53,6 +53,7 @@ begin
     command_line.switch(:fast, :f)
     command_line.switch(:colorize, :z)
     command_line.switch(:merb, :m)
+    command_line.switch(:install, :i)
     command_line.flag(:output, :alias => :o)
     command_line.flag(:amount, :alias => :c)
     command_line.required_files = 1
@@ -65,6 +66,19 @@ rescue CommandLine::Error => e
   exit(0) 
 end
 
+if $arguments[:install]
+  if $arguments.files.first == 'rails'
+    require 'ftools'
+    if File.directory?('./lib/tasks/')
+      File.copy(File.dirname(__FILE__) + '/../tasks/request_log_analyzer.rake', './lib/tasks/request_log_analyze.rake')
+      puts "Installed rake taks run:"
+      puts "rake rails:analyze_log"
+    else
+      puts "Cannot find /lib/tasks folder. Are you in your Rails directory?"
+    end
+  end
+  exit(0)
+end
 
 if $arguments[:merb]
   $summarizer = MerbAnalyzer::Summarizer.new(:calculate_database => $arguments[:guess_database_time])

@@ -1,10 +1,10 @@
 namespace :rails do
-  desc "Analyze a Rails log file" 
+  desc "Analyze the Rails log file using the request-log-analyzer gem." 
     task :analyze_log  => :environment do
-      puts "Environment: #{ENV}"
-      puts "#{Rails.configuration.log_path}"
+      puts "Analyzing the Rails log file using the request-log-analyzer gem."
+      puts "Environment: #{RAILS_ENV}"
+      puts "Logfile: #{Rails.configuration.log_path}"
       puts ""
-    
       `request-log-analyzer #{Rails.configuration.log_path} -z`
   end
 end

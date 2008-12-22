@@ -8,8 +8,9 @@ puts "  --output, -o:               Comma-separated list of reports to show"
 puts "  --amount, -c:               Displays the top <amount> elements in the reports"     
 puts "  --colorize, -z:             Fancy bash coloring"
 puts "  --merb, -m:                 Parse merb logfiles"
+puts "  --install rails, -i rails   Install Rails task rake log:analyze"
 puts 
 puts "Examples:"
 puts "  request-log-analyzer development.log"
 puts "  request-log-analyzer mongrel.0.log mongrel.1.log mongrel.2.log -g -f -o mean_time,most_requested,blockers -c 20 -z"
-puts
+puts "  request-log-analyzer --install rails"
