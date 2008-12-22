@@ -1,23 +1,23 @@
-Request log analyzer
---------------------------------
+h1. Request log analyzer
 
 This is a simple command line tool to analyze request log files of both Rails and
 Merb. Its purpose is to find what actions are best candidates for optimization.
 
-This tool will parse all requests in the logfile and aggregate the
-information. Once it is finished parsing the log file, it will show the
-requests that take op most server time. Different metrics are used (cumulative
-time, average time, blockers, DB time, etc)
+* Supports Rails (all versions) logs and Merb logs
+* Supports combining multiple files (handy if you are using logrotate)
+* Several metrics are used (cumulative time, average time, blockers, DB time, etc)
+* Low memory footprint while running, so it is server-safe
+* MIT licensed
 
+h2. Installation
 
-Installation
---------------------------------
-gem sources -a http://gems.github.com
-sudo gem install wvanbergen-request-log-analyzer
+@sudo gem install wvanbergen-request-log-analyzer --source http://gems.github.com@
 
-Usage
---------------------------------
+Or, to upgrade: @sudo gem upgrade@
 
+h2. Usage
+
+<pre>
 Usage: request-log-analyzer [FILE] [OPTION]
 Analyze the given log FILE with the given OPTION
 Example: request-log-analyzer mongrel.log
@@ -27,15 +27,15 @@ Example: request-log-analyzer mongrel.log
   --output, -o:               Comma-separated list of reports to show    
   --amount, -c:               Displays the top <amount> elements in the reports
   --colorize, -z:             Fancy bash coloring
+</pre>
 
 
-
-Example
---------------------------------
+h2. Example result
 
 Note that this example was shortened for your viewing pleasure.
-$ request-log-analyzer /var/log/my_app.log
+@$ request-log-analyzer /var/log/my_app.log@
 
+<pre>
 Request log analyzer, by Willem van Bergen and  Bart ten Brinke
 
 Processing all log lines...
@@ -130,3 +130,4 @@ StatementError: [2 requests]
  -> Mysql::Error: Deadlock found when trying to get lock; try restarting transaction
 NoMethodError: [1 requests]
  -> undefined method `code' for nil:NilClass
+</pre>
