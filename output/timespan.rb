@@ -5,7 +5,9 @@ puts green("====================================================================
 if $summarizer.has_timestamps?
   puts "Timestamp first request: #{$summarizer.first_request_at}"
   puts "Timestamp last request:  #{$summarizer.last_request_at}" 
-  puts "Total time analyzed: #{$summarizer.duration} days"
+  puts "Total time analyzed:     #{$summarizer.duration} days"
+  puts ""
+  puts "Total requests analyzed: #{$summarizer.request_count}"
 end
 
 methods_print_array = []
