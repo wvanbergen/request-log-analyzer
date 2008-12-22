@@ -2,7 +2,7 @@
 puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
 puts
 puts "Options:"
-puts "  --fast, -t:                 Only use completed requests"
+puts "  --fast, -f:                 Only use completed requests"
 puts "  --guess-database-time, -g:  Guesses the database duration of requests" 
 puts "  --output, -o:               Comma-separated list of reports to show"     
 puts "  --amount, -c:               Displays the top <amount> elements in the reports"     
