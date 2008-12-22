@@ -16,4 +16,12 @@ class BaseSummarizerTest < Test::Unit::TestCase
     assert_equal -1,  summarizer.compare_string_dates('2008-01-01 12:11:20', '2008-01-02 12:11:20')
     assert_equal 1,   summarizer.compare_string_dates('2008-01-02 12:11:20', '2008-01-01 12:11:20')
   end
+  
+  def test_has_timestamps
+    summarizer = Base::Summarizer.new
+    assert_equal false, !!summarizer.has_timestamps?
+  end
+  
+  
+  
 end
