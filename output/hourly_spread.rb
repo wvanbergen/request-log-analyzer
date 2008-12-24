@@ -1,7 +1,7 @@
 # Draws a graph containing the average amound of requests per hour per day
-if $summarizer.request_time_graph?
+if @summarizer.request_time_graph?
 
-  max_request_graph = $summarizer.request_time_graph.max / $summarizer.duration
+  max_request_graph = @summarizer.request_time_graph.max / @summarizer.duration
   deviation         = max_request_graph / 20
   deviation         = 1 if deviation == 0
   color_cutoff      = 15
@@ -11,7 +11,7 @@ if $summarizer.request_time_graph?
   puts green("========================================================================")
   
   (0..23).each do |a|
-    requests      = $summarizer.request_time_graph[a] / $summarizer.duration
+    requests      = @summarizer.request_time_graph[a] / @summarizer.duration
     display_chars = requests / deviation
     
     if display_chars >= color_cutoff
