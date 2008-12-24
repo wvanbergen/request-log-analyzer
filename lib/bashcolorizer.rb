@@ -2,7 +2,7 @@
 # <tt>text</tt> The text to colorize.
 # <tt>color_code</tt> The color code string to set
 # <tt>color</tt> Does not color if false. Defaults to ($arguments && $arguments[:colorize])
-def colorize(text, color_code, color = $arguments && $arguments[:colorize])
+def colorize(text, color_code, color = $colorize)
   color ? "#{color_code}#{text}\e[0m" : text
 end
 
