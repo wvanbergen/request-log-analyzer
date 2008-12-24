@@ -2,16 +2,18 @@ TODO items for Rails-log-analyzer
 =================================
 Contact willem AT vanbergen DOT org if you want to help out with the development.
 
-Database:
+General:
 - Add query functionality for the resulting database file (interactive reports?)
+- Add more tests / specs
 - Link request processing line to request completed line
 
-Rails integration:
-- Create script that calls request-log-analyzer 
-- Optionally use local or specific routes.rb file to parse URLs
-- Add rake tasks to Rails application when included
+Refactoring:
+- Add a Request class
+- Add a main class so that it can be used as a library
+- Fix the database inserter and make it more robust for future changes
 
-General:
-- Add useful rake tasks
-- Add more tests
+Rails integration:
+- Optionally use local or specific routes.rb file to parse URLs
+
+Other:
 - World domination
