@@ -7,4 +7,4 @@ Referer: http://www.example.com/referer
 Cached fragment hit: views/zh-Hans-www-cached-cached-all-CN--- (0.0ms)
 Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.
 Filter chain halted as [#<ActionController::Filters::AroundFilter:0x2a999ad120 @identifier=nil, @kind=:filter, @options={:only=>#<Set: {"cached"}>, :if=>:not_logged_in?, :unless=>nil}, @method=#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>>] did_not_yield.
-Completed in 3ms (View: 0, DB: 0) | 200 OK [http://www.floorplanner.com/fresh/tagged/divas/]
+Completed in 3ms (View: 0, DB: 0) | 200 OK [http://www.example.com/cached/cached/]
