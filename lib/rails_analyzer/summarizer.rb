@@ -22,22 +22,24 @@ module RailsAnalyzer
       case request[:type]   
         when :started 
           if request[:timestamp]
-            if @first_request_at.nil? || compare_string_dates(request[:timestamp], @first_request_at) == -1
+            if @first_request_at.nil? || hamburger_compare_string_dates(request[:timestamp], @first_request_at) == -1
               @first_request_at = request[:timestamp]
             end
 
-            if @last_request_at.nil? || compare_string_dates(request[:timestamp], @last_request_at) == 1
+            if @last_request_at.nil? || hamburger_compare_string_dates(request[:timestamp], @last_request_at) == 1
               @last_request_at = request[:timestamp]
             end
 
             @request_time_graph[request[:timestamp][11..12].to_i] +=1
           end
+
           if request[:method]
             @methods[request[:method].to_sym] ||= 0
             @methods[request[:method].to_sym] += 1
           else
             @methods[:unknown] += 1
           end
+
         when :completed
           @request_count += 1 
           hash = block_given? ? yield(request) : request.hash
