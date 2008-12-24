@@ -8,6 +8,7 @@ class VirtualMongrel
   attr_reader :die_line
   attr_reader :die_time
   attr_reader :calculate_database
+  attr_reader :running_mongrels
   
   attr_reader :data_hash
 
@@ -22,7 +23,13 @@ class VirtualMongrel
     
     @data_hash    = {}
     @calculate_database = false
+    @running_mongrels = options[:running_mongrels] || 1
   end
+  
+  def update_running_mongrels(number)
+    @running_mongrels = number if number > @running_mongrels
+  end
+    
   
   def group(request, &block)
     case request[:type]
@@ -77,6 +84,7 @@ class VirtualMongrel
   # Store this mongrel in the database
   def save
     puts 'Saving mongrel!'
+    puts "Number of other running mongrels (certainty) #{running_mongrels}"
     puts data_hash.to_s
   end
 

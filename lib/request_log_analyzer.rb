@@ -130,17 +130,13 @@ class RequestLogAnalyzer
         case request[:type]   
           when :started
             puts 'Spawned new virtual mongrel'
-            new_mongrel = VirtualMongrel.new(:start_line => line, :calculate_database => @guess_database_time)
+            new_mongrel = VirtualMongrel.new(:start_line => line, :calculate_database => @guess_database_time, :running_mongrels => virtual_mongrels.length + 1)
             new_mongrel.group(request)
             virtual_mongrels << new_mongrel
-          when :completed
+          else
             completed_mongrel = virtual_mongrels.first
             completed_mongrel.group(request)
-            completed_mongrel.save
-            
-          when :failed
-            completed_mongrel = virtual_mongrels.first
-            completed_mongrel.group(request)
+            completed_mongrel.update_running_mongrels(virtual_mongrels.length)
             completed_mongrel.save
         end
         
@@ -150,7 +146,9 @@ class RequestLogAnalyzer
           if mongrel.die_line >= line && mongrel.status == :started
             keep_virtual_mongrels << mongrel 
           else
-            puts 'Destroyed virtual mongrel!' if mongrel.die_line >= line
+            puts 'Destroyed virtual mongrel!'
+            puts ""
+
           end
         end
         
