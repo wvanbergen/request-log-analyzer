@@ -74,7 +74,7 @@ module Base
     # <tt>second_date</tt> The second date string
     # Returns -1 if first_date < second_date, nil if equal
     # and 1 if first_date > second_date (<=>)
-    def compare_string_dates first_date, second_date
+    def hamburger_compare_string_dates first_date, second_date
       return nil if first_date.nil? || second_date.nil?
       
       first_date.gsub(/[^0-9|\s]/,'').to_i \
