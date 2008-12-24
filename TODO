@@ -3,13 +3,11 @@ TODO items for Rails-log-analyzer
 Contact willem AT vanbergen DOT org if you want to help out with the development.
 
 General:
-- Add query functionality for the resulting database file (interactive reports?)
 - Add more tests / specs
-- Link request processing line to request completed line
 
-Refactoring:
-- Add a Request class
-- Add a main class so that it can be used as a library
+Datamining:
+- Add query functionality for the resulting database file (interactive reports?)
+- Link request processing line to request completed line (VirtualMongrel?)
 - Fix the database inserter and make it more robust for future changes
 
 Rails integration:
