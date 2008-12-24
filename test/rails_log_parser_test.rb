@@ -1,7 +1,6 @@
 require 'test/unit'
 
-require "#{File.dirname(__FILE__)}/../lib/base/log_parser"
-require "#{File.dirname(__FILE__)}/../lib/rails_analyzer/log_parser"
+require "#{File.dirname(__FILE__)}/../lib/request_log_analyzer"
 
 class RailsLogParserTest < Test::Unit::TestCase
   
@@ -90,6 +89,11 @@ class RailsLogParserTest < Test::Unit::TestCase
       assert_equal 0.0, request[:db]
     end
   
+  end
+  
+  def test_virtual_mongrel
+    request_log_analyzer = RequestLogAnalyzer.new()
+    request_log_analyzer.analyze_with_virtual_mongrels([fragment_file(5)])
   end
   
 end

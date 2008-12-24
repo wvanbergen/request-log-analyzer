@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/../lib/base/log_parser'
 require File.dirname(__FILE__) + '/../lib/base/summarizer'
 require File.dirname(__FILE__) + '/../lib/rails_analyzer/log_parser'
 require File.dirname(__FILE__) + '/../lib/rails_analyzer/summarizer'
+require File.dirname(__FILE__) + '/../lib/rails_analyzer/virtual_mongrel.rb'
 require File.dirname(__FILE__) + '/../lib/merb_analyzer/log_parser'
 require File.dirname(__FILE__) + '/../lib/merb_analyzer/summarizer'
 require File.dirname(__FILE__) + '/../lib/bashcolorizer'
@@ -107,5 +108,56 @@ class RequestLogAnalyzer
         puts "\nERROR: Output report #{report} not found!"
       end
     end
+  end
+  
+  def analyze_with_virtual_mongrels(files = [])
+    # Walk through al the files given via the arguments.
+    files.each do |log_file|
+      puts "Processing #{@line_types.join(', ')} log lines from #{log_file}..."
+
+      parser = @log_parser_class.new(log_file)
+
+      virtual_mongrels = []
+      
+      line = 0
+
+      parser.each(*line_types) do |request|
+        line += 1
+
+        puts "Number of mongrels: #{virtual_mongrels.length}"
+        puts "Line number: #{line}"
+
+        case request[:type]   
+          when :started
+            puts 'spawned mongrel'
+            new_mongrel = VirtualMongrel.new(:start_line => line)
+            new_mongrel.group(request) {|r| request_hasher(r)}
+            virtual_mongrels << new_mongrel
+          when :completed
+            completed_mongrel = virtual_mongrels.first
+            completed_mongrel.group(request) {|r| request_hasher(r)}
+            completed_mongrel.save
+            
+          when :failed
+            completed_mongrel = virtual_mongrels.first
+            completed_mongrel.group(request) {|r| request_hasher(r)}
+            completed_mongrel.save
+        end
+        
+        keep_virtual_mongrels = []
+        
+        virtual_mongrels.each do |mongrel|
+          if mongrel.die_line > line && mongrel.status == :started
+            keep_virtual_mongrels << mongrel 
+          else
+            puts 'killed mongrel!' if mongrel.die_line > line
+          end
+        end
+        
+        virtual_mongrels = keep_virtual_mongrels
+            
+      end
+    end
+
   end
 end
