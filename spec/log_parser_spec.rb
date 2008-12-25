@@ -20,9 +20,10 @@ describe RequestLogAnalyzer::LogParser, :line_by_line do
     @log_parser.should be_valid_language
   end
   
-  it "should have included the language specific hooks" do
+  it "should have include the language specific hooks in the instance, not in the class" do
     metaclass = (class << @log_parser; self; end)
-    metaclass.ancestors.include?(TestFileFormat::LogParser)
+    metaclass.ancestors.include?(TestFileFormat::LogParser).should be_true
+    @log_parser.class.ancestors.include?(TestFileFormat::LogParser).should be_false
   end
   
   it "should parse a stream and find valid requests" do
