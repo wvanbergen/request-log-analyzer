@@ -1,41 +1,52 @@
 module RequestLogAnalyzer
   module FileFormat
-    
-    def file_format=(format)
+
+    # Registers the correct language in the calling class (LogParser, Summarizer)
+    def register_file_format(format_module)
+
       # Loads the module constant for built in file formats
-      format = RequestLogAnalyzer::FileFormat.const_get(format.to_s.camelize) if format.kind_of?(Symbol)
+      if format_module.kind_of?(Symbol)
+        require "request_log_analyzer/file_format/#{format_module}"
+        format_module = RequestLogAnalyzer::FileFormat.const_get(format_module.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) 
+      end
       
-      # register all the line definitions to the parser
-      format::LINE_DEFINITIONS.each { |key, value| self[key] = value }
+      # register language specific hooks in base class
+      hook_module = self.class.to_s.split('::').last
+      if format_module.const_defined?(hook_module) && format_module.const_get(hook_module).kind_of?(Module)
+        metaclass = (class << self; self; end)
+        metaclass.send(:include, format_module.const_get(hook_module))
+      end
+      
+      return format_module
     end
+    
+    
     
     class LineDefinition
 
       attr_reader :name
-      attr_accessor :teaser
-      attr_accessor :regexp
-      attr_accessor :captures
-      attr_accessor :flags
+      attr_accessor :teaser, :regexp, :captures
+      attr_accessor :header, :footer
       
-      def initialize(name, definition = {})        
+      def initialize(name, definition = {})
         @name = name
         definition.each { |key, value| self.send("#{key.to_s}=".to_sym, value) }
       end
       
       def convert_value(value, type)
-        # TODO: fix me
         case type
         when :integer; value.to_i
         when :float;   value.to_f
+        when :decimal; value.to_f          
         when :symbol;  value.to_sym
         else value
         end
       end
             
-      def =~(line)
+      def matches(line, lineno = nil)
         if @teaser.nil? || @teaser =~ line
           if @regexp =~ line
-            request_info = { :line_type => @name }
+            request_info = { :line_type => name, :lineno => lineno }
             captures_found = $~.captures
             captures.each_with_index do |param, index|
               unless captures_found[index].nil? || param == :ignore
@@ -46,7 +57,7 @@ module RequestLogAnalyzer
             return request_info
           else
             # TODO: use Logger.warn
-            puts "Teaser matched, but full line did not" unless @teaser.nil?
+            # puts "Teaser matched, but full line did not" unless @teaser.nil?
             return false
           end
         else
@@ -54,7 +65,7 @@ module RequestLogAnalyzer
         end
       end
       
-      alias :matches :=~
+      alias :=~ :matches
       
     end
   end

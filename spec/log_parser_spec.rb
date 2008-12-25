@@ -4,19 +4,8 @@ require 'request_log_analyzer/file_format'
 require 'request_log_analyzer/request'
 require 'request_log_analyzer/log_parser'
 
-module TestFileFormat
+describe RequestLogAnalyzer::LogParser, :line_by_line do
   
-  LINE_DEFINITIONS = {
-    :test => {
-      :teaser => /testing /,
-      :regexp => /testing is (\w+)/,
-      :captures => [{:what => :string}]
-    }
-  }
-end
-
-
-describe RequestLogAnalyzer::LogParser do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
@@ -26,20 +15,51 @@ describe RequestLogAnalyzer::LogParser do
   it "should have line definitions" do
     @log_parser.line_definitions.should_not be_empty
   end
+
+  it "should have a valid language" do
+    @log_parser.should be_valid_language
+  end
+  
+  it "should have included the language specific hooks" do
+    metaclass = (class << @log_parser; self; end)
+    metaclass.ancestors.include?(TestFileFormat::LogParser)
+  end
   
   it "should parse a stream and find valid requests" do
-    io = File.new(log_fixture(:test), 'r')
-    @log_parser.parse_io(io, :line_types => [:test]) do |request| 
+    io = File.new(log_fixture(:test_file_format), 'r')
+    @log_parser.parse_io(io, :line_types => [:test_line]) do |request| 
       request.should be_kind_of(RequestLogAnalyzer::Request)
-      request[:test].should_not be_nil
+      request.should =~ :test_line
+      request[:test_capture].should_not be_nil      
     end
     io.close
   end
   
   it "should parse a test file and find 2 test line matches" do
     matches = 0
-    @log_parser.parse_file(log_fixture(:test), :line_types => [:test]) { |request| matches += 1 }
-    matches.should == 2
+    @log_parser.parse_file(log_fixture(:test_file_format), :line_types => [:test_line]) { |request| matches += 1 }
+    matches.should eql(2)
+  end
+end
+
+describe RequestLogAnalyzer::LogParser, :combibed do
+  include RequestLogAnalyzerSpecHelper
+  
+  before(:each) do
+    @log_parser = RequestLogAnalyzer::LogParser.new(TestFileFormat, :combined_requests => true)
   end
   
+  it "should have multiple line definitions" do
+    @log_parser.line_definitions.length.should >= 2
+  end  
+  
+  it "should have a valid language" do
+    @log_parser.should be_valid_language
+  end
+  
+  it "should parse a test file" do
+    matches = []
+    @log_parser.parse_file(log_fixture(:test_language_combined)) { |request| matches << request }  
+    matches.length.should == 2
+  end
 end
