@@ -13,11 +13,11 @@ begin
     command_line.flag(:format, :default => 'rails')
     command_line.flag(:aggregator, :alias => :a, :multiple => true)
     command_line.flag(:database, :alias => :d)
-    
+        
     command_line.switch(:combined_requests, :c)
-    #command_line.switch(:guess_database_time, :g) 
+    command_line.switch(:colorize, :z) 
+    #command_line.switch(:estimate_database_time, :e) 
     #command_line.switch(:fast, :f) #
-    #command_line.switch(:colorize, :z) 
   end
   
 rescue CommandLine::Error => e
@@ -43,8 +43,6 @@ end
 #   end
 #   exit(0)
 # end
-
-$colorize = true if arguments[:colorize]
 
 # Run the request_log_analyzer!
 request_log_analyzer = RequestLogAnalyzer::Controller.build(arguments).run!

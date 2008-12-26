@@ -26,5 +26,5 @@ module RequestLogAnalyzer::FileFormat::Merb
       :captures => [ {:dispatch_time => :sec}, {:after_filters_time => :sec}, {:before_filters_time => :sec}, {:action_time => :sec} ]
     }
   }
-  
+    
 end
