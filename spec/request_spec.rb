@@ -11,6 +11,10 @@ describe RequestLogAnalyzer::Request, :single_line do
     @single_line_request << { :line_type => :test_line, :lineno => 1, :test_capture => 'awesome!' }
   end
   
+  it "should include the file format module" do
+    (class << @single_line_request; self; end).ancestors.include?(TestFileFormat)
+  end  
+  
   it "should be single if only one line has been added" do
     @single_line_request.should be_single_line
     @single_line_request.should_not be_empty
