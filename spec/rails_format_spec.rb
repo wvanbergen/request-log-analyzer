@@ -20,7 +20,7 @@ describe RequestLogAnalyzer::LogParser, "Rails without combined requests" do
     @log_parser.parse_file(log_fixture(:rails_1x)) { |request| requests << request }
     requests.length.should == 8
     requests.each { |r| r.should be_single_line }
-    requests.select { |r| r.line_type == :started }.length.should == 4 
+    requests.select { |r| r.line_type == :started }.should have(4).items
   end  
 end
 

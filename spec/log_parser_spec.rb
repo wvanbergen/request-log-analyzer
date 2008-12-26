@@ -14,8 +14,8 @@ describe RequestLogAnalyzer::LogParser, :single_line_requests do
   
   it "should have include the language specific hooks in the instance, not in the class" do
     metaclass = (class << @log_parser; self; end)
-    metaclass.ancestors.include?(TestFileFormat::LogParser).should be_true
-    @log_parser.class.ancestors.include?(TestFileFormat::LogParser).should be_false
+    metaclass.ancestors.should include(TestFileFormat::LogParser)
+    @log_parser.class.ancestors.should_not include(TestFileFormat::LogParser)
   end
   
   it "should parse a stream and find valid requests" do
@@ -62,8 +62,8 @@ describe RequestLogAnalyzer::LogParser, :combined_requests do
   
   it "should parse all request values when spanned over multiple files" do
     @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)]) do |request|
-      request.lines.length.should == 4
-
+      request.lines.should have(4).items
+      
       request[:request_no].should == 1
       request[:test_capture].should == "amazing"      
     end

@@ -10,21 +10,29 @@ module RequestLogAnalyzer::Aggregator
     
     def aggregate(request)
       if options[:combined_requests]
-        bucket_name = bucket_for(request)
-        @buckets[bucket_name] ||= default_bucket_info
-        update(@buckets[bucket_name], request)
-      else
+        current_bucket_hash = @buckets
+      else       
         @buckets[request.line_type] ||= {}
-        bucket_name = bucket_for(request)
-        @buckets[request.line_type][bucket_name] ||= default_bucket_info
-        update(@buckets[request.line_type][bucket_name], request)
+        current_bucket_hash = @buckets[request.line_type]
       end
+      
+      bucket_name = bucket_for(request)
+      current_bucket_hash[bucket_name] ||= default_bucket_content
+      update_bucket(current_bucket_hash[bucket_name], request)
     end
+    
+    def default_bucket_content
+      return { :count => 0 }
+    end
+    
+    def update_bucket(bucket, request)
+      bucket[:count] += 1
+    end    
     
     def bucket_for(request)
       'all'
     end
-          
+       
     def report(color = false)
       if options[:combined_requests]
         @buckets.each do |hash, values|
@@ -40,14 +48,6 @@ module RequestLogAnalyzer::Aggregator
       end
     end
     
-    protected
-    
-    def default_bucket_info
-      { :count => 0 }
-    end
-    
-    def update(bucket, request)
-      bucket[:count] += 1
-    end
+
   end
 end

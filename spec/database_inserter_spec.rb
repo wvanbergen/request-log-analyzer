@@ -9,8 +9,6 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
   
   before(:each) do
     @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(TestFileFormat, :database => TEST_DATABASE_FILE)
-    @test_request      = RequestLogAnalyzer::Request.new(TestFileFormat)
-    @test_request << {:line_type => :first}
   end
   
   after(:each) do
