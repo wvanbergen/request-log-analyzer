@@ -3,7 +3,7 @@ module RequestLogAnalyzer::Aggregator
   class Echo < Base
     
     def aggregate(request)
-      puts "Found request: " + request.inspect
+      puts "\nRequest: " + request.inspect
     end
 
   end

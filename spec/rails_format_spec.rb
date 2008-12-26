@@ -41,29 +41,24 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
   end
   
   it "should find 4 completed requests when lines are linked" do
-    requests = []
-    @log_parser.parse_file(log_fixture(:rails_1x)) do |request|
-      request.should be_completed
-      requests << request
-    end
-    requests.length.should == 4
+    @log_parser.should_receive(:handle_request).exactly(4).times
+    @log_parser.parse_file(log_fixture(:rails_1x))
   end  
   
   it "should parse a Rails 2.2 request properly" do
-    requests = []
-    @log_parser.parse_file(log_fixture(:rails_22)) { |request| requests << request }
-    requests.length.should == 1
+
+    @log_parser.parse_file(log_fixture(:rails_22)) do |request|
+      request.should =~ :started
+      request.should =~ :completed  
     
-    requests.first.should =~ :started
-    requests.first.should =~ :completed  
-    
-    requests.first[:controller].should == 'PageController'
-    requests.first[:action].should     == 'demo'
-    requests.first[:url].should        == 'http://www.example.coml/demo'    
-    requests.first[:status].should     == 200
-    requests.first[:duration].should   == 0.614
-    requests.first[:db].should         == 0.031
-    requests.first[:view].should       == 0.120
+      request[:controller].should == 'PageController'
+      request[:action].should     == 'demo'
+      request[:url].should        == 'http://www.example.coml/demo'    
+      request[:status].should     == 200
+      request[:duration].should   == 0.614
+      request[:db].should         == 0.031
+      request[:view].should       == 0.120
+    end
   end
   
   it "should parse a syslog file with prefix correctly" do

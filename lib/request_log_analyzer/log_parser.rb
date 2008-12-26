@@ -72,13 +72,13 @@ module RequestLogAnalyzer
               raise "Parsebale line found outside of a request on line #{request_data[:lineno]} " if @current_request.nil?
               @current_request << request_data
               if footer_line?(request_data)
-                yield(@current_request) if block_given?
+                handle_request(@current_request, &block)
                 @current_request = nil
                 @parsed_requests += 1  
               end
             end
           else
-            yield(RequestLogAnalyzer::Request.create(@file_format, request_data)) if block_given?
+            handle_request(RequestLogAnalyzer::Request.create(@file_format, request_data), &block)
             @parsed_requests += 1
           end       
         end
@@ -86,6 +86,10 @@ module RequestLogAnalyzer
     end
     
     protected
+    
+    def handle_request(request, &block)
+      yield(request) if block_given?
+    end
     
     def header_line?(hash)
       file_format.line_definitions[hash[:line_type]].header

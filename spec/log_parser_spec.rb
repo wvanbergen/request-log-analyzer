@@ -40,10 +40,6 @@ describe RequestLogAnalyzer::LogParser, :single_line_requests do
     @log_parser.parse_file(log_fixture(:test_file_format)) { |request| request.should be_single_line }
     @log_parser.parsed_lines.should eql(@log_parser.parsed_requests)
   end
-  
-  it "should find as many lines as request" do
-    
-  end
 end
 
 describe RequestLogAnalyzer::LogParser, :combined_requests do
@@ -62,8 +58,13 @@ describe RequestLogAnalyzer::LogParser, :combined_requests do
   end
   
   it "should parse more lines than requests" do
+    @log_parser.should_receive(:handle_request).with(an_instance_of(RequestLogAnalyzer::Request)).twice
     @log_parser.parse_file(log_fixture(:test_language_combined)) { |request| request.should be_combined }  
-    @log_parser.parsed_requests.should == 2
     @log_parser.parsed_lines.should > 2    
+  end
+  
+  it "should parse requests spanned over multiple files" do
+    @log_parser.should_receive(:handle_request).with(an_instance_of(RequestLogAnalyzer::Request)).once
+    @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)])
   end
 end

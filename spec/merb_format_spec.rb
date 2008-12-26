@@ -12,21 +12,22 @@ describe RequestLogAnalyzer::LogParser, "Merb without combined requests" do
   end
   
   it "should parse a stream and find valid requests" do
-    io = File.new(log_fixture(:merb), 'r')
-    @log_parser.parse_io(io) do |request| 
-      request.should be_kind_of(RequestLogAnalyzer::Request)
-      request.should be_single_line
+    File.open(log_fixture(:merb), 'r') do |io|
+      @log_parser.parse_io(io) do |request| 
+        request.should be_kind_of(RequestLogAnalyzer::Request)
+        request.should be_single_line
+      end
     end
-    io.close
   end
 
-  it "should find 33 requests lines when lines are not linked" do
-    requests = []
-    @log_parser.parse_file(log_fixture(:merb)) { |request| requests << request }
-    
-    requests.length.should == 33
-    requests.each { |r| r.should be_single_line }
-    requests.select { |r| r.line_type == :started }.length.should == 11 
+  it "should find 33 request lines when lines are not linked" do
+    @log_parser.should_receive(:handle_request).exactly(33).times
+    @log_parser.parse_file(log_fixture(:merb))
+  end  
+  
+  it "should find 11 request start lines when lines are not linked" do
+    @log_parser.should_receive(:handle_request).exactly(11).times
+    @log_parser.parse_file(log_fixture(:merb), :line_types => [:started])
   end  
 end
 
@@ -42,13 +43,9 @@ describe RequestLogAnalyzer::LogParser, "Merb with combined requests" do
     @log_parser.should be_valid_language
   end
   
-  it "should find 4 completed requests when lines are linked" do
-    requests = []
-    @log_parser.parse_file(log_fixture(:merb)) do |request|
-      request.should be_completed
-      requests << request
-    end
-    requests.length.should == 11
+  it "should find 11 completed requests when lines are linked" do
+    @log_parser.should_receive(:handle_request).exactly(11).times
+    @log_parser.parse_file(log_fixture(:merb))
   end
   
   it "should parse all details from a request correctly" do
