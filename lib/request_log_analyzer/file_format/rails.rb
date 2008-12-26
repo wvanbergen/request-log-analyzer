@@ -32,8 +32,8 @@ module RequestLogAnalyzer::FileFormat::Rails
       :footer => true,
       :teaser   => /Completed in /,
       :regexp   => Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})"),
-      :captures   => [{:duration => :sec},  {:rendering => :sec},  {:db => :sec},  {:status => :int}, {:url => :string},  # 2.1 variant 
-                      {:duration => :msec}, {:rendering => :msec}, {:db => :msec}, {:status => :int}, {:url => :string}]  # 2.2 variant 
+      :captures   => [{:duration => :sec},  {:view => :sec},  {:db => :sec},  {:status => :integer}, {:url => :string},  # 2.1 variant 
+                      {:duration => :msec}, {:view => :msec}, {:db => :msec}, {:status => :integer}, {:url => :string}]  # 2.2 variant 
 
     }
   }   
