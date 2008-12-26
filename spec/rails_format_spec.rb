@@ -37,12 +37,13 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
   end
   
   it "should find 4 completed requests when lines are linked" do
+    @log_parser.should_not_receive(:warn)  
     @log_parser.should_receive(:handle_request).exactly(4).times
     @log_parser.parse_file(log_fixture(:rails_1x))
   end  
   
   it "should parse a Rails 2.2 request properly" do
-
+    @log_parser.should_not_receive(:warn)
     @log_parser.parse_file(log_fixture(:rails_22)) do |request|
       request.should =~ :started
       request.should =~ :completed  
@@ -58,6 +59,7 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
   end
   
   it "should parse a syslog file with prefix correctly" do
+    @log_parser.should_not_receive(:warn)    
     @log_parser.parse_file(log_fixture(:syslog_1x)) do |request| 
       
       request.should be_completed
@@ -74,11 +76,10 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
   end
   
   it "should parse cached requests" do
+    @log_parser.should_not_receive(:warn)
     @log_parser.parse_file(log_fixture(:rails_22_cached)) do |request| 
-      
       request.should be_completed
       request.should be_combined
-      
       request =~ :cache_hit
     end  
   end

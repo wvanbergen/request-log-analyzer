@@ -18,11 +18,11 @@ module RequestLogAnalyzer::FileFormat::Rails
       :regexp => /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/,
       :captures => [{:controller => :string}, {:action => :string}, {:format => :string}, {:ip => :string}, {:timestamp => :timestamp}, {:method => :string}]
     },
-    
+
+    # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a998a2ff0 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a998af660@/home/floorplanner/beta/releases/20081224113708/app/controllers/page_controller.rb:14>}>] rendered_or_redirected.
     # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.
     :cache_hit => {
-      :teaser   => /Filter chain halted /,
-      :regexp   => /Filter chain halted as \[\#ActionController\:\:Caching\:\:Actions\:\:ActionCacheFilter\:/,
+      :regexp   => /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter:.+>\] rendered_or_redirected/,
       :captures => []
     },
     

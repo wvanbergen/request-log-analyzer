@@ -76,7 +76,7 @@ module RequestLogAnalyzer
             end
             return request_info
           else
-            parser.warn(:teaser_check_failed, "Teaser matched, but full line did not")  unless @teaser.nil? || parser.nil?
+            parser.warn(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")  unless @teaser.nil? || parser.nil?
             return false
           end
         else
