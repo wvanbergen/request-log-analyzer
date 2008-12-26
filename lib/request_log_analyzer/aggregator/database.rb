@@ -24,7 +24,7 @@ module RequestLogAnalyzer::Aggregator
         
         attributes = line.reject { |k, v| [:line_type].include?(k) }
         attributes[:request_id] = @request_id if options[:combined_requests]  
-        RequestLogAnalyzer::Aggregator::Database.const_get(class_name).create!(attributes)
+        file_format.const_get(class_name).create!(attributes)
       end
       
     end
@@ -46,9 +46,7 @@ module RequestLogAnalyzer::Aggregator
 
     def create_activerecord_class(name, definition)
       class_name = "#{name}_line".camelize
-      unless RequestLogAnalyzer::Aggregator::Database.const_defined?(class_name)
-        RequestLogAnalyzer::Aggregator::Database.const_set(class_name, Class.new(ActiveRecord::Base))
-      end
+      file_format.const_set(class_name, Class.new(ActiveRecord::Base)) unless file_format.const_defined?(class_name)
     end
 
     def create_database_schema!

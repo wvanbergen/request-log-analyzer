@@ -27,7 +27,7 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
   it "should create the default table names" do
     @database_inserter.prepare
     @database_inserter.file_format.line_definitions.each do |name, definition|
-      klass = RequestLogAnalyzer::Aggregator::Database.const_get("#{name}_line".camelize)
+      klass = TestFileFormat.const_get("#{name}_line".camelize)
       klass.column_names.should include('id')
       klass.column_names.should include('lineno')      
       klass.column_names.should include('request_id')      
@@ -37,9 +37,9 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
   it "should create the correct fields in the table" do
     @database_inserter.prepare
     
-    RequestLogAnalyzer::Aggregator::Database::FirstLine.column_names.should include('request_no')
-    RequestLogAnalyzer::Aggregator::Database::LastLine.column_names.should include('request_no')
-    RequestLogAnalyzer::Aggregator::Database::TestLine.column_names.should include('test_capture')    
+    TestFileFormat::FirstLine.column_names.should include('request_no')
+    TestFileFormat::LastLine.column_names.should include('request_no')
+    TestFileFormat::TestLine.column_names.should include('test_capture')    
   end
   
 end
@@ -63,20 +63,20 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
   end 
   
   it "should insert a record in the relevant table" do
-    RequestLogAnalyzer::Aggregator::Database::FirstLine.should_receive(:create!).with(hash_including(:request_no => 564))
+    TestFileFormat::FirstLine.should_receive(:create!).with(hash_including(:request_no => 564))
     @database_inserter.aggregate(@single)
   end
   
   it "should insert records in all relevant tables" do
-    RequestLogAnalyzer::Aggregator::Database::FirstLine.should_receive(:create!).with(hash_including(:request_no => 564)).once
-    RequestLogAnalyzer::Aggregator::Database::TestLine.should_receive(:create!).twice
-    RequestLogAnalyzer::Aggregator::Database::LastLine.should_receive(:create!).with(hash_including(:request_no => 564)).once
+    TestFileFormat::FirstLine.should_receive(:create!).with(hash_including(:request_no => 564)).once
+    TestFileFormat::TestLine.should_receive(:create!).twice
+    TestFileFormat::LastLine.should_receive(:create!).with(hash_including(:request_no => 564)).once
     @database_inserter.aggregate(@combined)
   end
   
   it "should insert a record in the table" do
     @database_inserter.aggregate(@single)
-    RequestLogAnalyzer::Aggregator::Database::FirstLine.count(:conditions => {:request_no => 564}).should == 1
+    TestFileFormat::FirstLine.count(:conditions => {:request_no => 564}).should == 1
   end
   
 end
