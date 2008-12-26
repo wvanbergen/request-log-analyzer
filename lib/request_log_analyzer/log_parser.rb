@@ -5,6 +5,8 @@ module RequestLogAnalyzer
     
     attr_reader :options
     attr_reader :current_request
+    attr_reader :parsed_lines
+    attr_reader :parsed_requests
     
     def initialize(format, options = {})      
       @line_definitions = {}
@@ -27,6 +29,8 @@ module RequestLogAnalyzer
       end
     end
     
+    # Parses a file. 
+    # Creates an IO stream for the provided file, and sends it to parse_io for further handling
     def parse_file(file, options = {}, &block)
       @progress_handler.call(:started, file) if @progress_handler
       File.open(file, 'r') { |f| parse_io(f, options, &block) }
@@ -48,7 +52,7 @@ module RequestLogAnalyzer
       
       io.each_line do |line|
         
-        @progress_handler.call(:progress, @io.pos) if @progress_handler
+        @progress_handler.call(:progress, @io.pos) if @progress_handler && io.lineno % 10 == 0
         
         request_data = nil
         if options[:line_types].detect { |line_type| request_data = file_format.line_definitions[line_type].matches(line, io.lineno) }

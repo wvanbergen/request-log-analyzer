@@ -4,7 +4,7 @@ require 'request_log_analyzer/file_format'
 require 'request_log_analyzer/request'
 require 'request_log_analyzer/log_parser'
 
-describe RequestLogAnalyzer::LogParser, :line_by_line do
+describe RequestLogAnalyzer::LogParser, :single_line_requests do
   
   include RequestLogAnalyzerSpecHelper
   
@@ -36,14 +36,17 @@ describe RequestLogAnalyzer::LogParser, :line_by_line do
     io.close
   end
   
-  it "should parse a test file and find 2 test line matches" do
-    matches = 0
-    @log_parser.parse_file(log_fixture(:test_file_format), :line_types => [:test_line]) { |request| matches += 1 }
-    matches.should eql(2)
+  it "should find as many lines as request" do
+    @log_parser.parse_file(log_fixture(:test_file_format)) { |request| request.should be_single_line }
+    @log_parser.parsed_lines.should eql(@log_parser.parsed_requests)
+  end
+  
+  it "should find as many lines as request" do
+    
   end
 end
 
-describe RequestLogAnalyzer::LogParser, :combibed do
+describe RequestLogAnalyzer::LogParser, :combined_requests do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
@@ -58,9 +61,9 @@ describe RequestLogAnalyzer::LogParser, :combibed do
     @log_parser.should be_valid_language
   end
   
-  it "should parse a test file" do
-    matches = []
-    @log_parser.parse_file(log_fixture(:test_language_combined)) { |request| matches << request }  
-    matches.length.should == 2
+  it "should parse more lines than requests" do
+    @log_parser.parse_file(log_fixture(:test_language_combined)) { |request| request.should be_combined }  
+    @log_parser.parsed_requests.should == 2
+    @log_parser.parsed_lines.should > 2    
   end
 end
