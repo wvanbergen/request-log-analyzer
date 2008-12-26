@@ -40,7 +40,7 @@ describe RequestLogAnalyzer::LogParser, "Merb with combined requests" do
   end
   
   it "should have a valid language definitions" do
-    @log_parser.should be_valid_language
+    @log_parser.file_format.should be_valid
   end
   
   it "should find 11 completed requests when lines are linked" do

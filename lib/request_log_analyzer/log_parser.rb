@@ -18,18 +18,7 @@ module RequestLogAnalyzer
       # and register all the line definitions to the parser
       self.register_file_format(format)
     end
-          
-    
-    # checks whether 
-    def valid_language?
-      if @options[:combined_requests]
-        file_format.line_definitions.detect { |(name, ld)| ld.header } && file_format.line_definitions.detect { |(name, ld)| ld.footer }
-      else
-        file_format.line_definitions.length > 0
-      end
-    end
-    
-    
+              
     def parse_files(files, options = {}, &block)
       files.each do |file|
         parse_file(file, options, &block)

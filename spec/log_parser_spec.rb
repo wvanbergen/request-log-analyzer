@@ -15,10 +15,6 @@ describe RequestLogAnalyzer::LogParser, :single_line_requests do
   it "should have line definitions" do
     @log_parser.file_format.line_definitions.should_not be_empty
   end
-
-  it "should have a valid language" do
-    @log_parser.should be_valid_language
-  end
   
   it "should have include the language specific hooks in the instance, not in the class" do
     metaclass = (class << @log_parser; self; end)
@@ -54,7 +50,7 @@ describe RequestLogAnalyzer::LogParser, :combined_requests do
   end  
   
   it "should have a valid language" do
-    @log_parser.should be_valid_language
+    @log_parser.file_format.should be_valid
   end
   
   it "should parse more lines than requests" do

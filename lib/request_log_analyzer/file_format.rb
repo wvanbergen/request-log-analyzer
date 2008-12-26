@@ -20,6 +20,11 @@ module RequestLogAnalyzer
             hash.merge!(name => LineDefinition.new(name, definition))
           end
         end
+        
+        # checks whether the file format descriptor is valid
+        def valid?
+          @line_definitions.detect { |(name, ld)| ld.header } && @line_definitions.detect { |(name, ld)| ld.footer }
+        end
       end
       
       # register language specific hooks in base class
