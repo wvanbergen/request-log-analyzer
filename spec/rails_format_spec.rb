@@ -72,4 +72,14 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
       request[:view].should       == 0.00926
     end
   end
+  
+  it "should parse cached requests" do
+    @log_parser.parse_file(log_fixture(:rails_22_cached)) do |request| 
+      
+      request.should be_completed
+      request.should be_combined
+      
+      request =~ :cache_hit
+    end  
+  end
 end

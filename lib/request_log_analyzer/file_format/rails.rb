@@ -19,6 +19,13 @@ module RequestLogAnalyzer::FileFormat::Rails
       :captures => [{:controller => :string}, {:action => :string}, {:format => :string}, {:ip => :string}, {:timestamp => :timestamp}, {:method => :string}]
     },
     
+    # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.
+    :cache_hit => {
+      :teaser   => /Filter chain halted /,
+      :regexp   => /Filter chain halted as \[\#ActionController\:\:Caching\:\:Actions\:\:ActionCacheFilter\:/,
+      :captures => []
+    },
+    
     # RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy' 
     :failed => {
       :footer => true,   
