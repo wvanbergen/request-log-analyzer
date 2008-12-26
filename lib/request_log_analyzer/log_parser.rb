@@ -29,6 +29,13 @@ module RequestLogAnalyzer
       end
     end
     
+    
+    def parse_files(files, options = {}, &block)
+      files.each do |file|
+        parse_file(file, options, &block)
+      end
+    end
+    
     # Parses a file. 
     # Creates an IO stream for the provided file, and sends it to parse_io for further handling
     def parse_file(file, options = {}, &block)
