@@ -63,7 +63,7 @@ module RequestLogAnalyzer
         end
       end
             
-      def matches(line, lineno = nil)
+      def matches(line, lineno = nil, parser = nil)
         if @teaser.nil? || @teaser =~ line
           if @regexp =~ line
             request_info = { :line_type => name, :lineno => lineno }
@@ -76,8 +76,7 @@ module RequestLogAnalyzer
             end
             return request_info
           else
-            # TODO: use Logger.warn
-            # puts "Teaser matched, but full line did not" unless @teaser.nil?
+            parser.warn(:teaser_check_failed, "Teaser matched, but full line did not")  unless @teaser.nil? || parser.nil?
             return false
           end
         else

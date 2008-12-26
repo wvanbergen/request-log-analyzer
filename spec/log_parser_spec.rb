@@ -69,3 +69,24 @@ describe RequestLogAnalyzer::LogParser, :combined_requests do
     end
   end  
 end
+
+describe RequestLogAnalyzer::LogParser, :warnings do
+  include RequestLogAnalyzerSpecHelper
+    
+  it "should warn about teaser matching problems" do
+    @log_parser = RequestLogAnalyzer::LogParser.new(TestFileFormat)
+    @log_parser.should_receive(:warn).with(:teaser_check_failed, anything).exactly(5).times
+    @log_parser.parse_file(log_fixture(:test_file_format))
+  end
+  
+  it "should warn about unmatching request headers and footers" do
+    @log_parser = RequestLogAnalyzer::LogParser.new(TestFileFormat, :combined_requests => true)
+    
+    @log_parser.should_receive(:warn).with(:unclosed_request, anything).at_least(1).times    
+    @log_parser.should_receive(:warn).with(:no_current_request, anything).at_least(1).times    
+    @log_parser.should_not_receive(:handle_request)    
+    @log_parser.parse_file(log_fixture(:test_order))    
+
+  end  
+  
+end

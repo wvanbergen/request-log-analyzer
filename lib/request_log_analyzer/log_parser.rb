@@ -14,6 +14,8 @@ module RequestLogAnalyzer
       @parsed_lines     = 0
       @parsed_requests  = 0
       
+      @current_io = nil
+      
       # install the file format module (see RequestLogAnalyzer::FileFormat)
       # and register all the line definitions to the parser
       self.register_file_format(format)
@@ -46,49 +48,64 @@ module RequestLogAnalyzer
       unknown = options[:line_types].reject { |line_type| file_format.line_definitions.has_key?(line_type) }
       raise "Unknown line types: #{unknown.join(', ')}" unless unknown.empty?
       
-      io.each_line do |line|
+      @current_io = io
+      @current_io.each_line do |line|
         
-        @progress_handler.call(:progress, @io.pos) if @progress_handler && io.lineno % 10 == 0
+        @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.lineno % 10 == 0
         
         request_data = nil
-        if options[:line_types].detect { |line_type| request_data = file_format.line_definitions[line_type].matches(line, io.lineno) }
+        if options[:line_types].detect { |line_type| request_data = file_format.line_definitions[line_type].matches(line, @current_io.lineno, self) }
           @parsed_lines += 1
           if @options[:combined_requests]
-            if header_line?(request_data)
-              unless @current_request.nil?              
-                # TODO: warn
-                puts "Encountered header line on line #{request_data[:lineno]}, but previous request not closed" 
-                puts "#{io.lineno}: #{line.inspect}"
-              end
-              @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)              
-            else
-              unless @current_request.nil?
-                @current_request << request_data
-                if footer_line?(request_data)
-                  handle_request(@current_request, &block)
-                  @current_request = nil
-                  @parsed_requests += 1  
-                end
-              else
-                # TODO: warn
-                puts "Parsebale line found outside of a request on line #{request_data[:lineno]} " 
-                puts "#{io.lineno}: #{line.inspect}"            
-              end
-            end
+            update_current_request(request_data, &block)
           else
             handle_request(RequestLogAnalyzer::Request.create(@file_format, request_data), &block)
             @parsed_requests += 1
           end       
         end
       end
+      
+      warn(:unclosed_request, "End of file reached, but last request was not completed!") unless @current_request.nil?
+  
+      @current_io = nil
     end
     
     # Pass a block to this function to install a progress handler
-    def progress(&block)
+    def on_progress(&block)
       @progress_handler = block
     end
     
+    def on_warning(&block)
+      @warning_handler = block
+    end
+
+    def warn(type, message)
+      @warning_handler.call(type, message, @current_io.lineno) if @warning_handler
+    end
+    
     protected
+    
+    def update_current_request(request_data, &block)
+      if header_line?(request_data)
+        unless @current_request.nil?
+          warn(:unclosed_request, "Encountered header line, but previous request was not closed!")
+          @current_request = nil
+        else
+          @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)              
+        end
+      else
+        unless @current_request.nil?
+          @current_request << request_data
+          if footer_line?(request_data)
+            handle_request(@current_request, &block)
+            @current_request = nil
+            @parsed_requests += 1  
+          end
+        else
+          warn(:no_current_request, "Parsebale line found outside of a request!")
+        end
+      end
+    end
     
     def handle_request(request, &block)
       yield(request) if block_given?
@@ -100,6 +117,6 @@ module RequestLogAnalyzer
     
     def footer_line?(hash)
       file_format.line_definitions[hash[:line_type]].footer  
-    end    
+    end 
   end
 end

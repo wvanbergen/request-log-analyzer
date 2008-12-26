@@ -45,6 +45,11 @@ module RequestLogAnalyzer
       
       register_file_format(format)  
       @log_parser  = RequestLogAnalyzer::LogParser.new(file_format, @options)
+      
+      @log_parser.on_warning do |type, message, lineno|        
+        @aggregators.each { |agg| agg.warning(type, message, lineno) }
+        puts "WARNING #{type.inspect} on line #{lineno}: #{message}" unless options[:silent]
+      end
     end
     
     def add_aggregator(agg)

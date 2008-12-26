@@ -22,6 +22,9 @@ module RequestLogAnalyzer::Aggregator
     
     def finalize
     end
+    
+    def warning(type, message, lineno)
+    end    
 
   end
 end

@@ -12,7 +12,7 @@ module RequestLogAnalyzer::Aggregator
 
       File.unlink(options[:database]) if File.exist?(options[:database])
       create_database_schema!
-
+      
       @request_id = 0
     end
     
@@ -27,6 +27,10 @@ module RequestLogAnalyzer::Aggregator
         file_format.const_get(class_name).create!(attributes)
       end
       
+    end
+    
+    def warning(type, message, lineno)
+      file_format::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
     
     protected 
@@ -44,6 +48,18 @@ module RequestLogAnalyzer::Aggregator
       end
     end
 
+    def create_warning_table_and_class
+      ActiveRecord::Migration.suppress_messages do
+        ActiveRecord::Migration.create_table("warnings") do |t|
+          t.string  :warning_type, :limit => 30, :null => false
+          t.string  :message
+          t.integer :lineno          
+        end
+      end    
+      
+      file_format.const_set('Warning', Class.new(ActiveRecord::Base)) unless file_format.const_defined?('Warning')
+    end
+
     def create_activerecord_class(name, definition)
       class_name = "#{name}_line".camelize
       file_format.const_set(class_name, Class.new(ActiveRecord::Base)) unless file_format.const_defined?(class_name)
@@ -54,6 +70,8 @@ module RequestLogAnalyzer::Aggregator
         create_database_table(name, definition)
         create_activerecord_class(name, definition)
       end
+      
+      create_warning_table_and_class
     end
     
     def column_type(capture_type)

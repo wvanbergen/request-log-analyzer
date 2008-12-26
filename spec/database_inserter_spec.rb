@@ -18,6 +18,7 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
   end
   
   it "should create the correct tables" do
+    ActiveRecord::Migration.should_receive(:create_table).with("warnings")    
     ActiveRecord::Migration.should_receive(:create_table).with("first_lines")
     ActiveRecord::Migration.should_receive(:create_table).with("test_lines")        
     ActiveRecord::Migration.should_receive(:create_table).with("last_lines")    
@@ -74,9 +75,9 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
     @database_inserter.aggregate(@combined)
   end
   
-  it "should insert a record in the table" do
-    @database_inserter.aggregate(@single)
-    TestFileFormat::FirstLine.count(:conditions => {:request_no => 564}).should == 1
+  it "should log a warning in the warnings table" do
+    TestFileFormat::Warning.should_receive(:create!).with(hash_including(:warning_type => 'test_warning'))
+    @database_inserter.warning(:test_warning, "Testing the warning system", 12)
   end
   
 end
