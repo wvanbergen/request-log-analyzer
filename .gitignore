@@ -1,3 +1,4 @@
 .svn/
 .DS_Store
 request-log-analyzer-*.gem
+requests.db
