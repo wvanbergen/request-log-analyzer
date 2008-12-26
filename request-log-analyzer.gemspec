@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name    = 'request-log-analyzer'
-  s.version = '0.2.4'
+  s.version = '0.3.0'
   s.date    = '2008-12-22'
   
   s.bindir = 'bin'
-  s.executables = ['request-log-analyzer', 'request-log-database']
+  s.executables = ['request-log-analyzer']
   s.default_executable = 'request-log-analyzer'
   
   s.summary = "A command line tool to analyze Rails logs"
