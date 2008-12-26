@@ -40,7 +40,7 @@ X2lkaQIyBw==--3ad1948559448522a49d289a2a89dc7ccbe8847a
 Set language to: nl_NL
 Rendering template within layouts/priscilla
 Rendering people/show
-person: Gaby Somers, study_year: 2008/2009
+person: John Doe, study_year: 2008/2009
 Completed in 0.29077 (3 reqs/sec) | Rendering: 0.24187 (83%) | DB: 0.04030 (13%) | 200 OK [https://www.example.com/people/2545]
 
 

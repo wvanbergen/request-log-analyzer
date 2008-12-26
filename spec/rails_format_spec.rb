@@ -40,6 +40,15 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
     @log_parser.should be_valid_language
   end
   
+  it "should find 4 completed requests when lines are linked" do
+    requests = []
+    @log_parser.parse_file(log_fixture(:rails_1x)) do |request|
+      request.should be_completed
+      requests << request
+    end
+    requests.length.should == 4
+  end  
+  
   it "should parse a Rails 2.2 request properly" do
     requests = []
     @log_parser.parse_file(log_fixture(:rails_22)) { |request| requests << request }
@@ -57,13 +66,19 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
     requests.first[:view].should       == 0.120
   end
   
-  it "should find 4 completed requests when lines are linked" do
-    requests = []
-    @log_parser.parse_file(log_fixture(:rails_1x)) do |request|
+  it "should parse a syslog file with prefix correctly" do
+    @log_parser.parse_file(log_fixture(:syslog_1x)) do |request| 
+      
       request.should be_completed
-      requests << request
+      request.should be_combined
+      
+      request[:controller].should == 'EmployeeController'
+      request[:action].should     == 'index'
+      request[:url].should        == 'http://example.com/employee.xml'    
+      request[:status].should     == 200
+      request[:duration].should   == 0.21665
+      request[:db].should         == 0.0
+      request[:view].should       == 0.00926
     end
-    requests.length.should == 4
   end
-
 end
