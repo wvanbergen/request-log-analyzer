@@ -82,4 +82,13 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
       request =~ :cache_hit
     end  
   end
+  
+  it "should detect unordered requests in the logs" do
+    @log_parser.should_not_receive(:handle_request)
+    # the first Processing-line will not give a warning, but the next one will
+    @log_parser.should_receive(:warn).with(:unclosed_request, anything).once
+    # Both Completed ;ines will give a warning
+    @log_parser.should_receive(:warn).with(:no_current_request, anything).twice
+    @log_parser.parse_file(log_fixture(:rails_unordered))
+  end  
 end
