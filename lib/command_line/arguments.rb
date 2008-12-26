@@ -46,7 +46,7 @@ module CommandLine
     # <tt>flag</tt> A flag symbol like :fast
     # Options
     # * <tt>:expects</tt> Expects a value after the flag
-    def flag(flag, options)
+    def flag(flag, options = {})
       options[:expects] = String unless options.has_key?(:expects)
       argument = Flag.new(flag, options)
       @flag_definitions[argument.to_argument]  = argument
@@ -85,7 +85,14 @@ module CommandLine
             if flag.expects_argument?
               
               if @arguments.length > (i + 1) && @arguments[i + 1]
-                @flags[flag.name] = @arguments[i + 1]
+                
+                if flag.multiple?
+                  @flags[flag.name] ||= []
+                  @flags[flag.name] << @arguments[i + 1]
+                else
+                  @flags[flag.name] = @arguments[i + 1]
+                end
+                                
                 i += 1
               else
                 raise CommandLine::FlagExpectsArgument.new(arg)
@@ -115,6 +122,11 @@ module CommandLine
     # Check if the parsed arguments meet their requirements.
     # Raises CommandLineexception on error.
     def check_parsed_arguments!
+      
+      @flag_definitions.each do |flag, definition| 
+        @flags[definition.name] = definition.default if definition.default? && @flags[definition.name].nil?
+      end
+
       if @begins_with_command && @command.nil? 
         raise CommandLine::CommandMissing.new
       end

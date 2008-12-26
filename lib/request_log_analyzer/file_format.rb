@@ -10,7 +10,7 @@ module RequestLogAnalyzer
 
       # Loads the module constant for built in file formats
       if format_module.kind_of?(Symbol)
-        require "request_log_analyzer/file_format/#{format_module}"
+        require "#{File.dirname(__FILE__)}/file_format/#{format_module}"
         format_module = RequestLogAnalyzer::FileFormat.const_get(format_module.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) 
       end
       

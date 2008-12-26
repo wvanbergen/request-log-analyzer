@@ -9,6 +9,28 @@ module RequestLogAnalyzer
     attr_reader :sources
     attr_reader :options
 
+    def self.build(arguments)
+
+      options = {}
+      options[:combined_requests] = arguments[:combined_requests]
+
+      # Create the controller with the correct file format
+      controller = Controller.new(arguments[:format].to_sym, options)
+
+      # register sources
+      arguments.files.each do |file|
+        controller << file if File.exist?(file)
+      end
+
+      # register aggregators
+      arguments[:aggregator].each { |agg| controller >> agg.to_sym } 
+
+      # register the echo aggregator in debug mode
+      controller >> :echo if arguments[:debug]
+
+      return controller
+    end
+
     def initialize(format = :rails, options = {})
 
       @options = options
@@ -16,7 +38,7 @@ module RequestLogAnalyzer
       @sources     = []
       
       register_file_format(format)  
-      @log_parser  = RequestLogAnalyzer::LogParser.new(file_format)
+      @log_parser  = RequestLogAnalyzer::LogParser.new(file_format, @options)
     end
     
     def add_aggregator(agg)
@@ -36,7 +58,7 @@ module RequestLogAnalyzer
     
     alias :<< :add_source
     
-    def run
+    def run!
       
       @aggregators.each { |agg| agg.prepare }
       

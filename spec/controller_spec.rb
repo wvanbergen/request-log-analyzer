@@ -26,7 +26,7 @@ describe RequestLogAnalyzer::Controller do
     another_mock_aggregator.should_receive(:finalize).once.ordered  
     
     controller.aggregators << mock_aggregator << another_mock_aggregator
-    controller.run
+    controller.run!
   end
   
 end
