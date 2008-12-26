@@ -13,6 +13,7 @@ module RequestLogAnalyzer
 
       options = {}
       options[:combined_requests] = arguments[:combined_requests]
+      options[:database] = arguments[:database] if arguments[:database]
 
       # Create the controller with the correct file format
       controller = Controller.new(arguments[:format].to_sym, options)
@@ -25,9 +26,14 @@ module RequestLogAnalyzer
       # register aggregators
       arguments[:aggregator].each { |agg| controller >> agg.to_sym } 
 
+
+      # register the database 
+      controller >> :database   if arguments[:database] && !arguments[:aggregator].include?('database')
+      controller >> :summarizer if arguments[:aggregator].empty?
+    
       # register the echo aggregator in debug mode
       controller >> :echo if arguments[:debug]
-
+            
       return controller
     end
 

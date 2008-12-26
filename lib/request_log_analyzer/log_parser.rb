@@ -55,12 +55,12 @@ module RequestLogAnalyzer
           @parsed_lines += 1
           if @options[:combined_requests]
             if header_line?(request_data)
-              if @current_request.nil?
-                @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)
-              else
+              unless @current_request.nil?              
                 # TODO: warn
                 puts "Encountered header line on line #{request_data[:lineno]}, but previous request not closed" 
+                puts "#{io.lineno}: #{line.inspect}"
               end
+              @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)              
             else
               unless @current_request.nil?
                 @current_request << request_data
@@ -72,6 +72,7 @@ module RequestLogAnalyzer
               else
                 # TODO: warn
                 puts "Parsebale line found outside of a request on line #{request_data[:lineno]} " 
+                puts "#{io.lineno}: #{line.inspect}"            
               end
             end
           else

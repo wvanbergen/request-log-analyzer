@@ -1,9 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-require 'request_log_analyzer/file_format'
-require 'request_log_analyzer/request'
-require 'request_log_analyzer/log_parser'
-
 describe RequestLogAnalyzer::LogParser, "Merb without combined requests" do
   include RequestLogAnalyzerSpecHelper
   

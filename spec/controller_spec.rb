@@ -1,7 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-require 'request_log_analyzer'
-
 describe RequestLogAnalyzer::Controller do
 
   include RequestLogAnalyzerSpecHelper

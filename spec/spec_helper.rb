@@ -3,6 +3,8 @@ $: << File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
 require 'spec'
 
+require 'request_log_analyzer'
+
 module RequestLogAnalyzerSpecHelper
   
   def log_fixture(name)

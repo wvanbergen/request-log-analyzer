@@ -124,7 +124,8 @@ module CommandLine
     def check_parsed_arguments!
       
       @flag_definitions.each do |flag, definition| 
-        @flags[definition.name] = definition.default if definition.default? && @flags[definition.name].nil?
+        @flags[definition.name] ||= [] if definition.multiple? && !definition.default?
+        @flags[definition.name] ||= definition.default if definition.default?
       end
 
       if @begins_with_command && @command.nil? 

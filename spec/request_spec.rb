@@ -1,9 +1,5 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-require 'request_log_analyzer/file_format'
-require 'request_log_analyzer/request'
-
-
 describe RequestLogAnalyzer::Request, :single_line do
   
   before(:each) do

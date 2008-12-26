@@ -11,8 +11,8 @@ begin
     #command_line.flag(:install, :alias => :i) # command_line.command(:install)
     
     command_line.flag(:format, :default => 'rails')
-    command_line.flag(:aggregator, :alias => :a, :multiple => true, :default => ['summarizer'])
-    command_line.flag(:output, :alias => :o)
+    command_line.flag(:aggregator, :alias => :a, :multiple => true)
+    command_line.flag(:database, :alias => :d)
     
     command_line.switch(:combined_requests, :c)
     #command_line.switch(:guess_database_time, :g) 

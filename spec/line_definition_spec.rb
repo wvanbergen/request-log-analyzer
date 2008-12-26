@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/spec_helper'
-require 'request_log_analyzer/file_format'
 
 describe RequestLogAnalyzer::FileFormat::LineDefinition do
   
