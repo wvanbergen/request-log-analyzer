@@ -1,6 +1,10 @@
 module RequestLogAnalyzer
   module FileFormat
 
+    def self.included(base)
+      base.send(:attr_reader, :file_format)
+    end
+
     # Registers the correct language in the calling class (LogParser, Summarizer)
     def register_file_format(format_module)
 
@@ -10,6 +14,14 @@ module RequestLogAnalyzer
         format_module = RequestLogAnalyzer::FileFormat.const_get(format_module.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) 
       end
       
+      format_module.instance_eval do
+        def line_definitions
+          @line_definitions ||= self::LINE_DEFINITIONS.inject({}) do |hash, (name, definition)| 
+            hash.merge!(name => LineDefinition.new(name, definition))
+          end
+        end
+      end
+      
       # register language specific hooks in base class
       hook_module = self.class.to_s.split('::').last
       if format_module.const_defined?(hook_module) && format_module.const_get(hook_module).kind_of?(Module)
@@ -17,7 +29,7 @@ module RequestLogAnalyzer
         metaclass.send(:include, format_module.const_get(hook_module))
       end
       
-      return format_module
+      @file_format = format_module
     end
     
     
@@ -35,10 +47,13 @@ module RequestLogAnalyzer
       
       def convert_value(value, type)
         case type
-        when :integer; value.to_i
-        when :float;   value.to_f
-        when :decimal; value.to_f          
-        when :symbol;  value.to_sym
+        when :integer;   value.to_i
+        when :float;     value.to_f
+        when :decimal;   value.to_f          
+        when :symbol;    value.to_sym
+        when :sec;       value.to_f
+        when :msec;      value.to_f / 1000
+        when :timestamp; value.to_s # TODO: fix me?          
         else value
         end
       end

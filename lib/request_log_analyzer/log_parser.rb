@@ -4,7 +4,6 @@ module RequestLogAnalyzer
     include RequestLogAnalyzer::FileFormat
     
     attr_reader :options
-    attr_reader :line_definitions
     attr_reader :current_request
     
     def initialize(format, options = {})      
@@ -15,19 +14,16 @@ module RequestLogAnalyzer
       
       # install the file format module (see RequestLogAnalyzer::FileFormat)
       # and register all the line definitions to the parser
-      format_module = self.register_file_format(format)
-      format_module::LINE_DEFINITIONS.each { |key, value| self[key] = value }
+      self.register_file_format(format)
     end
           
-    def []=(name, line_definition_hash)
-      @line_definitions[name] = RequestLogAnalyzer::FileFormat::LineDefinition.new(name, line_definition_hash)
-    end
     
+    # checks whether 
     def valid_language?
       if @options[:combined_requests]
-        @line_definitions.detect { |(name, ld)| ld.header } && @line_definitions.detect { |(name, ld)| ld.footer }
+        file_format.line_definitions.detect { |(name, ld)| ld.header } && file_format.line_definitions.detect { |(name, ld)| ld.footer }
       else
-        @line_definitions.length > 0
+        file_format.line_definitions.length > 0
       end
     end
     
@@ -44,8 +40,10 @@ module RequestLogAnalyzer
     def parse_io(io, options = {}, &block)
 
       # parse every line type by default
-      options[:line_types] ||= @line_definitions.keys
-      unknown = options[:line_types].reject { |line_type| @line_definitions.has_key?(line_type) }
+      options[:line_types] ||= file_format.line_definitions.keys
+
+      # check whether all provided line types are valid
+      unknown = options[:line_types].reject { |line_type| file_format.line_definitions.has_key?(line_type) }
       raise "Unknown line types: #{unknown.join(', ')}" unless unknown.empty?
       
       io.each_line do |line|
@@ -53,12 +51,12 @@ module RequestLogAnalyzer
         @progress_handler.call(:progress, @io.pos) if @progress_handler
         
         request_data = nil
-        if options[:line_types].detect { |line_type| request_data = @line_definitions[line_type].matches(line, io.lineno) }
+        if options[:line_types].detect { |line_type| request_data = file_format.line_definitions[line_type].matches(line, io.lineno) }
           @parsed_lines += 1
           if @options[:combined_requests]
             if header_line?(request_data)
               raise "Encountered header line on line #{request_data[:lineno]}, but previous request not closed" unless @current_request.nil?
-              @current_request = RequestLogAnalyzer::Request.create(request_data)
+              @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)
             else
               raise "Parsebale line found outside of a request on line #{request_data[:lineno]} " if @current_request.nil?
               @current_request << request_data
@@ -69,7 +67,7 @@ module RequestLogAnalyzer
               end
             end
           else
-            yield(RequestLogAnalyzer::Request.create(request_data)) if block_given?
+            yield(RequestLogAnalyzer::Request.create(@file_format, request_data)) if block_given?
             @parsed_requests += 1
           end       
         end
@@ -79,11 +77,11 @@ module RequestLogAnalyzer
     protected
     
     def header_line?(hash)
-      @line_definitions[hash[:line_type]].header
+      file_format.line_definitions[hash[:line_type]].header
     end
     
     def footer_line?(hash)
-      @line_definitions[hash[:line_type]].footer  
+      file_format.line_definitions[hash[:line_type]].footer  
     end    
   end
 end

@@ -13,7 +13,7 @@ describe RequestLogAnalyzer::LogParser, :line_by_line do
   end
   
   it "should have line definitions" do
-    @log_parser.line_definitions.should_not be_empty
+    @log_parser.file_format.line_definitions.should_not be_empty
   end
 
   it "should have a valid language" do
@@ -51,7 +51,7 @@ describe RequestLogAnalyzer::LogParser, :combibed do
   end
   
   it "should have multiple line definitions" do
-    @log_parser.line_definitions.length.should >= 2
+    @log_parser.file_format.line_definitions.length.should >= 2
   end  
   
   it "should have a valid language" do
