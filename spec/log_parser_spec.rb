@@ -20,9 +20,9 @@ describe RequestLogAnalyzer::LogParser, :single_line_requests do
   
   it "should parse a stream and find valid requests" do
     io = File.new(log_fixture(:test_file_format), 'r')
-    @log_parser.parse_io(io, :line_types => [:test_line]) do |request| 
+    @log_parser.parse_io(io, :line_types => [:test]) do |request| 
       request.should be_kind_of(RequestLogAnalyzer::Request)
-      request.should =~ :test_line
+      request.should =~ :test
       request[:test_capture].should_not be_nil      
     end
     io.close

@@ -28,18 +28,18 @@ module TestFileFormat
   end
   
   LINE_DEFINITIONS = {
-    :first_line => {
+    :first => {
       :header => true,
       :teaser => /processing /,
       :regexp => /processing request (\d+)/,
       :captures => [{:request_no => :integer}]    
     },
-    :test_line => {
+    :test => {
       :teaser => /testing /,
       :regexp => /testing is (\w+)/,
       :captures => [{:test_capture => :string}]
     }, 
-    :last_line => {
+    :last => {
       :footer => true,
       :teaser => /finishing /,
       :regexp => /finishing request (\d+)/,
