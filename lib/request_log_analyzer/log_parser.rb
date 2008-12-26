@@ -93,6 +93,11 @@ module RequestLogAnalyzer
       end
     end
     
+    # Pass a block to this function to install a progress handler
+    def progress(&block)
+      @progress_handler = block
+    end
+    
     protected
     
     def handle_request(request, &block)
