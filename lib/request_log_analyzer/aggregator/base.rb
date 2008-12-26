@@ -26,5 +26,9 @@ module RequestLogAnalyzer::Aggregator
     def warning(type, message, lineno)
     end    
 
+    def report(color = false)
+      
+    end
+
   end
 end

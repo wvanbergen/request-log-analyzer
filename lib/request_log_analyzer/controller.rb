@@ -83,7 +83,7 @@ module RequestLogAnalyzer
       end
       
       @aggregators.each { |agg| agg.finalize }
-      
+      @aggregators.each { |agg| agg.report(options[:colorize]) }
     end
     
   end
