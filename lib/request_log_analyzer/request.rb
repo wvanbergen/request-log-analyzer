@@ -15,18 +15,32 @@ module RequestLogAnalyzer
       hashes.flatten.each { |hash| request << hash }
       return request
     end
-    
-    def =~(line_type)
-      @lines.detect { |l| l[:line_type] == line_type.to_sym }
-    end
      
+    # Adds another line to the request
     def << (request_info_hash)
       @lines << request_info_hash
     end
     
-    def [](field)
+    # Checks whether the given line type was parsed from the log file for this request
+    def has_line_type?(line_type)
+      @lines.detect { |l| l[:line_type] == line_type.to_sym }
+    end
+    
+    alias :=~ :has_line_type?
+    
+    # Returns the value that was captured for the "field" of this request.
+    # This function will return the first value that was captured if the field
+    # was captured in multiple lines for a combined request.
+    def first(field)
       @lines.detect { |fields| fields.has_key?(field) }[field] rescue nil
     end
+    
+    alias :[] :first
+    
+    # Returns an array of all the "field" values that were captured for this request
+    def every(field)
+      @lines.inject([]) { |result, fields| result << fields[field] if fields.has_key?(field); result }
+    end    
     
     def empty?
       @lines.length == 0

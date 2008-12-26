@@ -67,4 +67,13 @@ describe RequestLogAnalyzer::LogParser, :combined_requests do
     @log_parser.should_receive(:handle_request).with(an_instance_of(RequestLogAnalyzer::Request)).once
     @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)])
   end
+  
+  it "should parse all request values when spanned over multiple files" do
+    @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)]) do |request|
+      request.lines.length.should == 4
+
+      request[:request_no].should == 1
+      request[:test_capture].should == "amazing"      
+    end
+  end  
 end

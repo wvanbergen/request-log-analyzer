@@ -30,7 +30,7 @@ describe RequestLogAnalyzer::Request, :single_line do
     @single_line_request.should =~ :test_line    
   end
   
-  it "should return the correct field value" do
+  it "should return the first field value" do
     @single_line_request[:test_capture].should == 'awesome!'
   end
   
@@ -69,7 +69,12 @@ describe RequestLogAnalyzer::Request, :combined do
     @combined_request[:time].should == 0.03
   end
   
-  it "should detect the first correct field value" do  
-    @combined_request[:test_capture].should == 'testing'
+  it "should detect the first matching field value" do  
+    @combined_request.first(:test_capture).should == 'testing'
   end
+  
+  it "should detect the every matching field value" do  
+    @combined_request.every(:test_capture).should == ['testing', "testing some more"]
+  end
+  
 end
