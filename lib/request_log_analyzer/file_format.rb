@@ -1,11 +1,16 @@
 module RequestLogAnalyzer
   module FileFormat
 
+    # Add the file format attribute to the base class so that it can acccess the file format
+    # definition.
     def self.included(base)
       base.send(:attr_reader, :file_format)
     end
 
     # Registers the correct language in the calling class (LogParser, Summarizer)
+    # - It will load the correct file format module and assign it to the file_format attribute
+    # - It will initialize all line definitions (accessible under file_format.line_definitions)
+    # - It will include the hook module specific for the file format into the base class.
     def register_file_format(format_module)
 
       # Loads the module constant for built in file formats
@@ -38,18 +43,23 @@ module RequestLogAnalyzer
     end
     
     
-    
+    # The line definition class is used to specify what lines should be parsed from the log file.
+    # It contains functionality to match a line against the definition and parse the information
+    # from this line. This is used by the LogParser class when parsing a log file..
     class LineDefinition
 
       attr_reader :name
       attr_accessor :teaser, :regexp, :captures
       attr_accessor :header, :footer
       
+      # Initializes the LineDefinition instance with a hash containing the different elements of
+      # the definition.
       def initialize(name, definition = {})
         @name = name
         definition.each { |key, value| self.send("#{key.to_s}=".to_sym, value) }
       end
       
+      # Converts a parsed value (String) to the desired value using some heuristics.
       def convert_value(value, type)
         case type
         when :integer;   value.to_i
@@ -62,7 +72,12 @@ module RequestLogAnalyzer
         else value
         end
       end
-            
+      
+      # Checks whether a given line matches this definition. 
+      # It will return false if a line does not match. If the line matches, a hash is returned
+      # with all the fields parsed from that line as content.
+      # If the line definition has a teaser-check, a :teaser_check_failed warning will be emitted
+      # if this teaser-check is passed, but the full regular exprssion does not ,atch.
       def matches(line, lineno = nil, parser = nil)
         if @teaser.nil? || @teaser =~ line
           if @regexp =~ line

@@ -1,5 +1,20 @@
 module RequestLogAnalyzer
   
+  # The RequestLogAnalyzer::Controller class creates a LogParser instance for the
+  # requested file format, and connect it with sources and aggregators.
+  #
+  # Sources are streams or files from which the requests will be parsed.
+  # Aggregators will handle every passed request to yield a meaningfull results.
+  #
+  # - Use the build-function to build a controller instance using command line arguments.
+  # - Use add_aggregator to register a new aggregator
+  # - Use add_source to register a new aggregator
+  # - Use the run! method to start the parser and send the requests to the aggregators.
+  #
+  # Note that the order of sources can be imported if you have log files than succeed
+  # eachother. Requests that span over succeeding files will be parsed correctly if the
+  # sources are registered in the correct order. This can be helpful to parse requests
+  # from several logrotated log files.
   class Controller
 
     include RequestLogAnalyzer::FileFormat
@@ -9,6 +24,7 @@ module RequestLogAnalyzer
     attr_reader :sources
     attr_reader :options
 
+    # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     def self.build(arguments)
 
       options = {}
@@ -20,7 +36,7 @@ module RequestLogAnalyzer
 
       # register sources
       arguments.files.each do |file|
-        controller << file if File.exist?(file)
+        controller.add_source(file) if File.exist?(file)
       end
 
       # register aggregators
@@ -28,15 +44,16 @@ module RequestLogAnalyzer
 
 
       # register the database 
-      controller >> :database   if arguments[:database] && !arguments[:aggregator].include?('database')
-      controller >> :summarizer if arguments[:aggregator].empty?
+      controller.add_aggregator(:database) if arguments[:database] && !arguments[:aggregator].include?('database')
+      controller.add_aggregator(:summarizer) if arguments[:aggregator].empty?
     
       # register the echo aggregator in debug mode
-      controller >> :echo if arguments[:debug]
+      controller.add_aggregator(:echo) if arguments[:debug]
             
       return controller
     end
 
+    # Builds a new Controller for the given log file format.
     def initialize(format = :rails, options = {})
 
       @options = options
@@ -46,12 +63,15 @@ module RequestLogAnalyzer
       register_file_format(format)  
       @log_parser  = RequestLogAnalyzer::LogParser.new(file_format, @options)
       
+      # Pass all warnings to every aggregator so they can do something useful with them.
       @log_parser.on_warning do |type, message, lineno|        
         @aggregators.each { |agg| agg.warning(type, message, lineno) }
         puts "WARNING #{type.inspect} on line #{lineno}: #{message}" unless options[:silent]
       end
     end
     
+    # Adds an aggregator to the controller. The aggregator will be called for every request 
+    # that is parsed from the provided sources (see add_source)
     def add_aggregator(agg)
       if agg.kind_of?(Symbol)
         require File.dirname(__FILE__) + "/aggregator/#{agg}"
@@ -63,12 +83,23 @@ module RequestLogAnalyzer
     
     alias :>> :add_aggregator
     
+    # Adds an input source to the controller, which will be scanned by the LogParser. 
+    #
+    # The sources are scanned in the order they are given to the controller. This can be
+    # important if the different sources succeed eachother, for instance logrotated log 
+    # files. Make sure they are provided in the correct order.
     def add_source(source)
       @sources << source
     end
     
     alias :<< :add_source
     
+    # Runs RequestLogAnalyzer
+    # 1. Calls prepare on every aggregator
+    # 2. Starts parsing every input source
+    # 3. Calls aggregate for every parsed request on every aggregator
+    # 4. Calls finalize on every aggregator
+    # 5. Calls report on every aggregator
     def run!
       
       @aggregators.each { |agg| agg.prepare }

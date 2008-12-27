@@ -1,13 +1,37 @@
 module RequestLogAnalyzer
+  
+  # The LogParser class reads log data from a given source and uses a file format definition
+  # to parse all relevent information about requests from the file.
+  #
+  # A FileFormat module should be provided that contains the definitions of the lines that 
+  # occur in the log data. The log parser can run in two modes:
+  # - In single line mode, it will emit every detected line as a separate request
+  # - In combined requests mode, it will combine the different lines from the line defintions
+  #   into one request, that will then be emitted. 
+  #
+  # The combined requests mode gives better information, but can be problematic if the log 
+  # file is unordered. This can be the case if data is written to the log file simultaneously 
+  # by different mongrel processes. This problem is detected by the parser, but the requests
+  # that are mixed up cannot be parsed. It will emit warnings when this occurs.
   class LogParser
     
     include RequestLogAnalyzer::FileFormat
     
+    # A hash of options
     attr_reader :options
+    
+    # The current Request object that is being parsed
     attr_reader :current_request
+    
+    # The total number of parsed lines
     attr_reader :parsed_lines
+    
+    # The total number of parsed requests.
     attr_reader :parsed_requests
     
+    # Initializes the parser instance.
+    # It will apply the language specific FileFormat module to this instance. It will use the line
+    # definitions in this module to parse any input.
     def initialize(format, options = {})      
       @line_definitions = {}
       @options          = options
@@ -20,11 +44,10 @@ module RequestLogAnalyzer
       # and register all the line definitions to the parser
       self.register_file_format(format)
     end
-              
+    
+    # Parses a list of consequent files of the same format
     def parse_files(files, options = {}, &block)
-      files.each do |file|
-        parse_file(file, options, &block)
-      end
+      files.each { |file| parse_file(file, options, &block) }
     end
     
     # Parses a file. 
@@ -70,21 +93,35 @@ module RequestLogAnalyzer
       @current_io = nil
     end
     
-    # Pass a block to this function to install a progress handler
+    # Add a block to this method to install a progress handler while parsing
     def on_progress(&block)
       @progress_handler = block
     end
     
+    # Add a block to this method to install a warning handler while parsing
     def on_warning(&block)
       @warning_handler = block
     end
 
+    # This method is called by the parser if it encounteres any problems.
+    # It will call the warning handler. The default controller will pass all warnings to every
+    # aggregator that is registered and running
     def warn(type, message)
       @warning_handler.call(type, message, @current_io.lineno) if @warning_handler
     end
     
     protected
     
+    # Combines the different lines of a request into a single Request object.
+    # This function is only called in combined requests mode. It will start a new request when
+    # a header line is encountered en will emit the request when a footer line is encountered.
+    #
+    # - Every line that is parsed before a header line is ignored as it cannot be included in 
+    #   any request. It will emit a :no_current_request warning.
+    # - A header line that is parsed before a request is closed by a footer line, is a sign of
+    #   an unprpertly ordered file. All data that is gathered for the request until then is 
+    #   discarded, the next request is ignored as well and a :unclosed_request warning is
+    #   emitted.
     def update_current_request(request_data, &block)
       if header_line?(request_data)
         unless @current_request.nil?
@@ -107,14 +144,18 @@ module RequestLogAnalyzer
       end
     end
     
+    # Handles the parsed request by calling the request handler.
+    # The default controller will send the request to every running aggegator.
     def handle_request(request, &block)
       yield(request) if block_given?
     end
     
+    # Checks whether a given line hash is a header line.
     def header_line?(hash)
       file_format.line_definitions[hash[:line_type]].header
     end
-    
+
+    # Checks whether a given line hash is a footer line.    
     def footer_line?(hash)
       file_format.line_definitions[hash[:line_type]].footer  
     end 
