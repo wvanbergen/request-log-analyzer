@@ -19,14 +19,17 @@ module RequestLogAnalyzer
         format_module = RequestLogAnalyzer::FileFormat.const_get(format_module.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) 
       end
       
+      # Add some functions toe the file format module
       format_module.instance_eval do
+        
+        # creates LineDefinition instances for every key in the LINE_DEFINITIONS hash of the file format Module
         def line_definitions
           @line_definitions ||= self::LINE_DEFINITIONS.inject({}) do |hash, (name, definition)| 
             hash.merge!(name => LineDefinition.new(name, definition))
           end
         end
         
-        # checks whether the file format descriptor is valid
+        # checks whether the file format definition is valid and can be used in combined requests mode.
         def valid?
           @line_definitions.detect { |(name, ld)| ld.header } && @line_definitions.detect { |(name, ld)| ld.footer }
         end
