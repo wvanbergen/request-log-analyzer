@@ -25,6 +25,7 @@ module RequestLogAnalyzer
     attr_reader :options
 
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
+    # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     def self.build(arguments)
 
       options = {}
@@ -42,7 +43,6 @@ module RequestLogAnalyzer
       # register aggregators
       arguments[:aggregator].each { |agg| controller >> agg.to_sym } 
 
-
       # register the database 
       controller.add_aggregator(:database) if arguments[:database] && !arguments[:aggregator].include?('database')
       controller.add_aggregator(:summarizer) if arguments[:aggregator].empty?
@@ -54,13 +54,21 @@ module RequestLogAnalyzer
     end
 
     # Builds a new Controller for the given log file format.
+    # <tt>format</tt> Logfile format. Defaults to :rails
+    # Options are passd on to the LogParser.
+    # * <tt>:aggregator</tt> Aggregator array.
+    # * <tt>:combined_requests</tt> Combine multiline requests into a single request.
+    # * <tt>:database</tt> Database the controller should use.
+    # * <tt>:echo</tt> Output debug information.
+    # * <tt>:silent</tt> Do not output any warnings.
     def initialize(format = :rails, options = {})
 
       @options = options
       @aggregators = []
       @sources     = []
       
-      register_file_format(format)  
+      # Requester format through RequestLogAnalyzer::FileFormat and construct the parser
+      register_file_format(format) 
       @log_parser  = RequestLogAnalyzer::LogParser.new(file_format, @options)
       
       # Pass all warnings to every aggregator so they can do something useful with them.
