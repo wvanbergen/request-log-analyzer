@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 require File.dirname(__FILE__) + '/../lib/request_log_analyzer'
-require File.dirname(__FILE__) + '/../lib/command_line/arguments'
+require File.dirname(__FILE__) + '/../lib/command_line_arguments'
 
 puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
 
@@ -8,14 +8,18 @@ puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
 begin
   arguments = CommandLine::Arguments.parse do |command_line|
     
-    #command_line.flag(:install, :alias => :i) # command_line.command(:install)
+    #command_line.command(:install, :alias => :i) do end
     
-    command_line.flag(:format, :default => 'rails')
-    command_line.flag(:aggregator, :alias => :a, :multiple => true)
-    command_line.flag(:database, :alias => :d)
+    command_line.option(:format, :default => 'rails')
+    command_line.option(:aggregator, :alias => :a, :multiple => true)
+    command_line.option(:database, :alias => :d)
         
     command_line.switch(:combined_requests, :c)
     command_line.switch(:colorize, :z) 
+    command_line.switch(:debug)
+    
+    command_line.minimum_parameters = 1
+    
     #command_line.switch(:estimate_database_time, :e) 
     #command_line.switch(:fast, :f) #
   end

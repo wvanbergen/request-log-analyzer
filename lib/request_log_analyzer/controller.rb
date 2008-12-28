@@ -36,7 +36,7 @@ module RequestLogAnalyzer
       controller = Controller.new(arguments[:format].to_sym, options)
 
       # register sources
-      arguments.files.each do |file|
+      arguments.parameters.each do |file|
         controller.add_source(file) if File.exist?(file)
       end
 
