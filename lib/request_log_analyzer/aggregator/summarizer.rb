@@ -171,6 +171,32 @@ module RequestLogAnalyzer::Aggregator
         end
       end      
     end
+
+    class TimespanTracker < Tracker
+      
+      attr_reader :first, :last
+      
+      def prepare
+        raise "No categorizer set up for category tracker #{self.inspect}" unless options[:field]
+      end
+                  
+      def update(request)
+        timestamp = timestamp.kind_of?(String) ? DateTime.parse(request[options[:field]]) : request[options[:field]]
+        
+        @first = timestamp if @first.nil? || @first > timestamp 
+        @last  = timestamp if @last.nil?  || @last  < timestamp         
+      end
+      
+      def report(color = false)
+        if options[:title]
+          puts "\n#{options[:title]}" 
+          puts '-' * options[:title].length
+        end
+        
+        puts "First request parsed: #{@first.strftime('%Y/%m/%d %H:%M:%I')}"
+        puts "Last request parsed:  #{@last.strftime('%Y/%m/%d %H:%M:%I')}"        
+      end
+    end
     
     class CategoryTracker < Tracker
       

@@ -34,7 +34,7 @@ module RequestLogAnalyzer::FileFormat::Rails
     :failed => {
       :footer => true,   
       :teaser => /Error/,
-      :regexp => /(\w+)(?:Error|Invalid) \((.*)\)\:(.*)/,
+      :regexp => /(\w+Error|\w+Invalid) \((.*)\)\:(.*)/,
       :captures => [{ :name => :error,            :type => :string}, 
                     { :name => :exception_string, :type => :string}, 
                     { :name => :stack_trace,      :type => :string, :anonymize => true}]
@@ -62,7 +62,7 @@ module RequestLogAnalyzer::FileFormat::Rails
   module Summarizer
     
     def setup
-      
+      track(:timespan, :field => :timestamp, :line_type => :started)      
       track(:category, :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20, :line_type => :started)
       track(:category, :category => :method, :title => 'HTTP methods')
       track(:category, :category => :status, :title => 'HTTP statuses returned')
