@@ -49,7 +49,7 @@ module CommandLine
     end
 
     def =~(test)
-      [@name, @alias].include?(test.to_sym)
+      [@name, @alias].include?(CommandLine::Option.rewrite(test))
     end
 
     # Argument representation of the flag (--fast)

@@ -27,7 +27,12 @@ module RequestLogAnalyzer
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     def self.build(arguments)
-
+      
+      if arguments[:debug]
+        print "Parsing mode: "
+        puts arguments[:combined_requests] ? 'combined requests' : 'single lines'
+      end
+      
       options = {}
       options[:combined_requests] = arguments[:combined_requests]
       options[:database] = arguments[:database] if arguments[:database]

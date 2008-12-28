@@ -48,13 +48,19 @@ module RequestLogAnalyzer::FileFormat::Rails
   module Summarizer
     
     def setup
+      
+      track(:category, :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20)
       track(:category, :category => :method, :title => 'HTTP methods')
       track(:category, :category => :status, :title => 'HTTP statuses returned')
-      track(:category, :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits')      
+      track(:category, :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits')
+      
+      track(:duration, :duration => :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration", :line_type => :completed)
+      track(:duration, :duration => :view, :category => REQUEST_CATEGORIZER, :title => "Database time", :line_type => :completed)
+      track(:duration, :duration => :db, :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed)
     end
     
-    def bucket_for(request)
-      if options[:combined_requests]
+    REQUEST_CATEGORIZER = Proc.new do |request|
+      if request.combined?
       
         if request =~ :failed
           "#{request[:error]} in #{request[:controller]}##{request[:action]}.#{format} [#{request[:method]}]"
