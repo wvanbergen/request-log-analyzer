@@ -80,9 +80,26 @@ module RequestLogAnalyzer
       @log_parser  = RequestLogAnalyzer::LogParser.new(file_format, @options)
       
       # Pass all warnings to every aggregator so they can do something useful with them.
-      @log_parser.on_warning do |type, message, lineno|        
-        @aggregators.each { |agg| agg.warning(type, message, lineno) }
-        puts "WARNING #{type.inspect} on line #{lineno}: #{message}" if options[:debug]
+      @log_parser.warning = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } }
+
+      # Handle progress messagess
+      @log_parser.progress = lambda { |message, value| handle_progress(message, value) } 
+    end
+    
+    def handle_progress(message, value = nil)
+      case message
+      when :started
+        @progress_bar = ProgressBar.new(File.basename(value), File.size(value))
+      when :finished
+        @progress_bar.finish
+        @progress_bar = nil
+      when :interrupted
+        if @progress_bar
+          @progress_bar.halt
+          @progress_bar = nil
+        end
+      when :progress
+        @progress_bar.set(value)
       end
     end
     
@@ -126,15 +143,15 @@ module RequestLogAnalyzer
           case source
           when IO;     
             puts "Parsing from the standard input. Press CTRL+C to finish."
-            @log_parser.parse_io(source, options,   &handle_request) 
+            @log_parser.parse_stream(source, options, &handle_request) 
           when String
-            puts "Parsing #{source}..."
             @log_parser.parse_file(source, options, &handle_request) 
           else
             raise "Unknwon source provided"
           end
         end
       rescue Interrupt => e
+        handle_progress(:interrupted)
         puts "Caught interrupt! Stopped parsing."
       end
       puts 

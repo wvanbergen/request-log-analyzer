@@ -55,8 +55,12 @@ module RequestLogAnalyzer
     def parse_file(file, options = {}, &block)
       @progress_handler.call(:started, file) if @progress_handler
       File.open(file, 'r') { |f| parse_io(f, options, &block) }
-      @progress_handler.call(:completed, file) if @progress_handler
-    end    
+      @progress_handler.call(:finished, file) if @progress_handler
+    end
+    
+    def parse_stream(stream, options = {}, &block)
+      parse_io(stream, options, &block)
+    end
 
     # Finds a log line and then parses the information in the line.
     # Yields a hash containing the information found. 
@@ -77,7 +81,7 @@ module RequestLogAnalyzer
       @current_io = io
       @current_io.each_line do |line|
         
-        @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.lineno % 10 == 0
+        @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
         
         request_data = nil
         if options[:line_types].detect { |line_type| request_data = file_format.line_definitions[line_type].matches(line, @current_io.lineno, self) }
@@ -97,15 +101,15 @@ module RequestLogAnalyzer
     end
     
     # Add a block to this method to install a progress handler while parsing
-    def on_progress(&block)
-      @progress_handler = block
+    def progress=(proc)
+      @progress_handler = proc
     end
     
     # Add a block to this method to install a warning handler while parsing
-    def on_warning(&block)
-      @warning_handler = block
+    def warning=(proc)
+      @warning_handler = proc
     end
-
+    
     # This method is called by the parser if it encounteres any problems.
     # It will call the warning handler. The default controller will pass all warnings to every
     # aggregator that is registered and running
