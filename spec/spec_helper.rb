@@ -32,12 +32,12 @@ module TestFileFormat
       :header => true,
       :teaser => /processing /,
       :regexp => /processing request (\d+)/,
-      :captures => [{ :name => :request_no, :type => :integer }]    
+      :captures => [{ :name => :request_no, :type => :integer, :anonymize => :slightly }]    
     },
     :test => {
       :teaser => /testing /,
       :regexp => /testing is (\w+)/,
-      :captures => [{ :name => :test_capture, :type => :string}]
+      :captures => [{ :name => :test_capture, :type => :string, :anonymize => true}]
     }, 
     :last => {
       :footer => true,

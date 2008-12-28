@@ -44,12 +44,25 @@ module RequestLogAnalyzer
       
       @file_format = format_module
     end
+  
+  
     
+    module Anonymizers
+      def anonymizer_for_ip(value, capture_definition)
+        '127.0.0.1'
+      end
+
+      def anonymizer_for_url(value, capture_definition)
+        value.sub(/^https?\:\/\/[A-z0-9\.-]+\//, "http://example.com/")
+      end
+    end  
     
     # The line definition class is used to specify what lines should be parsed from the log file.
     # It contains functionality to match a line against the definition and parse the information
     # from this line. This is used by the LogParser class when parsing a log file..
     class LineDefinition
+
+      include RequestLogAnalyzer::FileFormat::Anonymizers
 
       attr_reader :name
       attr_accessor :teaser, :regexp, :captures
@@ -103,6 +116,63 @@ module RequestLogAnalyzer
       
       alias :=~ :matches
       
+      def anonymize_value(value, capture_definition)
+        if capture_definition[:anonymize].respond_to?(:call)
+          capture_definition[:anonymize].call(value, capture_definition)
+        else
+          case capture_definition[:anonymize]
+          when nil;   value
+          when false; value
+          when true;  '***'
+          when :slightly; anonymize_slightly(value, capture_definition)
+          else 
+            method_name = "anonymizer_for_#{capture_definition[:anonymize]}".to_sym
+            self.respond_to?(method_name) ? self.send(method_name, value, capture_definition) : '***'
+          end
+        end
+      end
+      
+      def anonymize_slightly(value, capture_definition)  
+        case capture_definition[:type]
+        when :integer
+          (value.to_i * (0.8 + rand * 0.4)).to_i
+        when :double
+          (value.to_f * (0.8 + rand * 0.4)).to_f          
+        when :msec
+          (value.to_i * (0.8 + rand * 0.4)).to_i
+        when :sec
+          (value.to_f * (0.8 + rand * 0.4)).to_f
+        when :timestamp
+          (DateTime.parse(value) + (rand(100) - 50)).to_s
+        else
+          puts "Cannot anonymize #{capture_definition[:type].inspect} slightly, using ***"
+          '***'
+        end  
+      end
+
+      # Anonymize a log line
+      def anonymize(line, options = {})
+        if self.teaser.nil? || self.teaser =~ line
+          if self.regexp =~ line
+            pos_adjustment = 0
+            captures.each_with_index do |capture, index|
+              unless $~[index + 1].nil?
+                anonymized_value = anonymize_value($~[index + 1], capture).to_s
+                line[($~.begin(index + 1) + pos_adjustment)...($~.end(index + 1) + pos_adjustment)] = anonymized_value
+                pos_adjustment += anonymized_value.length - $~[index + 1].length                    
+              end
+            end
+            line
+          elsif self.teaser.nil?
+            nil
+          else
+            options[:discard_teaser_lines] ? "" : line
+          end
+        else
+          nil
+        end
+      end
     end
+    
   end
 end
