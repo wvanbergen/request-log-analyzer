@@ -187,9 +187,9 @@ module RequestLogAnalyzer::Aggregator
         end
         
         sorted_categories = @categories.sort { |a, b| b[1] <=> a[1] }
-        sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
-        
         total_hits     = sorted_categories.inject(0) { |carry, item| carry + item[1] }
+                
+        sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
         max_cat_length = sorted_categories.map { |c| c[0].to_s.length }.max
         sorted_categories.each { |(cat, count)| puts "%-#{max_cat_length}s: %5d hits (%.01f%%)" % [cat, count, (count.to_f / total_hits) * 100] }
       end
