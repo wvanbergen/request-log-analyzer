@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name    = 'request-log-analyzer'
-  s.version = '0.2.4'
-  s.date    = '2008-12-22'
+  s.version = '0.3.3'
+  s.date    = '2008-12-28'
   
   s.bindir = 'bin'
   s.executables = ['request-log-analyzer', 'request-log-database']
