@@ -37,7 +37,7 @@ module RequestLogAnalyzer::FileFormat::Rails
       :regexp => /(\w+)(?:Error|Invalid) \((.*)\)\:(.*)/,
       :captures => [{ :name => :error,            :type => :string}, 
                     { :name => :exception_string, :type => :string}, 
-                    { :name => :stack_trace,      :type => :string, :anonymize => :remove}]
+                    { :name => :stack_trace,      :type => :string, :anonymize => true}]
     },
 
     # Completed lines: see above. Parse both completed line formats
