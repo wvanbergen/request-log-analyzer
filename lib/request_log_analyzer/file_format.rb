@@ -71,7 +71,7 @@ module RequestLogAnalyzer
         when :symbol;    value.to_sym
         when :sec;       value.to_f
         when :msec;      value.to_f / 1000
-        when :timestamp; value.to_s # TODO: fix me?          
+        when :timestamp; DateTime.parse(value) # TODO: fix me?          
         else value
         end
       end

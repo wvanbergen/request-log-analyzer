@@ -47,6 +47,12 @@ module RequestLogAnalyzer::FileFormat::Rails
   
   module Summarizer
     
+    def setup
+      track(:category, :category => :method, :title => 'HTTP methods')
+      track(:category, :category => :status, :title => 'HTTP statuses returned')
+      track(:category, :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits')      
+    end
+    
     def bucket_for(request)
       if options[:combined_requests]
       
