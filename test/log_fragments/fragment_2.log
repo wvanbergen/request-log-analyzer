@@ -1,0 +1,5 @@
+Jul 13 06:25:58 10.1.1.32 app_p [1957]: Processing EmployeeController#index (for 10.1.1.33 at 2008-07-13 06:25:58) [GET]
+Jul 13 06:25:58 10.1.1.32 app_p [1957]: Session ID: bd1810833653be11c38ad1e5675635bd
+Jul 13 06:25:58 10.1.1.32 app_p [1957]: Parameters: {"format"=>"xml", "action"=>"index}
+Jul 13 06:25:58 10.1.1.32 app_p [1957]: Rendering employees
+Jul 13 06:25:58 10.1.1.32 app_p [1957]: Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://example.com/employee.xml]

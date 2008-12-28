@@ -1,0 +1,24 @@
+Processing AccountController#dashboard (for 1.1.1.1 at 2008-12-24 07:36:49) [GET]
+  Parameters: {"action"=>"dashboard", "controller"=>"account", "first_use"=>"true"}
+Logging in from session data...
+
+
+Processing ProjectsController#new (for 1.1.1.1 at 2008-12-24 07:36:49) [GET]
+  Parameters: {"action"=>"new", "controller"=>"projects"}
+Rendering template within layouts/default
+Rendering account/dashboard
+Logging in from session data...
+Logging in using cookie...
+Using locale: en-US, http-accept: [], session: , det browser: , det domain: , user pref locale: 
+Rendered shared/_maintenance (0.6ms)
+Rendering template within layouts/templates/general_default/index.html.erb
+Rendered projects/_recent_designs (4.3ms)
+Rendered projects/_project (13.6ms)
+Rendered projects/_projects (18.7ms)
+Rendered layouts/_menu (1.4ms)
+Completed in 36ms (View: 30, DB: 3) | 200 OK [http://www.example.com/projects/new]
+Rendered layouts/_actions (0.3ms)
+Rendered layouts/_menu (1.6ms)
+Rendered layouts/_tabbar (1.9ms)
+Rendered layouts/_footer (3.2ms)
+Completed in 50ms (View: 41, DB: 4) | 200 OK [http://www.example.com/dashboard?first_use=true]

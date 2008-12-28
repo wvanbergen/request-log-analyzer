@@ -1,0 +1,10 @@
+Processing CachedController#cached (for 1.1.1.1 at 2008-12-24 07:36:53) [GET]
+  Parameters: {"action"=>"cached", "controller"=>"cached"}
+Logging in from session data...
+Logging in using cookie...
+Using locale: zh-Hans, http-accept: ["zh-CN", "zh-HK", "zh-TW", "en-US"], session: , det browser: zh-Hans, det domain: , user pref locale: 
+Referer: http://www.example.com/referer
+Cached fragment hit: views/zh-Hans-www-cached-cached-all-CN--- (0.0ms)
+Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.
+Filter chain halted as [#<ActionController::Filters::AroundFilter:0x2a999ad120 @identifier=nil, @kind=:filter, @options={:only=>#<Set: {"cached"}>, :if=>:not_logged_in?, :unless=>nil}, @method=#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>>] did_not_yield.
+Completed in 3ms (View: 0, DB: 0) | 200 OK [http://www.example.com/cached/cached/]
