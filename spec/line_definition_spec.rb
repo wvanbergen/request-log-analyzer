@@ -6,7 +6,7 @@ describe RequestLogAnalyzer::FileFormat::LineDefinition do
     @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
       :teaser   => /Testing /,
       :regexp   => /Testing (\w+), tries\: (\d+)/,
-      :captures => [{:what => :string}, {:tries => :integer}]
+      :captures => [{ :name => :what, :type => :string }, { :name => :tries, :type => :integer }]
     })
   end
   

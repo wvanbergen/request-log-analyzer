@@ -49,9 +49,8 @@ module RequestLogAnalyzer::Aggregator
       ActiveRecord::Migration.create_table("#{name}_lines") do |t|
         t.column(:request_id, :integer) #if options[:combined_requests]
         t.column(:lineno, :integer)
-        definition.captures.each do |field|
-          # there is only on key/value pait in this hash
-          field.each { |key, capture_type| t.column(key, column_type(capture_type)) }
+        definition.captures.each do |capture|
+          t.column(capture[:name], column_type(capture))
         end
       end
     end
@@ -81,12 +80,12 @@ module RequestLogAnalyzer::Aggregator
       create_warning_table_and_class
     end
     
-    def column_type(capture_type)
-      case capture_type
+    def column_type(capture)
+      case capture[:type]
       when :sec;   :double
       when :msec;  :double
       when :float; :double
-      else capture_type
+      else         capture[:type]
       end
     end
   end

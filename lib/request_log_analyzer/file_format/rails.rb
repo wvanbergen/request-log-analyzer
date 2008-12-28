@@ -16,10 +16,14 @@ module RequestLogAnalyzer::FileFormat::Rails
       :header => true,
       :teaser => /Processing/,
       :regexp => /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/,
-      :captures => [{:controller => :string}, {:action => :string}, {:format => :string}, {:ip => :string}, {:timestamp => :timestamp}, {:method => :string}]
+      :captures => [{ :name => :controller, :type => :string }, 
+                    { :name => :action,     :type  => :string }, 
+                    { :name => :format,     :type  => :string }, 
+                    { :name => :ip,         :type  => :string, :anonymize => :ip }, 
+                    { :name => :timestamp,  :type  => :timestamp, :anonymize => :slightly }, 
+                    { :name => :method,     :type  => :string }]
     },
 
-    # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a998a2ff0 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a998af660@/home/floorplanner/beta/releases/20081224113708/app/controllers/page_controller.rb:14>}>] rendered_or_redirected.
     # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.
     :cache_hit => {
       :regexp   => /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter:.+>\] rendered_or_redirected/,
@@ -31,16 +35,26 @@ module RequestLogAnalyzer::FileFormat::Rails
       :footer => true,   
       :teaser => /Error/,
       :regexp => /(\w+)(?:Error|Invalid) \((.*)\)\:(.*)/,
-      :captures => [{:error => :string}, {:exception_string => :string}, {:stack_trace => :string}]
+      :captures => [{ :name => :error,            :type => :string}, 
+                    { :name => :exception_string, :type => :string}, 
+                    { :name => :stack_trace,      :type => :string, :anonymize => :remove}]
     },
 
-    # Completed lines: see above
+    # Completed lines: see above. Parse both completed line formats
     :completed => {
       :footer   => true,
       :teaser   => /Completed in /,
       :regexp   => Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})"),
-      :captures => [{:duration => :sec},  {:view => :sec},  {:db => :sec},  {:status => :integer}, {:url => :string},  # 2.1 variant 
-                    {:duration => :msec}, {:view => :msec}, {:db => :msec}, {:status => :integer}, {:url => :string}]  # 2.2 variant 
+      :captures => [{ :name => :duration, :type => :sec, :anonymize => :slightly }, 
+                    { :name => :view,     :type => :sec, :anonymize => :slightly },  
+                    { :name => :db,       :type => :sec, :anonymize => :slightly },  
+                    { :name => :status,   :type => :integer }, 
+                    { :name => :url,      :type => :string, :anonymize => :url },  # 2.1 variant 
+                    { :name => :duration, :type => :msec, :anonymize => :slightly }, 
+                    { :name => :view,     :type => :msec, :anonymize => :slightly }, 
+                    { :name => :db,       :type => :msec, :anonymize => :slightly }, 
+                    { :name => :status,   :type => :integer}, 
+                    { :name => :url,      :type => :string, :anonymize => :url }]  # 2.2 variant 
 
     }
   }   
@@ -54,9 +68,9 @@ module RequestLogAnalyzer::FileFormat::Rails
       track(:category, :category => :status, :title => 'HTTP statuses returned')
       track(:category, :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits')
       
-      track(:duration, :duration => :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration", :line_type => :completed)
-      track(:duration, :duration => :view, :category => REQUEST_CATEGORIZER, :title => "Database time", :line_type => :completed)
-      track(:duration, :duration => :db, :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed)
+      track(:duration, :duration => :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed)
+      track(:duration, :duration => :view,     :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed)
+      track(:duration, :duration => :db,       :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed)
       
       track(:category, :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', :line_type => :completed,
               :if => lambda { |request| request[:duration] > 1.0 })

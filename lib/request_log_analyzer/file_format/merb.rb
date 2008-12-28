@@ -7,7 +7,7 @@ module RequestLogAnalyzer::FileFormat::Merb
       :header   => true,
       :teaser   => /Started/,
       :regexp   => /Started request handling\:\ (.+)/,
-      :captures => [{:timestamp => :timestamp}]
+      :captures => [{ :name => :timestamp, :type => :timestamp, :anonymize => :slightly }]
     },
     
     # ~ Params: {"action"=>"create", "controller"=>"session"}
@@ -15,7 +15,7 @@ module RequestLogAnalyzer::FileFormat::Merb
     :params => {
       :teaser   => /Params/,
       :regexp   => /Params\:\ \{(.+)\}/,
-      :captures => [{:raw_hash => :string}]
+      :captures => [{ :name => :raw_hash, :type => :string}]
     },
     
     # ~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}
@@ -23,7 +23,10 @@ module RequestLogAnalyzer::FileFormat::Merb
       :footer   => true,
       :teaser   => /\{:dispatch_time/,
       :regexp   => /\{\:dispatch_time=>(\d+\.\d+(?:e-?\d+)?), (?:\:after_filters_time=>(\d+\.\d+(?:e-?\d+)?), )?(?:\:before_filters_time=>(\d+\.\d+(?:e-?\d+)?), )?\:action_time=>(\d+\.\d+(?:e-?\d+)?)\}/,
-      :captures => [ {:dispatch_time => :sec}, {:after_filters_time => :sec}, {:before_filters_time => :sec}, {:action_time => :sec} ]
+      :captures => [{ :name => :dispatch_time,       :type => :sec, :anonymize => :slightly }, 
+                    { :name => :after_filters_time,  :type => :sec, :anonymize => :slightly }, 
+                    { :name => :before_filters_time, :type => :sec, :anonymize => :slightly }, 
+                    { :name => :action_time,         :type => :sec, :anonymize => :slightly }]
     }
   }
     

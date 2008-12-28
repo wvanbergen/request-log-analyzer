@@ -86,10 +86,9 @@ module RequestLogAnalyzer
           if @regexp =~ line
             request_info = { :line_type => name, :lineno => lineno }
             captures_found = $~.captures
-            captures.each_with_index do |param, index|
-              unless captures_found[index].nil? || param == :ignore
-                # there is only one key/value pair in the param hash, each will only be called once
-                param.each { |key, type| request_info[key] = convert_value(captures_found[index], type) }
+            captures.each_with_index do |capture, index|
+              unless captures_found[index].nil? || capture == :ignore
+                request_info[capture[:name]] = convert_value(captures_found[index], capture[:type])
               end
             end
             return request_info
