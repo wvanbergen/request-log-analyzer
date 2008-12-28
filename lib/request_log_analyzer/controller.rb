@@ -38,7 +38,14 @@ module RequestLogAnalyzer
 
       # register sources
       arguments.parameters.each do |file|
-        controller.add_source(file) if File.exist?(file)
+        if file == '-' || file == 'STDIN'
+          controller.add_source($stdin)
+        elsif File.exist?(file)
+          controller.add_source(file) 
+        else
+          puts "File not found: #{file}"
+          exit(0)
+        end
       end
 
       # register aggregators
@@ -114,12 +121,16 @@ module RequestLogAnalyzer
       @aggregators.each { |agg| agg.prepare }
       
       handle_request = Proc.new { |request| @aggregators.each { |agg| agg.aggregate(request) } }
-      @sources.each do |source|
-        case source
-        when IO;     @log_parser.parse_io(source, options,   &handle_request) 
-        when String; @log_parser.parse_file(source, options, &handle_request) 
-        else;        raise "Unknwon source provided"
+      begin
+        @sources.each do |source|
+          case source
+          when IO;     @log_parser.parse_io(source, options,   &handle_request) 
+          when String; @log_parser.parse_file(source, options, &handle_request) 
+          else;        raise "Unknwon source provided"
+          end
         end
+      rescue Interrupt => e
+        puts "Caught interrupt! Stopped parsing..."
       end
       
       @aggregators.each { |agg| agg.finalize }
