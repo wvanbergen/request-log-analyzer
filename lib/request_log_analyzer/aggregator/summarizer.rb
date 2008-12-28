@@ -60,8 +60,6 @@ module RequestLogAnalyzer::Aggregator
         puts "is not setup correctly. Visit this website for logging configuration tips:"
         puts "http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging"
       end
-      puts "=========================================================================="
-      puts "Thanks for using request-log-analyzer"
     end
     
     def has_warnings?

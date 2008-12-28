@@ -33,28 +33,35 @@ module RequestLogAnalyzer::Aggregator
       file_format::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
     
+    def report(color)
+      puts
+      puts "=========================================================================="
+      puts "A database file has been created with all parsed request information."
+      puts "To execute queries on this database, run the following command:"
+      puts "  $ sqlite3 #{options[:database]}"
+      puts
+    end
+    
     protected 
     
     def create_database_table(name, definition)
-      ActiveRecord::Migration.suppress_messages do
-        ActiveRecord::Migration.create_table("#{name}_lines") do |t|
-          t.column(:request_id, :integer) #if options[:combined_requests]
-          t.column(:lineno, :integer)
-          definition.captures.each do |field|
-            # there is only on key/value pait in this hash
-            field.each { |key, capture_type| t.column(key, column_type(capture_type)) }
-          end
+      ActiveRecord::Migration.verbose = options[:debug]
+      ActiveRecord::Migration.create_table("#{name}_lines") do |t|
+        t.column(:request_id, :integer) #if options[:combined_requests]
+        t.column(:lineno, :integer)
+        definition.captures.each do |field|
+          # there is only on key/value pait in this hash
+          field.each { |key, capture_type| t.column(key, column_type(capture_type)) }
         end
       end
     end
 
     def create_warning_table_and_class
-      ActiveRecord::Migration.suppress_messages do
-        ActiveRecord::Migration.create_table("warnings") do |t|
-          t.string  :warning_type, :limit => 30, :null => false
-          t.string  :message
-          t.integer :lineno          
-        end
+      ActiveRecord::Migration.verbose = options[:debug]
+      ActiveRecord::Migration.create_table("warnings") do |t|
+        t.string  :warning_type, :limit => 30, :null => false
+        t.string  :message
+        t.integer :lineno          
       end    
       
       file_format.const_set('Warning', Class.new(ActiveRecord::Base)) unless file_format.const_defined?('Warning')
