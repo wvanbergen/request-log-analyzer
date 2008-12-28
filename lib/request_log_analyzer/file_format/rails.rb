@@ -73,7 +73,9 @@ module RequestLogAnalyzer::FileFormat::Rails
       track(:duration, :duration => :db,       :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed)
       
       track(:category, :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', :line_type => :completed,
-              :if => lambda { |request| request[:duration] > 1.0 })
+              :if => lambda { |request| request[:duration] > 1.0 }, :amount => 20)
+              
+      track(:category, :category => :error, :title => 'Failed requests', :line_type => :failed, :amount => 20)              
     end
     
     REQUEST_CATEGORIZER = Proc.new do |request|
