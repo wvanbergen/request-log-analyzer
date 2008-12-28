@@ -44,9 +44,9 @@ module RequestLogAnalyzer::Aggregator
     
     def report_header
       puts "Summarizer results"
-      puts "=============================================="
+      puts "=========================================================================="
       puts "Parsed lines:    #{log_parser.parsed_lines}"
-      puts "Parsed requests: #{log_parser.parsed_requests}"
+      puts "Parsed requests: #{log_parser.parsed_requests}" if options[:combined_requests]
       if has_warnings?
         puts "Warnings: " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{value}" }.join(', ')
       end
