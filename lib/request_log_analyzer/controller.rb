@@ -124,9 +124,14 @@ module RequestLogAnalyzer
       begin
         @sources.each do |source|
           case source
-          when IO;     @log_parser.parse_io(source, options,   &handle_request) 
-          when String; @log_parser.parse_file(source, options, &handle_request) 
-          else;        raise "Unknwon source provided"
+          when IO;     
+            puts "Parsing from the standard input. Press CTRL+C to finish."
+            @log_parser.parse_io(source, options,   &handle_request) 
+          when String
+            puts "Parsing #{source}..."
+            @log_parser.parse_file(source, options, &handle_request) 
+          else
+            raise "Unknwon source provided"
           end
         end
       rescue Interrupt => e
