@@ -28,7 +28,7 @@ module RequestLogAnalyzer::Aggregator
     
     def aggregate(request)
       @trackers.each do |tracker|
-        tracker.update(request)
+        tracker.update(request) if tracker.should_update?(request)
       end
     end
     
@@ -92,6 +92,24 @@ module RequestLogAnalyzer::Aggregator
       def finalize
       end
       
+      def should_update?(request)
+        return false if options[:line_type] && !request.has_line_type?(options[:line_type])
+        
+        if options[:if].kind_of?(Symbol)
+          return false unless request[options[:if]]
+        elsif options[:if].respond_to?(:call)
+          return false unless options[:if].call(request)
+        end
+        
+        if options[:unless].kind_of?(Symbol)
+          return false if request[options[:unless]]
+        elsif options[:unless].respond_to?(:call)
+          return false if options[:unless].call(request)
+        end        
+        
+        return true
+      end
+      
       def report(color = false)
         puts self.inspect
         puts        
@@ -110,9 +128,6 @@ module RequestLogAnalyzer::Aggregator
       end
       
       def update(request)
-        
-        return if options[:line_type] && !request.has_line_type?(options[:line_type])
-        
         category = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
         duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
         
@@ -170,9 +185,6 @@ module RequestLogAnalyzer::Aggregator
       end
                   
       def update(request)
-        
-        return if options[:line_type] && !request.has_line_type?(options[:line_type])
-        
         cat = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
         if !cat.nil? || options[:nils]
           @categories[cat] ||= 0
