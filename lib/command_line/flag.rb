@@ -6,8 +6,6 @@ module CommandLine
     attr_reader :name
     attr_reader :alias
     attr_reader :argument
-    attr_reader :default
-    attr_reader :multiple
     
     # Initialize new Flag
     # <tt>name</tt> The name of the flag
@@ -17,8 +15,6 @@ module CommandLine
       @alias    = definition[:alias].to_sym if definition[:alias]
       @required = definition.has_key?(:required) && definition[:required] == true
       @argument = definition[:expects] if definition[:expects]
-      @multiple = definition[:multiple] || false
-      @default  = definition[:default] if definition[:default]
     end
     
     # Argument representation of the flag (--fast)
@@ -39,14 +35,6 @@ module CommandLine
     # Check if flag is optional
     def optional?
       !@required
-    end
-    
-    def multiple?
-      @multiple
-    end
-    
-    def default?
-      !@default.nil?
     end
     
     # Check if flag is required
