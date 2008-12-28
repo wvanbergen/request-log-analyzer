@@ -2,15 +2,18 @@
 puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
 puts
 puts "Options:"
-puts "  --fast, -f:                 Only use completed requests"
-puts "  --guess-database-time, -g:  Guesses the database duration of requests" 
-puts "  --output, -o:               Comma-separated list of reports to show"     
-puts "  --amount, -c:               Displays the top <amount> elements in the reports"     
-puts "  --colorize, -z:             Fancy bash coloring"
-puts "  --merb, -m:                 Parse merb logfiles"
-puts "  --install rails, -i rails   Install Rails task rake log:analyze"
+puts "  --format <format>, -f:     Uses the specified log file format. Defaults to rails."
+puts "  --combined-requests, -c:   Combine the log lines that belong to the same request. "
+puts "                             This improves the generated reports, but does not always work properly." 
+puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
+puts "  --debug                    Print debug information while parsing."
 puts 
 puts "Examples:"
 puts "  request-log-analyzer development.log"
-puts "  request-log-analyzer mongrel.0.log mongrel.1.log mongrel.2.log -g -f -o mean_time,most_requested,blockers -c 20 -z"
-puts "  request-log-analyzer --install rails"
+puts "  request-log-analyzer -cz mongrel.0.log mongrel.1.log mongrel.2.log "
+puts "  request-log-analyzer --format merb -d requests.db production.log"
+puts
+puts "To install rake tasks in your Rails application, "
+puts "run the following command in your application's root directory:"
+puts
+puts "  request-log-analyzer install rails"

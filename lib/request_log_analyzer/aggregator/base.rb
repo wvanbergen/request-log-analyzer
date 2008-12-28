@@ -13,11 +13,13 @@ module RequestLogAnalyzer::Aggregator
     include RequestLogAnalyzer::FileFormat
     
     attr_reader :options
+    attr_reader :log_parser
     
     # Intializes a new RequestLogAnalyzer::Aggregator::Base instance
     # It will include the specific file format module.
-    def initialize(format, options = {})
-      self.register_file_format(format)
+    def initialize(log_parser, options = {})
+      @log_parser = log_parser
+      self.register_file_format(log_parser.file_format)
       @options = options
     end
 

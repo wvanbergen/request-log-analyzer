@@ -3,9 +3,11 @@ module RequestLogAnalyzer::Aggregator
   class Summarizer < Base
     
     attr_reader :trackers
+    attr_reader :warnings_encountered
     
-    def initialize(format, options = {})
-      super(format, options)
+    def initialize(log_parser, options = {})
+      super(log_parser, options)
+      @warnings_encountered = {}
       setup
     end
     
@@ -42,14 +44,37 @@ module RequestLogAnalyzer::Aggregator
     
     def report_header
       puts "Summarizer results"
-      puts "====================================="
+      puts "=============================================="
+      puts "Parsed lines:    #{log_parser.parsed_lines}"
+      puts "Parsed requests: #{log_parser.parsed_requests}"
+      if has_warnings?
+        puts "Warnings: " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{value}" }.join(', ')
+      end
     end
     
     def report_footer
       puts 
-      puts "====================================="
+      if has_serious_warnings?      
+        puts "=========================================================================="
+        puts "Multiple warnings were encountered during parsing. Possible, your logging "
+        puts "is not setup correctly. Visit this website for logging configuration tips:"
+        puts "http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging"
+      end
+      puts "=========================================================================="
       puts "Thanks for using request-log-analyzer"
-      puts
+    end
+    
+    def has_warnings?
+       @warnings_encountered.inject(0) { |result, (key, value)| result += value } > 0
+    end
+    
+    def has_serious_warnings?
+      @warnings_encountered.inject(0) { |result, (key, value)| result += value } > 10
+    end
+    
+    def warning(type, message, lineno)
+      @warnings_encountered[type] ||= 0
+      @warnings_encountered[type] += 1
     end
     
     class Tracker

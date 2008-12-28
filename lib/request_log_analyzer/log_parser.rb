@@ -71,6 +71,9 @@ module RequestLogAnalyzer
       unknown = options[:line_types].reject { |line_type| file_format.line_definitions.has_key?(line_type) }
       raise "Unknown line types: #{unknown.join(', ')}" unless unknown.empty?
       
+      
+      puts "Parsing mode: " + (options[:combined_requests] ? 'combined requests' : 'single lines') if options[:debug]
+      
       @current_io = io
       @current_io.each_line do |line|
         

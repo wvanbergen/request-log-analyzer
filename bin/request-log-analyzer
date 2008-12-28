@@ -8,12 +8,13 @@ puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
 begin
   arguments = CommandLine::Arguments.parse do |command_line|
     
-    #command_line.command(:install, :alias => :i) do end
+    command_line.command(:install) do |install|
+      install.parameters = 1
+    end
     
-    command_line.option(:format, :default => 'rails')
+    command_line.option(:format, :alias => :f, :default => 'rails')
     command_line.option(:aggregator, :alias => :a, :multiple => true)
-    command_line.option(:database, :alias => :d)
-        
+    command_line.option(:database, :alias => :d)    
     command_line.switch(:combined_requests, :c)
     command_line.switch(:colorize, :z) 
     command_line.switch(:debug)
@@ -31,22 +32,26 @@ rescue CommandLine::Error => e
   exit(0) 
 end
 
-# if arguments[:install]
-#   if arguments[:install] == 'rails'
-#     require 'ftools'
-#     if File.directory?('./lib/tasks/')
-#       File.copy(File.dirname(__FILE__) + '/../tasks/request_log_analyzer.rake', './lib/tasks/request_log_analyze.rake')
-#       puts "Installed rake tasks."
-#       puts "To use, run: rake log:analyze"
-#     else
-#       puts "Cannot find /lib/tasks folder. Are you in your Rails directory?"
-#       puts "Installation aborted."
-#     end
-#   else
-#     raise "Cannot perform this install type!"
-#   end
-#   exit(0)
-# end
+def install_rake_tasks(install_type)
+  if install_type == 'rails'
+    require 'ftools'
+    if File.directory?('./lib/tasks/')
+      File.copy(File.dirname(__FILE__) + '/../tasks/request_log_analyzer.rake', './lib/tasks/request_log_analyze.rake')
+      puts "Installed rake tasks."
+      puts "To use, run: rake log:analyze"
+    else
+      puts "Cannot find /lib/tasks folder. Are you in your Rails directory?"
+      puts "Installation aborted."
+    end
+  else
+    raise "Cannot perform this install type! (#{install_type})"
+  end
+end
 
 # Run the request_log_analyzer!
-request_log_analyzer = RequestLogAnalyzer::Controller.build(arguments).run!
+case arguments.command
+when :install
+  install_rake_tasks(arguments.parameters[0])
+else 
+  RequestLogAnalyzer::Controller.build(arguments).run!
+end

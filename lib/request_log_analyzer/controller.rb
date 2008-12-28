@@ -27,16 +27,12 @@ module RequestLogAnalyzer
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     def self.build(arguments)
-      
-      if arguments[:debug]
-        print "Parsing mode: "
-        puts arguments[:combined_requests] ? 'combined requests' : 'single lines'
-      end
-      
+            
       options = {}
       options[:combined_requests] = arguments[:combined_requests]
       options[:database] = arguments[:database] if arguments[:database]
-
+      options[:debug] = arguments[:debug]
+      
       # Create the controller with the correct file format
       controller = Controller.new(arguments[:format].to_sym, options)
 
@@ -79,7 +75,7 @@ module RequestLogAnalyzer
       # Pass all warnings to every aggregator so they can do something useful with them.
       @log_parser.on_warning do |type, message, lineno|        
         @aggregators.each { |agg| agg.warning(type, message, lineno) }
-        puts "WARNING #{type.inspect} on line #{lineno}: #{message}" unless options[:silent]
+        puts "WARNING #{type.inspect} on line #{lineno}: #{message}" if options[:debug]
       end
     end
     
@@ -91,7 +87,7 @@ module RequestLogAnalyzer
         agg = RequestLogAnalyzer::Aggregator.const_get(agg.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join(''))
       end
       
-      @aggregators << agg.new(file_format, @options)
+      @aggregators << agg.new(@log_parser, @options)
     end
     
     alias :>> :add_aggregator
