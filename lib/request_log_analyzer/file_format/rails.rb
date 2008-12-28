@@ -49,7 +49,7 @@ module RequestLogAnalyzer::FileFormat::Rails
     
     def setup
       
-      track(:category, :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20)
+      track(:category, :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20, :line_type => :started)
       track(:category, :category => :method, :title => 'HTTP methods')
       track(:category, :category => :status, :title => 'HTTP statuses returned')
       track(:category, :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits')

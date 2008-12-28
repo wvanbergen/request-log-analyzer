@@ -147,6 +147,9 @@ module RequestLogAnalyzer::Aggregator
       end
                   
       def update(request)
+        
+        return if options[:line_type] && !request.has_line_type?(options[:line_type])
+        
         cat = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
         if !cat.nil? || options[:nils]
           @categories[cat] ||= 0
