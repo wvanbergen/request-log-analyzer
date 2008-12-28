@@ -135,8 +135,9 @@ module RequestLogAnalyzer
           end
         end
       rescue Interrupt => e
-        puts "Caught interrupt! Stopped parsing..."
+        puts "Caught interrupt! Stopped parsing."
       end
+      puts 
       
       @aggregators.each { |agg| agg.finalize }
       @aggregators.each { |agg| agg.report(options[:colorize]) }
