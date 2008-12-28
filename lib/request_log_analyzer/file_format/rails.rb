@@ -80,6 +80,7 @@ module RequestLogAnalyzer::FileFormat::Rails
       if request.combined?
       
         if request =~ :failed
+          format = request[:format] || 'html'
           "#{request[:error]} in #{request[:controller]}##{request[:action]}.#{format} [#{request[:method]}]"
         else
           format = request[:format] || 'html'
