@@ -17,6 +17,8 @@ module RequestLogAnalyzer
   # from several logrotated log files.
   class Controller
 
+    VERSION = '0.4.0'
+
     include RequestLogAnalyzer::FileFormat
     
     attr_reader :aggregators
