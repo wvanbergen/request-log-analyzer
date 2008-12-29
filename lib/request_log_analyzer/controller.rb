@@ -32,6 +32,7 @@ module RequestLogAnalyzer
       options[:combined_requests] = arguments[:combined_requests]
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug] = arguments[:debug]
+      options[:colorize] = arguments[:colorize] if arguments[:colorize]
       
       # Create the controller with the correct file format
       controller = Controller.new(arguments[:format].to_sym, options)
@@ -69,6 +70,7 @@ module RequestLogAnalyzer
     # * <tt>:database</tt> Database the controller should use.
     # * <tt>:echo</tt> Output debug information.
     # * <tt>:silent</tt> Do not output any warnings.
+    # * <tt>:colorize</tt> Colorize output
     def initialize(format = :rails, options = {})
 
       @options = options
@@ -147,14 +149,15 @@ module RequestLogAnalyzer
           when String
             @log_parser.parse_file(source, options, &handle_request) 
           else
-            raise "Unknwon source provided"
+            raise "Unknown source provided"
           end
         end
       rescue Interrupt => e
         handle_progress(:interrupted)
         puts "Caught interrupt! Stopped parsing."
       end
-      puts 
+
+      puts "\n"
       
       @aggregators.each { |agg| agg.finalize }
       @aggregators.each { |agg| agg.report(options[:colorize]) }

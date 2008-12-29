@@ -37,28 +37,28 @@ module RequestLogAnalyzer::Aggregator
     end
        
     def report(color = false)
-      report_header
+      report_header(color)
       @trackers.each { |tracker| tracker.report(color) }
-      report_footer      
+      report_footer(color)
     end
     
-    def report_header
+    def report_header(color = false)
       puts "Summarizer results"
-      puts "=========================================================================="
-      puts "Parsed lines:    #{log_parser.parsed_lines}"
-      puts "Parsed requests: #{log_parser.parsed_requests}" if options[:combined_requests]
+      puts green("==========================================================================", color)
+      puts "Parsed lines:         #{green(log_parser.parsed_lines, color)}"
+      puts "Parsed requests:      #{green(log_parser.parsed_requests, color)}" if options[:combined_requests]
       if has_warnings?
-        puts "Warnings: " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{value}" }.join(', ')
+        puts "Warnings: " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ')
       end
     end
     
-    def report_footer
+    def report_footer(color = false)
       puts 
       if has_serious_warnings?      
-        puts "=========================================================================="
-        puts "Multiple warnings were encountered during parsing. Possible, your logging "
+        puts green("==========================================================================", color)
+        puts "Multiple warnings were encountered during parsing. Possibly, your logging "
         puts "is not setup correctly. Visit this website for logging configuration tips:"
-        puts "http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging"
+        puts blue("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", color)
       end
     end
     
@@ -142,11 +142,15 @@ module RequestLogAnalyzer::Aggregator
         if options[:title]
           puts
           puts "#{options[:title]}" 
-          puts '-' * options[:title].length
+          puts green('=' * options[:title].length, options[:color])
         end
         
         @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount).each do |(cat, info)|
-          puts "%-40s: %6d hits, %-2.03fs total, %-2.03fs average " % [cat[0...40], info[:count], info[:total_duration], info[:total_duration] / info[:count]]
+          hits  = info[:count]
+          total = "%-2.01f" % info[:total_duration]
+          avg   = green(("(%-2.01fs avg)" % (info[:total_duration] / info[:count])) , options[:color])
+          
+          puts "%-50s: %6d hits - %6ss total %s" % [cat[0...40], hits, total, avg]
         end
       end
       
@@ -160,11 +164,11 @@ module RequestLogAnalyzer::Aggregator
         options[:report].each do |report|
           case report
           when :average
-            report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time:") { |request| request[:total_duration] / request[:count] }  
+            report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time:", :color => color) { |request| request[:total_duration] / request[:count] }  
           when :total
-            report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time:") { |request| request[:total_duration] }
+            report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time:", :color => color) { |request| request[:total_duration] }
           when :hits
-            report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits:") { |request| request[:count] }
+            report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits:", :color => color) { |request| request[:count] }
           else
             puts "Unknown duration report specified"
           end
@@ -192,9 +196,10 @@ module RequestLogAnalyzer::Aggregator
           puts "\n#{options[:title]}" 
           puts '-' * options[:title].length
         end
-        
-        puts "First request parsed: #{@first.strftime('%Y/%m/%d %H:%M:%I')}"
-        puts "Last request parsed:  #{@last.strftime('%Y/%m/%d %H:%M:%I')}"        
+        puts "First request:        #{@first.strftime('%Y/%m/%d %H:%M:%I')}"
+        puts "Last request:         #{@last.strftime('%Y/%m/%d %H:%M:%I')}"        
+        puts "Total time analyzed:  #{(@last && @first) ? (@last-@first).ceil : '-1' } days"
+        puts ""
       end
     end
     
@@ -221,7 +226,7 @@ module RequestLogAnalyzer::Aggregator
       def report(color = false)
         if options[:title]
           puts "\n#{options[:title]}" 
-          puts '-' * options[:title].length
+          puts green(('=' * options[:title].length), color)
         end
         
         sorted_categories = @categories.sort { |a, b| b[1] <=> a[1] }
@@ -229,7 +234,9 @@ module RequestLogAnalyzer::Aggregator
                 
         sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
         max_cat_length = sorted_categories.map { |c| c[0].to_s.length }.max
-        sorted_categories.each { |(cat, count)| puts "%-#{max_cat_length}s: %5d hits (%.01f%%)" % [cat, count, (count.to_f / total_hits) * 100] }
+        sorted_categories.each { |(cat, count)| 
+          puts "%-#{max_cat_length}s: %5d hits %s" % [cat, count, (green("(%0.01f%%)", color) % [(count.to_f / total_hits) * 100])]
+        }
       end
     end
   end

@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name    = 'request-log-analyzer'
-  s.version = '0.3.0'
+  s.version = '0.4.0'
   s.date    = '2008-12-22'
   
   s.bindir = 'bin'

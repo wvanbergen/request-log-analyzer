@@ -7,27 +7,27 @@ def colorize(text, color_code, color = $colorize)
 end
 
 # Draw a red line of text
-def red(text)
-  colorize(text, "\e[31m")
+def red(text, color = $colorize)
+  colorize(text, "\e[31m", color)
 end
 
 # Draw a Green line of text
-def green(text)
-  colorize(text, "\e[32m")
+def green(text, color = $colorize)
+  colorize(text, "\e[32m", color)
 end
 
 # Draw a Yellow line of text
-def yellow(text)
-  colorize(text, "\e[33m")
+def yellow(text, color = $colorize)
+  colorize(text, "\e[33m", color)
 end
 
 # Draw a Yellow line of text
-def blue(text)
-  colorize(text, "\e[34m")
+def blue(text, color = $colorize)
+  colorize(text, "\e[34m", color)
 end
 
-def white(text)
-  colorize(text, "\e[37m")
+def white(text, color = $colorize)
+  colorize(text, "\e[37m", color)
 end
 
 
