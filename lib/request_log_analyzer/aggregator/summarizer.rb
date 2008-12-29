@@ -187,21 +187,21 @@ module RequestLogAnalyzer::Aggregator
       def update(request)
         timestamp = request[options[:field]]
         
-        @first = timestamp if @first.nil? || @first < timestamp
-        @last  = timestamp if @last.nil?  || @last > timestamp
+        @first = timestamp if @first.nil? || timestamp < @first
+        @last  = timestamp if @last.nil?  || timestamp > @last
       end
       
       def report(color = false)
         if options[:title]
           puts "\n#{options[:title]}" 
-          puts '-' * options[:title].length
+          puts '=' * options[:title].length
         end
         
-        first_date  = DateTime.strptime(@first.to_s, '%Y%m%d%H%M%S')
-        last_date   = DateTime.strptime(@last.to_s, '%Y%m%d%H%M%S')
+        first_date  = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')
+        last_date   = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
 
-        puts "First request:        #{first_date.strftime('%Y/%m/%d %H:%M:%I')}"
-        puts "Last request:         #{last_date.strftime('%Y/%m/%d %H:%M:%I')}"        
+        puts "First request:        #{first_date.strftime('%Y-%m-%d %H:%M:%I')}"
+        puts "Last request:         #{last_date.strftime('%Y-%m-%d %H:%M:%I')}"        
         puts "Total time analyzed:  #{(@last && @first) ? (last_date - first_date).ceil : '-1' } days"
         puts ""
       end

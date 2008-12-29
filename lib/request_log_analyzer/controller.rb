@@ -93,7 +93,7 @@ module RequestLogAnalyzer
     def handle_progress(message, value = nil)
       case message
       when :started
-        @progress_bar = ProgressBar.new(File.basename(value), File.size(value))
+        @progress_bar = ProgressBar.new(green(File.basename(value), options[:colorize]), File.size(value))
       when :finished
         @progress_bar.finish
         @progress_bar = nil

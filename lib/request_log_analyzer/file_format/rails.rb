@@ -99,8 +99,8 @@ module RequestLogAnalyzer::FileFormat::Rails
           url = request[:url].downcase.split(/^http[s]?:\/\/[A-z0-9\.-]+/).last.split('?').first # only the relevant URL part
           url << '/' if url[-1] != '/'[0] && url.length > 1 # pad a trailing slash for consistency
 
-          url.gsub!(/\/\d+-\d+-\d+(\/|$)/, '/:date') # Combine all (year-month-day) queries
-          url.gsub!(/\/\d+-\d+(\/|$)/, '/:month') # Combine all date (year-month) queries
+          url.gsub!(/\/\d+-\d+-\d+(\/|$)/, '/:date/') # Combine all (year-month-day) queries
+          url.gsub!(/\/\d+-\d+(\/|$)/, '/:month/') # Combine all date (year-month) queries
           url.gsub!(/\/\d+[\w-]*/, '/:id') # replace identifiers in URLs request[:url] # TODO: improve me
           url
         

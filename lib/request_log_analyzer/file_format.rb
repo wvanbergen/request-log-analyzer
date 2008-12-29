@@ -84,7 +84,7 @@ module RequestLogAnalyzer
         when :symbol;    value.to_sym
         when :sec;       value.to_f
         when :msec;      value.to_f / 1000
-        when :timestamp; value.gsub(/[^0-9]/,'')[0..13].to_i # TODO: DateTime.strptime(@first.to_s, '%Y%m%d%H%M%S')?
+        when :timestamp; value.gsub(/[^0-9]/,'')[0..13].to_i # Retrieve with: DateTime.parse(value, '%Y%m%d%H%M%S')
         else value
         end
       end
