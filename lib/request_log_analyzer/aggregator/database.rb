@@ -26,7 +26,12 @@ module RequestLogAnalyzer::Aggregator
         attributes[:request_id] = @request_id if options[:combined_requests]  
         file_format.const_get(class_name).create!(attributes)
       end
-      
+    rescue SQLite3::SQLException => e
+      raise Interrupt, e.message
+    end
+    
+    def finalize
+      ActiveRecord::Base.remove_connection
     end
     
     def warning(type, message, lineno)
