@@ -84,7 +84,7 @@ module RequestLogAnalyzer
         when :symbol;    value.to_sym
         when :sec;       value.to_f
         when :msec;      value.to_f / 1000
-        when :timestamp; DateTime.parse(value) # TODO: fix me?          
+        when :timestamp; value.gsub(/[^0-9]/,'')[0..13].to_i # TODO: DateTime.strptime(@first.to_s, '%Y%m%d%H%M%S')?
         else value
         end
       end
@@ -96,17 +96,22 @@ module RequestLogAnalyzer
       # if this teaser-check is passed, but the full regular exprssion does not ,atch.
       def matches(line, lineno = nil, parser = nil)
         if @teaser.nil? || @teaser =~ line
-          if @regexp =~ line
+          if match_data = line.match(@regexp)
             request_info = { :line_type => name, :lineno => lineno }
-            captures_found = $~.captures
+            
             captures.each_with_index do |capture, index|
-              unless captures_found[index].nil? || capture == :ignore
-                request_info[capture[:name]] = convert_value(captures_found[index], capture[:type])
+              next if capture == :ignore
+
+              if match_data.captures[index]
+                request_info[capture[:name]] = convert_value(match_data.captures[index], capture[:type])
               end
+
             end
             return request_info
           else
-            parser.warn(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}") unless @teaser.nil? || parser.nil?
+            if @teaser && parser
+              parser.warn(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")
+            end
             return false
           end
         else
