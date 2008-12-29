@@ -44,7 +44,7 @@ module RequestLogAnalyzer::Aggregator
     
     def report_header(color = false)
       puts "Summarizer results"
-      puts green("==========================================================================", color)
+      puts green("==================", color)
       puts "Parsed lines:         #{green(log_parser.parsed_lines, color)}"
       puts "Parsed requests:      #{green(log_parser.parsed_requests, color)}" if options[:combined_requests]
       if has_warnings?
@@ -207,9 +207,10 @@ module RequestLogAnalyzer::Aggregator
         puts "Last request:         #{last_date.strftime('%Y-%m-%d %H:%M:%I')}"        
         puts "Total time analyzed:  #{days} days"
         puts ""
+
         
         puts "Requests graph - average per day per hour"
-        puts green("========================================================================", color)
+        puts green("=========================================", color)
 
         deviation         = @request_time_graph.max / 20
         deviation         = 1 if deviation == 0
