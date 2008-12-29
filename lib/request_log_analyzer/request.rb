@@ -18,11 +18,13 @@ module RequestLogAnalyzer
     include RequestLogAnalyzer::FileFormat
   
     attr_reader :lines
-    
+    attr_reader :attributes
+        
     # Initializes a new Request object. 
     # It will apply the the provided FileFormat module to this instance.
     def initialize(file_format)
       @lines = []
+      @attributes = {}
       register_file_format(file_format)
     end
     
@@ -38,10 +40,13 @@ module RequestLogAnalyzer
     # The line should be provides as a hash of the fields parsed from the line.
     def << (request_info_hash)
       @lines << request_info_hash
+      @attributes = request_info_hash.merge(@attributes)
     end
     
     # Checks whether the given line type was parsed from the log file for this request
     def has_line_type?(line_type)
+      return true if @lines.length == 1 && @lines[0][:line_type] == line_type.to_sym
+      
       @lines.detect { |l| l[:line_type] == line_type.to_sym }
     end
     
@@ -51,7 +56,7 @@ module RequestLogAnalyzer
     # This function will return the first value that was captured if the field
     # was captured in multiple lines for a combined request.
     def first(field)
-      @lines.detect { |fields| fields.has_key?(field) }[field] rescue nil
+      @attributes[field]
     end
     
     alias :[] :first

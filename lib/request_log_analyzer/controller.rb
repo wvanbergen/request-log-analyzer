@@ -1,5 +1,7 @@
 module RequestLogAnalyzer
   
+  VERSION = '0.4.0'
+  
   # The RequestLogAnalyzer::Controller class creates a LogParser instance for the
   # requested file format, and connect it with sources and aggregators.
   #
@@ -16,8 +18,6 @@ module RequestLogAnalyzer
   # sources are registered in the correct order. This can be helpful to parse requests
   # from several logrotated log files.
   class Controller
-
-    VERSION = '0.4.0'
 
     include RequestLogAnalyzer::FileFormat
     

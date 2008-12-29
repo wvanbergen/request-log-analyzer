@@ -69,12 +69,11 @@ module RequestLogAnalyzer
     def parse_io(io, options = {}, &block)
 
       # parse every line type by default
-      options[:line_types] ||= file_format.line_definitions.keys
+      line_types = options[:line_types] || file_format.line_definitions.keys
 
       # check whether all provided line types are valid
-      unknown = options[:line_types].reject { |line_type| file_format.line_definitions.has_key?(line_type) }
+      unknown = line_types.reject { |line_type| file_format.line_definitions.has_key?(line_type) }
       raise "Unknown line types: #{unknown.join(', ')}" unless unknown.empty?
-      
       
       puts "Parsing mode: " + (options[:combined_requests] ? 'combined requests' : 'single lines') if options[:debug]
       
@@ -84,7 +83,12 @@ module RequestLogAnalyzer
         @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
         
         request_data = nil
-        if options[:line_types].detect { |line_type| request_data = file_format.line_definitions[line_type].matches(line, @current_io.lineno, self) }
+        line_types.each do |line_type|
+          line_type_definition = file_format.line_definitions[line_type]
+          break if request_data = line_type_definition.matches(line, @current_io.lineno, self)
+        end
+
+        if request_data
           @parsed_lines += 1
           if @options[:combined_requests]
             update_current_request(request_data, &block)
