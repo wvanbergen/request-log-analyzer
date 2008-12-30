@@ -31,7 +31,7 @@ module RequestLogAnalyzer
     def self.build(arguments)
             
       options = {}
-      options[:combined_requests] = arguments[:combined_requests]
+      options[:combined_requests] = !arguments[:single_lines]
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug] = arguments[:debug]
       options[:colorize] = arguments[:colorize] if arguments[:colorize]
