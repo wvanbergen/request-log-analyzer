@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 require File.dirname(__FILE__) + '/../lib/request_log_analyzer'
-require File.dirname(__FILE__) + '/../lib/command_line_arguments'
+require File.dirname(__FILE__) + '/../lib/cli/command_line_arguments'
 
 
 puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 0.4.0\n\n"
