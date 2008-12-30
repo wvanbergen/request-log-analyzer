@@ -9,8 +9,6 @@ Parameters:
 - Add commandline parameters
   --version, -v     -> This should support github - last version checking
   --help, -h        -> Show usage
-  --from <DATE>     -> Only parse dates >= the given date
-  --to <DATE>       -> Only parse dates < the given date
 
 Datamining:
 - Add query functionality for the resulting database file (interactive reports?)
