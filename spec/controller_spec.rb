@@ -30,4 +30,10 @@ describe RequestLogAnalyzer::Controller do
     controller.run!
   end
   
+  it "should run well from the command line" do
+    temp_file = "#{File.dirname(__FILE__)}/fixtures/temp.txt"
+    system("#{File.dirname(__FILE__)}/../bin/request-log-analyzer #{log_fixture(:rails_1x)} > #{temp_file}").should be_true
+    File.unlink(temp_file)
+  end
+  
 end
