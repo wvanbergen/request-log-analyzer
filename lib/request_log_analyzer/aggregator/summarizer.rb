@@ -38,7 +38,12 @@ module RequestLogAnalyzer::Aggregator
        
     def report(color = false)
       report_header(color)
-      @trackers.each { |tracker| tracker.report(color) }
+      if log_parser.parsed_requests - log_parser.skipped_requests > 0
+        @trackers.each { |tracker| tracker.report(color) }
+      else
+        puts
+        puts "There were no requests analyzed."
+      end
       report_footer(color)
     end
     
@@ -47,8 +52,9 @@ module RequestLogAnalyzer::Aggregator
       puts green("==================", color)
       puts "Parsed lines:         #{green(log_parser.parsed_lines, color)}"
       puts "Parsed requests:      #{green(log_parser.parsed_requests, color)}" if options[:combined_requests]
+      puts "Skipped requests:     #{green(log_parser.skipped_requests, color)}" if log_parser.skipped_requests > 0
       if has_warnings?
-        puts "Warnings: " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ')
+        puts "\nWarnings: " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ')
       end
     end
     

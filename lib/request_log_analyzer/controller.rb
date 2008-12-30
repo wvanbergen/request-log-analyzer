@@ -36,6 +36,12 @@ module RequestLogAnalyzer
       options[:debug] = arguments[:debug]
       options[:colorize] = arguments[:colorize] if arguments[:colorize]
       
+      if options[:combined_requests]
+        # date range checks are only supported in combined requests mode
+        options[:after]  = DateTime.parse(arguments[:after])  if arguments[:after]
+        options[:before] = DateTime.parse(arguments[:before]) if arguments[:before]
+      end
+          
       # Create the controller with the correct file format
       controller = Controller.new(arguments[:format].to_sym, options)
 

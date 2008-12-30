@@ -86,7 +86,34 @@ describe RequestLogAnalyzer::LogParser, :warnings do
     @log_parser.should_receive(:warn).with(:no_current_request, anything).at_least(1).times    
     @log_parser.should_not_receive(:handle_request)    
     @log_parser.parse_file(log_fixture(:test_order))    
-
   end  
+end
+
+describe RequestLogAnalyzer::LogParser, :date_constraints do
+  before(:each) do
+    @log_parser = RequestLogAnalyzer::LogParser.new(TestFileFormat, :combined_requests => true,
+          :after => DateTime.parse('2009-01-01'), :before => DateTime.parse('2009-02-02'))
+          
+    @too_old_request = RequestLogAnalyzer::Request.create(TestFileFormat,  { :timestamp => 20081212000000 })
+    @current_request = RequestLogAnalyzer::Request.create(TestFileFormat,  { :timestamp => 20090102000000 })    
+    @too_new_request = RequestLogAnalyzer::Request.create(TestFileFormat,  { :timestamp => 20090303000000 })    
+  end
   
+  it "should not yield a request before the after date" do
+    yielded = false
+    @log_parser.send(:handle_request, @too_old_request) { |request| yielded = true }
+    yielded.should be_false
+  end
+  
+  it "should not yield a request after the before date" do
+    yielded = false
+    @log_parser.send(:handle_request, @too_new_request) { |request| yielded = true }
+    yielded.should be_false    
+  end
+  
+  it "should yield a request between the after en before dates" do
+    yielded = false
+    @log_parser.send(:handle_request, @current_request) { |request| yielded = true }
+    yielded.should be_true
+  end  
 end

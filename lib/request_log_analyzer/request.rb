@@ -103,5 +103,9 @@ module RequestLogAnalyzer
       raise "Not a single line request!" unless single_line?
       lines.first[:line_type]
     end
+    
+    def timestamp
+      first(:timestamp)
+    end
   end
 end

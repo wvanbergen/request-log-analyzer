@@ -16,6 +16,8 @@ begin
     command_line.option(:format, :alias => :f, :default => 'rails')
     command_line.option(:aggregator, :alias => :a, :multiple => true)
     command_line.option(:database, :alias => :d)    
+    command_line.option(:after)
+    command_line.option(:before)    
     command_line.switch(:single_lines, :s)
     command_line.switch(:colorize, :z) 
     command_line.switch(:debug)
@@ -37,6 +39,8 @@ rescue CommandLine::Error => e
   puts "                             This improves the generated reports, but can skew results." 
   puts "  --colorize, -z             Output reports in ASCII colors."
   puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
+  puts "  --after <date>             Only consider requests from <date> or later."
+  puts "  --before <date>            Only consider before <date>."  
   puts "  --debug                    Print debug information while parsing."
   puts 
   puts "Examples:"
