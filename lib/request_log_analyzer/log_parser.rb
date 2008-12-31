@@ -40,13 +40,9 @@ module RequestLogAnalyzer
       @options          = options
       @parsed_lines     = 0
       @parsed_requests  = 0
-      @skipped_requests  = 0      
+      @skipped_requests = 0      
       
       @current_io = nil
-
-      # Convert the timestamp to the correct formats for quick timestamp comparisons
-      @after_timestamp  = options[:after].strftime('%Y%m%d%H%M%S').to_i  if options[:after]     
-      @before_timestamp = options[:before].strftime('%Y%m%d%H%M%S').to_i if options[:before]
       
       # install the file format module (see RequestLogAnalyzer::FileFormat)
       # and register all the line definitions to the parser
@@ -166,11 +162,8 @@ module RequestLogAnalyzer
     # Handles the parsed request by calling the request handler.
     # The default controller will send the request to every running aggegator.
     def handle_request(request, &block)
-      if (!@after_timestamp || @after_timestamp <= request.timestamp) && (!@before_timestamp || @before_timestamp > request.timestamp)
-        yield(request) if block_given?
-      else
-        @skipped_requests += 1
-      end
+      accepted = block_given? ? yield(request) : true
+      @skipped_requests += 1 if !accepted
     end
     
     # Checks whether a given line hash is a header line.

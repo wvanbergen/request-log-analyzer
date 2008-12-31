@@ -22,6 +22,7 @@ module RequestLogAnalyzer
     include RequestLogAnalyzer::FileFormat
     
     attr_reader :aggregators
+    attr_reader :filters
     attr_reader :log_parser
     attr_reader :sources
     attr_reader :options
@@ -33,15 +34,9 @@ module RequestLogAnalyzer
       options = {}
       options[:combined_requests] = !arguments[:single_lines]
       options[:database] = arguments[:database] if arguments[:database]
-      options[:debug] = arguments[:debug]
+      options[:debug]    = arguments[:debug]
       options[:colorize] = arguments[:colorize] if arguments[:colorize]
-      
-      if options[:combined_requests]
-        # date range checks are only supported in combined requests mode
-        options[:after]  = DateTime.parse(arguments[:after])  if arguments[:after]
-        options[:before] = DateTime.parse(arguments[:before]) if arguments[:before]
-      end
-          
+                
       # Create the controller with the correct file format
       controller = Controller.new(arguments[:format].to_sym, options)
 
@@ -56,12 +51,32 @@ module RequestLogAnalyzer
           exit(0)
         end
       end
+      
+      # register filters
+      # filters are only supported in combined requests mode
+      if options[:combined_requests]
+        if arguments[:after] || arguments[:before]
+          filter_options = {}
+          filter_options[:after]  = DateTime.parse(arguments[:after])  
+          filter_options[:before] = DateTime.parse(arguments[:before]) if arguments[:before]
+          controller.add_filter(:timespan, filter_options)
+        end
+        
+        arguments[:reject].each do |(field, value)|
+          controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
+        end
+        
+        arguments[:select].each do |(field, value)|
+          controller.add_filter(:field, :mode => :select, :field => field, :value => value)
+        end
+        
+      end
 
       # register aggregators
       arguments[:aggregator].each { |agg| controller >> agg.to_sym } 
 
       # register the database 
-      controller.add_aggregator(:database) if arguments[:database] && !arguments[:aggregator].include?('database')
+      controller.add_aggregator(:database)   if arguments[:database] && !arguments[:aggregator].include?('database')
       controller.add_aggregator(:summarizer) if arguments[:aggregator].empty?
     
       # register the echo aggregator in debug mode
@@ -84,6 +99,7 @@ module RequestLogAnalyzer
       @options = options
       @aggregators = []
       @sources     = []
+      @filters     = []
       
       # Requester format through RequestLogAnalyzer::FileFormat and construct the parser
       register_file_format(format) 
@@ -126,6 +142,16 @@ module RequestLogAnalyzer
     
     alias :>> :add_aggregator
     
+    # Adds a request filter to the controller.
+    def add_filter(filter, filter_options = {})
+      if filter.kind_of?(Symbol)
+        require File.dirname(__FILE__) + "/filter/#{filter}"
+        filter = RequestLogAnalyzer::Filter.const_get(filter.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join(''))
+      end
+      
+      @filters << filter.new(@log_parser, @options.merge(filter_options))
+    end
+    
     # Adds an input source to the controller, which will be scanned by the LogParser. 
     #
     # The sources are scanned in the order they are given to the controller. This can be
@@ -145,9 +171,15 @@ module RequestLogAnalyzer
     # 5. Calls report on every aggregator
     def run!
       
+      @filters.each { |filter| filter.prepare }
       @aggregators.each { |agg| agg.prepare }
       
-      handle_request = Proc.new { |request| @aggregators.each { |agg| agg.aggregate(request) } }
+      handle_request = Proc.new do |request|
+        filter = @filters.detect { |filter| false == filter.filter(request) }
+        @aggregators.each { |agg| agg.aggregate(request) } if filter.nil?
+        filter.nil?
+      end
+        
       begin
         @sources.each do |source|
           case source
