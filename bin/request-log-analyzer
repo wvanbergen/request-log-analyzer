@@ -2,6 +2,14 @@
 require File.dirname(__FILE__) + '/../lib/request_log_analyzer'
 require File.dirname(__FILE__) + '/../lib/cli/command_line_arguments'
 
+def terminal_width(default = 80)
+  IO.popen('stty -a') do |pipe|
+    column_line = pipe.detect { |line| /(\d+) columns/ =~ line }
+    width = column_line ? $1.to_i : default
+  end
+rescue 
+  default  
+end
 
 puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 0.4.0\n\n"
 
@@ -14,6 +22,8 @@ begin
     end
     
     command_line.option(:format, :alias => :f, :default => 'rails')
+    command_line.switch(:single_lines, :s)
+    
     command_line.option(:aggregator, :alias => :a, :multiple => true)
     command_line.option(:database, :alias => :d)    
 
@@ -23,8 +33,10 @@ begin
     command_line.option(:after)
     command_line.option(:before)    
     
-    command_line.switch(:single_lines, :s)
+    
     command_line.switch(:colorize, :z) 
+    command_line.option(:report_width, :default => terminal_width)
+    
     command_line.switch(:debug)
     
     command_line.minimum_parameters = 1
@@ -76,16 +88,6 @@ def install_rake_tasks(install_type)
   else
     raise "Cannot perform this install type! (#{install_type})"
   end
-end
-
-def terminal_width(minimum = 80)
-  IO.popen('stty -a') do |pipe|
-    column_line = pipe.detect { |line| /(\d+) columns/ =~ line }
-    width = column_line ? $1.to_i : default
-    [width, minimum].max
-  end
-rescue 
-  minimum  
 end
 
 

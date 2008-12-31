@@ -31,7 +31,7 @@ module RequestLogAnalyzer
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     def self.build(arguments, report_width = 80)
             
-      options = { :report_width => report_width }
+      options = { :report_width => arguments[:report_width].to_i }
       options[:combined_requests] = !arguments[:single_lines]
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
