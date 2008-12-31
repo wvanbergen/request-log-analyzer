@@ -12,7 +12,7 @@ module RequestLogAnalyzerSpecHelper
   end
   
   def request(fields, format = TestFileFormat)
-    if fields.kind_of?(array)
+    if fields.kind_of?(Array)
       RequestLogAnalyzer::Request.create(format, *fields)
     else
       RequestLogAnalyzer::Request.create(format, fields)

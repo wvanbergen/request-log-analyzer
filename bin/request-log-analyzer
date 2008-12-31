@@ -45,7 +45,9 @@ rescue CommandLine::Error => e
   puts "  --colorize, -z             Output reports in ASCII colors."
   puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
   puts "  --after <date>             Only consider requests from <date> or later."
-  puts "  --before <date>            Only consider before <date>."  
+  puts "  --before <date>            Only consider requests before <date>."  
+  puts "  --select <field> <value>   Only consider requests where <field> matches <value>."        
+  puts "  --reject <field> <value>   Only consider requests where <field> does not match <value>."    
   puts "  --debug                    Print debug information while parsing."
   puts 
   puts "Examples:"
