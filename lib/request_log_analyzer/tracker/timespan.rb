@@ -15,10 +15,10 @@ module RequestLogAnalyzer::Tracker
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
   
-    def report(color = false)
+    def report(report_width = 80, color = false)
       if options[:title]
         puts "\n#{options[:title]}" 
-        puts '=' * options[:title].length
+        puts green('━' * options[:title].length, color)
       end
     
       first_date  = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')

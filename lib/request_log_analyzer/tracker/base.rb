@@ -36,7 +36,7 @@ module RequestLogAnalyzer
         return true
       end
       
-      def report(color = false)
+      def report(report_width = 80, color = false)
         puts self.inspect
         puts        
       end

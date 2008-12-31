@@ -20,20 +20,27 @@ module RequestLogAnalyzer::Tracker
       end
     end
   
-    def report(color = false)
+    def report(report_width, color = false)
       if options[:title]
         puts "\n#{options[:title]}" 
-        puts green(('=' * options[:title].length), color)
+        puts green(('━' * report_width), color)
       end
     
-      sorted_categories = @categories.sort { |a, b| b[1] <=> a[1] }
-      total_hits     = sorted_categories.inject(0) { |carry, item| carry + item[1] }
-            
-      sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
-      max_cat_length = sorted_categories.map { |c| c[0].to_s.length }.max
-      sorted_categories.each { |(cat, count)| 
-        puts "%-#{max_cat_length}s: %5d hits %s" % [cat, count, (green("(%0.01f%%)", color) % [(count.to_f / total_hits) * 100])]
-      }
+      if @categories.empty?
+        puts 'None found.'
+      else
+        sorted_categories = @categories.sort { |a, b| b[1] <=> a[1] }
+        total_hits        = sorted_categories.inject(0) { |carry, item| carry + item[1] }
+        sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
+      
+        max_cat_length = sorted_categories.map { |c| c[0].to_s.length }.max
+        sorted_categories.each do |(cat, count)|
+          text = "%-#{max_cat_length}s: %5d hits %s" % [cat, count, (green("(%0.01f%%)", color) % [(count.to_f / total_hits) * 100])]
+          space_left = report_width - (max_cat_length + 24)
+          bar_chars  = (space_left * (count.to_f / total_hits)).round
+          puts "%-#{max_cat_length + 21}s %s%s" % [text, '┃', '░' * bar_chars]
+        end
+      end
     end
 
   end

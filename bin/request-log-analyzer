@@ -78,13 +78,23 @@ def install_rake_tasks(install_type)
   end
 end
 
-# Run the request_log_analyzer!
+def terminal_width(minimum = 80)
+  IO.popen('stty -a') do |pipe|
+    column_line = pipe.detect { |line| /(\d+) columns/ =~ line }
+    width = column_line ? $1.to_i : default
+    [width, minimum].max
+  end
+rescue 
+  minimum  
+end
+
+
 case arguments.command
 when :install
   install_rake_tasks(arguments.parameters[0])
 else 
-
-  RequestLogAnalyzer::Controller.build(arguments).run!
+  # Run the request_log_analyzer!
+  RequestLogAnalyzer::Controller.build(arguments, terminal_width).run!
 
   puts 
   puts "Thanks for using request-log-analyzer"  

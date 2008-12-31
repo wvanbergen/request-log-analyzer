@@ -29,9 +29,9 @@ module RequestLogAnalyzer
 
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
-    def self.build(arguments)
+    def self.build(arguments, report_width = 80)
             
-      options = {}
+      options = { :report_width => report_width }
       options[:combined_requests] = !arguments[:single_lines]
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
@@ -200,7 +200,7 @@ module RequestLogAnalyzer
       puts "\n"
       
       @aggregators.each { |agg| agg.finalize }
-      @aggregators.each { |agg| agg.report(options[:colorize]) }
+      @aggregators.each { |agg| agg.report(options[:report_width], options[:colorize]) }
     end
     
   end

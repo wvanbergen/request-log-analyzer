@@ -26,7 +26,7 @@ module RequestLogAnalyzer::Tracker
       if options[:title]
         puts
         puts "#{options[:title]}" 
-        puts green('=' * options[:title].length, options[:color])
+        puts green('━' * options[:report_width], options[:color])
       end
     
       @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount).each do |(cat, info)|
@@ -34,11 +34,11 @@ module RequestLogAnalyzer::Tracker
         total = "%-2.01f" % info[:total_duration]
         avg   = green(("(%-2.01fs avg)" % (info[:total_duration] / info[:count])) , options[:color])
       
-        puts "%-50s: %6d hits - %6ss total %s" % [cat[0...40], hits, total, avg]
+        puts "%-50s: %6d hits - %6ss total %s" % [cat[0...49], hits, total, avg]
       end
     end
   
-    def report(color = false)
+    def report(report_width = 80, color = false)
 
       options[:title]  ||= 'Request duration'
       options[:report] ||= [:total, :average]
@@ -48,11 +48,11 @@ module RequestLogAnalyzer::Tracker
       options[:report].each do |report|
         case report
         when :average
-          report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time:", :color => color) { |request| request[:total_duration] / request[:count] }  
+          report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time:", :color => color, :report_width => report_width) { |request| request[:total_duration] / request[:count] }  
         when :total
-          report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time:", :color => color) { |request| request[:total_duration] }
+          report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time:", :color => color, :report_width => report_width) { |request| request[:total_duration] }
         when :hits
-          report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits:", :color => color) { |request| request[:count] }
+          report_top(options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits:", :color => color, :report_width => report_width) { |request| request[:count] }
         else
           puts "Unknown duration report specified"
         end

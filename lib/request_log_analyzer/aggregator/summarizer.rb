@@ -39,32 +39,33 @@ module RequestLogAnalyzer::Aggregator
       @trackers.each { |tracker| tracker.finalize }
     end
        
-    def report(color = false)
-      report_header(color)
+    def report(report_width = 80, color = false)
+      report_header(report_width, color)
       if log_parser.parsed_requests - log_parser.skipped_requests > 0
-        @trackers.each { |tracker| tracker.report(color) }
+        @trackers.each { |tracker| tracker.report(report_width, color) }
       else
         puts
         puts "There were no requests analyzed."
       end
-      report_footer(color)
+      report_footer(report_width, color)
     end
     
-    def report_header(color = false)
-      puts "Summarizer results"
-      puts green("==================", color)
+    def report_header(report_width = 80, color = false)
+      puts "Request summary"
+      puts green("━" * report_width, color)
       puts "Parsed lines:         #{green(log_parser.parsed_lines, color)}"
-      puts "Parsed requests:      #{green(log_parser.parsed_requests, color)}" if options[:combined_requests]
+      puts "Parsed requests:      #{green(log_parser.parsed_requests, color)}"  if options[:combined_requests]
       puts "Skipped requests:     #{green(log_parser.skipped_requests, color)}" if log_parser.skipped_requests > 0
       if has_warnings?
-        puts "\nWarnings: " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ')
+        puts "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ')
       end
+      puts
     end
     
-    def report_footer(color = false)
+    def report_footer(report_width = 80, color = false)
       puts 
       if has_serious_warnings?      
-        puts green("==========================================================================", color)
+        puts green("━" * report_width, color)
         puts "Multiple warnings were encountered during parsing. Possibly, your logging "
         puts "is not setup correctly. Visit this website for logging configuration tips:"
         puts blue("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", color)
