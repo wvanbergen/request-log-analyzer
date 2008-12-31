@@ -41,7 +41,7 @@ module CommandLine
         parameters = []
         @parameter_count.times do |n|
           parameter = arguments_parser.next_parameter
-          raise CommandLine::ParameterExpected(self) if parameter.nil?
+          raise CommandLine::ParameterExpected, self if parameter.nil?
           parameters << parameter
         end
         return parameters
