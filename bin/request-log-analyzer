@@ -33,8 +33,7 @@ begin
     command_line.option(:after)
     command_line.option(:before)    
     
-    
-    command_line.switch(:colorize, :z) 
+    command_line.switch(:boring, :b)
     command_line.option(:report_width, :default => terminal_width)
     
     command_line.switch(:debug)
@@ -50,21 +49,23 @@ rescue CommandLine::Error => e
   puts
   puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
   puts
-  puts "Options:"
+  puts "Input options:"
   puts "  --format <format>, -f:     Uses the specified log file format. Defaults to rails."
-  puts "  --combined-requests, -c:   Combine the log lines that belong to the same request. "
-  puts "                             This improves the generated reports, but can skew results." 
-  puts "  --colorize, -z             Output reports in ASCII colors."
-  puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
+  puts
+  puts "Filter options:"
   puts "  --after <date>             Only consider requests from <date> or later."
   puts "  --before <date>            Only consider requests before <date>."  
   puts "  --select <field> <value>   Only consider requests where <field> matches <value>."        
   puts "  --reject <field> <value>   Only consider requests where <field> does not match <value>."    
+  puts
+  puts "Output options:"
+  puts "  --boring, -b               Output reports without ASCII colors."
+  puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
   puts "  --debug                    Print debug information while parsing."
   puts 
   puts "Examples:"
   puts "  request-log-analyzer development.log"
-  puts "  request-log-analyzer -cz mongrel.0.log mongrel.1.log mongrel.2.log "
+  puts "  request-log-analyzer -z mongrel.0.log mongrel.1.log mongrel.2.log "
   puts "  request-log-analyzer --format merb -d requests.db production.log"
   puts
   puts "To install rake tasks in your Rails application, "
@@ -99,5 +100,5 @@ else
   RequestLogAnalyzer::Controller.build(arguments, terminal_width).run!
 
   puts 
-  puts "Thanks for using request-log-analyzer"  
+  puts "Thanks for using request-log-analyzer"
 end

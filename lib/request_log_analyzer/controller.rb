@@ -35,7 +35,7 @@ module RequestLogAnalyzer
       options[:combined_requests] = !arguments[:single_lines]
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
-      options[:colorize] = arguments[:colorize] if arguments[:colorize]
+      options[:colorize] = !arguments[:boring]
                 
       # Create the controller with the correct file format
       controller = Controller.new(arguments[:format].to_sym, options)
