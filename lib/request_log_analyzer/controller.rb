@@ -149,7 +149,7 @@ module RequestLogAnalyzer
         filter = RequestLogAnalyzer::Filter.const_get(filter.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join(''))
       end
       
-      @filters << filter.new(@log_parser, @options.merge(filter_options))
+      @filters << filter.new(file_format, @options.merge(filter_options))
     end
     
     # Adds an input source to the controller, which will be scanned by the LogParser. 

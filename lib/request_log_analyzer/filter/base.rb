@@ -7,10 +7,9 @@ module RequestLogAnalyzer
       attr_reader :log_parser
       attr_reader :options
       
-      def initialize(log_parser, options = {})
+      def initialize(format, options = {})
         @options    = options
-        @log_parser = log_parser
-        register_file_format(log_parser.file_format)
+        register_file_format(format)
       end
       
       def prepare

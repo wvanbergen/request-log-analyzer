@@ -11,6 +11,14 @@ module RequestLogAnalyzerSpecHelper
     File.dirname(__FILE__) + "/fixtures/#{name}.log"
   end
   
+  def request(fields, format = TestFileFormat)
+    if fields.kind_of?(array)
+      RequestLogAnalyzer::Request.create(format, *fields)
+    else
+      RequestLogAnalyzer::Request.create(format, fields)
+    end
+  end
+  
 end
 
 module TestFileFormat
