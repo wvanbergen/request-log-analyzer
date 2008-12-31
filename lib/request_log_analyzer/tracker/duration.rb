@@ -26,17 +26,17 @@ module RequestLogAnalyzer::Tracker
       
       top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
       max_cat_length = top_categories.map { |a| a[0].length }.max
-      space_left = [options[:report_width] - 31, [max_cat_length + 1, options[:title].length].max].min
+      space_left = [options[:report_width] - 33, [max_cat_length + 1, options[:title].length].max].min
       
       puts
-      puts "%-#{space_left+1}s┃   Hits ┃     Sum. |     Avg." % [options[:title][0...space_left]] 
+      puts "%-#{space_left+1}s┃    Hits ┃      Sum. |      Avg." % [options[:title][0...space_left]] 
       puts green('━' * options[:report_width], options[:color])
           
       top_categories.each do |(cat, info)|
         hits  = info[:count]
         total = "%0.02f" % info[:total_duration]
         avg   = "%0.02f" % (info[:total_duration] / info[:count])
-        puts "%-#{space_left+1}s┃ %6d ┃ %7ss ┃ %7ss" % [cat[0...space_left], hits, total, avg]
+        puts "%-#{space_left+1}s┃%8d ┃%9ss ┃%9ss" % [cat[0...space_left], hits, total, avg]
       end
     end
   

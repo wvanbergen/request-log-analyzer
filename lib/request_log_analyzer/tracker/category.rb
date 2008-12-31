@@ -33,13 +33,17 @@ module RequestLogAnalyzer::Tracker
         total_hits        = sorted_categories.inject(0) { |carry, item| carry + item[1] }
         sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
 
-        adjuster = color ? 30 : 21 # justifcation calcultaion is slight different when color codes are inserterted
-        max_cat_length = sorted_categories.map { |c| c[0].to_s.length }.max
+        adjuster = color ? 33 : 24 # justifcation calcultaion is slight different when color codes are inserterted
+        max_cat_length = [sorted_categories.map { |c| c[0].to_s.length }.max, report_width - adjuster].min
         sorted_categories.each do |(cat, count)|
-          text = "%-#{max_cat_length}s: %5d hits %s" % [cat, count, (green("(%0.01f%%)", color) % [(count.to_f / total_hits) * 100])]
+          text = "%-#{max_cat_length+1}s┃%7d hits %s" % [cat.to_s[0..max_cat_length], count, (green("(%0.01f%%)", color) % [(count.to_f / total_hits) * 100])]
           space_left  = report_width - (max_cat_length + adjuster + 3)
-          bar_chars  = (space_left * (count.to_f / total_hits)).round
-          puts "%-#{max_cat_length + adjuster}s %s%s" % [text, '┃', '░' * bar_chars]
+          if space_left > 3
+            bar_chars  = (space_left * (count.to_f / total_hits)).round
+            puts "%-#{max_cat_length + adjuster}s %s%s" % [text, '┃', '░' * bar_chars]
+          else
+            puts text
+          end
         end
       end
     end
