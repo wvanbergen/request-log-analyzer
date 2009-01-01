@@ -33,10 +33,11 @@ module RequestLogAnalyzer::FileFormat::Rails
     # RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy' 
     :failed => {
       :footer => true,   
-      :teaser => /Error/,
-      :regexp => /(\w+Error|\w+Invalid) \((.*)\)\:(.*)/,
+      :regexp => /((?:\w+\:\:)*\w+Error|\w+Invalid) \((.*)\)(?: on line #(\d+) of .+)?\:(.*)/,
       :captures => [{ :name => :error,            :type => :string}, 
                     { :name => :exception_string, :type => :string}, 
+                    { :name => :line,             :type => :integer}, 
+                    { :name => :file,             :type => :string},                     
                     { :name => :stack_trace,      :type => :string, :anonymize => true}]
     },
 
