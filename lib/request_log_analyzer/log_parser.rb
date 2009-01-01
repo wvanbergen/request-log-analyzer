@@ -98,12 +98,11 @@ module RequestLogAnalyzer
             update_current_request(request_data, &block)
           else
             handle_request(RequestLogAnalyzer::Request.create(@file_format, request_data), &block)
-            @parsed_requests += 1
           end       
         end
       end
       
-      warn(:unclosed_request, "End of file reached, but last request was not completed!") unless @current_request.nil?
+      warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
   
       @current_io = nil
     end
@@ -140,8 +139,13 @@ module RequestLogAnalyzer
     def update_current_request(request_data, &block)
       if header_line?(request_data)
         unless @current_request.nil?
-          warn(:unclosed_request, "Encountered header line, but previous request was not closed!")
-          @current_request = nil
+          if options[:assume_correct_order]
+            handle_request(@current_request, &block)            
+            @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)
+          else
+            warn(:unclosed_request, "Encountered header line, but previous request was not closed!")
+            @current_request = nil # remove all data that was parsed, skip next request as well.
+          end
         else
           @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)              
         end
@@ -150,8 +154,7 @@ module RequestLogAnalyzer
           @current_request << request_data
           if footer_line?(request_data)
             handle_request(@current_request, &block)
-            @current_request = nil
-            @parsed_requests += 1  
+            @current_request = nil 
           end
         else
           warn(:no_current_request, "Parsebale line found outside of a request!")
@@ -162,6 +165,7 @@ module RequestLogAnalyzer
     # Handles the parsed request by calling the request handler.
     # The default controller will send the request to every running aggegator.
     def handle_request(request, &block)
+      @parsed_requests += 1
       accepted = block_given? ? yield(request) : true
       @skipped_requests += 1 if !accepted
     end

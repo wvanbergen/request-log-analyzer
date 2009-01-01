@@ -10,11 +10,13 @@ module RequestLogAnalyzer
       
       options = { 
           :discard_teaser_lines => arguments[:discard_teaser_lines], 
-          :keep_junk_lines      => arguments[:keep_junk_lines] 
+          :keep_junk_lines      => arguments[:keep_junk_lines], 
+          :strip                => arguments[:strip] 
         }
           
       input_file  = arguments.parameters[0]
-      output_file = arguments.parameters[1] || input_file + '.anonymized'
+      suffix = options[:strip] ? '.stripped' : '.anonymized'
+      output_file = arguments.parameters[1] || input_file + suffix
       
       log_anonymizer = RequestLogAnalyzer::LogAnonymizer.new(arguments[:format].to_sym, input_file, output_file, options)
     end
@@ -27,6 +29,17 @@ module RequestLogAnalyzer
       self.register_file_format(format)
     end
     
+    def strip_line(line)
+      file_format.line_definitions.any? { |name, definition| definition =~ line } ? line : ""
+    end
+
+    def strip_file
+      File.open(output_file, 'w') do |output|
+        File.open(input_file, 'r') do |input|          
+          input.each_line { |line| output << strip_line(line) }
+        end
+      end
+    end
 
     def anonymize_line(line)
     
@@ -51,7 +64,7 @@ module RequestLogAnalyzer
     end
     
     def run!
-      anonymize_file
+      options[:strip] ? strip_file : anonymize_file
     end
   end
 

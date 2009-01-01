@@ -55,6 +55,9 @@ module RequestLogAnalyzer
       # register filters
       # filters are only supported in combined requests mode
       if options[:combined_requests]
+        
+        options[:assume_correct_order] = arguments[:assume_correct_order]
+        
         if arguments[:after] || arguments[:before]
           filter_options = {}
           filter_options[:after]  = DateTime.parse(arguments[:after])  
