@@ -13,6 +13,7 @@ begin
     command_line.option(:format, :alias => :f, :default => 'rails')    
     command_line.switch(:discard_teaser_lines, :t)
     command_line.switch(:keep_junk_lines, :j)    
+    command_line.switch(:strip, :s)        
     command_line.switch(:debug)
     command_line.minimum_parameters = 1
   end
