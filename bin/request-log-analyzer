@@ -11,14 +11,28 @@ rescue
   default  
 end
 
-puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 0.4.0\n\n"
-
 # Parse the arguments given via commandline
 begin
   arguments = CommandLine::Arguments.parse do |command_line|
     
     command_line.command(:install) do |install|
       install.parameters = 1
+    end
+    
+    command_line.command(:strip) do |strip|
+      strip.minimum_parameters = 1
+      strip.option(:format, :alias => :f, :default => 'rails')      
+      strip.option(:output, :alias => :o)
+      strip.switch(:discard_teaser_lines, :t)
+      strip.switch(:keep_junk_lines, :j)      
+    end
+    
+    command_line.command(:anonymize) do |anonymize|
+      anonymize.minimum_parameters = 1
+      anonymize.option(:format, :alias => :f, :default => 'rails')            
+      anonymize.option(:output, :alias => :o)
+      anonymize.switch(:discard_teaser_lines, :t)
+      anonymize.switch(:keep_junk_lines, :j)      
     end
     
     command_line.option(:format, :alias => :f, :default => 'rails')
@@ -96,7 +110,15 @@ end
 case arguments.command
 when :install
   install_rake_tasks(arguments.parameters[0])
+when :strip
+  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'  
+  RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
+when :anonymize
+  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'    
+  RequestLogAnalyzer::LogProcessor.build(:anonymize, arguments).run!  
 else 
+  puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 0.4.0\n\n"  
+  
   # Run the request_log_analyzer!
   RequestLogAnalyzer::Controller.build(arguments, terminal_width).run!
 
