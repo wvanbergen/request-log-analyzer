@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe RequestLogAnalyzer::FileFormat::LineDefinition, :parsing do
+describe RequestLogAnalyzer::LineDefinition, :parsing do
   
   before(:each) do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
       :teaser   => /Testing /,
       :regexp   => /Testing (\w+), tries\: (\d+)/,
       :captures => [{ :name => :what, :type => :string }, { :name => :tries, :type => :integer }]
@@ -33,9 +33,9 @@ describe RequestLogAnalyzer::FileFormat::LineDefinition, :parsing do
    end
 end
 
-describe RequestLogAnalyzer::FileFormat::LineDefinition, :anonymizing_basics do
+describe RequestLogAnalyzer::LineDefinition, :anonymizing_basics do
   before(:each) do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
       :teaser   => /Anonymize /,
       :regexp   => /Anonymize (\w+)!/,
       :captures => [{ :name => :what, :type => :string }]
@@ -47,7 +47,7 @@ describe RequestLogAnalyzer::FileFormat::LineDefinition, :anonymizing_basics do
   end
   
   it "should return nil if no teaser exists and the regexp doesn't match" do
-    line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize!/, :captures => []})
 
     line_definition.anonymize('nonsense').should be_nil
@@ -70,52 +70,52 @@ describe RequestLogAnalyzer::FileFormat::LineDefinition, :anonymizing_basics do
   end  
 end
 
-describe RequestLogAnalyzer::FileFormat::LineDefinition, :anonymizing_specifics do
+describe RequestLogAnalyzer::LineDefinition, :anonymizing_specifics do
 
   it "should anonymize completely if anonymize is true" do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize (.+)!/, :captures => [{ :name => :what, :type => :string, :anonymize => true }]})
 
     @line_definition.anonymize("Anonymize 1.2.3.4!").should == "Anonymize ***!"
   end    
     
   it "should anonymize a URL" do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize (.+)!/, :captures => [{ :name => :what, :type => :string, :anonymize => :url }]})
     
     @line_definition.anonymize("Anonymize https://www.not-anonymous.com/path/to/file.html!").should == "Anonymize http://example.com/path/to/file.html!"
   end
   
   it "should anonymize an IP address" do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize (.+)!/, :captures => [{ :name => :what, :type => :string, :anonymize => :ip }]})
     
     @line_definition.anonymize("Anonymize 1.2.3.4!").should == "Anonymize 127.0.0.1!"
   end 
   
   it "should anonymize completely if the anonymizer is unknown" do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize (.+)!/, :captures => [{ :name => :what, :type => :string, :anonymize => :unknown }]})
 
     @line_definition.anonymize("Anonymize 1.2.3.4!").should == "Anonymize ***!"
   end
   
   it "should anonymize an integer slightly" do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize (.+)!/, :captures => [{ :name => :what, :type => :integer, :anonymize => :slightly }]})
 
     @line_definition.anonymize("Anonymize 1234!").should =~ /Anonymize \d{3,4}\!/
   end
   
   it "should anonymize an integer slightly" do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize (.+)!/, :captures => [{ :name => :what, :type => :integer, :anonymize => :slightly }]})
 
     @line_definition.anonymize("Anonymize 1234!").should =~ /Anonymize \d{3,4}\!/
   end
   
   it "should anonymize an double slightly" do
-    @line_definition = RequestLogAnalyzer::FileFormat::LineDefinition.new(:test, {
+    @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, {
           :regexp => /Anonymize (.+)!/, :captures => [{ :name => :what, :type => :double, :anonymize => :slightly }]})
 
     @line_definition.anonymize("Anonymize 1.3!").should =~ /Anonymize 1\.\d+\!/
