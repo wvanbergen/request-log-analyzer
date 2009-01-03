@@ -1,7 +1,7 @@
 class RequestLogAnalyzer::FileFormat::Rails < RequestLogAnalyzer::FileFormat
   
   # Processing EmployeeController#index (for 123.123.123.123 at 2008-07-13 06:00:00) [GET]
-  format_definition :processing do |line|
+  line_definition :processing do |line|
     line.header = true # this line is the first log line for a request 
     line.teaser = /Processing /
     line.regexp = /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
@@ -14,12 +14,12 @@ class RequestLogAnalyzer::FileFormat::Rails < RequestLogAnalyzer::FileFormat
   end
 
   # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.    
-  format_definition :cache_hit do |line|
+  line_definition :cache_hit do |line|
     line.regexp = /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter:.+>\] rendered_or_redirected/
   end
   
   # RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy' 
-  format_definition :failed do |line|
+  line_definition :failed do |line|
     line.footer = true
     line.regexp = /((?:[A-Z]\w+\:\:)*[A-Z]\w+) \((.*)\)(?: on line #(\d+) of .+)?\:(.*)/
     line.captures << { :name => :error,            :type => :string } \
@@ -41,7 +41,8 @@ class RequestLogAnalyzer::FileFormat::Rails < RequestLogAnalyzer::FileFormat
   # The completed line uses a kind of hack to ensure that both old style logs and new style logs 
   # are both parsed by the same regular expression. The format in Rails 2.2 was slightly changed,
   # but the line contains exactly the same information.
-  format_definition :completed do |line|
+  line_definition :completed do |line|
+    
     line.footer = true
     line.teaser = /Completed in /
     line.regexp = Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})")

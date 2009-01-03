@@ -66,8 +66,8 @@ describe RequestLogAnalyzer::FileFormat, :load do
   include RequestLogAnalyzerSpecHelper
 
   it "should load a predefined file format from the /file_format dir" do
-    @file_format = RequestLogAnalyzer::FileFormat.load(:detailed_rails)
-    @file_format.should be_kind_of(RequestLogAnalyzer::FileFormat::DetailedRails)
+    @file_format = RequestLogAnalyzer::FileFormat.load(:rails)
+    @file_format.should be_kind_of(RequestLogAnalyzer::FileFormat::Rails)
   end
   
   it "should load a provided format file" do

@@ -20,13 +20,13 @@ module RequestLogAnalyzer
        subclass.class_eval { class << self; attr_accessor :report_definer; end }       
     end    
     
-    def self.format_definition(name = nil, &block)
+    def self.line_definition(name, &block)
+      @line_definer.send(name, &block)
+    end
+    
+    def self.format_definition(&block)
       if block_given?
-        if name.nil?
-          yield(@line_definer) 
-        else
-          @line_definer.send(name, &block)
-        end
+        yield(@line_definer) 
       else
         return @line_definer
       end

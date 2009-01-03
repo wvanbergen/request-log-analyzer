@@ -10,7 +10,7 @@ describe RequestLogAnalyzer::Controller do
   # end
 
   it "should call the aggregators when run" do
-    controller = RequestLogAnalyzer::Controller.new(RequestLogAnalyzer::FileFormat.load(:detailed_rails))
+    controller = RequestLogAnalyzer::Controller.new(RequestLogAnalyzer::FileFormat.load(:rails))
     controller << log_fixture(:rails_1x)
     
     mock_aggregator = mock('aggregator')
