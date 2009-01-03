@@ -96,22 +96,22 @@ class RequestLogAnalyzer::FileFormat::Rails < RequestLogAnalyzer::FileFormat
     end
   end
 
-  report do |analysis|
-    analysis.track(:timespan, :field => :timestamp, :line_type => :processing)      
-    analysis.track(:category, :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20, :line_type => :processing)
-    analysis.track(:category, :category => :method, :title => 'HTTP methods')
-    analysis.track(:category, :category => :status, :title => 'HTTP statuses returned')
-    analysis.track(:category, :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits')
+  report do |analyze|
+    analyze.timespan :line_type => :processing
+    analyze.category :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20, :line_type => :processing
+    analyze.category :method, :title => 'HTTP methods'
+    analyze.category :status, :title => 'HTTP statuses returned'
+    analyze.category :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits'
     
-    analysis.track(:duration, :duration => :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed)
-    analysis.track(:duration, :duration => :view,     :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed)
-    analysis.track(:duration, :duration => :db,       :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed)
+    analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
+    analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
+    analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
     
-    analysis.track(:category, :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', 
-            :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20)
+    analyze.category :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', 
+            :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20
             
-    analysis.track(:hourly_spread, :field => :timestamp, :line_type => :processing)      
-    analysis.track(:category, :category => :error, :title => 'Failed requests', :line_type => :failed, :amount => 20)
+    analyze.hourly_spread :line_type => :processing
+    analyze.category :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
   end
 
 

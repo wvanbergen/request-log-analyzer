@@ -12,6 +12,26 @@ module RequestLogAnalyzer::Aggregator
         @trackers = []
       end
       
+      def method_missing(tracker_method, *args)
+        track(tracker_method, args.first)
+      end
+      
+      def category(category_field, options = {})
+        if category_field.kind_of?(Symbol)
+          track(:category, options.merge(:category => category_field))
+        elsif category_field.kind_of?(Hash)
+          track(:category, category_field.merge(options))
+        end
+      end
+      
+      def duration(duration_field, options = {})
+        if duration_field.kind_of?(Symbol)
+          track(:duration, options.merge(:duration => duration_field))
+        elsif duration_field.kind_of?(Hash)
+          track(:duration, duration_field.merge(options))        
+        end
+      end      
+      
       def track(tracker_klass, options = {})
         require "#{File.dirname(__FILE__)}/../tracker/#{tracker_klass}"
         tracker_klass = RequestLogAnalyzer::Tracker.const_get(tracker_klass.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) if tracker_klass.kind_of?(Symbol)
@@ -25,11 +45,11 @@ module RequestLogAnalyzer::Aggregator
     def initialize(log_parser, options = {})
       super(log_parser, options)
       @warnings_encountered = {}
-      setup(log_parser.file_format.report_definer)
+      @trackers = log_parser.file_format.report_trackers
+      setup
     end
     
-    def setup(definer)
-      @trackers = definer.trackers
+    def setup
     end
     
     def prepare

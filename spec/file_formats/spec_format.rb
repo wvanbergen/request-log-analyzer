@@ -18,6 +18,9 @@ class SpecFormat < RequestLogAnalyzer::FileFormat
     line.teaser = /finishing /
     line.regexp = /finishing request (\d+)/
     line.captures = [{ :name => :request_no, :type => :integer}]
-  end  
+  end
   
+  report do |analyze|
+    analyze.category :test_capture, :title => 'What is testing exactly?'
+  end
 end

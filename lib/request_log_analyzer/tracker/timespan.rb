@@ -5,7 +5,7 @@ module RequestLogAnalyzer::Tracker
     attr_reader :first, :last, :request_time_graph
   
     def prepare
-      raise "No categorizer set up for category tracker #{self.inspect}" unless options[:field]
+      options[:field] ||= :timestamp
     end
               
     def update(request)

@@ -66,8 +66,8 @@ module RequestLogAnalyzer
       @line_definitions ||= self.class.line_definer.line_definitions
     end
     
-    def report_definer
-      self.class.instance_variable_get(:@report_definer)
+    def report_trackers
+      self.class.instance_variable_get(:@report_definer).trackers rescue []
     end
     
     def valid?
