@@ -3,11 +3,11 @@ require 'request_log_analyzer/log_processor'
 
 describe RequestLogAnalyzer::LogProcessor, 'anonymization' do
 
-  include TestFileFormat
+  include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_anonymizer = RequestLogAnalyzer::LogProcessor.new(TestFileFormat, :anonymize, {})
-    @alternate_log_anonymizer = RequestLogAnalyzer::LogProcessor.new(TestFileFormat, :anonymize, {:keep_junk_lines => true, :discard_teaser_lines => true})
+    @log_anonymizer = RequestLogAnalyzer::LogProcessor.new(spec_format, :anonymize, {})
+    @alternate_log_anonymizer = RequestLogAnalyzer::LogProcessor.new(spec_format, :anonymize, {:keep_junk_lines => true, :discard_teaser_lines => true})
   end
   
   it "should keep a junk line if :keep_junk_lines is true" do
@@ -41,10 +41,10 @@ end
 
 describe RequestLogAnalyzer::LogProcessor, 'stripping log files' do
 
-  include TestFileFormat
+  include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_stripper = RequestLogAnalyzer::LogProcessor.new(TestFileFormat, :strip, {})
+    @log_stripper = RequestLogAnalyzer::LogProcessor.new(spec_format, :strip, {})
   end
   
   it "should remove a junk line" do

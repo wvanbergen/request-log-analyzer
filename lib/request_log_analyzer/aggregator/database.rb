@@ -24,7 +24,7 @@ module RequestLogAnalyzer::Aggregator
         
         attributes = line.reject { |k, v| [:line_type].include?(k) }
         attributes[:request_id] = @request_id if options[:combined_requests]  
-        file_format.const_get(class_name).create!(attributes)
+        file_format.class.const_get(class_name).create!(attributes)
       end
     rescue SQLite3::SQLException => e
       raise Interrupt, e.message
@@ -35,7 +35,7 @@ module RequestLogAnalyzer::Aggregator
     end
     
     def warning(type, message, lineno)
-      file_format::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
+      file_format.class::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
     
     def report(reporth_width, color)
@@ -68,12 +68,12 @@ module RequestLogAnalyzer::Aggregator
         t.integer :lineno          
       end    
       
-      file_format.const_set('Warning', Class.new(ActiveRecord::Base)) unless file_format.const_defined?('Warning')
+      file_format.class.const_set('Warning', Class.new(ActiveRecord::Base)) unless file_format.class.const_defined?('Warning')
     end
 
     def create_activerecord_class(name, definition)
       class_name = "#{name}_line".camelize
-      file_format.const_set(class_name, Class.new(ActiveRecord::Base)) unless file_format.const_defined?(class_name)
+      file_format.class.const_set(class_name, Class.new(ActiveRecord::Base)) unless file_format.class.const_defined?(class_name)
     end
 
     def create_database_schema!

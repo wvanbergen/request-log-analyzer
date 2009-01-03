@@ -15,7 +15,7 @@ module RequestLogAnalyzer
   # that are mixed up cannot be parsed. It will emit warnings when this occurs.
   class LogParser
     
-    include RequestLogAnalyzer::FileFormat
+    include RequestLogAnalyzer::FileFormat::Awareness
     
     # A hash of options
     attr_reader :options

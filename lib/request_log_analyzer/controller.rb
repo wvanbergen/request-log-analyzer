@@ -19,7 +19,7 @@ module RequestLogAnalyzer
   # from several logrotated log files.
   class Controller
 
-    include RequestLogAnalyzer::FileFormat
+    include RequestLogAnalyzer::FileFormat::Awareness
     
     attr_reader :aggregators
     attr_reader :filters
@@ -38,7 +38,8 @@ module RequestLogAnalyzer
       options[:colorize] = !arguments[:boring]
                 
       # Create the controller with the correct file format
-      controller = Controller.new(arguments[:format].to_sym, options)
+      file_format = RequestLogAnalyzer::FileFormat.load(arguments[:format])
+      controller = Controller.new(file_format, options)
 
       # register sources
       arguments.parameters.each do |file|

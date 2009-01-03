@@ -4,24 +4,32 @@ module RequestLogAnalyzer::Aggregator
 
   class Summarizer < Base
     
+    class Definer
+      
+      attr_reader :trackers
+      
+      def initialize
+        @trackers = []
+      end
+      
+      def track(tracker_klass, options = {})
+        require "#{File.dirname(__FILE__)}/../tracker/#{tracker_klass}"
+        tracker_klass = RequestLogAnalyzer::Tracker.const_get(tracker_klass.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) if tracker_klass.kind_of?(Symbol)
+        @trackers << tracker_klass.new(options)
+      end
+    end
+    
     attr_reader :trackers
     attr_reader :warnings_encountered
     
     def initialize(log_parser, options = {})
       super(log_parser, options)
       @warnings_encountered = {}
-      setup
+      setup(log_parser.file_format.report_definer)
     end
     
-    def setup
-      
-    end
-    
-    def track(tracker_klass, options = {})
-      @trackers ||= []
-      require "#{File.dirname(__FILE__)}/../tracker/#{tracker_klass}"
-      tracker_klass = RequestLogAnalyzer::Tracker.const_get(tracker_klass.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) if tracker_klass.kind_of?(Symbol)
-      @trackers << tracker_klass.new(options)
+    def setup(definer)
+      @trackers = definer.trackers
     end
     
     def prepare

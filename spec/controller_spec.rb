@@ -4,13 +4,13 @@ describe RequestLogAnalyzer::Controller do
 
   include RequestLogAnalyzerSpecHelper
 
-  it "should include the file format module" do
-    controller = RequestLogAnalyzer::Controller.new(:rails)
-    (class << controller; self; end).ancestors.include?(RequestLogAnalyzer::FileFormat::Rails)
-  end
+  # it "should include the file format module" do
+  #   controller = RequestLogAnalyzer::Controller.new(:rails)
+  #   (class << controller; self; end).ancestors.include?(RequestLogAnalyzer::FileFormat::Rails)
+  # end
 
   it "should call the aggregators when run" do
-    controller = RequestLogAnalyzer::Controller.new(:rails)
+    controller = RequestLogAnalyzer::Controller.new(RequestLogAnalyzer::FileFormat.load(:detailed_rails))
     controller << log_fixture(:rails_1x)
     
     mock_aggregator = mock('aggregator')

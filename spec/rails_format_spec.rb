@@ -4,7 +4,7 @@ describe RequestLogAnalyzer::LogParser, "Rails without combined requests" do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::LogParser.new(:rails, :combined_requests => false)
+    @log_parser = RequestLogAnalyzer::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails), :combined_requests => false)
   end
   
   it "should parse a stream and find valid requests" do
@@ -20,7 +20,7 @@ describe RequestLogAnalyzer::LogParser, "Rails without combined requests" do
     @log_parser.parse_file(log_fixture(:rails_1x)) { |request| requests << request }
     requests.length.should == 8
     requests.each { |r| r.should be_single_line }
-    requests.select { |r| r.line_type == :started }.should have(4).items
+    requests.select { |r| r.line_type == :processing }.should have(4).items
   end  
 end
 
@@ -29,7 +29,7 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::LogParser.new(:rails, :combined_requests => true)
+    @log_parser = RequestLogAnalyzer::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails), :combined_requests => true)
   end
   
   it "should have a valid language definitions" do
@@ -45,7 +45,7 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
   it "should parse a Rails 2.2 request properly" do
     @log_parser.should_not_receive(:warn)
     @log_parser.parse_file(log_fixture(:rails_22)) do |request|
-      request.should =~ :started
+      request.should =~ :processing
       request.should =~ :completed  
     
       request[:controller].should == 'PageController'

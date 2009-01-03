@@ -6,7 +6,7 @@ describe RequestLogAnalyzer::Filter::Timespan, 'both before and after'  do
   include RequestLogAnalyzerSpecHelper
 
   before(:each) do
-    @filter = RequestLogAnalyzer::Filter::Timespan.new(TestFileFormat, :after => DateTime.parse('2009-01-01'), :before => DateTime.parse('2009-02-02'))
+    @filter = RequestLogAnalyzer::Filter::Timespan.new(spec_format, :after => DateTime.parse('2009-01-01'), :before => DateTime.parse('2009-02-02'))
     @filter.prepare
   end
   
@@ -27,7 +27,7 @@ describe RequestLogAnalyzer::Filter::Timespan, 'only before'  do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @filter = RequestLogAnalyzer::Filter::Timespan.new(TestFileFormat, :before => DateTime.parse('2009-02-02'))    
+    @filter = RequestLogAnalyzer::Filter::Timespan.new(spec_format, :before => DateTime.parse('2009-02-02'))    
     @filter.prepare
   end
   
@@ -48,7 +48,7 @@ describe RequestLogAnalyzer::Filter::Timespan, 'only after'  do
   include RequestLogAnalyzerSpecHelper 
   
   before(:each) do
-    @filter = RequestLogAnalyzer::Filter::Timespan.new(TestFileFormat, :after => DateTime.parse('2009-01-01'))
+    @filter = RequestLogAnalyzer::Filter::Timespan.new(spec_format, :after => DateTime.parse('2009-01-01'))
     @filter.prepare
   end
   
@@ -69,7 +69,7 @@ describe RequestLogAnalyzer::Filter::Field, 'string in accept mode' do
   include RequestLogAnalyzerSpecHelper
 
   before(:each) do
-    @filter = RequestLogAnalyzer::Filter::Field.new(TestFileFormat, :field => :test, :value => 'test', :mode => :select)
+    @filter = RequestLogAnalyzer::Filter::Field.new(spec_format, :field => :test, :value => 'test', :mode => :select)
     @filter.prepare
   end
   
@@ -94,7 +94,7 @@ describe RequestLogAnalyzer::Filter::Field, 'string in reject mode' do
   include RequestLogAnalyzerSpecHelper
 
   before(:each) do
-    @filter = RequestLogAnalyzer::Filter::Field.new(TestFileFormat, :field => :test, :value => 'test', :mode => :reject)
+    @filter = RequestLogAnalyzer::Filter::Field.new(spec_format, :field => :test, :value => 'test', :mode => :reject)
     @filter.prepare
   end
   
@@ -119,7 +119,7 @@ describe RequestLogAnalyzer::Filter::Field, 'regexp in accept mode' do
   include RequestLogAnalyzerSpecHelper
 
   before(:each) do
-    @filter = RequestLogAnalyzer::Filter::Field.new(TestFileFormat, :field => :test, :value => '/test/', :mode => :select)
+    @filter = RequestLogAnalyzer::Filter::Field.new(spec_format, :field => :test, :value => '/test/', :mode => :select)
     @filter.prepare
   end
   

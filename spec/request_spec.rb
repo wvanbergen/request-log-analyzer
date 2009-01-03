@@ -2,8 +2,10 @@ require File.dirname(__FILE__) + '/spec_helper'
 
 describe RequestLogAnalyzer::Request, :single_line do
   
+  include RequestLogAnalyzerSpecHelper
+  
   before(:each) do
-    @single_line_request = RequestLogAnalyzer::Request.new(TestFileFormat)
+    @single_line_request = RequestLogAnalyzer::Request.new(spec_format)
     @single_line_request << { :line_type => :test, :lineno => 1, :test_capture => 'awesome!' }
   end
   
@@ -38,8 +40,10 @@ end
 
 describe RequestLogAnalyzer::Request, :combined do
   
+  include RequestLogAnalyzerSpecHelper
+  
   before(:each) do
-    @combined_request = RequestLogAnalyzer::Request.new(TestFileFormat)
+    @combined_request = RequestLogAnalyzer::Request.new(spec_format)
     @combined_request << { :line_type => :first, :lineno =>  1, :name => 'first line!' }    
     @combined_request << { :line_type => :test,  :lineno =>  4, :test_capture => 'testing' }        
     @combined_request << { :line_type => :test,  :lineno =>  7, :test_capture => 'testing some more' }            

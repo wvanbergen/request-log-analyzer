@@ -17,6 +17,23 @@ module RequestLogAnalyzer
 
     include RequestLogAnalyzer::Anonymizers
 
+    class Definer
+      
+      attr_accessor :line_definitions
+      
+      def initialize
+        @line_definitions = {}
+      end
+      
+      def method_missing(name, *args, &block)
+        if block_given?
+          @line_definitions[name] = RequestLogAnalyzer::LineDefinition.define(name, &block)
+        else
+          @line_definitions[name] = RequestLogAnalyzer::LineDefinition.new(name, args.first)
+        end
+      end
+    end
+
     attr_reader :name
     attr_accessor :teaser, :regexp, :captures
     attr_accessor :header, :footer
@@ -24,8 +41,15 @@ module RequestLogAnalyzer
     # Initializes the LineDefinition instance with a hash containing the different elements of
     # the definition.
     def initialize(name, definition = {})
-      @name = name
+      @name     = name
+      @captures = []
       definition.each { |key, value| self.send("#{key.to_s}=".to_sym, value) }
+    end
+    
+    def self.define(name, &block)
+      definition = self.new(name)
+      yield(definition) if block_given?
+      return definition
     end
     
     # Converts a parsed value (String) to the desired value using some heuristics.

@@ -10,7 +10,7 @@ module RequestLogAnalyzer::Aggregator
   # requests mode, otherwise it is running in single line mode.
   class Base
     
-    include RequestLogAnalyzer::FileFormat
+    include RequestLogAnalyzer::FileFormat::Awareness
     
     attr_reader :options
     attr_reader :log_parser

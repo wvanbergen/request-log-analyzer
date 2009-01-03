@@ -15,7 +15,7 @@ module RequestLogAnalyzer
   #
   class LogProcessor
     
-    include RequestLogAnalyzer::FileFormat
+    include RequestLogAnalyzer::FileFormat::Awareness
     
     attr_reader :mode, :options, :sources
     attr_accessor :output_file

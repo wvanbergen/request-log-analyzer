@@ -15,7 +15,7 @@ module RequestLogAnalyzer
   # Request#every(field_name) returns all values corresponding to the given field name as array.
   class Request
   
-    include RequestLogAnalyzer::FileFormat
+    include RequestLogAnalyzer::FileFormat::Awareness
   
     attr_reader :lines
     attr_reader :attributes

@@ -2,7 +2,7 @@ module RequestLogAnalyzer
   module Filter
     class Base
       
-      include RequestLogAnalyzer::FileFormat
+      include RequestLogAnalyzer::FileFormat::Awareness
       
       attr_reader :log_parser
       attr_reader :options
