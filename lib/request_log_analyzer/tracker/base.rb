@@ -5,7 +5,7 @@ module RequestLogAnalyzer
     #
     # Accepts the following options:
     # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
-    # * <tt>:if</tt> Proc that has to return true for a request to be passed to the tracker.
+    # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
     #
     # For example :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
     class Base

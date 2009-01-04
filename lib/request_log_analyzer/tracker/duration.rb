@@ -4,7 +4,7 @@ module RequestLogAnalyzer::Tracker
   #
   # Accepts the following options:
   # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
-  # * <tt>:if</tt> Proc that has to return true for a request to be passed to the tracker.
+  # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
   # * <tt>:title</tt> Title do be displayed above the report  
   # * <tt>:category</tt> Proc that handles request categorization for given fileformat (REQUEST_CATEGORIZER)
   # * <tt>:duration</tt> The field containing the duration in the request hash.
@@ -13,7 +13,6 @@ module RequestLogAnalyzer::Tracker
   # The items in the update request hash are set during the creation of the Duration tracker.
   #
   # Example output:
-  #
   #  Request duration - top 20 by cumulative time   ┃    Hits ┃      Sum. |      Avg.
   #   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   #  EmployeeController#show.html [GET]             ┃    4742 ┃  4922.56s ┃     1.04s
