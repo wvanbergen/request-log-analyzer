@@ -1,5 +1,31 @@
 module RequestLogAnalyzer::Tracker
 
+  # Determines the average hourly spread of the parsed requests.
+  # This spread is shown in a graph form.
+  #
+  # Accepts the following options:
+  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
+  # * <tt>:if</tt> Proc that has to return true for a request to be passed to the tracker.
+  #
+  # Expects the following items in the update request hash
+  # * <tt>:timestamp</tt> in YYYYMMDDHHMMSS format.
+  #
+  # Example output:
+  # Requests graph - average per day per hour
+  #  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  #   7:00 - 330 hits        : ░░░░░░░
+  #   8:00 - 704 hits        : ░░░░░░░░░░░░░░░░░
+  #   9:00 - 830 hits        : ░░░░░░░░░░░░░░░░░░░░
+  #  10:00 - 822 hits        : ░░░░░░░░░░░░░░░░░░░
+  #  11:00 - 823 hits        : ░░░░░░░░░░░░░░░░░░░
+  #  12:00 - 729 hits        : ░░░░░░░░░░░░░░░░░
+  #  13:00 - 614 hits        : ░░░░░░░░░░░░░░
+  #  14:00 - 690 hits        : ░░░░░░░░░░░░░░░░
+  #  15:00 - 492 hits        : ░░░░░░░░░░░
+  #  16:00 - 355 hits        : ░░░░░░░░
+  #  17:00 - 213 hits        : ░░░░░
+  #  18:00 - 107 hits        : ░░
+  #  ................
   class HourlySpread < RequestLogAnalyzer::Tracker::Base
 
     attr_reader :first, :last, :request_time_graph

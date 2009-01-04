@@ -1,5 +1,25 @@
 module RequestLogAnalyzer::Tracker
 
+  # Catagorize requests.
+  # Count and analyze requests for a specific attribute 
+  #
+  # Accepts the following options:
+  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
+  # * <tt>:if</tt> Proc that has to return true for a request to be passed to the tracker.
+  # * <tt>:title</tt> Title do be displayed above the report.
+  # * <tt>:category</tt> Proc that handles the request categorization.
+  # * <tt>:amount</tt> The amount of lines in the report
+  #
+  # The items in the update request hash are set during the creation of the Duration tracker.
+  #
+  # Example output:
+  #
+  #  HTTP methods
+  #   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  #  GET    ┃  22248 hits (46.2%) ┃░░░░░░░░░░░░░░░░░
+  #  PUT    ┃  13685 hits (28.4%) ┃░░░░░░░░░░░
+  #  POST   ┃  11662 hits (24.2%) ┃░░░░░░░░░
+  #  DELETE ┃    512 hits (1.1%)  ┃
   class Category < RequestLogAnalyzer::Tracker::Base
   
     attr_reader :categories

@@ -1,5 +1,19 @@
 module RequestLogAnalyzer::Tracker
 
+  # Determines the datetime of the first request and the last request
+  # Also determines the amount of days inbetween these.
+  #
+  # Accepts the following options:
+  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
+  # * <tt>:if</tt> Proc that has to return true for a request to be passed to the tracker.
+  #
+  # Expects the following items in the update request hash
+  # * <tt>:timestamp</tt> in YYYYMMDDHHMMSS format.
+  #
+  # Example output:
+  #  First request:        2008-07-13 06:25:06
+  #  Last request:         2008-07-20 06:18:06
+  #  Total time analyzed:  7 days
   class Timespan < RequestLogAnalyzer::Tracker::Base
 
     attr_reader :first, :last, :request_time_graph
@@ -21,13 +35,9 @@ module RequestLogAnalyzer::Tracker
         puts green('━' * options[:title].length, color)
       end
       
-      puts @first.inspect
-      
       first_date  = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')
       last_date   = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
       days        = (@last && @first) ? (last_date - first_date).ceil : 1
-
-      puts first_date.inspect
 
       puts "First request:        #{first_date.strftime('%Y-%m-%d %H:%M:%I')}"
       puts "Last request:         #{last_date.strftime('%Y-%m-%d %H:%M:%I')}"        
