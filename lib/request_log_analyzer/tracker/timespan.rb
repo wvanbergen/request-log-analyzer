@@ -6,6 +6,7 @@ module RequestLogAnalyzer::Tracker
   # Accepts the following options:
   # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
   # * <tt>:if</tt> Proc that has to return true for a request to be passed to the tracker.
+  # * <tt>:field</tt> The timestamp field that is looked at. Defaults to :timestamp.
   #
   # Expects the following items in the update request hash
   # * <tt>:timestamp</tt> in YYYYMMDDHHMMSS format.
