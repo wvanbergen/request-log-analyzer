@@ -29,6 +29,7 @@ module RequestLogAnalyzer
 
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
+    # <rr>report_with</tt> Width of the report. Defaults to 80.
     def self.build(arguments, report_width = 80)
             
       options = { :report_width => arguments[:report_width].to_i }
@@ -116,6 +117,10 @@ module RequestLogAnalyzer
       @log_parser.progress = lambda { |message, value| handle_progress(message, value) } 
     end
     
+    # Progress function.
+    # Expects :started with file, :progress with current line and :finished or :interrupted when done.
+    # <tt>message</tt> Current state (:started, :finished, :interupted or :progress).
+    # <tt>value</tt> File or current line.
     def handle_progress(message, value = nil)
       case message
       when :started

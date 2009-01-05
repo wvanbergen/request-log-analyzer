@@ -1,5 +1,9 @@
 module RequestLogAnalyzer::Filter
   
+  # Reject all requests not in given timespan
+  # Options
+  # * <tt>:after</tt> Only keep requests after this DateTime.
+  # * <tt>:before</tt> Only keep requests before this DateTime.
   class Timespan < Base
    
     attr_reader :before, :after

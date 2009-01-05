@@ -53,10 +53,7 @@ begin
     
     command_line.switch(:debug)
     
-    command_line.minimum_parameters = 1
-    
-    #command_line.switch(:estimate_database_time, :e) 
-    #command_line.switch(:fast, :f) #
+    command_line.minimum_parameters = 1    
   end
   
 rescue CommandLine::Error => e
@@ -66,8 +63,6 @@ rescue CommandLine::Error => e
   puts
   puts "Input options:"
   puts "  --format <format>, -f:     Uses the specified log file format. Defaults to rails."
-  puts
-  puts "Filter options:"
   puts "  --after <date>             Only consider requests from <date> or later."
   puts "  --before <date>            Only consider requests before <date>."  
   puts "  --select <field> <value>   Only consider requests where <field> matches <value>."        
