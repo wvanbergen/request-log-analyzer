@@ -1,0 +1,33 @@
+Request-log-analyzer is set up like a simple pipe and filter system.
+
+This allows you to easily add extra reports, filters and outputs.
+
+# Read a Logfile
+/controller.rb::run!
+  ||          ||
+  \/          \/
+  ||        # Break down file into smaller chunks
+  ||        # Detect type of line based on the line definitions (/file_format/rails.rb::line_definition).
+  ||        # Yield on detection of information chunk (line or mutliline).
+  ||        /log_parser::parse_io
+  ||          ||
+  ||          \/
+  ||        # Filter out requests
+  ||        /log_parser::handle_request
+  ||          ||
+  ||          \/
+  ||        # Chunks are fed in parallel through specified Aggregators.
+  ||        # In this example we will only explain the summarizer
+  ||        /aggregator/summarizer.rb
+  ||          ||
+  ||          \/
+  ||        # Summarizer passes chunks to relevant trackers
+  ||        /tracker/hourly_spread.rb
+  ||          ||
+  \/          \/
+# Finalize aggregators
+/log_parser::parse_io (@aggregators.each { |agg| agg.finalize })
+  ||
+  \/
+# Output all data end the end of the pipes
+/log_parser::parse_io (@aggregators.each { |agg| agg.report })

@@ -104,6 +104,7 @@ module RequestLogAnalyzer
       lines.first[:line_type]
     end
     
+    # Returns the first timestamp encountered in a request. 
     def timestamp
       first(:timestamp)
     end
