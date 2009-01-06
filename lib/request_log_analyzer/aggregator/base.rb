@@ -14,6 +14,7 @@ module RequestLogAnalyzer::Aggregator
     
     attr_reader :options
     attr_reader :log_parser
+    attr_reader :output
     
     # Intializes a new RequestLogAnalyzer::Aggregator::Base instance
     # It will include the specific file format module.
@@ -21,6 +22,7 @@ module RequestLogAnalyzer::Aggregator
       @log_parser = log_parser
       self.register_file_format(log_parser.file_format)
       @options = options
+      @output = options[:output] || STDOUT
     end
 
     # The prepare function is called just before parsing starts. This function 

@@ -55,6 +55,7 @@ module RequestLogAnalyzer::Aggregator
     def prepare
       raise "No trackers set up in Summarizer!" if @trackers.nil? || @trackers.empty?
       @trackers.each { |tracker| tracker.prepare }
+      @trackers.each { |tracker| tracker.set_output(@output) }
     end
     
     def aggregate(request)
@@ -72,31 +73,31 @@ module RequestLogAnalyzer::Aggregator
       if log_parser.parsed_requests - log_parser.skipped_requests > 0
         @trackers.each { |tracker| tracker.report(report_width, color) }
       else
-        puts
-        puts "There were no requests analyzed."
+        @output << "\n"
+        @output << "There were no requests analyzed.\n"
       end
       report_footer(report_width, color)
     end
     
     def report_header(report_width = 80, color = false)
-      puts "Request summary"
-      puts green("━" * report_width, color)
-      puts "Parsed lines:         #{green(log_parser.parsed_lines, color)}"
-      puts "Parsed requests:      #{green(log_parser.parsed_requests, color)}"  if options[:combined_requests]
-      puts "Skipped requests:     #{green(log_parser.skipped_requests, color)}" if log_parser.skipped_requests > 0
+      @output << "Request summary\n"
+      @output << green("━" * report_width, color) + "\n"
+      @output << "Parsed lines:         #{green(log_parser.parsed_lines, color)}\n"
+      @output << "Parsed requests:      #{green(log_parser.parsed_requests, color)}\n"  if options[:combined_requests]
+      @output << "Skipped requests:     #{green(log_parser.skipped_requests, color)}\n" if log_parser.skipped_requests > 0
       if has_warnings?
-        puts "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ')
+        @output <<  "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ') + "\n"
       end
-      puts
+      @output << "\n"
     end
     
     def report_footer(report_width = 80, color = false)
-      puts 
+      @output << "\n" 
       if has_serious_warnings?      
-        puts green("━" * report_width, color)
-        puts "Multiple warnings were encountered during parsing. Possibly, your logging "
-        puts "is not setup correctly. Visit this website for logging configuration tips:"
-        puts blue("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", color)
+        @output << green("━" * report_width, color) + "\n"
+        @output << "Multiple warnings were encountered during parsing. Possibly, your logging " + "\n"
+        @output << "is not setup correctly. Visit this website for logging configuration tips:" + "\n"
+        @output <<  blue("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", color) + "\n"
       end
     end
     

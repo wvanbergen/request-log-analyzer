@@ -36,6 +36,7 @@ begin
     end
     
     command_line.option(:format, :alias => :f, :default => 'rails')
+    command_line.option(:file, :alias => :e)
     command_line.switch(:single_lines, :s)
     command_line.switch(:assume_correct_order)
     
@@ -57,7 +58,7 @@ begin
   end
   
 rescue CommandLine::Error => e
-  puts "ARGUMENT ERROR: " + e.message
+  puts "ARGUMENT ERROR: " + e.message if e.message
   puts
   puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
   puts
@@ -72,6 +73,7 @@ rescue CommandLine::Error => e
   puts "  --boring, -b               Output reports without ASCII colors."
   puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
   puts "  --debug                    Print debug information while parsing."
+  puts "  --file <filename>          Output to file."
   puts 
   puts "Examples:"
   puts "  request-log-analyzer development.log"

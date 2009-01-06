@@ -32,11 +32,17 @@ module RequestLogAnalyzer
     # <rr>report_with</tt> Width of the report. Defaults to 80.
     def self.build(arguments, report_width = 80)
             
-      options = { :report_width => arguments[:report_width].to_i }
+      options = { :report_width => arguments[:report_width].to_i, :output => STDOUT}
+
       options[:combined_requests] = !arguments[:single_lines]
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
       options[:colorize] = !arguments[:boring]
+
+      if arguments[:file]
+        options[:output] = File.new(arguments[:file], "w+")
+        options[:colorize] = false
+      end
                 
       # Create the controller with the correct file format
       file_format = RequestLogAnalyzer::FileFormat.load(arguments[:format])
@@ -78,7 +84,7 @@ module RequestLogAnalyzer
       end
 
       # register aggregators
-      arguments[:aggregator].each { |agg| controller >> agg.to_sym } 
+      arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
 
       # register the database 
       controller.add_aggregator(:database)   if arguments[:database] && !arguments[:aggregator].include?('database')
@@ -99,6 +105,7 @@ module RequestLogAnalyzer
     # * <tt>:echo</tt> Output debug information.
     # * <tt>:silent</tt> Do not output any warnings.
     # * <tt>:colorize</tt> Colorize output
+    # * <tt>:output</tt> All report outputs get << through this output.
     def initialize(format = :rails, options = {})
 
       @options = options

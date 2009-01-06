@@ -6,14 +6,20 @@ module RequestLogAnalyzer
     # Accepts the following options:
     # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
     # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
+    # * <tt>:output</tt> Direct output here (defaults to STDOUT)
     #
     # For example :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
     class Base
 
       attr_reader :options
+      attr_reader :output
       
       def initialize(options ={})
         @options = options
+      end
+      
+      def set_output(output)
+        @output = output
       end
         
       def prepare
