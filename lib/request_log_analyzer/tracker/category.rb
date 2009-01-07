@@ -39,14 +39,14 @@ module RequestLogAnalyzer::Tracker
       end
     end
   
-    def report(report_width, color = false)
+    def report(output = STDOUT, report_width = 80, color = false)
       if options[:title]
-        @output << "\n#{options[:title]}\n"
-        @output << green(('━' * report_width), color) + "\n"
+        output << "\n#{options[:title]}\n"
+        output << green(('━' * report_width), color) + "\n"
       end
     
       if @categories.empty?
-        @output << "None found.\n" 
+        output << "None found.\n" 
       else
         sorted_categories = @categories.sort { |a, b| b[1] <=> a[1] }
         total_hits        = sorted_categories.inject(0) { |carry, item| carry + item[1] }
@@ -59,9 +59,9 @@ module RequestLogAnalyzer::Tracker
           space_left  = report_width - (max_cat_length + adjuster + 3)
           if space_left > 3
             bar_chars  = (space_left * (count.to_f / total_hits)).round
-            @output << "%-#{max_cat_length + adjuster}s %s%s" % [text, '┃', '░' * bar_chars] + "\n"
+            output << "%-#{max_cat_length + adjuster}s %s%s" % [text, '┃', '░' * bar_chars] + "\n"
           else
-            @output << text + "\n"
+            output << text + "\n"
           end
         end
       end

@@ -38,13 +38,13 @@ module RequestLogAnalyzer::Aggregator
       file_format.class::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
     
-    def report(reporth_width, color)
-      puts
-      puts green("━" * reporth_width, color)
-      puts "A database file has been created with all parsed request information."
-      puts "To execute queries on this database, run the following command:"
-      puts "  $ sqlite3 #{options[:database]}"
-      puts
+    def report(output = STDOUT, report_width = 80, color = false)
+      output << "\n"
+      output << green("━" * report_width, color) + "\n"
+      output <<  "A database file has been created with all parsed request information.\n"
+      output <<  "To execute queries on this database, run the following command:\n"
+      output <<  "  $ sqlite3 #{options[:database]}\n"
+      output << "\n"
     end
     
     protected 

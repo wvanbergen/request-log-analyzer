@@ -31,20 +31,20 @@ module RequestLogAnalyzer::Tracker
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
   
-    def report(report_width = 80, color = false)
+    def report(output = STDOUT, report_width = 80, color = false)
       if options[:title]
-        @output << "\n#{options[:title]}\n"
-        @output << green('━' * options[:title].length, color) + "\n"
+        output << "\n#{options[:title]}\n"
+        output << green('━' * options[:title].length, color) + "\n"
       end
       
       first_date  = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')
       last_date   = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
       days        = (@last && @first) ? (last_date - first_date).ceil : 1
 
-      @output << "First request:        #{first_date.strftime('%Y-%m-%d %H:%M:%I')}\n"
-      @output << "Last request:         #{last_date.strftime('%Y-%m-%d %H:%M:%I')}\n"
-      @output << "Total time analyzed:  #{days} days\n"
-      @output << "\n"
+      output << "First request:        #{first_date.strftime('%Y-%m-%d %H:%M:%I')}\n"
+      output << "Last request:         #{last_date.strftime('%Y-%m-%d %H:%M:%I')}\n"
+      output << "Total time analyzed:  #{days} days\n"
+      output << "\n"
     end
   end
 end

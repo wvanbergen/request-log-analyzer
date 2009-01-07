@@ -14,11 +14,11 @@ module RequestLogAnalyzer::Aggregator
       @warnings << "WARNING #{type.inspect} on line #{lineno}: #{message}\n"
     end
     
-    def report(report_width = 80, color = false)
-      puts
-      puts "Warnings during parsing:"
-      puts green("━" * report_width, color)
-      puts @warnings
+    def report(output=STDOUT, report_width = 80, color = false)
+      output << "\n"
+      output << "Warnings during parsing:\n"
+      output << green("━" * report_width, color) + "\n"
+      output << @warnings + "\n"
     end
 
   end

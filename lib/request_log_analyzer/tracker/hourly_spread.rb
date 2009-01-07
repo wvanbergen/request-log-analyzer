@@ -43,10 +43,10 @@ module RequestLogAnalyzer::Tracker
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
   
-    def report(report_width = 80, color = false)
-      @output << "\n"
-      @output << "Requests graph - average per day per hour\n"
-      @output << green("━" * report_width, color) + "\n"
+    def report(output = STDOUT, report_width = 80, color = false)
+      output << "\n"
+      output << "Requests graph - average per day per hour\n"
+      output << green("━" * report_width, color) + "\n"
 
       first_date    = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')
       last_date     = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
@@ -65,9 +65,9 @@ module RequestLogAnalyzer::Tracker
           display_chars_string = green(('░' * display_chars), color)
         end
       
-        @output << "#{index.to_s.rjust(3)}:00 - #{(request_today.to_s + ' hits').ljust(15)} : #{display_chars_string}\n"
+        output << "#{index.to_s.rjust(3)}:00 - #{(request_today.to_s + ' hits').ljust(15)} : #{display_chars_string}\n"
       end
-      @output << "\n"
+      output << "\n"
 
     end
   end

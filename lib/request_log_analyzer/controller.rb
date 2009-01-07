@@ -1,7 +1,5 @@
 module RequestLogAnalyzer
   
-  VERSION = '0.4.0'
-  
   # The RequestLogAnalyzer::Controller class creates a LogParser instance for the
   # requested file format, and connect it with sources and aggregators.
   #
@@ -18,6 +16,7 @@ module RequestLogAnalyzer
   # sources are registered in the correct order. This can be helpful to parse requests
   # from several logrotated log files.
   class Controller
+    VERSION = '0.4.0'
 
     include RequestLogAnalyzer::FileFormat::Awareness
     
@@ -25,6 +24,7 @@ module RequestLogAnalyzer
     attr_reader :filters
     attr_reader :log_parser
     attr_reader :sources
+    attr_reader :output
     attr_reader :options
 
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
@@ -112,6 +112,7 @@ module RequestLogAnalyzer
       @aggregators = []
       @sources     = []
       @filters     = []
+      @output      = options[:output]
       
       # Requester format through RequestLogAnalyzer::FileFormat and construct the parser
       register_file_format(format) 
@@ -216,7 +217,7 @@ module RequestLogAnalyzer
       puts "\n"
       
       @aggregators.each { |agg| agg.finalize }
-      @aggregators.each { |agg| agg.report(options[:report_width], options[:colorize]) }
+      @aggregators.each { |agg| agg.report(output, options[:report_width], options[:colorize]) }
     end
     
   end

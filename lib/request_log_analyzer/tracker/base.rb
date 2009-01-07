@@ -12,16 +12,11 @@ module RequestLogAnalyzer
     class Base
 
       attr_reader :options
-      attr_reader :output
       
       def initialize(options ={})
         @options = options
       end
       
-      def set_output(output)
-        @output = output
-      end
-        
       def prepare
       end
       
@@ -49,9 +44,9 @@ module RequestLogAnalyzer
         return true
       end
       
-      def report(report_width = 80, color = false)
-        puts self.inspect
-        puts        
+      def report(output=STDOUT, report_width = 80, color = false)
+        output << self.inspect
+        output << "\n"  
       end
            
     end 

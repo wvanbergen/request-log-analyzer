@@ -55,8 +55,7 @@ module RequestLogAnalyzer::Aggregator
     def prepare
       raise "No trackers set up in Summarizer!" if @trackers.nil? || @trackers.empty?
       @trackers.each { |tracker| tracker.prepare }
-      @trackers.each { |tracker| tracker.set_output(@output) }
-    end
+      end
     
     def aggregate(request)
       @trackers.each do |tracker|
@@ -68,36 +67,36 @@ module RequestLogAnalyzer::Aggregator
       @trackers.each { |tracker| tracker.finalize }
     end
        
-    def report(report_width = 80, color = false)
-      report_header(report_width, color)
+    def report(output=STDOUT, report_width = 80, color = false)
+      report_header(output, report_width, color)
       if log_parser.parsed_requests - log_parser.skipped_requests > 0
-        @trackers.each { |tracker| tracker.report(report_width, color) }
+        @trackers.each { |tracker| tracker.report(output, report_width, color) }
       else
-        @output << "\n"
-        @output << "There were no requests analyzed.\n"
+        output << "\n"
+        output << "There were no requests analyzed.\n"
       end
-      report_footer(report_width, color)
+      report_footer(output, report_width, color)
     end
     
-    def report_header(report_width = 80, color = false)
-      @output << "Request summary\n"
-      @output << green("━" * report_width, color) + "\n"
-      @output << "Parsed lines:         #{green(log_parser.parsed_lines, color)}\n"
-      @output << "Parsed requests:      #{green(log_parser.parsed_requests, color)}\n"  if options[:combined_requests]
-      @output << "Skipped requests:     #{green(log_parser.skipped_requests, color)}\n" if log_parser.skipped_requests > 0
+    def report_header(output=STDOUT, report_width = 80, color = false)
+      output << "Request summary\n"
+      output << green("━" * report_width, color) + "\n"
+      output << "Parsed lines:         #{green(log_parser.parsed_lines, color)}\n"
+      output << "Parsed requests:      #{green(log_parser.parsed_requests, color)}\n"  if options[:combined_requests]
+      output << "Skipped requests:     #{green(log_parser.skipped_requests, color)}\n" if log_parser.skipped_requests > 0
       if has_warnings?
-        @output <<  "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ') + "\n"
+        output <<  "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ') + "\n"
       end
-      @output << "\n"
+      output << "\n"
     end
     
-    def report_footer(report_width = 80, color = false)
-      @output << "\n" 
+    def report_footer(output=STDOUT, report_width = 80, color = false)
+      output << "\n" 
       if has_serious_warnings?      
-        @output << green("━" * report_width, color) + "\n"
-        @output << "Multiple warnings were encountered during parsing. Possibly, your logging " + "\n"
-        @output << "is not setup correctly. Visit this website for logging configuration tips:" + "\n"
-        @output <<  blue("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", color) + "\n"
+        output << green("━" * report_width, color) + "\n"
+        output << "Multiple warnings were encountered during parsing. Possibly, your logging " + "\n"
+        output << "is not setup correctly. Visit this website for logging configuration tips:" + "\n"
+        output <<  blue("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", color) + "\n"
       end
     end
     
