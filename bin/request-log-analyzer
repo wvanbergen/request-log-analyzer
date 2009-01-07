@@ -77,7 +77,7 @@ rescue CommandLine::Error => e
   puts 
   puts "Examples:"
   puts "  request-log-analyzer development.log"
-  puts "  request-log-analyzer -z mongrel.0.log mongrel.1.log mongrel.2.log "
+  puts "  request-log-analyzer -b mongrel.0.log mongrel.1.log mongrel.2.log "
   puts "  request-log-analyzer --format merb -d requests.db production.log"
   puts
   puts "To install rake tasks in your Rails application, "

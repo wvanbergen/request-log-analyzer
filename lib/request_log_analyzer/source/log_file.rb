@@ -41,7 +41,7 @@ module RequestLogAnalyzer::Source
         parse_stream(@source_files, options, &block) 
       when String
         parse_file(@source_files, options, &block) 
-      when []
+      when Array
         parse_files(@source_files, options, &block) 
       else
         raise "Unknown source provided"
