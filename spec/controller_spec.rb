@@ -13,7 +13,7 @@ describe RequestLogAnalyzer::Controller do
     file_format = RequestLogAnalyzer::FileFormat.load(:rails)
     
     controller = RequestLogAnalyzer::Controller.new(RequestLogAnalyzer::FileFormat.load(:rails),
-                :source => RequestLogAnalyzer::Source::LogFile.new(file_format, :source_files => log_fixture(:rails_1x)))
+                 RequestLogAnalyzer::Source::LogFile.new(file_format, :source_files => log_fixture(:rails_1x)))
     
     mock_aggregator = mock('aggregator')
     mock_aggregator.should_receive(:prepare).once.ordered
