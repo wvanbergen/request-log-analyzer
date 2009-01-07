@@ -15,7 +15,17 @@ module RequestLogAnalyzer::Filter
     end
     
     def filter(request)
-      (@after.nil? || @after <= request.timestamp) && (@before.nil? || @before > request.timestamp)
+      return nil unless request
+      
+      if @after && @before && request.timestamp <= @before && @after <= request.timestamp
+        return request
+      elsif @after && @before.nil? && @after <= request.timestamp
+        return request
+      elsif @before && @after.nil? && request.timestamp <= @before 
+        return request
+      end
+
+      return nil
     end 
   end
   

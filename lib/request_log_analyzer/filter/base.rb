@@ -21,7 +21,8 @@ module RequestLogAnalyzer
       end
       
       def filter(request)
-        return true
+        return nil unless request
+        return request
       end
     end
   end

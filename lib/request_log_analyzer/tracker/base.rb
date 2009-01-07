@@ -39,7 +39,7 @@ module RequestLogAnalyzer
           return false if request[options[:unless]]
         elsif options[:unless].respond_to?(:call)
           return false if options[:unless].call(request)
-        end        
+        end
         
         return true
       end

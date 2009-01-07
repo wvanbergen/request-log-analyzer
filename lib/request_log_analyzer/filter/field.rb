@@ -22,10 +22,14 @@ module RequestLogAnalyzer::Filter
     end
     
     def filter(request)
-      case @mode
-      when :select;  request.every(@field).any? { |value| @value === value }
-      when :reject; !request.every(@field).any? { |value| @value === value }
-      end
+      return nil unless request
+      
+      found_field = request.every(@field).any? { |value| @value === value }
+      
+      return nil if !found_field && @mode == :select
+      return nil if found_field && @mode == :reject
+      
+      return request
     end 
   end
   

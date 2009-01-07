@@ -42,10 +42,10 @@ module RequestLogAnalyzer::Aggregator
     attr_reader :trackers
     attr_reader :warnings_encountered
     
-    def initialize(log_parser, options = {})
-      super(log_parser, options)
+    def initialize(source, options = {})
+      super(source, options)
       @warnings_encountered = {}
-      @trackers = log_parser.file_format.report_trackers
+      @trackers = source.file_format.report_trackers
       setup
     end
     
@@ -69,7 +69,7 @@ module RequestLogAnalyzer::Aggregator
        
     def report(output=STDOUT, report_width = 80, color = false)
       report_header(output, report_width, color)
-      if log_parser.parsed_requests - log_parser.skipped_requests > 0
+      if source.parsed_requests - source.skipped_requests > 0
         @trackers.each { |tracker| tracker.report(output, report_width, color) }
       else
         output << "\n"
@@ -81,9 +81,9 @@ module RequestLogAnalyzer::Aggregator
     def report_header(output=STDOUT, report_width = 80, color = false)
       output << "Request summary\n"
       output << green("━" * report_width, color) + "\n"
-      output << "Parsed lines:         #{green(log_parser.parsed_lines, color)}\n"
-      output << "Parsed requests:      #{green(log_parser.parsed_requests, color)}\n"  if options[:combined_requests]
-      output << "Skipped requests:     #{green(log_parser.skipped_requests, color)}\n" if log_parser.skipped_requests > 0
+      output << "Parsed lines:         #{green(source.parsed_lines, color)}\n"
+      output << "Parsed requests:      #{green(source.parsed_requests, color)}\n"  if options[:combined_requests]
+      output << "Skipped requests:     #{green(source.skipped_requests, color)}\n" if source.skipped_requests > 0
       if has_warnings?
         output <<  "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ') + "\n"
       end

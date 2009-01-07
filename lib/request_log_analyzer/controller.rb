@@ -23,7 +23,7 @@ module RequestLogAnalyzer
     attr_reader :aggregators
     attr_reader :filters
     attr_reader :log_parser
-    attr_reader :sources
+    attr_reader :source
     attr_reader :output
     attr_reader :options
 
@@ -46,20 +46,26 @@ module RequestLogAnalyzer
                 
       # Create the controller with the correct file format
       file_format = RequestLogAnalyzer::FileFormat.load(arguments[:format])
-      controller = Controller.new(file_format, options)
-
+      source_files = nil
       # register sources
-      arguments.parameters.each do |file|
+      if arguments.parameters.length == 1
+        file = arguments.parameters[0]
         if file == '-' || file == 'STDIN'
-          controller.add_source($stdin)
+          options.store(:source_files, $stdin)
         elsif File.exist?(file)
-          controller.add_source(file) 
+          options.store(:source_files, file)
         else
           puts "File not found: #{file}"
           exit(0)
         end
+      else
+        options.store(:source_files, arguments.parameters)
       end
       
+      options.store(:source, RequestLogAnalyzer::Source::LogFile.new(file_format, options))
+      
+      controller = Controller.new(file_format, options)
+
       # register filters
       # filters are only supported in combined requests mode
       if options[:combined_requests]
@@ -106,23 +112,23 @@ module RequestLogAnalyzer
     # * <tt>:silent</tt> Do not output any warnings.
     # * <tt>:colorize</tt> Colorize output
     # * <tt>:output</tt> All report outputs get << through this output.
+    # * <tt>:source</tt> Request source
     def initialize(format = :rails, options = {})
 
-      @options = options
+      @options     = options
       @aggregators = []
-      @sources     = []
+      @source      = options[:source]
       @filters     = []
       @output      = options[:output]
       
       # Requester format through RequestLogAnalyzer::FileFormat and construct the parser
       register_file_format(format) 
-      @log_parser  = RequestLogAnalyzer::LogParser.new(file_format, @options)
       
       # Pass all warnings to every aggregator so they can do something useful with them.
-      @log_parser.warning = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } }
+      @source.warning = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } } if @source
 
       # Handle progress messagess
-      @log_parser.progress = lambda { |message, value| handle_progress(message, value) } 
+      @source.progress = lambda { |message, value| handle_progress(message, value) } if @source
     end
     
     # Progress function.
@@ -154,7 +160,7 @@ module RequestLogAnalyzer
         agg = RequestLogAnalyzer::Aggregator.const_get(agg.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join(''))
       end
       
-      @aggregators << agg.new(@log_parser, @options)
+      @aggregators << agg.new(@source, @options)
     end
     
     alias :>> :add_aggregator
@@ -169,21 +175,11 @@ module RequestLogAnalyzer
       @filters << filter.new(file_format, @options.merge(filter_options))
     end
     
-    # Adds an input source to the controller, which will be scanned by the LogParser. 
-    #
-    # The sources are scanned in the order they are given to the controller. This can be
-    # important if the different sources succeed eachother, for instance logrotated log 
-    # files. Make sure they are provided in the correct order.
-    def add_source(source)
-      @sources << source
-    end
-    
-    alias :<< :add_source
-    
     # Runs RequestLogAnalyzer
     # 1. Calls prepare on every aggregator
-    # 2. Starts parsing every input source
-    # 3. Calls aggregate for every parsed request on every aggregator
+    # 2. Start parsing every input source
+    # 3. Filter out bad requests
+    # 4. Calls aggregate for remaning requests on every aggregator
     # 4. Calls finalize on every aggregator
     # 5. Calls report on every aggregator
     def run!
@@ -191,23 +187,10 @@ module RequestLogAnalyzer
       @filters.each { |filter| filter.prepare }
       @aggregators.each { |agg| agg.prepare }
       
-      handle_request = Proc.new do |request|
-        filter = @filters.detect { |filter| false == filter.filter(request) }
-        @aggregators.each { |agg| agg.aggregate(request) } if filter.nil?
-        filter.nil?
-      end
-        
       begin
-        @sources.each do |source|
-          case source
-          when IO;     
-            puts "Parsing from the standard input. Press CTRL+C to finish."
-            @log_parser.parse_stream(source, options, &handle_request) 
-          when String
-            @log_parser.parse_file(source, options, &handle_request) 
-          else
-            raise "Unknown source provided"
-          end
+        @source.requests do |request|
+          @filters.each { |filter| request = filter.filter(request) }
+          @aggregators.each { |agg| agg.aggregate(request) } if request
         end
       rescue Interrupt => e
         handle_progress(:interrupted)
@@ -217,7 +200,7 @@ module RequestLogAnalyzer
       puts "\n"
       
       @aggregators.each { |agg| agg.finalize }
-      @aggregators.each { |agg| agg.report(output, options[:report_width], options[:colorize]) }
+      @aggregators.each { |agg| agg.report(@output, options[:report_width], options[:colorize]) }
     end
     
   end

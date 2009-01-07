@@ -45,6 +45,7 @@ module RequestLogAnalyzer::Tracker
       output << "Last request:         #{last_date.strftime('%Y-%m-%d %H:%M:%I')}\n"
       output << "Total time analyzed:  #{days} days\n"
       output << "\n"
+      
     end
   end
 end

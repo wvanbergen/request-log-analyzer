@@ -36,6 +36,7 @@ module RequestLogAnalyzer::Tracker
     end
               
     def update(request)
+      request = request.attributes
       timestamp = request[options[:field]]
 
       @request_time_graph[timestamp.to_s[8..9].to_i] +=1
