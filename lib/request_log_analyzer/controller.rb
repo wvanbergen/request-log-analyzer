@@ -173,12 +173,13 @@ module RequestLogAnalyzer
     end
     
     # Runs RequestLogAnalyzer
-    # 1. Calls prepare on every aggregator
-    # 2. Start parsing every input source
-    # 3. Filter out bad requests
-    # 4. Calls aggregate for remaning requests on every aggregator
-    # 4. Calls finalize on every aggregator
-    # 5. Calls report on every aggregator
+    # 1. Call prepare on every aggregator
+    # 2. Generate requests from source object
+    # 3. Filter out unwanted requests
+    # 4. Call aggregate for remaning requests on every aggregator
+    # 4. Call finalize on every aggregator
+    # 5. Call report on every aggregator
+    # 6. Finalize Source
     def run!
       
       @filters.each { |filter| filter.prepare }
@@ -198,6 +199,8 @@ module RequestLogAnalyzer
       
       @aggregators.each { |agg| agg.finalize }
       @aggregators.each { |agg| agg.report(@output, options[:report_width], options[:colorize]) }
+      
+      @source.finalize
     end
     
   end
