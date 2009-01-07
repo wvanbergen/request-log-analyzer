@@ -62,7 +62,7 @@ module RequestLogAnalyzer
         options.store(:source_files, arguments.parameters)
       end
       
-      controller = Controller.new(file_format, RequestLogAnalyzer::Source::LogFile.new(file_format, options), options)
+      controller = Controller.new(RequestLogAnalyzer::Source::LogFile.new(file_format, options), options)
 
       # register filters
       # filters are only supported in combined requests mode
@@ -110,16 +110,16 @@ module RequestLogAnalyzer
     # * <tt>:silent</tt> Do not output any warnings.
     # * <tt>:colorize</tt> Colorize output
     # * <tt>:output</tt> All report outputs get << through this output.
-    def initialize(format = :rails, source = STDIN, options = {})
+    def initialize(source, options = {})
 
+      @source      = source
       @options     = options
       @aggregators = []
-      @source      = source
       @filters     = []
       @output      = options[:output]
       
       # Requester format through RequestLogAnalyzer::FileFormat and construct the parser
-      register_file_format(format) 
+      register_file_format(@source.file_format) 
       
       # Pass all warnings to every aggregator so they can do something useful with them.
       @source.warning = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } } if @source

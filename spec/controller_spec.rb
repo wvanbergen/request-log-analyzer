@@ -11,9 +11,8 @@ describe RequestLogAnalyzer::Controller do
 
   it "should call the aggregators when run" do
     file_format = RequestLogAnalyzer::FileFormat.load(:rails)
-    
-    controller = RequestLogAnalyzer::Controller.new(RequestLogAnalyzer::FileFormat.load(:rails),
-                 RequestLogAnalyzer::Source::LogFile.new(file_format, :source_files => log_fixture(:rails_1x)))
+    source      = RequestLogAnalyzer::Source::LogFile.new(file_format, :source_files => log_fixture(:rails_1x))  
+    controller  = RequestLogAnalyzer::Controller.new(source)
     
     mock_aggregator = mock('aggregator')
     mock_aggregator.should_receive(:prepare).once.ordered
