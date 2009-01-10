@@ -1,33 +1,33 @@
 # Colorize a text output with the given color if.
 # <tt>text</tt> The text to colorize.
 # <tt>color_code</tt> The color code string to set
-# <tt>color</tt> Does not color if false. Defaults to ($arguments && $arguments[:colorize])
-def colorize(text, color_code, color = $colorize)
+# <tt>color</tt> Does not color if false. Defaults to false
+def colorize(text, color_code, color = false)
   color ? "#{color_code}#{text}\e[0m" : text
 end
 
 # Draw a red line of text
-def red(text)
-  colorize(text, "\e[31m")
+def red(text, color = false)
+  colorize(text, "\e[31m", color)
 end
 
 # Draw a Green line of text
-def green(text)
-  colorize(text, "\e[32m")
+def green(text, color = false)
+  colorize(text, "\e[32m", color)
 end
 
 # Draw a Yellow line of text
-def yellow(text)
-  colorize(text, "\e[33m")
+def yellow(text, color = false)
+  colorize(text, "\e[33m", color)
 end
 
 # Draw a Yellow line of text
-def blue(text)
-  colorize(text, "\e[34m")
+def blue(text, color = false)
+  colorize(text, "\e[34m", color)
 end
 
-def white(text)
-  colorize(text, "\e[37m")
+def white(text, color = false)
+  colorize(text, "\e[37m", color)
 end
 
 

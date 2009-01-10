@@ -1,31 +1,94 @@
 #!/usr/bin/ruby
 require File.dirname(__FILE__) + '/../lib/request_log_analyzer'
-require File.dirname(__FILE__) + '/../lib/command_line/arguments'
+require File.dirname(__FILE__) + '/../lib/cli/command_line_arguments'
 
-puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke\n\n"
+def terminal_width(default = 81)
+  IO.popen('stty -a') do |pipe|
+    column_line = pipe.detect { |line| /(\d+) columns/ =~ line }
+    width = column_line ? $1.to_i : default
+  end
+rescue 
+  default  
+end
 
 # Parse the arguments given via commandline
 begin
   arguments = CommandLine::Arguments.parse do |command_line|
-    command_line.switch(:guess_database_time, :g)
-    command_line.switch(:fast, :f)
-    command_line.switch(:colorize, :z)
-    command_line.switch(:merb, :m)
-    command_line.switch(:install, :i)
-    command_line.flag(:output, :alias => :o)
-    command_line.flag(:amount, :alias => :c)
-    command_line.required_files = 1
+
+    command_line.command(:install) do |install|
+      install.parameters = 1
+    end
+    
+    command_line.command(:strip) do |strip|
+      strip.minimum_parameters = 1
+      strip.option(:format, :alias => :f, :default => 'rails')      
+      strip.option(:output, :alias => :o)
+      strip.switch(:discard_teaser_lines, :t)
+      strip.switch(:keep_junk_lines, :j)      
+    end
+    
+    command_line.command(:anonymize) do |anonymize|
+      anonymize.minimum_parameters = 1
+      anonymize.option(:format, :alias => :f, :default => 'rails')            
+      anonymize.option(:output, :alias => :o)
+      anonymize.switch(:discard_teaser_lines, :t)
+      anonymize.switch(:keep_junk_lines, :j)      
+    end
+    
+    command_line.option(:format, :alias => :f, :default => 'rails')
+    command_line.option(:file, :alias => :e)
+    command_line.switch(:single_lines, :s)
+    command_line.switch(:assume_correct_order)
+    
+    command_line.option(:aggregator, :alias => :a, :multiple => true)
+    command_line.option(:database, :alias => :d)    
+
+    # filtering options
+    command_line.option(:select, :multiple => true, :parameters => 2)
+    command_line.option(:reject, :multiple => true, :parameters => 2)
+    command_line.option(:after)
+    command_line.option(:before)    
+    
+    command_line.switch(:boring, :b)
+    command_line.option(:report_width, :default => terminal_width - 1)
+    
+    command_line.switch(:debug)
+    
+    command_line.minimum_parameters = 1    
   end
   
 rescue CommandLine::Error => e
-  puts "ARGUMENT ERROR: " + e.message
+  puts "ARGUMENT ERROR: " + e.message if e.message
   puts
-  load File.dirname(__FILE__) + "/../output/usage.rb"
+  puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
+  puts
+  puts "Input options:"
+  puts "  --format <format>, -f:     Uses the specified log file format. Defaults to rails."
+  puts "  --after <date>             Only consider requests from <date> or later."
+  puts "  --before <date>            Only consider requests before <date>."  
+  puts "  --select <field> <value>   Only consider requests where <field> matches <value>."        
+  puts "  --reject <field> <value>   Only consider requests where <field> does not match <value>."    
+  puts
+  puts "Output options:"
+  puts "  --boring, -b               Output reports without ASCII colors."
+  puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
+  puts "  --debug                    Print debug information while parsing."
+  puts "  --file <filename>          Output to file."
+  puts 
+  puts "Examples:"
+  puts "  request-log-analyzer development.log"
+  puts "  request-log-analyzer -b mongrel.0.log mongrel.1.log mongrel.2.log "
+  puts "  request-log-analyzer --format merb -d requests.db production.log"
+  puts
+  puts "To install rake tasks in your Rails application, "
+  puts "run the following command in your application's root directory:"
+  puts
+  puts "  request-log-analyzer install rails"
   exit(0) 
 end
 
-if arguments[:install]
-  if arguments.files.first == 'rails'
+def install_rake_tasks(install_type)
+  if install_type == 'rails'
     require 'ftools'
     if File.directory?('./lib/tasks/')
       File.copy(File.dirname(__FILE__) + '/../tasks/request_log_analyzer.rake', './lib/tasks/request_log_analyze.rake')
@@ -35,14 +98,27 @@ if arguments[:install]
       puts "Cannot find /lib/tasks folder. Are you in your Rails directory?"
       puts "Installation aborted."
     end
+  else
+    raise "Cannot perform this install type! (#{install_type})"
   end
-  exit(0)
 end
 
-$colorize = true if arguments[:colorize]
 
-# Run the request_log_analyzer!
-request_log_analyzer = RequestLogAnalyzer.new(arguments)
-request_log_analyzer.analyze_this(arguments.files)
+case arguments.command
+when :install
+  install_rake_tasks(arguments.parameters[0])
+when :strip
+  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'  
+  RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
+when :anonymize
+  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'    
+  RequestLogAnalyzer::LogProcessor.build(:anonymize, arguments).run!  
+else 
+  puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 0.4.0\n\n"  
+  
+  # Run the request_log_analyzer!
+  RequestLogAnalyzer::Controller.build(arguments, terminal_width).run!
 
-
+  puts 
+  puts "Thanks for using request-log-analyzer"
+end

@@ -94,11 +94,11 @@ class ProgressBar
   # ETA stands for Estimated Time of Arrival.
   def eta
     if @current == 0
-      white("ETA:  --:--:--")
+      "ETA:  --:--:--"
     else
       elapsed = Time.now - @start_time
       eta = elapsed * @total / @current - elapsed;
-      sprintf(white("ETA:  %s"), format_time(eta))
+      sprintf("ETA:  %s", format_time(eta))
     end
   end
 
@@ -215,9 +215,9 @@ class ProgressBar
   end
 
   def set (count)
-    if count < 0 || count > @total
-      raise "invalid count: #{count} (total: #{@total})"
-    end
+    count = 0 if count < 0 
+    count = @total if count > @total
+    
     @current = count
     show_if_needed
     @previous = @current

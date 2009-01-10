@@ -91,9 +91,4 @@ class RailsLogParserTest < Test::Unit::TestCase
   
   end
   
-  def test_virtual_mongrel
-    request_log_analyzer = RequestLogAnalyzer.new()
-    request_log_analyzer.analyze_with_virtual_mongrels([fragment_file(5)])
-  end
-  
 end

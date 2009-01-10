@@ -135,7 +135,7 @@ module Rake
       spec = File.read(gemspec_file)
       spec.gsub! /^(\s* s.(test_)?files \s* = \s* )( \[ [^\]]* \] | %w\( [^)]* \) )/mx do
         assignment = $1
-        bunch = $2 ? list.grep(/^test.*_test\.rb$/) : list
+        bunch = $2 ? list.grep(/^(test.*_test\.rb|spec.*_spec.rb)$/) : list
         '%s%%w(%s)' % [assignment, bunch.join(' ')]
       end
 

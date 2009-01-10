@@ -5,6 +5,11 @@ Contact willem AT vanbergen DOT org if you want to help out with the development
 General:
 - Add more tests / specs
 
+Parameters:
+- Add commandline parameters
+  --version, -v     -> This should support github - last version checking
+  --help, -h        -> Show usage
+
 Datamining:
 - Add query functionality for the resulting database file (interactive reports?)
 - Link request processing line to request completed line (VirtualMongrel?)
