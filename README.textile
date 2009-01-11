@@ -5,7 +5,7 @@ Merb. Its purpose is to find what actions are best candidates for optimization.
 
 * Analyzes Rails log files (all versions)
 * Can combine multiple files (handy if you are using logrotate)
-* Uses several metrics (cumulative time, average time, blockers, DB time, etc)
+* Uses several metrics, including cumulative request time, average request time, process blockers, database and rendering time, HTTP methods and states, Rails action cache statistics, etc.) ("Sample output":http://wiki.github.com/wvanbergen/request-log-analyzer/sample-output)
 * Low memory footprint (server-safe)
 * MIT licensed
 * Fast
