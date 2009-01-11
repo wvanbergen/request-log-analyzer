@@ -114,7 +114,7 @@ when :anonymize
   require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'    
   RequestLogAnalyzer::LogProcessor.build(:anonymize, arguments).run!  
 else 
-  puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 0.4.0\n\n"  
+  puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 1.0\n\n"  
   
   # Run the request_log_analyzer!
   RequestLogAnalyzer::Controller.build(arguments, terminal_width).run!

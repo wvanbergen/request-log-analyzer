@@ -16,7 +16,6 @@ module RequestLogAnalyzer
   # sources are registered in the correct order. This can be helpful to parse requests
   # from several logrotated log files.
   class Controller
-    VERSION = '0.4.0'
 
     include RequestLogAnalyzer::FileFormat::Awareness
     
