@@ -88,6 +88,8 @@ module RequestLogAnalyzer
     # line and a parsed footer line. Not that calling this function in single line mode will always 
     # return false.
     def completed?
+      puts attributes[:method]
+
       header_found, footer_found = false, false
       @lines.each do |line| 
         line_def = file_format.line_definitions[line[:line_type]]
@@ -95,6 +97,7 @@ module RequestLogAnalyzer
         footer_found = true if line_def.footer        
       end
       header_found && footer_found
+      
     end
     
     # Returns the line type of the parsed line of this request.

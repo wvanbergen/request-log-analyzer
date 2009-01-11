@@ -9,5 +9,6 @@ This allows you to easily add extra reports, filters and outputs.
 
 2) Start chunk producer and push chunks through pipeline.
   Controller.start
+
 3) Gather output from pipeline.
   Controller.report

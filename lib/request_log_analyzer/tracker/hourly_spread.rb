@@ -50,7 +50,7 @@ module RequestLogAnalyzer::Tracker
       output << green("━" * report_width, color) + "\n"
       
       if @request_time_graph == [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        output << "Nothing to analyze\n"
+        output << "None found.\n"
         return
       end
 

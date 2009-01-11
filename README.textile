@@ -35,10 +35,11 @@ h2. Usage
     --boring, -b               Output reports without ASCII colors.
     --database <filename>, -d: Creates an SQLite3 database of all the parsed request information.
     --debug                    Print debug information while parsing.
+    --file <filename>          Output to file.
 
   Examples:
     request-log-analyzer development.log
-    request-log-analyzer -z mongrel.0.log mongrel.1.log mongrel.2.log 
+    request-log-analyzer mongrel.0.log mongrel.1.log mongrel.2.log 
     request-log-analyzer --format merb -d requests.db production.log
 
   To install rake tasks in your Rails application, 
