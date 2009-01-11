@@ -3,12 +3,17 @@ h1. Request log analyzer
 This is a simple command line tool to analyze request log files of both Rails and
 Merb. Its purpose is to find what actions are best candidates for optimization.
 
-* Analyzes Rails logs (all versions) and Merb logs
+* Analyzes Rails log files (all versions)
 * Can combine multiple files (handy if you are using logrotate)
 * Uses several metrics (cumulative time, average time, blockers, DB time, etc)
 * Low memory footprint (server-safe)
 * MIT licensed
 * Fast
+
+h2. Additional information
+
+* "Project wiki at GitHub":http://wiki.github.com/wvanbergen/request-log-analyzer
+* "wvanbergen's blog posts":http://techblog.floorplanner.com/tag/request-log-analyzer/
 
 h2. Installation
 
@@ -40,99 +45,4 @@ h2. Usage
   run the following command in your application's root directory:
 
     request-log-analyzer install rails
-</pre>
-
-
-h2. Example result
-
-Note that this example was shortened for your viewing pleasure.
-@$ request-log-analyzer /var/log/my_app.log -o 5@
-
-<pre>
-Request log analyzer, by Willem van Bergen and  Bart ten Brinke
-
-Processing started, failed, completed log lines from /var/log/my_app.log...
-
-Processing all log lines...
-========================================================================
-Timestamp first request: 2008-07-13T06:25:58+00:00
-Timestamp last request:  2008-07-20T06:18:53+00:00
-Total time analyzed: 7 days
-
-Total requests analyzed 58908 requests from log file
-Methods: GET (50.6%), POST (22.8%), PUT (25.4%), DELETE (1.1%), unknown (0.0%).
-
-Top 5 most requested actions
-========================================================================
-/overview/:date/                                  : 19359 requests
-/overview/day/:date/                              : 6365 requests
-/overview/:date/set/                              : 5589 requests
-/overview/                                        : 3985 requests
-/clients/:id/                                     : 1976 requests
-
-Top 5 actions by time - cumulative
-========================================================================
-/overview/:date/                                  :   9044.582s [19359 requests]
-/overview/                                        :   8478.767s [3985 requests]
-/overview/:date/set/                              :   3309.041s [5589 requests]
-/clients/:id/products/:id/                        :   1479.911s [924 requests]
-/clients/:id/                                     :    750.080s [1976 requests]
-
-Top 5 actions by time - per request mean
-========================================================================
-/overview/                                        :      2.128s [3985 requests]
-/clients/:id/products/:id/                        :      1.602s [924 requests]
-/overview/:date/set/                              :      0.592s [5589 requests]
-/overview/:date/                                  :      0.467s [19359 requests]
-/clients/:id/                                     :      0.380s [1976 requests]
-
-Top 5 worst DB offenders - cumulative time
-========================================================================
-/overview/:date/                                  :   8773.993s [19359 requests]
-/overview/                                        :   8394.754s [3985 requests]
-/overview/:date/set/                              :   3307.928s [5589 requests]
-/clients/:id/products/:id/                        :   1425.220s [924 requests]
-/clients/:id/                                     :    535.229s [1976 requests]
-
-Top 5 worst DB offenders - mean time
-========================================================================
-/overview/:id/:id/:id/print/                      :      6.994s [448 requests]
-/overview/                                        :      2.128s [3985 requests]
-/clients/:id/products/:id/                        :      1.602s [924 requests]
-/overview/:date/set/                              :      0.592s [5589 requests]
-/overview/:date/                                  :      0.467s [19359 requests]
-
-Mongrel process blockers (> 1.0 seconds)
-========================================================================
-/overview/:date/                                  :   7494.233s [3144 requests]
-/overview/                                        :   8320.293s [1549 requests]
-/overview/:date/set/                              :   1149.235s [803 requests]
-/overview/:id/:id/:id/print/new/                  :    613.693s [341 requests]
-/clients/:id/products/:id/                        :   1370.693s [313 requests]
-
-Requests graph - per hour
-========================================================================
-         ........
-         7:00 - 2731                 : XXXXXXX
-         8:00 - 6139                 : XXXXXXXXXXXXXXXX
-         9:00 - 7465                 : XXXXXXXXXXXXXXXXXXXX
-        10:00 - 7118                 : XXXXXXXXXXXXXXXXXXX
-        11:00 - 7409                 : XXXXXXXXXXXXXXXXXXX
-        12:00 - 6450                 : XXXXXXXXXXXXXXXXX
-        13:00 - 5377                 : XXXXXXXXXXXXXX
-        14:00 - 6058                 : XXXXXXXXXXXXXXXX
-        15:00 - 4156                 : XXXXXXXXXXX
-        16:00 - 2767                 : XXXXXXX
-        17:00 - 1598                 : XXXX
-        18:00 - 792                  : XX
-        ........
-
-Errors
-========================================================================
-StaleObjectError: [28 requests]
- -> Attempted to update a stale object
-StatementError: [2 requests]
- -> Mysql::Error: Deadlock found when trying to get lock; try restarting transaction
-NoMethodError: [1 requests]
- -> undefined method `code' for nil:NilClass
 </pre>
