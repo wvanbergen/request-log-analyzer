@@ -3,7 +3,10 @@ Request-log-analyzer is set up like a simple pipe and filter system.
 This allows you to easily add extra reports, filters and outputs.
 
 1) Build pipeline.
-  Source -> Filter -> Filter -> Aggregator
+                             -> Aggregator  (database)
+  Source -> Filter -> Filter -> Aggregator  (summary report)
+                             -> Aggregator  (...)
+
 2) Start chunk producer and push chunks through pipeline.
   Controller.start
 3) Gather output from pipeline.
