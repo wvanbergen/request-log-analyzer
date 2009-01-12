@@ -13,7 +13,7 @@ Merb to produce a performance report. Its purpose is to find what actions are be
 h2. Installation
 
 <pre>
-sudo gem install wvanbergen-request-log-analyzer --source http://gems.github.com
+$ sudo gem install wvanbergen-request-log-analyzer --source http://gems.github.com
 </pre>
 
 To get the best results out of request-log-analyzer, make sure to 
