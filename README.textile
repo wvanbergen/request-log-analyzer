@@ -1,49 +1,36 @@
-h1. Request log analyzer
+h1. Request-log-analyzer
 
 This is a simple command line tool to analyze request log files of both Rails and
-Merb. Its purpose is to find what actions are best candidates for optimization.
+Merb to produce a performance report. Its purpose is to find what actions are best candidates for optimization.
 
 * Analyzes Rails log files (all versions)
 * Can combine multiple files (handy if you are using logrotate)
 * Uses several metrics, including cumulative request time, average request time, process blockers, database and rendering time, HTTP methods and states, Rails action cache statistics, etc.) ("Sample output":http://wiki.github.com/wvanbergen/request-log-analyzer/sample-output)
 * Low memory footprint (server-safe)
-* MIT licensed
 * Fast
+* MIT licensed
+
+h2. Installation
+
+<pre>
+sudo gem install wvanbergen-request-log-analyzer --source http://gems.github.com
+</pre>
+
+To get the best results out of request-log-analyzer, make sure to 
+"set up logging correctly":http://wiki.github.com/wvanbergen/request-log-analyzer/configure-logging
+for your application.
+
+h2. Usage
+
+To analyze a log file and produce a performance report, run request-log-analyzer like this:
+
+<pre>
+$ request-log-analyzer log/production.log
+</pre>
+
+For more details and available command line options, see the "project's wiki":http://wiki.github.com/wvanbergen/request-log-analyzer/basic-usage
 
 h2. Additional information
 
 * "Project wiki at GitHub":http://wiki.github.com/wvanbergen/request-log-analyzer
 * "wvanbergen's blog posts":http://techblog.floorplanner.com/tag/request-log-analyzer/
-
-h2. Installation
-
-@sudo gem install wvanbergen-request-log-analyzer --source http://gems.github.com@
-
-h2. Usage
-
-<pre>
-  Usage: request-log-analyzer [LOGFILES*] <OPTIONS>
-
-  Input options:
-    --format <format>, -f:     Uses the specified log file format. Defaults to rails.
-    --after <date>             Only consider requests from <date> or later.
-    --before <date>            Only consider requests before <date>.
-    --select <field> <value>   Only consider requests where <field> matches <value>.
-    --reject <field> <value>   Only consider requests where <field> does not match <value>.
-
-  Output options:
-    --boring, -b               Output reports without ASCII colors.
-    --database <filename>, -d: Creates an SQLite3 database of all the parsed request information.
-    --debug                    Print debug information while parsing.
-    --file <filename>          Output to file.
-
-  Examples:
-    request-log-analyzer development.log
-    request-log-analyzer mongrel.0.log mongrel.1.log mongrel.2.log 
-    request-log-analyzer --format merb -d requests.db production.log
-
-  To install rake tasks in your Rails application, 
-  run the following command in your application's root directory:
-
-    request-log-analyzer install rails
-</pre>
