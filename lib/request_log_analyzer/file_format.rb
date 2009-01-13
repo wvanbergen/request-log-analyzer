@@ -73,5 +73,9 @@ module RequestLogAnalyzer
     def valid?
       line_definitions.detect { |(name, ld)| ld.header } && line_definitions.detect { |(name, ld)| ld.footer }
     end
+    
+    def setup_environment(controller)
+      
+    end
   end
 end

@@ -80,7 +80,6 @@ module RequestLogAnalyzer
         controller.add_filter(:field, :mode => :select, :field => field, :value => value)
       end
 
-
       # register aggregators
       arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
 
@@ -90,7 +89,9 @@ module RequestLogAnalyzer
     
       # register the echo aggregator in debug mode
       controller.add_aggregator(:echo) if arguments[:debug]
-            
+      
+      file_format.setup_environment(controller)
+          
       return controller
     end
 
