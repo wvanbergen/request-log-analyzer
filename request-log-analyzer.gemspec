@@ -3,6 +3,8 @@ Gem::Specification.new do |s|
   s.version = '1.0.2'
   s.date    = '2009-01-13'
   
+  s.rubyforge_project = 'r-l-a'
+  
   s.bindir = 'bin'
   s.executables = ['request-log-analyzer']
   s.default_executable = 'request-log-analyzer'
