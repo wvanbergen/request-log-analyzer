@@ -1,6 +1,8 @@
 require 'rubygems'
+require 'rubyforge'
 require 'rake'
 require 'rake/tasklib'
+require 'rake/gempackagetask'
 require 'date'
 
 module Rake 
@@ -25,21 +27,13 @@ module Rake
         desc "Updates the file lists for this gem"
         task(:manifest) { manifest_task }
         
-        desc "Builds a ruby gem for #{@name}"
-        task(:build => [:manifest]) { build_task }
-        
-        desc "Installs the ruby gem for #{@name} locally"
-        task(:install => [:build]) { install_task }
-        
-        desc "Uninstalls the ruby gem for #{@name} locally"
-        task(:uninstall) { uninstall_task }             
-        
         desc "Releases a new version of #{@name}"
-        task(:release) { release_task } 
-      end
+        task(:release => :package) { release_task } 
+        
+        Rake::GemPackageTask.new(@specification) do |pkg|
+        end
+      end    
     end
-    
-
     
     protected 
 
