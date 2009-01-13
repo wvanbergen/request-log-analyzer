@@ -1,18 +1,14 @@
 module RequestLogAnalyzer
   
   # The LogParser class reads log data from a given source and uses a file format definition
-  # to parse all relevent information about requests from the file.
+  # to parse all relevent information about requests from the file. A FileFormat module should 
+  # be provided that contains the definitions of the lines that occur in the log data.
   #
-  # A FileFormat module should be provided that contains the definitions of the lines that 
-  # occur in the log data. The log parser can run in two modes:
-  # - In single line mode, it will emit every detected line as a separate request
-  # - In combined requests mode, it will combine the different lines from the line defintions
-  #   into one request, that will then be emitted. 
-  #
-  # The combined requests mode gives better information, but can be problematic if the log 
-  # file is unordered. This can be the case if data is written to the log file simultaneously 
-  # by different mongrel processes. This problem is detected by the parser, but the requests
-  # that are mixed up cannot be parsed. It will emit warnings when this occurs.
+  # De order in which lines occur is used to combine lines to a single request. If these lines 
+  # are mixed, requests cannot be combined properly. This can be the case if data is written to 
+  # the log file simultaneously by different mongrel processes. This problem is detected by the 
+  # parser, but the requests that are mixed up cannot be parsed. It will emit warnings when this 
+  # occurs.
   class LogParser
     
     include RequestLogAnalyzer::FileFormat::Awareness
@@ -79,8 +75,6 @@ module RequestLogAnalyzer
       unknown = line_types.reject { |line_type| file_format.line_definitions.has_key?(line_type) }
       raise "Unknown line types: #{unknown.join(', ')}" unless unknown.empty?
       
-      puts "Parsing mode: " + (options[:combined_requests] ? 'combined requests' : 'single lines') if options[:debug]
-      
       @current_io = io
       @current_io.each_line do |line|
         
@@ -94,11 +88,7 @@ module RequestLogAnalyzer
 
         if request_data
           @parsed_lines += 1
-          if @options[:combined_requests]
-            update_current_request(request_data, &block)
-          else
-            handle_request(RequestLogAnalyzer::Request.create(@file_format, request_data), &block)
-          end       
+          update_current_request(request_data, &block)
         end
       end
       
@@ -126,9 +116,9 @@ module RequestLogAnalyzer
     
     protected
     
-    # Combines the different lines of a request into a single Request object.
-    # This function is only called in combined requests mode. It will start a new request when
-    # a header line is encountered en will emit the request when a footer line is encountered.
+    # Combines the different lines of a request into a single Request object. It will start a 
+    # new request when a header line is encountered en will emit the request when a footer line 
+    # is encountered.
     #
     # - Every line that is parsed before a header line is ignored as it cannot be included in 
     #   any request. It will emit a :no_current_request warning.

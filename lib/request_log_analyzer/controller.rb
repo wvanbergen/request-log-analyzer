@@ -33,7 +33,6 @@ module RequestLogAnalyzer
             
       options = { :report_width => arguments[:report_width].to_i, :output => STDOUT}
 
-      options[:combined_requests] = !arguments[:single_lines]
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
       options[:colorize] = !arguments[:boring]
@@ -45,7 +44,7 @@ module RequestLogAnalyzer
                 
       # Create the controller with the correct file format
       file_format = RequestLogAnalyzer::FileFormat.load(arguments[:format])
-      source_files = nil
+
       # register sources
       if arguments.parameters.length == 1
         file = arguments.parameters[0]
@@ -63,28 +62,24 @@ module RequestLogAnalyzer
       
       controller = Controller.new(RequestLogAnalyzer::Source::LogFile.new(file_format, options), options)
 
-      # register filters
-      # filters are only supported in combined requests mode
-      if options[:combined_requests]
-        
-        options[:assume_correct_order] = arguments[:assume_correct_order]
-        
-        if arguments[:after] || arguments[:before]
-          filter_options = {}
-          filter_options[:after]  = DateTime.parse(arguments[:after])  
-          filter_options[:before] = DateTime.parse(arguments[:before]) if arguments[:before]
-          controller.add_filter(:timespan, filter_options)
-        end
-        
-        arguments[:reject].each do |(field, value)|
-          controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
-        end
-        
-        arguments[:select].each do |(field, value)|
-          controller.add_filter(:field, :mode => :select, :field => field, :value => value)
-        end
-        
+      options[:assume_correct_order] = arguments[:assume_correct_order]
+      
+      # register filters        
+      if arguments[:after] || arguments[:before]
+        filter_options = {}
+        filter_options[:after]  = DateTime.parse(arguments[:after])  
+        filter_options[:before] = DateTime.parse(arguments[:before]) if arguments[:before]
+        controller.add_filter(:timespan, filter_options)
       end
+      
+      arguments[:reject].each do |(field, value)|
+        controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
+      end
+      
+      arguments[:select].each do |(field, value)|
+        controller.add_filter(:field, :mode => :select, :field => field, :value => value)
+      end
+
 
       # register aggregators
       arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
@@ -103,7 +98,6 @@ module RequestLogAnalyzer
     # <tt>format</tt> Logfile format. Defaults to :rails
     # Options are passd on to the LogParser.
     # * <tt>:aggregator</tt> Aggregator array.
-    # * <tt>:combined_requests</tt> Combine multiline requests into a single request.
     # * <tt>:database</tt> Database the controller should use.
     # * <tt>:echo</tt> Output debug information.
     # * <tt>:silent</tt> Do not output any warnings.

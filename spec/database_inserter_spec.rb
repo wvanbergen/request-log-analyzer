@@ -52,8 +52,8 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
     @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => TEST_DATABASE_FILE)
     @database_inserter.prepare
         
-    @single = RequestLogAnalyzer::Request.create(spec_format, {:line_type => :first, :request_no => 564})
-    @combined = RequestLogAnalyzer::Request.create(spec_format, 
+    @incomplete_request = RequestLogAnalyzer::Request.create(spec_format, {:line_type => :first, :request_no => 564})
+    @completed_request = RequestLogAnalyzer::Request.create(spec_format, 
                           {:line_type => :first, :request_no  => 564},
                           {:line_type => :test, :test_capture => "awesome"},
                           {:line_type => :test, :test_capture => "indeed"},                                                    
@@ -66,14 +66,14 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
   
   it "should insert a record in the relevant table" do
     SpecFormat::FirstLine.should_receive(:create!).with(hash_including(:request_no => 564))
-    @database_inserter.aggregate(@single)
+    @database_inserter.aggregate(@incomplete_request)
   end
   
   it "should insert records in all relevant tables" do
     SpecFormat::FirstLine.should_receive(:create!).with(hash_including(:request_no => 564)).once
     SpecFormat::TestLine.should_receive(:create!).twice
     SpecFormat::LastLine.should_receive(:create!).with(hash_including(:request_no => 564)).once
-    @database_inserter.aggregate(@combined)
+    @database_inserter.aggregate(@completed_request)
   end
   
   it "should log a warning in the warnings table" do

@@ -2,12 +2,6 @@ module RequestLogAnalyzer::Aggregator
 
   # The base class of an aggregator. This class provides the interface to which
   # every aggregator should comply (by simply subclassing this class).
-  #
-  # When building an aggregator, do not forget that RequestLogAnalyzer can run in
-  # single line mode or in combined requests mode. Make sure your aggregator can 
-  # handle both cases, or raise an exception if RLA is rnning in the wrong mode.
-  # Calling options[:combined_requests] tells you if RLA is running in combined 
-  # requests mode, otherwise it is running in single line mode.
   class Base
     
     include RequestLogAnalyzer::FileFormat::Awareness

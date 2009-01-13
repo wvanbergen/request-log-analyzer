@@ -1,10 +1,14 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe RequestLogAnalyzer::LogParser, "Rails without combined requests" do
+describe RequestLogAnalyzer::LogParser, "Rails" do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails), :combined_requests => false)
+    @log_parser = RequestLogAnalyzer::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails))
+  end
+  
+  it "should have a valid language definitions" do
+    @log_parser.file_format.should be_valid
   end
   
   it "should parse a stream and find valid requests" do
@@ -13,30 +17,9 @@ describe RequestLogAnalyzer::LogParser, "Rails without combined requests" do
       request.should be_kind_of(RequestLogAnalyzer::Request)
     end
     io.close
-  end
-
-  it "should find 8 requests when lines are not linked" do
-    requests = []
-    @log_parser.parse_file(log_fixture(:rails_1x)) { |request| requests << request }
-    requests.length.should == 8
-    requests.each { |r| r.should be_single_line }
-    requests.select { |r| r.line_type == :processing }.should have(4).items
   end  
-end
-
-
-describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
-  include RequestLogAnalyzerSpecHelper
   
-  before(:each) do
-    @log_parser = RequestLogAnalyzer::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails), :combined_requests => true)
-  end
-  
-  it "should have a valid language definitions" do
-    @log_parser.file_format.should be_valid
-  end
-  
-  it "should find 4 completed requests when lines are linked" do
+  it "should find 4 completed requests" do
     @log_parser.should_not_receive(:warn)  
     @log_parser.should_receive(:handle_request).exactly(4).times
     @log_parser.parse_file(log_fixture(:rails_1x))
@@ -63,7 +46,6 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
     @log_parser.parse_file(log_fixture(:syslog_1x)) do |request| 
       
       request.should be_completed
-      request.should be_combined
       
       request[:controller].should == 'EmployeeController'
       request[:action].should     == 'index'
@@ -79,7 +61,6 @@ describe RequestLogAnalyzer::LogParser, "Rails with combined requests" do
     @log_parser.should_not_receive(:warn)
     @log_parser.parse_file(log_fixture(:rails_22_cached)) do |request| 
       request.should be_completed
-      request.should be_combined
       request =~ :cache_hit
     end  
   end

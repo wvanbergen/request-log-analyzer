@@ -82,7 +82,7 @@ module RequestLogAnalyzer::Aggregator
       output << "Request summary\n"
       output << green("━" * report_width, color) + "\n"
       output << "Parsed lines:         #{green(source.parsed_lines, color)}\n"
-      output << "Parsed requests:      #{green(source.parsed_requests, color)}\n"  if options[:combined_requests]
+      output << "Parsed requests:      #{green(source.parsed_requests, color)}\n"
       output << "Skipped requests:     #{green(source.skipped_requests, color)}\n" if source.skipped_requests > 0
       if has_warnings?
         output <<  "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ') + "\n"

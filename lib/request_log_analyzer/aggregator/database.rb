@@ -23,7 +23,7 @@ module RequestLogAnalyzer::Aggregator
         class_name = "#{line[:line_type]}_line".camelize #split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')
         
         attributes = line.reject { |k, v| [:line_type].include?(k) }
-        attributes[:request_id] = @request_id if options[:combined_requests]  
+        attributes[:request_id] = @request_id
         file_format.class.const_get(class_name).create!(attributes)
       end
     rescue SQLite3::SQLException => e
@@ -52,7 +52,7 @@ module RequestLogAnalyzer::Aggregator
     def create_database_table(name, definition)
       ActiveRecord::Migration.verbose = options[:debug]
       ActiveRecord::Migration.create_table("#{name}_lines") do |t|
-        t.column(:request_id, :integer) #if options[:combined_requests]
+        t.column(:request_id, :integer)
         t.column(:lineno, :integer)
         definition.captures.each do |capture|
           t.column(capture[:name], column_type(capture))
