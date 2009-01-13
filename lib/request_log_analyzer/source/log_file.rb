@@ -21,8 +21,8 @@ module RequestLogAnalyzer::Source
       @options          = options
       @parsed_lines     = 0
       @parsed_requests  = 0
-      @skipped_requests = 0
-      @current_io = nil
+      @skipped_lines    = 0
+      @current_io       = nil
       @source_files     = options[:source_files]
 
       # install the file format module (see RequestLogAnalyzer::FileFormat)
@@ -134,7 +134,7 @@ module RequestLogAnalyzer::Source
             yield @current_request
             @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)
           else
-            @skipped_requests += 1
+            @skipped_lines += 1
             warn(:unclosed_request, "Encountered header line, but previous request was not closed!")
             @current_request = nil # remove all data that was parsed, skip next request as well.
           end
@@ -150,7 +150,7 @@ module RequestLogAnalyzer::Source
             @current_request = nil 
           end
         else
-          @skipped_requests += 1
+          @skipped_lines += 1
           warn(:no_current_request, "Parsebale line found outside of a request!")
         end
       end

@@ -69,7 +69,7 @@ module RequestLogAnalyzer::Aggregator
        
     def report(output=STDOUT, report_width = 80, color = false)
       report_header(output, report_width, color)
-      if source.parsed_requests - source.skipped_requests > 0
+      if source.parsed_requests > 0
         @trackers.each { |tracker| tracker.report(output, report_width, color) }
       else
         output << "\n"
@@ -83,7 +83,7 @@ module RequestLogAnalyzer::Aggregator
       output << green("━" * report_width, color) + "\n"
       output << "Parsed lines:         #{green(source.parsed_lines, color)}\n"
       output << "Parsed requests:      #{green(source.parsed_requests, color)}\n"
-      output << "Skipped requests:     #{green(source.skipped_requests, color)}\n" if source.skipped_requests > 0
+      output << "Skipped lines:        #{green(source.skipped_lines, color)}\n" if source.skipped_lines > 0
       if has_warnings?
         output <<  "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ') + "\n"
       end

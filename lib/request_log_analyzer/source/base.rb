@@ -15,8 +15,8 @@ module RequestLogAnalyzer::Source
     # The total number of parsed requests.
     attr_reader :parsed_requests
 
-    # The number of skipped requests because of date constraints
-    attr_reader :skipped_requests
+    # The number of skipped lines because of warnings
+    attr_reader :skipped_lines
 
     # Base source class used to filter input requests.
 
