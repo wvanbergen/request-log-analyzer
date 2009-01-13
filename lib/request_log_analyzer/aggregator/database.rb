@@ -3,6 +3,17 @@ require 'activerecord'
 
 module RequestLogAnalyzer::Aggregator
 
+  # The database aggregator will create an SQLite3 database with all parsed request information.
+  #
+  # The prepare method will create a database schema according to the file format definitions.
+  # It will also create ActiveRecord::Base subclasses to interact with the created tables. 
+  # Then, the aggregate method will be called for every parsed request. The information of
+  # these requests is inserted into the tables using the ActiveRecord classes.
+  #
+  # A requests table will be created, in which a record is inserted for every parsed request.
+  # For every line type, a separate table will be created with a request_id field to point to
+  # the request record, and a field for every parsed value. Finally, a warnings table will be
+  # created to log all parse warnings.
   class Database < Base
 
     # Establishes a connection to the database and creates the necessary database schema for the
