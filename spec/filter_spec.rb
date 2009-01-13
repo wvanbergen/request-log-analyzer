@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require File.dirname(__FILE__) + '/../lib/request_log_analyzer/filter/timespan'
 require File.dirname(__FILE__) + '/../lib/request_log_analyzer/filter/field'
+require File.dirname(__FILE__) + '/../lib/request_log_analyzer/filter/anonimize'
 
 describe RequestLogAnalyzer::Filter::Timespan, 'both before and after'  do
   include RequestLogAnalyzerSpecHelper
@@ -134,4 +135,26 @@ describe RequestLogAnalyzer::Filter::Field, 'regexp in accept mode' do
   it "should accept a request if the value is not the first value" do
     @filter.filter(request([{:test => 'ignore'}, {:test => 'testing 123'}])).should_not be_nil
   end  
+end
+
+describe RequestLogAnalyzer::Filter::Anonimize, 'anonimize request' do
+  include RequestLogAnalyzerSpecHelper
+
+  before(:each) do
+    @filter = RequestLogAnalyzer::Filter::Anonimize.new(spec_format)
+    @filter.prepare
+  end
+  
+  it "should anonimize ip" do
+    @filter.filter(request(:ip => '123.123.123.123'))[:ip].should_not eql('123.123.123.123')
+  end
+
+  it "should anonimize url" do
+    @filter.filter(request(:url => 'https://test.mysite.com/employees'))[:url].should eql('http://example.com/employees')
+  end
+
+  it "should anonimize url" do
+    @filter.filter(request(:duration => 100))[:duration].should_not eql(100)
+  end
+  
 end

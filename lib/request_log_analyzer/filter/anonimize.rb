@@ -15,7 +15,7 @@ module RequestLogAnalyzer::Filter
     end
 
     def anonymize_url(value)
-      value.sub(/^https?\:\/\/[A-z0-9\.-]+\//, "http://example.com/")
+      return value.sub(/^https?\:\/\/[A-z0-9\.-]+\//, "http://example.com/")
     end
     
     def fuzz(value)
@@ -25,14 +25,14 @@ module RequestLogAnalyzer::Filter
     def filter(request)
       return nil unless request
       
-      request.each do |key, value|
+      request.attributes.each do |key, value|
         if key == :ip
-          value = generate_random_ip
+          request.attributes[key] = generate_random_ip
         elsif key == :url
-          value = anonymize_url
+          request.attributes[key] = anonymize_url(value)
         elsif [ :duration, :view, :db, :type, :after_filters_time, :before_filters_time,
                 :action_time].include?(key)
-          value = fuzz(value)
+          request.attributes[key] = fuzz(value)
         end
       end
       
