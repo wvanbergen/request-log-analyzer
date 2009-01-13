@@ -5,15 +5,17 @@ module RequestLogAnalyzer::Aggregator
 
   class Database < Base
 
-    attr_reader :request_id
-
+    # Establishes a connection to the database and creates the necessary database schema for the
+    # current file format
     def prepare
       ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
-
-      File.unlink(options[:database]) if File.exist?(options[:database])
+      File.unlink(options[:database]) if File.exist?(options[:database]) # TODO: keep old database?
       create_database_schema!
     end
     
+    # Aggregates a request into the database
+    # This will create a record in the requests table and create a record for every line that has been parsed,
+    # in which the captured values will be stored.
     def aggregate(request)
       @request_object = @request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
@@ -25,18 +27,23 @@ module RequestLogAnalyzer::Aggregator
       raise Interrupt, e.message
     end
     
+    # Finalizes the aggregator by closing the connection to the database
     def finalize
+      @request_count = @orm_module::Request.count
       ActiveRecord::Base.remove_connection
     end
     
+    # Records w warining in the warnings table.
     def warning(type, message, lineno)
       @orm_module::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
     
+    # Prints a short report of what has been inserted into the database
     def report(output = STDOUT, report_width = 80, color = false)
       output << "\n"
       output << green("━" * report_width, color) + "\n"
       output <<  "A database file has been created with all parsed request information.\n"
+      output <<  "#{@request_count} requests have been added to the database.\n"      
       output <<  "To execute queries on this database, run the following command:\n"
       output <<  "  $ sqlite3 #{options[:database]}\n"
       output << "\n"
@@ -44,6 +51,10 @@ module RequestLogAnalyzer::Aggregator
     
     protected 
     
+    # This function creates a database table for a given line definition.
+    # It will create a field for every capture in the line, and adds a lineno field to indicate at
+    # what line in the original file the line was found, and a request_id to link lines related
+    # to the same request.
     def create_database_table(name, definition)
       ActiveRecord::Migration.verbose = options[:debug]
       ActiveRecord::Migration.create_table("#{name}_lines") do |t|
@@ -55,6 +66,20 @@ module RequestLogAnalyzer::Aggregator
       end
     end
     
+    # Creates an ActiveRecord class for a given line definition.
+    # A subclass of ActiveRecord::Base is created and an association with the Request class is
+    # created using belongs_to / has_many. This association will later be used to create records
+    # in the corresponding table. This table should already be created before this method is called.
+    def create_activerecord_class(name, definition)
+      class_name = "#{name}_line".camelize
+      klass = Class.new(ActiveRecord::Base)
+      klass.send(:belongs_to, :request)
+      @orm_module.const_set(class_name, klass) unless @orm_module.const_defined?(class_name)
+      @request_class.send(:has_many, "#{name}_lines".to_sym)
+    end    
+    
+    # Creates a requests table, in which a record is created for every request. It also creates an
+    # ActiveRecord::Base class to communicate with this table.
     def create_request_table_and_class
       ActiveRecord::Migration.verbose = options[:debug]
       ActiveRecord::Migration.create_table("requests") do |t|
@@ -66,6 +91,7 @@ module RequestLogAnalyzer::Aggregator
       @request_class = @orm_module.const_get('Request')
     end
 
+    # Creates a warnings table and a corresponding Warning class to communicate with this table using ActiveRecord.
     def create_warning_table_and_class
       ActiveRecord::Migration.verbose = options[:debug]
       ActiveRecord::Migration.create_table("warnings") do |t|
@@ -76,13 +102,9 @@ module RequestLogAnalyzer::Aggregator
       
       @orm_module.const_set('Warning', Class.new(ActiveRecord::Base)) unless @orm_module.const_defined?('Warning')
     end
-
-    def create_activerecord_class(name, definition)
-      class_name = "#{name}_line".camelize
-      @orm_module.const_set(class_name, Class.new(ActiveRecord::Base)) unless @orm_module.const_defined?(class_name)
-      @request_class.send(:has_many, "#{name}_lines".to_sym)
-    end
-
+    
+    # Creates the database schema and related ActiveRecord::Base subclasses that correspond to the 
+    # file format definition. These ORM classes will later be used to create records in the database.
     def create_database_schema!
       
       if file_format.class.const_defined?('Database')
@@ -100,6 +122,8 @@ module RequestLogAnalyzer::Aggregator
       end
     end
     
+    # Function to determine the column type for a field
+    # TODO: make more robust / include in file-format definition
     def column_type(capture)
       case capture[:type]
       when :sec;   :double
