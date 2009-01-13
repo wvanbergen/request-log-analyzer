@@ -83,5 +83,13 @@ module RequestLogAnalyzer
     def timestamp
       first(:timestamp)
     end
+    
+    def first_lineno
+      @lines.first[:lineno]
+    end
+    
+    def last_lineno
+      @lines.last[:lineno]
+    end
   end
 end
