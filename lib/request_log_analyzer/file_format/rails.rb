@@ -22,11 +22,11 @@ class RequestLogAnalyzer::FileFormat::Rails < RequestLogAnalyzer::FileFormat
   line_definition :failed do |line|
     line.footer = true
     line.regexp = /((?:[A-Z]\w+\:\:)*[A-Z]\w+) \((.*)\)(?: on line #(\d+) of .+)?\:(.*)/
-    line.captures << { :name => :error,            :type => :string } \
-                  << { :name => :exception_string, :type => :string } \
-                  << { :name => :line,             :type => :integer } \
-                  << { :name => :file,             :type => :string } \
-                  << { :name => :stack_trace,      :type => :string, :anonymize => true }
+    line.captures << { :name => :error,       :type => :string } \
+                  << { :name => :message,     :type => :string } \
+                  << { :name => :line,        :type => :integer } \
+                  << { :name => :file,        :type => :string } \
+                  << { :name => :stack_trace, :type => :string, :anonymize => true }
   end
 
 
