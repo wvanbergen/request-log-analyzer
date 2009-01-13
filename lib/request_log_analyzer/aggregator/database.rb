@@ -54,7 +54,7 @@ module RequestLogAnalyzer::Aggregator
     # This function creates a database table for a given line definition.
     # It will create a field for every capture in the line, and adds a lineno field to indicate at
     # what line in the original file the line was found, and a request_id to link lines related
-    # to the same request.
+    # to the same request. It will also create an index in the request_id field to speed up queries.
     def create_database_table(name, definition)
       ActiveRecord::Migration.verbose = options[:debug]
       ActiveRecord::Migration.create_table("#{name}_lines") do |t|
@@ -64,6 +64,7 @@ module RequestLogAnalyzer::Aggregator
           t.column(capture[:name], column_type(capture))
         end
       end
+      ActiveRecord::Migration.add_index("#{name}_lines", [:request_id])
     end
     
     # Creates an ActiveRecord class for a given line definition.
