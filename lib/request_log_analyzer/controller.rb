@@ -181,7 +181,7 @@ module RequestLogAnalyzer
       
       begin
         @source.requests do |request|
-          #@filters.each { |filter| request = filter.filter(request) }
+          @filters.each { |filter| request = filter.filter(request) }
           @aggregators.each { |agg| agg.aggregate(request) } if request
         end
       rescue Interrupt => e
