@@ -26,9 +26,12 @@ module Rake
       namespace(:gem) do
         desc "Updates the file lists for this gem"
         task(:manifest) { manifest_task }
+
+        desc "Releases a new version of #{@name}"
+        task(:build) { build_task } 
         
         desc "Releases a new version of #{@name}"
-        task(:release => :package) { release_task } 
+        task(:release) { release_task } 
         
         Rake::GemPackageTask.new(@specification) do |pkg|
         end
@@ -139,15 +142,17 @@ module Rake
     
     def build_task
       sh "gem build #{gemspec_file}"
+      Dir.mkdir('pkg') unless File.exist?('pkg')
+      sh "mv #{name}-#{specification.version}.gem pkg/#{name}-#{specification.version}.gem" 
     end
     
     def install_task
-      raise "#{name} .gem file not found" unless File.exist?("#{name}-#{specification.version}.gem")
-      sh "gem install #{name}-#{specification.version}.gem"
+      raise "#{name} .gem file not found" unless File.exist?("pkg/#{name}-#{specification.version}.gem")
+      sh "gem install pkg/#{name}-#{specification.version}.gem"
     end
     
     def uninstall_task
-      raise "#{name} .gem file not found" unless File.exist?("#{name}-#{specification.version}.gem")
+      raise "#{name} .gem file not found" unless File.exist?("pkg/#{name}-#{specification.version}.gem")
       sh "gem uninstall #{name}"
     end    
     
