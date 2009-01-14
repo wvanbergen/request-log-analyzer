@@ -74,3 +74,47 @@ describe RequestLogAnalyzer::LogParser, "Rails" do
     @log_parser.parse_file(log_fixture(:rails_unordered))
   end  
 end
+
+describe "RequestLogAnalyzer::FileFormat::RailsDevelopment - Rails with development details" do
+  include RequestLogAnalyzerSpecHelper
+  
+  before(:each) do
+    @file_format = RequestLogAnalyzer::FileFormat.load(:rails_development)
+  end
+  
+  it "should have a valid language definitions" do
+    @file_format.should be_valid
+  end
+  
+  it "should parse a rendered line" do
+    info = @file_format.line_definitions[:rendered].matches("Rendered layouts/_footer (2.9ms)")
+    info[:render_file].should == 'layouts/_footer'
+    info[:render_duration].should == 0.0029
+  end
+  
+  it "should parse a query executed line with colors" do
+    info = @file_format.line_definitions[:query_executed].matches(" [4;36;1mUser Load (0.4ms)[0m   [0;1mSELECT * FROM `users` WHERE (`users`.`id` = 18205844) [0m")
+    info[:query_class].should == 'User'
+    info[:query_duration].should == 0.0004
+    info[:query_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 18205844)'
+  end  
+  
+  it "should parse a query executed line without colors" do
+    info = @file_format.line_definitions[:query_executed].matches(" User Load (0.4ms)   SELECT * FROM `users` WHERE (`users`.`id` = 18205844) ")
+    info[:query_class].should == 'User'
+    info[:query_duration].should == 0.0004
+    info[:query_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 18205844)'    
+  end  
+  
+  it "should parse a cached query line with colors" do
+    info = @file_format.line_definitions[:query_cached].matches(' [4;35;1mCACHE (0.0ms)[0m   [0mSELECT * FROM `users` WHERE (`users`.`id` = 0) [0m')
+    info[:cached_duration].should == 0.0
+    info[:cached_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 0)'   
+  end
+  
+  it "should parse a cached query line without colors" do
+    info = @file_format.line_definitions[:query_cached].matches(' CACHE (0.0ms)   SELECT * FROM `users` WHERE (`users`.`id` = 0) ')
+    info[:cached_duration].should == 0.0
+    info[:cached_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 0)'   
+  end  
+end
