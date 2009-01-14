@@ -12,6 +12,13 @@ Merb to produce a performance report. Its purpose is to find what actions are be
 
 h2. Installation
 
+Install request-log-analyzer as a Ruby gem:
+<pre>
+$ sudo gem install request-log-analyzer
+</pre>
+
+Alternatively, use the gem from the GitHub gem server:
+
 <pre>
 $ sudo gem install wvanbergen-request-log-analyzer --source http://gems.github.com
 </pre>
