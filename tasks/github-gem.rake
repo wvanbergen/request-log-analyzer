@@ -27,11 +27,54 @@ module Rake
         task(:manifest) { manifest_task }
 
         desc "Releases a new version of #{@name}"
-        task(:build) { build_task } 
+        task(:build => [:manifest]) { build_task } 
         
         desc "Releases a new version of #{@name}"
-        task(:release) { release_task } 
-      end    
+        task(:release => [:check_clean_master_branch, :version, :build]) { release_task } 
+        
+        # helper task for releasing
+        task(:check_clean_master_branch) { verify_clean_status('master') }
+        task(:check_version) { verify_version(ENV['VERSION'] || @specification.version) }
+        task(:version => [:check_version]) { set_gem_version! }        
+      end
+      
+      # Register RDoc tasks
+      if @specification.has_rdoc
+        require 'rake/rdoctask'
+        
+        namespace(:doc) do 
+          desc 'Generate documentation for request-log-analyzer'
+          Rake::RDocTask.new(:compile) do |rdoc|
+            rdoc.rdoc_dir = 'doc'
+            rdoc.title    = @name
+            rdoc.options += @specification.rdoc_options
+            rdoc.rdoc_files.include(@specification.extra_rdoc_files)
+            rdoc.rdoc_files.include('lib/**/*.rb')
+          end
+        end
+      end
+    
+      # Setup :spec task if RSpec files exist
+      if Dir['spec/**/*_spec.rb'].any?
+        require 'spec/rake/spectask'
+
+        desc "Run all specs for #{@name}"
+        Spec::Rake::SpecTask.new(:spec) do |t|
+          t.spec_files = FileList['spec/**/*_spec.rb']
+        end
+      end
+      
+      # Setup :test task if unit test files exist
+      if Dir['test/**/*_test.rb'].any?
+        require 'rake/testtask'
+
+        desc "Run all unit tests for #{@name}"
+        Rake::TestTask.new(:test) do |t|
+          t.pattern = 'test/**/*_test.rb'
+          t.verbose = true
+          t.libs << 'test'
+        end
+      end      
     end
     
     protected 
@@ -109,6 +152,12 @@ module Rake
       newest_version = run_command('git tag').map { |tag| tag.split(name + '-').last }.compact.map { |v| Gem::Version.new(v) }.max
       raise "This version number (#{new_version}) is not higher than the highest tagged version (#{newest_version})" if !newest_version.nil? && newest_version >= Gem::Version.new(new_version.to_s)
     end
+    
+    def set_gem_version!
+      # update gemspec file
+      self.gemspec_version = ENV['VERSION'] if Gem::Version.correct?(ENV['VERSION'])
+      self.gemspec_date    = Date.today
+    end
 
     def manifest_task
       verify_current_branch('master')
@@ -153,13 +202,7 @@ module Rake
     end    
     
     def release_task
-      verify_clean_status('master')
-      verify_version(ENV['VERSION'] || @specification.version)
-      
-      # update gemspec file
-      self.gemspec_version = ENV['VERSION'] if Gem::Version.correct?(ENV['VERSION'])
-      self.gemspec_date    = Date.today
-      manifest_task      
+      # commit the gemspec file
       git_commit_file(gemspec_file, "Updated #{gemspec_file} for release of version #{@specification.version}") if git_modified?(gemspec_file)
 
       # create tag and push changes
