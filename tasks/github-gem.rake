@@ -2,7 +2,6 @@ require 'rubygems'
 require 'rubyforge'
 require 'rake'
 require 'rake/tasklib'
-require 'rake/gempackagetask'
 require 'date'
 
 module Rake 
@@ -32,9 +31,6 @@ module Rake
         
         desc "Releases a new version of #{@name}"
         task(:release) { release_task } 
-        
-        Rake::GemPackageTask.new(@specification) do |pkg|
-        end
       end    
     end
     
