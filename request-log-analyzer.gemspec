@@ -13,7 +13,8 @@ Gem::Specification.new do |s|
   s.description = "Rails log analyzer's purpose is to find what actions are best candidates for optimization. This tool will parse all requests in the Rails logfile and aggregate the information. Once it is finished parsing the log file, it will show the requests that take op most server time using various metrics."
   
   s.has_rdoc = true
-  s.rdoc_options << '--title' << 'request-log-analyzer' << '--main' << 'README.textile' << '--line-numbers'  
+  s.rdoc_options << '--title' << s.name << '--main' << 'README.rdoc' << '--line-numbers'  
+  s.extra_rdoc_files = ['README.rdoc']
   
   s.authors  = ['Willem van Bergen', 'Bart ten Brinke']
   s.email    = 'willem@vanbergen.org'
