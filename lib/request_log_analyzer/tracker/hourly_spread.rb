@@ -44,37 +44,27 @@ module RequestLogAnalyzer::Tracker
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
   
-    def report(output = STDOUT, report_width = 80, color = false)
-      output << "\n"
-      output << "Requests graph - average per day per hour\n"
-      output << green("━" * report_width, color) + "\n"
+    def report(output)
+      output.title("Requests graph - average per day per hour")
       
       if @request_time_graph == [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         output << "None found.\n"
         return
       end
 
-      first_date    = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')
-      last_date     = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
-      days          = (@last && @first) ? (last_date - first_date).ceil : 1
-      deviation     = @request_time_graph.max / 20
-      deviation     = 1 if deviation == 0
-      color_cutoff  = 15
+      first_date     = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')
+      last_date      = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
+      days           = (@last && @first) ? (last_date - first_date).ceil : 1
+      total_requests = @request_time_graph.inject(0) { |sum, value| sum + value }
       
-      @request_time_graph.each_with_index do |requests, index|
-        display_chars = requests / deviation
-        request_today = requests / days
+      output.table({}, {:align => :right}, {:type => :ratio, :width => :rest, :treshold => 0.15}) do |rows|
+        @request_time_graph.each_with_index do |requests, index|
+          ratio = requests.to_f / total_requests.to_f
+          requests_per_day = requests / days
       
-        if display_chars >= color_cutoff
-          display_chars_string = green(('░' * color_cutoff), color) + red(('░' * (display_chars - color_cutoff)), color)
-        else
-          display_chars_string = green(('░' * display_chars), color)
+          rows << ["#{index.to_s.rjust(3)}:00", "#{requests_per_day} hits", ratio]
         end
-      
-        output << "#{index.to_s.rjust(3)}:00 - #{(request_today.to_s + ' hits').ljust(15)} : #{display_chars_string}\n"
       end
-      output << "\n"
-
     end
   end
 end

@@ -227,10 +227,4 @@ module CommandLine
       "#<ProgressBar:#{@current}/#{@total}>"
     end
   end
-
-  class ReversedProgressBar < ProgressBar
-    def do_percentage
-      100 - super
-    end
-  end
 end

@@ -38,7 +38,7 @@ module RequestLogAnalyzer::Aggregator
     
     # The report function is called at the end. Implement any result reporting
     # in this function.
-    def report(output = STDOUT, report_width = 80, color = false)
+    def report(output)
     end
 
   end

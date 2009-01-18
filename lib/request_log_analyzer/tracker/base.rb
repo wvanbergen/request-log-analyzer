@@ -44,7 +44,7 @@ module RequestLogAnalyzer
         return true
       end
       
-      def report(output=STDOUT, report_width = 80, color = false)
+      def report(output)
         output << self.inspect
         output << "\n"  
       end

@@ -67,36 +67,42 @@ module RequestLogAnalyzer::Aggregator
       @trackers.each { |tracker| tracker.finalize }
     end
        
-    def report(output=STDOUT, report_width = 80, color = false)
-      report_header(output, report_width, color)
+    def report(output)
+      report_header(output)
       if source.parsed_requests > 0
-        @trackers.each { |tracker| tracker.report(output, report_width, color) }
+        @trackers.each { |tracker| tracker.report(output) }
       else
-        output << "\n"
-        output << "There were no requests analyzed.\n"
+        output.puts
+        output.puts('There were no requests analyzed.')
       end
-      report_footer(output, report_width, color)
+      report_footer(output)
     end
     
-    def report_header(output=STDOUT, report_width = 80, color = false)
-      output << "Request summary\n"
-      output << green("━" * report_width, color) + "\n"
-      output << "Parsed lines:         #{green(source.parsed_lines, color)}\n"
-      output << "Parsed requests:      #{green(source.parsed_requests, color)}\n"
-      output << "Skipped lines:        #{green(source.skipped_lines, color)}\n" if source.skipped_lines > 0
-      if has_warnings?
-        output <<  "Warnings:             " + @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{blue(value, color)}" }.join(', ') + "\n"
+    def report_header(output)
+      output.title("Request summary")
+  
+      output.with_style(:cell_separator => false) do 
+        output.table({:width => 20}, {:font => :bold}) do |rows|
+          rows << ['Parsed lines:',   source.parsed_lines]
+          rows << ['Parsed request:', source.parsed_requests]
+          rows << ['Skipped lines:',  source.skipped_lines]
+        
+          rows <<  ["Warnings:", @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{value}" }.join(', ')] if has_warnings?
+        end
       end
       output << "\n"
     end
     
-    def report_footer(output=STDOUT, report_width = 80, color = false)
-      output << "\n" 
-      if has_serious_warnings?      
-        output << green("━" * report_width, color) + "\n"
-        output << "Multiple warnings were encountered during parsing. Possibly, your logging " + "\n"
-        output << "is not setup correctly. Visit this website for logging configuration tips:" + "\n"
-        output <<  blue("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", color) + "\n"
+    def report_footer(output)
+      if has_serious_warnings?     
+        
+        output.puts 
+        output.line(:green)
+        
+        output.puts "Multiple warnings were encountered during parsing. Possibly, your logging "
+        output.puts "is not setup correctly. Visit this website for logging configuration tips:"
+        output.puts output.colorize("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", :blue, :bold)
+        output.puts
       end
     end
     

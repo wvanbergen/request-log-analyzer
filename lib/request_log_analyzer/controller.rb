@@ -34,13 +34,13 @@ module RequestLogAnalyzer
 
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
-      options[:colorize] = !arguments[:boring]
+      options[:colorize] = false
 
       if arguments[:file]
         output_file = File.new(arguments[:file], "w+")
         options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => 80, :color => false, :characters => :ascii)
       else
-        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => arguments[:report_width].to_i, :color => false)
+        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => arguments[:report_width].to_i, :color => !arguments[:boring])
       end
                 
       # Create the controller with the correct file format
@@ -130,7 +130,7 @@ module RequestLogAnalyzer
     def handle_progress(message, value = nil)
       case message
       when :started
-        @progress_bar = CommandLine::ProgressBar.new(green(File.basename(value), options[:colorize]), File.size(value))
+        @progress_bar = CommandLine::ProgressBar.new(File.basename(value), File.size(value))
       when :finished
         @progress_bar.finish
         @progress_bar = nil
@@ -193,7 +193,7 @@ module RequestLogAnalyzer
       puts "\n"
       
       @aggregators.each { |agg| agg.finalize }
-      @aggregators.each { |agg| agg.report(@output, options[:report_width], options[:colorize]) }
+      @aggregators.each { |agg| agg.report(@output) }
       
       @source.finalize
     end

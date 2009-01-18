@@ -50,13 +50,13 @@ module RequestLogAnalyzer::Aggregator
     end
     
     # Prints a short report of what has been inserted into the database
-    def report(output = STDOUT, report_width = 80, color = false)
-      output << "\n"
-      output << green("━" * report_width, color) + "\n"
+    def report(output)
+      output.title('Request database created')
+      
       output <<  "A database file has been created with all parsed request information.\n"
       output <<  "#{@request_count} requests have been added to the database.\n"      
       output <<  "To execute queries on this database, run the following command:\n"
-      output <<  "  $ sqlite3 #{options[:database]}\n"
+      output <<  output.colorize("  $ sqlite3 #{options[:database]}\n", :bold)
       output << "\n"
     end
     

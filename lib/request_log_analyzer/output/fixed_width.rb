@@ -1,5 +1,42 @@
 class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
   
+  module Monochrome
+    def colorize(text, *options)
+      text
+    end
+  end
+  
+  module Color
+    
+    STYLES = { :normal => 0, :bold => 1, :underscore => 4, :blink => 5, :inverse => 7, :concealed => 8 }
+    COLORS = { :black  => 0, :blue => 4, :green => 2, :cyan => 6, :red => 1, :purple => 5, :brown => 3, :white => 7 }
+    
+    def colorize(text, *options)
+    
+      font_style       = ''
+      foreground_color = '0'
+      background_color = ''
+      
+      options.each do |option|
+        if option.kind_of?(Symbol)
+          foreground_color = "3#{COLORS[option]}" if COLORS.include?(option)
+          font_style       = "#{STYLES[option]};" if STYLES.include?(option)          
+        elsif option.kind_of?(Hash)
+          options.each do |key, value|
+            case key
+            when :color;      foreground_color = "3#{COLORS[value]}"  if COLORS.include?(value)
+            when :background; background_color = "4#{COLORS[value]};" if COLORS.include?(value)
+            when :on;         background_color = "4#{COLORS[value]};" if COLORS.include?(value)
+            when :style;      font_style       = "#{STYLES[value]};"  if STYLES.include?(value)
+            end
+          end
+        end
+      end
+      return "\e[#{background_color}#{font_style}#{foreground_color}m#{text}\e[0m"
+    end
+    
+  end
+  
   attr_reader :characters
   
   CHARACTERS = {
@@ -12,6 +49,9 @@ class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
     @options[:width]      ||= 80
     @options[:characters] ||= :utf
     @characters = CHARACTERS[@options[:characters]]
+    
+    color_module = @options[:color] ? Color : Monochrome
+    (class << self; self; end).send(:include, color_module) 
   end
   
   def print(str)
@@ -26,8 +66,12 @@ class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
   
   def title(title)
     puts
-    puts title
-    puts characters[:horizontal_line] * @options[:width]
+    puts colorize(title, :bold, :white)
+    line(:green)
+  end
+    
+  def line(*font)  
+    puts colorize(characters[:horizontal_line] * @options[:width], *font)
   end
     
   def table(*columns, &block)
@@ -49,16 +93,16 @@ class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
       elsif column[:width]
         column[:width]
       elsif column[:min_width]
-        [column[:min_width], col[:actual_width]].max
+        [column[:min_width], column[:actual_width]].max
       elsif column[:max_width]
-        [column[:max_width], col[:actual_width]].min
+        [column[:max_width], column[:actual_width]].min
       else
         column[:actual_width]
       end
     end
      
     if column_widths.include?(nil)
-      width_left = options[:width] - ((columns.length - 1) * 3) - column_widths.compact.inject(0) { |sum, col| sum + col}
+      width_left = options[:width] - ((columns.length - 1) * (style[:cell_separator] ? 3 : 1)) - column_widths.compact.inject(0) { |sum, col| sum + col}
       column_widths[column_widths.index(nil)] = width_left
     end
     
@@ -66,28 +110,40 @@ class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
     if table_has_header?(columns)
       column_titles = []
       columns.each_with_index do |column, index|
+        width = column_widths[index]        
         alignment = (column[:align] == :right ? '' : '-')
-        column_titles.push("%#{alignment}#{column_widths[index]}s" % column[:title].to_s[0...(column_widths[index])])
+        column_titles.push(colorize("%#{alignment}#{width}s" % column[:title].to_s[0...width], :bold))
       end
       
       puts
-      puts column_titles.join(" #{characters[:vertical_line]} ")
-      puts characters[:horizontal_line] * @options[:width]
+      puts column_titles.join(style[:cell_separator] ? " #{characters[:vertical_line]} " : ' ')
+      line(:green)
     end
     
     rows.each do |row|
       row_values = []
-      row.each_with_index do |column, index|
+      columns.each_with_index do |column, index|
         width = column_widths[index]
-        case columns[index][:type]
+        case column[:type]
         when :ratio
-          row_values.push(characters[:block] * (width.to_f * column.to_f).round)
+          if width > 4
+            if column[:treshold] && column[:treshold] < row[index].to_f
+              bar = ''
+              bar << characters[:block] * (width.to_f * column[:treshold]).round 
+              bar << colorize(characters[:block] * (width.to_f * (row[index].to_f - column[:treshold])).round, :red) 
+              row_values.push(bar) 
+            else
+              row_values.push(characters[:block] * (width.to_f * row[index].to_f).round) 
+            end
+          else
+            row_values.push('')
+          end
         else
           alignment = (columns[index][:align] == :right ? '' : '-')        
-          row_values.push("%#{alignment}#{width}s" % column.to_s[0...width])
+          row_values.push("%#{alignment}#{width}s" % row[index].to_s[0...width])
         end
       end
-      puts row_values.join(" #{characters[:vertical_line]} ")      
+      puts row_values.join(style[:cell_separator] ? " #{characters[:vertical_line]} " : ' ')      
     end
   end
   
