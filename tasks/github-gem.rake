@@ -51,6 +51,15 @@ module Rake
             rdoc.rdoc_files.include(@specification.extra_rdoc_files)
             rdoc.rdoc_files.include('lib/**/*.rb')
           end
+          
+          desc "Publish RDoc files for #{@name} to Github"
+          task(:publish => :compile) do
+            sh 'git checkout gh-pages'
+            sh 'cp -rf doc/* .'
+            sh "git commit -am \"Publishing newest RDoc documentation for #{@name}\""
+            sh "git push origin gh-pages"
+            sh "git checkout master"
+          end
         end
       end
     
