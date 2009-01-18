@@ -2,7 +2,7 @@ module RequestLogAnalyzer::Tracker
 
   # Analyze the duration of a specific attribute
   #
-  # Accepts the following options:
+  # Options:
   # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
   # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
   # * <tt>:title</tt> Title do be displayed above the report  
@@ -13,11 +13,11 @@ module RequestLogAnalyzer::Tracker
   # The items in the update request hash are set during the creation of the Duration tracker.
   #
   # Example output:
-  #  Request duration - top 20 by cumulative time   ┃    Hits ┃      Sum. |      Avg.
-  #   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  #  EmployeeController#show.html [GET]             ┃    4742 ┃  4922.56s ┃     1.04s
-  #  EmployeeController#update.html [POST]          ┃    4647 ┃  2731.23s ┃     0.59s
-  #  EmployeeController#index.html [GET]            ┃    5802 ┃  1477.32s ┃     0.25s
+  #  Request duration - top 20 by cumulative time   |    Hits |      Sum. |      Avg.
+  #  ---------------------------------------------------------------------------------
+  #  EmployeeController#show.html [GET]             |    4742 |  4922.56s |     1.04s
+  #  EmployeeController#update.html [POST]          |    4647 |  2731.23s |     0.59s
+  #  EmployeeController#index.html [GET]            |    5802 |  1477.32s |     0.25s
   #  .............
   class Duration < RequestLogAnalyzer::Tracker::Base
     attr_reader :categories

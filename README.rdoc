@@ -10,6 +10,8 @@ Merb to produce a performance report. Its purpose is to find what actions are be
 * Fast
 * MIT licensed
 
+Request log analyzer was designed and built by Willem van Bergen and Bart ten Brinke.
+
 == Installation
 
 Install request-log-analyzer as a Ruby gem:
@@ -36,3 +38,4 @@ For more details and available command line options, see the project's wiki:http
 
 * Project wiki at GitHub: http://wiki.github.com/wvanbergen/request-log-analyzer
 * wvanbergen's blog posts: http://techblog.floorplanner.com/tag/request-log-analyzer
+* bart ten brinke's blog posts: http://movesonrails.com

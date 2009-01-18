@@ -12,7 +12,7 @@ module RequestLogAnalyzer::Tracker
   #
   # Example output:
   #  Requests graph - average per day per hour
-  #   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  #  --------------------------------------------------
   #    7:00 - 330 hits        : ░░░░░░░
   #    8:00 - 704 hits        : ░░░░░░░░░░░░░░░░░
   #    9:00 - 830 hits        : ░░░░░░░░░░░░░░░░░░░░
