@@ -75,6 +75,12 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
       	color: #c75f3e;
       }
       
+      .color_bar {
+        border: 1px solid;
+        height:10px;
+      	background: #CAE8EA;
+      }
+      
       #mytable {
       	width: 700px;
       	padding: 0;
@@ -139,7 +145,7 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
         "<#{tag}#{attributes} />"
       else
         if content.class == Float
-          "<#{tag}#{attributes}><div style=\"border: 1px solid; width:#{(content*200).floor}px\"/></#{tag}>"
+          "<#{tag}#{attributes}><div class='color_bar' style=\"width:#{(content*200).floor}px;\"/></#{tag}>"
         else
           "<#{tag}#{attributes}>#{content}</#{tag}>"
         end
