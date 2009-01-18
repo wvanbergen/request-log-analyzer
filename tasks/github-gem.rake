@@ -30,7 +30,7 @@ module Rake
         task(:build => [:manifest]) { build_task } 
         
         
-        release_dependencies = [:check_clean_master_branch, :version, :build]
+        release_dependencies = [:check_clean_master_branch, :version, :build, :create_tag]
         release_dependencies.push 'doc:publish' if has_rdoc?
         release_dependencies.unshift 'test' if has_tests?
         release_dependencies.unshift 'spec' if has_specs?
@@ -41,7 +41,8 @@ module Rake
         # helper task for releasing
         task(:check_clean_master_branch) { verify_clean_status('master') }
         task(:check_version) { verify_version(ENV['VERSION'] || @specification.version) }
-        task(:version => [:check_version]) { set_gem_version! }        
+        task(:version => [:check_version]) { set_gem_version! }
+        task(:create_tag) { create_version_tag! }
       end
       
       # Register RDoc tasks
@@ -229,13 +230,18 @@ module Rake
       sh "gem uninstall #{name}"
     end    
     
-    def release_task
+    def create_version_tag!
       # commit the gemspec file
       git_commit_file(gemspec_file, "Updated #{gemspec_file} for release of version #{@specification.version}") if git_modified?(gemspec_file)
 
       # create tag and push changes
       git_create_tag("#{@name}-#{@specification.version}", "Tagged version #{@specification.version}")
-      git_push('origin', 'master', [:tags])
+      git_push('origin', 'master', [:tags])     
+    end
+    
+    def release_task
+      puts
+      puts "Released #{@name} - version#{@specification.version}"
     end
   end
 end
