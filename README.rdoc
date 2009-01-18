@@ -5,7 +5,7 @@ Merb to produce a performance report. Its purpose is to find what actions are be
 
 * Analyzes Rails log files (all versions)
 * Can combine multiple files (handy if you are using logrotate)
-* Uses several metrics, including cumulative request time, average request time, process blockers, database and rendering time, HTTP methods and states, Rails action cache statistics, etc.) (Sample output: http://wiki.github.com/wvanbergen/request-log-analyzer/sample-output)
+* Uses several metrics, including cumulative request time, average request time, process blockers, database and rendering time, HTTP methods and statuses, Rails action cache statistics, etc.) (Sample output: http://wiki.github.com/wvanbergen/request-log-analyzer/sample-output)
 * Low memory footprint (server-safe)
 * Fast
 * MIT licensed
@@ -32,11 +32,11 @@ To analyze a log file and produce a performance report, run request-log-analyzer
 
   $ request-log-analyzer log/production.log
 
-For more details and available command line options, see the project's wiki:http://wiki.github.com/wvanbergen/request-log-analyzer/basic-usage
+For more details and available command line options, see the project's wiki: http://wiki.github.com/wvanbergen/request-log-analyzer/basic-usage
 
 == Additional information
 
 * Project wiki at GitHub: http://wiki.github.com/wvanbergen/request-log-analyzer
 * RDoc documentation: http://wvanbergen.github.com/request-log-analyzer
 * wvanbergen's blog posts: http://techblog.floorplanner.com/tag/request-log-analyzer
-* bart ten brinke's blog posts: http://movesonrails.com
+* barttenbrinke's blog posts: http://movesonrails.com/articles/tag/analyzer
