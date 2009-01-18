@@ -41,7 +41,7 @@ module RequestLogAnalyzer::Tracker
   
     def report(output = STDOUT, report_width = 80, color = false)
       output.title(options[:title]) if options[:title]
-    
+      
       if @categories.empty?
         output << "None found.\n" 
       else
@@ -49,10 +49,10 @@ module RequestLogAnalyzer::Tracker
         total_hits        = sorted_categories.inject(0) { |carry, item| carry + item[1] }
         sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
 
-        output.table({:align => :left}, { :align => :right}, {}) do |rows|
+        output.table({:align => :left}, {:align => :right }, {:align => :right}, {:type => :ratio, :width => :rest}) do |rows|
           
           sorted_categories.each do |(cat, count)|
-            rows << [cat, count]
+            rows << [cat, "#{count} hits", '%0.1f%%' % ((count.to_f / total_hits.to_f) * 100.0), (count.to_f / total_hits.to_f)]
           end
           
         end
