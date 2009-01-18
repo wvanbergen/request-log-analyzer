@@ -74,6 +74,7 @@ rescue CommandLine::Error => e
   puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
   puts "  --debug                    Print debug information while parsing."
   puts "  --file <filename>          Output to file."
+  puts "  --output <format>          Output format. Supports 'HTML' and 'FixedWidth' (default)"  
   puts 
   puts "Examples:"
   puts "  request-log-analyzer development.log"
