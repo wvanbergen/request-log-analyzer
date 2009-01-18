@@ -10,9 +10,14 @@ describe RequestLogAnalyzer::Controller do
   # end
 
   it "should call the aggregators when run" do
+    
+    mock_output = mock('output')
+    mock_output.should_receive(:header)
+    mock_output.should_receive(:footer)    
+    
     file_format = RequestLogAnalyzer::FileFormat.load(:rails)
     source      = RequestLogAnalyzer::Source::LogFile.new(file_format, :source_files => log_fixture(:rails_1x))  
-    controller  = RequestLogAnalyzer::Controller.new(source)
+    controller  = RequestLogAnalyzer::Controller.new(source, :output => mock_output)
     
     mock_aggregator = mock('aggregator')
     mock_aggregator.should_receive(:prepare).once.ordered
@@ -26,7 +31,6 @@ describe RequestLogAnalyzer::Controller do
     another_mock_aggregator.should_receive(:finalize).once.ordered  
     another_mock_aggregator.should_receive(:report).once.ordered  
 
-    
     controller.aggregators << mock_aggregator << another_mock_aggregator
     controller.run!
   end
