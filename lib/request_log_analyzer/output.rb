@@ -23,6 +23,12 @@ module RequestLogAnalyzer
       @style = old_style
     end    
     
+    def header
+    end
+    
+    def footer
+    end
+    
     protected
     
     def table_has_header?(columns)

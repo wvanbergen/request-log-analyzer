@@ -73,6 +73,14 @@ class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
   def line(*font)  
     puts colorize(characters[:horizontal_line] * @options[:width], *font)
   end
+  
+  def link(text, url)
+    if url.nil?
+      colorize(text, :blue, :bold)
+    else
+      "#{text} (#{colorize(url, :blue, :bold)})"
+    end
+  end
     
   def table(*columns, &block)
     

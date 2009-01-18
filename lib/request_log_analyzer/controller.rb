@@ -35,11 +35,12 @@ module RequestLogAnalyzer
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
 
+      output_class = RequestLogAnalyzer::Output::const_get(arguments[:output])
       if arguments[:file]
         output_file = File.new(arguments[:file], "w+")
-        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => 80, :color => false, :characters => :ascii)
+        options[:output] = output_class.new(output_file, :width => 80, :color => false, :characters => :ascii)
       else
-        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => arguments[:report_width].to_i, 
+        options[:output] = output_class.new(STDOUT, :width => arguments[:report_width].to_i, 
             :color => !arguments[:boring], :characters => (arguments[:boring] ? :ascii : :utf))
       end
                 
@@ -177,6 +178,8 @@ module RequestLogAnalyzer
     # 6. Finalize Source
     def run!
       
+
+      
       @filters.each { |filter| filter.prepare }
       @aggregators.each { |agg| agg.prepare }
       
@@ -190,12 +193,15 @@ module RequestLogAnalyzer
         puts "Caught interrupt! Stopped parsing."
       end
 
-      puts "\n"
-      
       @aggregators.each { |agg| agg.finalize }
+
+      @output.header
       @aggregators.each { |agg| agg.report(@output) }
-      
+      @output.footer
+            
       @source.finalize
+      
+
     end
     
   end
