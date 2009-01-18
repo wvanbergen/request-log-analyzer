@@ -37,5 +37,6 @@ For more details and available command line options, see the project's wiki:http
 == Additional information
 
 * Project wiki at GitHub: http://wiki.github.com/wvanbergen/request-log-analyzer
+* RDoc documentation: http://wvanbergen.github.com/request-log-analyzer
 * wvanbergen's blog posts: http://techblog.floorplanner.com/tag/request-log-analyzer
 * bart ten brinke's blog posts: http://movesonrails.com
