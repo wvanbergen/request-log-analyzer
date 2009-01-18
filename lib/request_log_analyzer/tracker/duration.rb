@@ -42,8 +42,10 @@ module RequestLogAnalyzer::Tracker
   
     def report_table(output, amount = 10, options = {}, &block)
       
+      output.title(options[:title])
+      
       top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
-      output.table({:title => options[:title]}, {:title => 'Hits', :align => :right, :min_width => 4}, 
+      output.table({:title => 'Action'}, {:title => 'Hits', :align => :right, :min_width => 4}, 
             {:title => 'Cumulative', :align => :right, :min_width => 10}, {:title => 'Average', :align => :right, :min_width => 8}) do |rows|
         
         top_categories.each do |(cat, info)|

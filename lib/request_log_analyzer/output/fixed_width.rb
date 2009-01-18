@@ -123,7 +123,6 @@ class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
         column_titles.push(colorize("%#{alignment}#{width}s" % column[:title].to_s[0...width], :bold))
       end
       
-      puts
       puts column_titles.join(style[:cell_separator] ? " #{characters[:vertical_line]} " : ' ')
       line(:green)
     end

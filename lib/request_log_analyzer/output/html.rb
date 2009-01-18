@@ -31,10 +31,6 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
     rows = Array.new
     yield(rows)
     
-    if table_has_header?(columns)
-      @io << tag(:h2, columns.first[:title])
-    end
-    
     @io << tag(:table, {:id => 'mytable', :cellspacing => 0}) do |content|
       if table_has_header?(columns)
         content << tag(:tr) do
