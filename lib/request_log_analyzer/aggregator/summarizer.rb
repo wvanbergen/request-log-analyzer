@@ -96,12 +96,11 @@ module RequestLogAnalyzer::Aggregator
     def report_footer(output)
       if has_serious_warnings?     
         
-        output.puts 
-        output.line(:green)
+        output.title("Parse warnings")
         
         output.puts "Multiple warnings were encountered during parsing. Possibly, your logging "
         output.puts "is not setup correctly. Visit this website for logging configuration tips:"
-        output.puts output.colorize("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging", :blue, :bold)
+        output.puts output.link("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging")
         output.puts
       end
     end

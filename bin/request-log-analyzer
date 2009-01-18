@@ -49,6 +49,7 @@ begin
     command_line.option(:before)    
     
     command_line.switch(:boring, :b)
+    command_line.option(:output, :alias => :o, :default => 'FixedWidth')    
     command_line.option(:report_width, :default => terminal_width - 1)
     
     command_line.switch(:debug)
