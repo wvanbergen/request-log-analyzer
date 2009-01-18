@@ -1,9 +1,9 @@
 class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
-
+  
   # def initialize(io, options = {})
   #   super(io, options)
   # end
-
+  
   def print(str)
     @io << str
   end
@@ -120,9 +120,11 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
       ', :type => "text/css")
     end
     @io << '<body>'
+    @io << tag(:h1, 'Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 1.0')
   end
   
   def footer
+    @io << tag(:h2, 'Thanks for using request-log-analyzer')
     @io << "</body></html>\n"
   end
   
