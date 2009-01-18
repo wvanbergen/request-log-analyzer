@@ -14,11 +14,11 @@ module RequestLogAnalyzer::Tracker
   #
   # Example output:
   #  HTTP methods
-  #   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  #  GET    ┃  22248 hits (46.2%) ┃░░░░░░░░░░░░░░░░░
-  #  PUT    ┃  13685 hits (28.4%) ┃░░░░░░░░░░░
-  #  POST   ┃  11662 hits (24.2%) ┃░░░░░░░░░
-  #  DELETE ┃    512 hits (1.1%)  ┃
+  #  ----------------------------------------------------------------------
+  #  GET    |  22248 hits (46.2%) |░░░░░░░░░░░░░░░░░
+  #  PUT    |  13685 hits (28.4%) |░░░░░░░░░░░
+  #  POST   |  11662 hits (24.2%) |░░░░░░░░░
+  #  DELETE |    512 hits (1.1%)  |
   class Category < RequestLogAnalyzer::Tracker::Base
   
     attr_reader :categories
