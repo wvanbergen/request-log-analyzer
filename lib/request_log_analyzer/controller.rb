@@ -34,13 +34,13 @@ module RequestLogAnalyzer
 
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
-      options[:colorize] = false
 
       if arguments[:file]
         output_file = File.new(arguments[:file], "w+")
         options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => 80, :color => false, :characters => :ascii)
       else
-        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => arguments[:report_width].to_i, :color => !arguments[:boring])
+        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => arguments[:report_width].to_i, 
+            :color => !arguments[:boring], :characters => (arguments[:boring] ? :ascii : :utf))
       end
                 
       # Create the controller with the correct file format
