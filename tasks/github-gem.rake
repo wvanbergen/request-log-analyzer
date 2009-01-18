@@ -29,8 +29,14 @@ module Rake
         desc "Releases a new version of #{@name}"
         task(:build => [:manifest]) { build_task } 
         
+        
+        release_dependencies = [:check_clean_master_branch, :version, :build]
+        release_dependencies.push 'doc:publish' if has_rdoc?
+        release_dependencies.unshift 'test' if has_tests?
+        release_dependencies.unshift 'spec' if has_specs?
+                
         desc "Releases a new version of #{@name}"
-        task(:release => [:check_clean_master_branch, :version, :build]) { release_task } 
+        task(:release => release_dependencies) { release_task } 
         
         # helper task for releasing
         task(:check_clean_master_branch) { verify_clean_status('master') }
@@ -39,7 +45,7 @@ module Rake
       end
       
       # Register RDoc tasks
-      if @specification.has_rdoc
+      if has_rdoc?
         require 'rake/rdoctask'
         
         namespace(:doc) do 
@@ -65,7 +71,7 @@ module Rake
       end
     
       # Setup :spec task if RSpec files exist
-      if Dir['spec/**/*_spec.rb'].any?
+      if has_specs?
         require 'spec/rake/spectask'
 
         desc "Run all specs for #{@name}"
@@ -75,7 +81,7 @@ module Rake
       end
       
       # Setup :test task if unit test files exist
-      if Dir['test/**/*_test.rb'].any?
+      if has_tests?
         require 'rake/testtask'
 
         desc "Run all unit tests for #{@name}"
@@ -88,6 +94,18 @@ module Rake
     end
     
     protected 
+
+    def has_rdoc?
+      @specification.has_rdoc
+    end
+
+    def has_specs?
+      Dir['spec/**/*_spec.rb'].any?
+    end
+    
+    def has_tests?
+      Dir['test/**/*_test.rb'].any?
+    end
 
     def reload_gemspec!
       raise "No gemspec file found!" if gemspec_file.nil?      
