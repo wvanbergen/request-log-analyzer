@@ -9,6 +9,7 @@ module RequestLogAnalyzer::Filter
    
     attr_reader :field, :value, :mode
    
+    # Setup mode, field and value.
     def prepare
       @mode = (@options[:mode] || :accept).to_sym
       @field = @options[:field].to_sym
@@ -21,6 +22,10 @@ module RequestLogAnalyzer::Filter
       end
     end
     
+    # Keep request if @mode == :select and request has the field and value.
+    # Drop request if @mode == :reject and request has the field and value.
+    # Returns nil otherwise.
+    # <tt>request</tt> Request Object
     def filter(request)
       return nil unless request
       
