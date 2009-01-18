@@ -11,7 +11,7 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
   alias :<< :print
 
   def puts(str = '')
-    @io << str << "<br />\n"
+    @io << str << "<br/>\n"
   end
 
   def title(title)
@@ -31,16 +31,26 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
     rows = Array.new
     yield(rows)
     
-    @io << tag(:table) do |content|
+    if table_has_header?(columns)
+      @io << tag(:h2, columns.first[:title])
+    end
+    
+    @io << tag(:table, {:id => 'mytable', :cellspacing => 0}) do |content|
       if table_has_header?(columns)
         content << tag(:tr) do
           columns.map { |col| tag(:th, col[:title]) }.join("\n")
         end
       end
       
+      odd = false
       rows.each do |row|
+        odd = !odd
         content << tag(:tr) do
-          row.map { |cell| tag(:td, cell) }.join("\n") 
+          if odd
+            row.map { |cell| tag(:td, cell, :class => 'alt') }.join("\n") 
+          else
+            row.map { |cell| tag(:td, cell) }.join("\n") 
+          end
         end
       end
     end
@@ -51,6 +61,61 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
     @io << "<html>"
     @io << tag(:head) do |headers|
       headers << tag(:title, 'Request-log-analyzer report')
+      headers << tag(:style, '
+      body {
+      	font: normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+      	color: #4f6b72;
+      	background: #E6EAE9;
+      	padding-left:20px;
+      	padding-top:20px;
+      	padding-bottom:20px;
+      }
+
+      a {
+      	color: #c75f3e;
+      }
+      
+      #mytable {
+      	width: 700px;
+      	padding: 0;
+      	margin: 0;
+      	padding-bottom:10px;
+      }
+
+      caption {
+      	padding: 0 0 5px 0;
+      	width: 700px;	 
+      	font: italic 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+      	text-align: right;
+      }
+
+      th {
+      	font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+      	color: #4f6b72;
+      	border-right: 1px solid #C1DAD7;
+      	border-bottom: 1px solid #C1DAD7;
+      	border-top: 1px solid #C1DAD7;
+      	letter-spacing: 2px;
+      	text-transform: uppercase;
+      	text-align: left;
+      	padding: 6px 6px 6px 12px;
+      	background: #CAE8EA url(images/bg_header.jpg) no-repeat;
+      }
+
+      td {
+      	font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+      	border-right: 1px solid #C1DAD7;
+      	border-bottom: 1px solid #C1DAD7;
+      	background: #fff;
+      	padding: 6px 6px 6px 12px;
+      	color: #4f6b72;
+      }
+
+      td.alt {
+      	background: #F5FAFA;
+      	color: #797268;
+      }
+      ', :type => "text/css")
     end
     @io << '<body>'
   end
@@ -73,7 +138,11 @@ class RequestLogAnalyzer::Output::HTML < RequestLogAnalyzer::Output
       if content.nil?
         "<#{tag}#{attributes} />"
       else
-        "<#{tag}#{attributes}>#{content}</#{tag}>"
+        if content.class == Float
+          "<#{tag}#{attributes}><div style=\"border: 1px solid; width:#{(content*200).floor}px\"/></#{tag}>"
+        else
+          "<#{tag}#{attributes}>#{content}</#{tag}>"
+        end
       end
     end
   end  
