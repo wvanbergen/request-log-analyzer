@@ -30,16 +30,17 @@ module RequestLogAnalyzer
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     # <rr>report_with</tt> Width of the report. Defaults to 80.
     def self.build(arguments, report_width = 80)
-            
-      options = { :report_width => arguments[:report_width].to_i, :output => STDOUT}
+      options = { :report_width => arguments[:report_width].to_i}
 
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
       options[:colorize] = !arguments[:boring]
 
       if arguments[:file]
-        options[:output] = File.new(arguments[:file], "w+")
-        options[:colorize] = false
+        output_file = File.new(arguments[:file], "w+")
+        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => 80, :color => false, :characters => :ascii)
+      else
+        options[:output] = RequestLogAnalyzer::Output::FixedWidth.new(STDOUT, :width => arguments[:report_width].to_i, :color => false)
       end
                 
       # Create the controller with the correct file format
