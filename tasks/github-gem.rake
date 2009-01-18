@@ -55,6 +55,7 @@ module Rake
           desc "Publish RDoc files for #{@name} to Github"
           task(:publish => :compile) do
             sh 'git checkout gh-pages'
+            sh 'git pull origin gh-pages'
             sh 'cp -rf doc/* .'
             sh "git commit -am \"Publishing newest RDoc documentation for #{@name}\""
             sh "git push origin gh-pages"
