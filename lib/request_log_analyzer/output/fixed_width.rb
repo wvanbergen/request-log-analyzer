@@ -74,7 +74,7 @@ class RequestLogAnalyzer::Output::FixedWidth < RequestLogAnalyzer::Output
     puts colorize(characters[:horizontal_line] * @options[:width], *font)
   end
   
-  def link(text, url)
+  def link(text, url = nil)
     if url.nil?
       colorize(text, :blue, :bold)
     else
