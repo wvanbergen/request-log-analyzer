@@ -116,7 +116,7 @@ else
   puts "Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 1.0\n\n"  
   
   # Run the request_log_analyzer!
-  RequestLogAnalyzer::Controller.build(arguments, terminal_width).run!
+  RequestLogAnalyzer::Controller.build(arguments).run!
 
   puts 
   puts "Thanks for using request-log-analyzer"

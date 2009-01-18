@@ -29,8 +29,8 @@ module RequestLogAnalyzer
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     # <rr>report_with</tt> Width of the report. Defaults to 80.
-    def self.build(arguments, report_width = 80)
-      options = { :report_width => arguments[:report_width].to_i}
+    def self.build(arguments)
+      options = { }
 
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
