@@ -241,7 +241,8 @@ module Rake
     
     def release_task
       puts
-      puts "Released #{@name} - version#{@specification.version}"
+      puts '------------------------------------------------------------'
+      puts "Released #{@name} - version #{@specification.version}"
     end
   end
 end
