@@ -122,11 +122,13 @@ module RequestLogAnalyzer::Output
         ', :type => "text/css")
       end
       @io << '<body>'
-      @io << tag(:h1, 'Request log analyzer, by Willem van Bergen and Bart ten Brinke - Version 1.0')
+      @io << tag(:h1, 'Request-log-analyzer summary report')
+      @io << tag(:p, 'Version 1.1 - written by Willem van Bergen and Bart ten Brinke')
     end
   
     def footer
-      @io << tag(:h2, 'Thanks for using request-log-analyzer')
+      @io << tag(:hr) << tag(:h2, 'Thanks for using request-log-analyzer')
+      @io << tag(:p, 'Please visit the ' + link('Request-log-analyzer website', 'http://github.com/wvanbergen/request-log-analyzer'))
       @io << "</body></html>\n"
     end
   
