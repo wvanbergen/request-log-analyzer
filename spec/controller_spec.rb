@@ -12,8 +12,9 @@ describe RequestLogAnalyzer::Controller do
   it "should call the aggregators when run" do
     
     mock_output = mock('output')
+    mock_output.stub!(:io).and_return($stdout)
     mock_output.should_receive(:header)
-    mock_output.should_receive(:footer)    
+    mock_output.should_receive(:footer)
     
     file_format = RequestLogAnalyzer::FileFormat.load(:rails)
     source      = RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => log_fixture(:rails_1x))  
