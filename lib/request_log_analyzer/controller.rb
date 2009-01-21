@@ -191,7 +191,12 @@ module RequestLogAnalyzer
             
       @source.finalize
       
-
+      if @output.io.kind_of?(File)
+        puts
+        puts "Report written to: " + File.expand_path(@output.io.path)
+        puts "Thanks for using request-log-analyzer!"
+        @output.io.close
+      end
     end
     
   end

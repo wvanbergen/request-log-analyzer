@@ -84,6 +84,11 @@ module RequestLogAnalyzer::Output
       end
     end
     
+    def footer
+      puts
+      puts "Thanks for using request-log-analyzer!"
+    end
+    
     def table(*columns, &block)
     
       rows = Array.new
