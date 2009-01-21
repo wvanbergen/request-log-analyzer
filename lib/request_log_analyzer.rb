@@ -2,6 +2,8 @@ require 'date'
 require File.dirname(__FILE__) + '/cli/progressbar'
 
 module RequestLogAnalyzer
+   
+  VERSION = '1.1'
     
   # Function to implement 
   def self.load_default_class_file(base, const)
