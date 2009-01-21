@@ -133,14 +133,14 @@ module RequestLogAnalyzer::Source
           if options[:assume_correct_order]
             @parsed_requests += 1
             handle_request(@current_request, &block) #yield @current_request
-            @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)
+            @current_request = @file_format.create_request(request_data)
           else
             @skipped_lines += 1
             warn(:unclosed_request, "Encountered header line, but previous request was not closed!")
             @current_request = nil # remove all data that was parsed, skip next request as well.
           end
         else
-          @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)              
+          @current_request = @file_format.create_request(request_data)              
         end
       else
         unless @current_request.nil?

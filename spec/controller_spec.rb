@@ -21,13 +21,13 @@ describe RequestLogAnalyzer::Controller do
     
     mock_aggregator = mock('aggregator')
     mock_aggregator.should_receive(:prepare).once.ordered
-    mock_aggregator.should_receive(:aggregate).with(an_instance_of(RequestLogAnalyzer::Request)).at_least(:twice).ordered
+    mock_aggregator.should_receive(:aggregate).with(an_instance_of(file_format.class::Request)).at_least(:twice).ordered
     mock_aggregator.should_receive(:finalize).once.ordered
     mock_aggregator.should_receive(:report).once.ordered
     
     another_mock_aggregator = mock('another aggregator')
     another_mock_aggregator.should_receive(:prepare).once.ordered
-    another_mock_aggregator.should_receive(:aggregate).with(an_instance_of(RequestLogAnalyzer::Request)).at_least(:twice).ordered
+    another_mock_aggregator.should_receive(:aggregate).with(an_instance_of(file_format.class::Request)).at_least(:twice).ordered
     another_mock_aggregator.should_receive(:finalize).once.ordered  
     another_mock_aggregator.should_receive(:report).once.ordered  
 

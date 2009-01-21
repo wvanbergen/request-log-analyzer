@@ -23,9 +23,9 @@ module RequestLogAnalyzerSpecHelper
   
   def request(fields, format = spec_format)
     if fields.kind_of?(Array)
-      RequestLogAnalyzer::Request.create(format, *fields)
+      format.create_request(*fields)
     else
-      RequestLogAnalyzer::Request.create(format, fields)
+      format.create_request(fields)      
     end
   end
   

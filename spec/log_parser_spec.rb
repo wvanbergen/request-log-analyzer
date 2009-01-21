@@ -16,13 +16,13 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
   end
   
   it "should parse more lines than requests" do
-    @log_parser.should_receive(:handle_request).with(an_instance_of(RequestLogAnalyzer::Request)).twice
+    @log_parser.should_receive(:handle_request).with(an_instance_of(SpecFormat::Request)).twice
     @log_parser.parse_file(log_fixture(:test_language_combined))
     @log_parser.parsed_lines.should > 2    
   end
   
   it "should parse requests spanned over multiple files" do
-    @log_parser.should_receive(:handle_request).with(an_instance_of(RequestLogAnalyzer::Request)).once
+    @log_parser.should_receive(:handle_request).with(an_instance_of(SpecFormat::Request)).once
     @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)])
   end
   

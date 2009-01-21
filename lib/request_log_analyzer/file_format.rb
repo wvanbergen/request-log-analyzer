@@ -1,9 +1,9 @@
 module RequestLogAnalyzer::FileFormat
   
-  # Loader for built-in file-formats using const_missing
+  
   def self.const_missing(const)
     RequestLogAnalyzer::load_default_class_file(self, const)
-  end
+  end  
   
   # Loads a FileFormat::Base subclass instance.
   # You can provide:
@@ -15,9 +15,10 @@ module RequestLogAnalyzer::FileFormat
     klass = nil
     if file_format.kind_of?(RequestLogAnalyzer::FileFormat::Base)
       # this already is a file format! return itself
-      return file_format
+      return @current_file_format = file_format
 
     elsif file_format.kind_of?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
+      # a usable class is provided. Use this format class.
       klass = file_format
 
     elsif file_format.kind_of?(String) && File.exist?(file_format)
@@ -31,7 +32,7 @@ module RequestLogAnalyzer::FileFormat
     end
     
     raise if klass.nil?
-    klass.new # return an instance of the class
+    @current_file_format = klass.new # return an instance of the class
   end  
   
   # Makes classes aware of a file format by registering the file_format variable
@@ -57,12 +58,20 @@ module RequestLogAnalyzer::FileFormat
     def self.inherited(subclass)
        subclass.instance_variable_set(:@line_definer, RequestLogAnalyzer::LineDefinition::Definer.new)
        subclass.class_eval { class << self; attr_accessor :line_definer; end } 
-       subclass.class_eval { class << self; attr_accessor :report_definer; end }       
+       subclass.class_eval { class << self; attr_accessor :report_definer; end }
+       
+       unless subclass.const_defined?('Request')
+         subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request))         
+       end
     end    
     
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
       @line_definer.send(name, &block)
+    end
+    
+    def create_request(*hashes)
+      self.class.const_get('Request').create(self, *hashes)
     end
     
     # Specifies multiple line definitions at once using a block

@@ -72,12 +72,9 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
     @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => TEST_DATABASE_FILE)
     @database_inserter.prepare
         
-    @incomplete_request = RequestLogAnalyzer::Request.create(spec_format, {:line_type => :first, :request_no => 564})
-    @completed_request = RequestLogAnalyzer::Request.create(spec_format, 
-                          {:line_type => :first, :request_no  => 564},
-                          {:line_type => :test, :test_capture => "awesome"},
-                          {:line_type => :test, :test_capture => "indeed"},                                                    
-                          {:line_type => :last, :request_no   => 564})    
+    @incomplete_request = spec_format.create_request( {:line_type => :first, :request_no => 564})
+    @completed_request = spec_format.create_request( {:line_type => :first, :request_no  => 564}, {:line_type => :test, :test_capture => "awesome"},
+                          {:line_type => :test, :test_capture => "indeed"}, {:line_type => :last, :request_no   => 564})    
   end
   
   after(:each) do

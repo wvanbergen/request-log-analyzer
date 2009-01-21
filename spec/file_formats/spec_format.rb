@@ -23,4 +23,5 @@ class SpecFormat < RequestLogAnalyzer::FileFormat::Base
   report do |analyze|
     analyze.category :test_capture, :title => 'What is testing exactly?'
   end
+  
 end
