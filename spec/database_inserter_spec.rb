@@ -8,7 +8,7 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    log_parser = RequestLogAnalyzer::LogParser.new(spec_format)
+    log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format)
     @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => TEST_DATABASE_FILE)
   end
   
@@ -68,7 +68,7 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
   include RequestLogAnalyzerSpecHelper  
   
   before(:each) do
-    log_parser = RequestLogAnalyzer::LogParser.new(spec_format)    
+    log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format)    
     @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => TEST_DATABASE_FILE)
     @database_inserter.prepare
         

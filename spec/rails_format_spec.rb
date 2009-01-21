@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe RequestLogAnalyzer::LogParser, "Rails" do
+describe RequestLogAnalyzer::Source::LogParser, "Rails" do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails))
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails))
   end
   
   it "should have a valid language definitions" do

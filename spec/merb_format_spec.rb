@@ -1,10 +1,10 @@
 # require File.dirname(__FILE__) + '/spec_helper'
 # 
-# describe RequestLogAnalyzer::LogParser, "Merb" do
+# describe RequestLogAnalyzer::Source::LogParser, "Merb" do
 #   include RequestLogAnalyzerSpecHelper
 #   
 #   before(:each) do
-#     @log_parser = RequestLogAnalyzer::LogParser.new(:merb)
+#     @log_parser = RequestLogAnalyzer::Source::LogParser.new(:merb)
 #   end
 #   
 #   it "should have a valid language definitions" do

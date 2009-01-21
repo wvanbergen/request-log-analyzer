@@ -23,7 +23,6 @@ end
 require File.dirname(__FILE__) + '/request_log_analyzer/file_format'
 require File.dirname(__FILE__) + '/request_log_analyzer/line_definition'
 require File.dirname(__FILE__) + '/request_log_analyzer/request'
-require File.dirname(__FILE__) + '/request_log_analyzer/log_parser'
 require File.dirname(__FILE__) + '/request_log_analyzer/aggregator'
 require File.dirname(__FILE__) + '/request_log_analyzer/filter'
 require File.dirname(__FILE__) + '/request_log_analyzer/controller'

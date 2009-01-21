@@ -16,7 +16,7 @@ describe RequestLogAnalyzer::Controller do
     mock_output.should_receive(:footer)    
     
     file_format = RequestLogAnalyzer::FileFormat.load(:rails)
-    source      = RequestLogAnalyzer::Source::LogFile.new(file_format, :source_files => log_fixture(:rails_1x))  
+    source      = RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => log_fixture(:rails_1x))  
     controller  = RequestLogAnalyzer::Controller.new(source, :output => mock_output)
     
     mock_aggregator = mock('aggregator')

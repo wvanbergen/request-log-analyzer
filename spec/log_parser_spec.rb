@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe RequestLogAnalyzer::LogParser, :requests do
+describe RequestLogAnalyzer::Source::LogParser, :requests do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::LogParser.new(spec_format)
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format)
   end
   
   it "should have multiple line definitions" do
@@ -47,11 +47,11 @@ describe RequestLogAnalyzer::LogParser, :requests do
   
 end
 
-describe RequestLogAnalyzer::LogParser, :warnings do
+describe RequestLogAnalyzer::Source::LogParser, :warnings do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::LogParser.new(spec_format)
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format)
   end
     
   it "should warn about teaser matching problems" do

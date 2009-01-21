@@ -62,7 +62,7 @@ module RequestLogAnalyzer
         options.store(:source_files, arguments.parameters)
       end
       
-      controller = Controller.new(RequestLogAnalyzer::Source::LogFile.new(file_format, options), options)
+      controller = Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format, options), options)
 
       options[:assume_correct_order] = arguments[:assume_correct_order]
       
@@ -174,7 +174,7 @@ module RequestLogAnalyzer
       @aggregators.each { |agg| agg.prepare }
       
       begin
-        @source.requests do |request|
+        @source.each_request do |request|
           @filters.each { |filter| request = filter.filter(request) }
           @aggregators.each { |agg| agg.aggregate(request) } if request
         end

@@ -1,4 +1,4 @@
-module RequestLogAnalyzer
+module RequestLogAnalyzer::Source
   
   # The LogParser class reads log data from a given source and uses a file format definition
   # to parse all relevent information about requests from the file. A FileFormat module should 
@@ -9,25 +9,10 @@ module RequestLogAnalyzer
   # the log file simultaneously by different mongrel processes. This problem is detected by the 
   # parser, but the requests that are mixed up cannot be parsed. It will emit warnings when this 
   # occurs.
-  class LogParser
-    
-    include RequestLogAnalyzer::FileFormat::Awareness
-    
-    # A hash of options
-    attr_reader :options
-    
-    # The current Request object that is being parsed
-    attr_reader :current_request
-    
-    # The total number of parsed lines
-    attr_reader :parsed_lines
-    
-    # The total number of parsed requests.
-    attr_reader :parsed_requests
-    
-    # The number of skipped requests because of date constraints
-    attr_reader :skipped_requests
-    
+  class LogParser < Base
+
+    attr_reader :source_files
+
     # Initializes the parser instance.
     # It will apply the language specific FileFormat module to this instance. It will use the line
     # definitions in this module to parse any input.
@@ -36,20 +21,36 @@ module RequestLogAnalyzer
       @options          = options
       @parsed_lines     = 0
       @parsed_requests  = 0
-      @skipped_requests = 0      
-      
-      @current_io = nil
-      
+      @skipped_lines    = 0
+      @skipped_requests = 0
+      @current_io       = nil
+      @source_files     = options[:source_files]
+
       # install the file format module (see RequestLogAnalyzer::FileFormat)
       # and register all the line definitions to the parser
       self.register_file_format(format)
     end
     
+    def each_request(options = {}, &block)
+      
+      case @source_files
+      when IO;     
+        puts "Parsing from the standard input. Press CTRL+C to finish."
+        parse_stream(@source_files, options, &block) 
+      when String
+        parse_file(@source_files, options, &block) 
+      when Array
+        parse_files(@source_files, options, &block) 
+      else
+        raise "Unknown source provided"
+      end
+    end
+
     # Parses a list of consequent files of the same format
     def parse_files(files, options = {}, &block)
       files.each { |file| parse_file(file, options, &block) }
     end
-    
+
     # Parses a file. 
     # Creates an IO stream for the provided file, and sends it to parse_io for further handling
     def parse_file(file, options = {}, &block)
@@ -57,7 +58,7 @@ module RequestLogAnalyzer
       File.open(file, 'r') { |f| parse_io(f, options, &block) }
       @progress_handler.call(:finished, file) if @progress_handler
     end
-    
+
     def parse_stream(stream, options = {}, &block)
       parse_io(stream, options, &block)
     end
@@ -74,12 +75,12 @@ module RequestLogAnalyzer
       # check whether all provided line types are valid
       unknown = line_types.reject { |line_type| file_format.line_definitions.has_key?(line_type) }
       raise "Unknown line types: #{unknown.join(', ')}" unless unknown.empty?
-      
+
       @current_io = io
       @current_io.each_line do |line|
-        
+
         @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
-        
+
         request_data = nil
         line_types.each do |line_type|
           line_type_definition = file_format.line_definitions[line_type]
@@ -91,31 +92,31 @@ module RequestLogAnalyzer
           update_current_request(request_data, &block)
         end
       end
-      
+
       warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
-  
+
       @current_io = nil
     end
-    
+
     # Add a block to this method to install a progress handler while parsing
     def progress=(proc)
       @progress_handler = proc
     end
-    
+
     # Add a block to this method to install a warning handler while parsing
     def warning=(proc)
       @warning_handler = proc
     end
-    
+
     # This method is called by the parser if it encounteres any problems.
     # It will call the warning handler. The default controller will pass all warnings to every
     # aggregator that is registered and running
     def warn(type, message)
       @warning_handler.call(type, message, @current_io.lineno) if @warning_handler
     end
-    
+
     protected
-    
+
     # Combines the different lines of a request into a single Request object. It will start a 
     # new request when a header line is encountered en will emit the request when a footer line 
     # is encountered.
@@ -130,9 +131,11 @@ module RequestLogAnalyzer
       if header_line?(request_data)
         unless @current_request.nil?
           if options[:assume_correct_order]
-            handle_request(@current_request, &block)            
+            @parsed_requests += 1
+            handle_request(@current_request, &block) #yield @current_request
             @current_request = RequestLogAnalyzer::Request.create(@file_format, request_data)
           else
+            @skipped_lines += 1
             warn(:unclosed_request, "Encountered header line, but previous request was not closed!")
             @current_request = nil # remove all data that was parsed, skip next request as well.
           end
@@ -143,10 +146,12 @@ module RequestLogAnalyzer
         unless @current_request.nil?
           @current_request << request_data
           if footer_line?(request_data)
-            handle_request(@current_request, &block)
+            @parsed_requests += 1
+            handle_request(@current_request, &block) # yield @current_request
             @current_request = nil 
           end
         else
+          @skipped_lines += 1
           warn(:no_current_request, "Parsebale line found outside of a request!")
         end
       end
@@ -157,9 +162,9 @@ module RequestLogAnalyzer
     def handle_request(request, &block)
       @parsed_requests += 1
       accepted = block_given? ? yield(request) : true
-      @skipped_requests += 1 if !accepted
-    end
-    
+      @skipped_requests += 1 if not accepted
+    end    
+
     # Checks whether a given line hash is a header line.
     def header_line?(hash)
       file_format.line_definitions[hash[:line_type]].header
@@ -170,4 +175,5 @@ module RequestLogAnalyzer
       file_format.line_definitions[hash[:line_type]].footer  
     end 
   end
+
 end
