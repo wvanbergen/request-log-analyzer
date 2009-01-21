@@ -71,7 +71,7 @@ module RequestLogAnalyzer::FileFormat
     end
     
     def create_request(*hashes)
-      self.class.const_get('Request').create(self, *hashes)
+      self.class::Request.create(self, *hashes)
     end
     
     # Specifies multiple line definitions at once using a block

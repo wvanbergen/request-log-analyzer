@@ -32,10 +32,12 @@ module RequestLogAnalyzer
      
     # Adds another line to the request.
     # The line should be provides as a hash of the fields parsed from the line.
-    def << (request_info_hash)
+    def add_parsed_line (request_info_hash)
       @lines << request_info_hash
       @attributes = request_info_hash.merge(@attributes)
     end
+    
+    alias :<< :add_parsed_line
     
     # Checks whether the given line type was parsed from the log file for this request
     def has_line_type?(line_type)

@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::Request, :incomplete_request do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @incomplete_request = RequestLogAnalyzer::Request.new(spec_format)
+    @incomplete_request = spec_format.create_request
     @incomplete_request << { :line_type => :test, :lineno => 1, :test_capture => 'awesome!' }
   end
   
@@ -37,7 +37,7 @@ describe RequestLogAnalyzer::Request, :completed_request do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @completed_request = RequestLogAnalyzer::Request.new(spec_format)
+    @completed_request = spec_format.create_request
     @completed_request << { :line_type => :first, :lineno =>  1, :name => 'first line!' }    
     @completed_request << { :line_type => :test,  :lineno =>  4, :test_capture => 'testing' }        
     @completed_request << { :line_type => :test,  :lineno =>  7, :test_capture => 'testing some more' }            
