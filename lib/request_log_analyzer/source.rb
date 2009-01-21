@@ -1,4 +1,9 @@
 module RequestLogAnalyzer::Source
+
+  def self.const_missing(const)
+    RequestLogAnalyzer::load_default_class_file(self, const)
+  end
+  
   class Base
     
     include RequestLogAnalyzer::FileFormat::Awareness

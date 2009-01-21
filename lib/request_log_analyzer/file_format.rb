@@ -1,18 +1,46 @@
-module RequestLogAnalyzer
+module RequestLogAnalyzer::FileFormat
   
-  class FileFormat
-    
-    # Makes classes aware of a file format by registering the file_format variable
-    module Awareness
-      
-      def self.included(base)
-        base.send(:attr_reader, :file_format)
-      end
-      
-      def register_file_format(format)
-        @file_format = format
-      end
+  def self.const_missing(const)
+    RequestLogAnalyzer::load_default_class_file(self, const)
+  end
+  
+  def self.load(file_format)
+    klass = nil
+    if file_format.kind_of?(RequestLogAnalyzer::FileFormat::Base)
+      # this already is a file format! return itself
+      return file_format
+
+    elsif file_format.kind_of?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
+      klass = file_format
+
+    elsif file_format.kind_of?(String) && File.exist?(file_format)
+      # load a format from a ruby file
+      require file_format
+      klass = Object.const_get(RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb')))
+
+    else
+      # load a provided file format
+      klass = RequestLogAnalyzer::FileFormat.const_get(RequestLogAnalyzer::to_camelcase(file_format))      
     end
+    
+    raise if klass.nil?
+    klass.new # return an instance of the class
+  end  
+  
+  # Makes classes aware of a file format by registering the file_format variable
+  module Awareness
+    
+    def self.included(base)
+      base.send(:attr_reader, :file_format)
+    end
+    
+    def register_file_format(format)
+      @file_format = format
+    end
+  end  
+
+  
+  class Base
       
     def self.inherited(subclass)
        subclass.instance_variable_set(:@line_definer, RequestLogAnalyzer::LineDefinition::Definer.new)
@@ -37,31 +65,6 @@ module RequestLogAnalyzer
       yield(@report_definer)
     end
 
-    def self.load(file_format)
-      if file_format.kind_of?(RequestLogAnalyzer::FileFormat)
-        # this already is a file format! return itself
-        return file_format
-
-      elsif file_format.kind_of?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::FileFormat)
-        klass = file_format
-
-      elsif file_format.kind_of?(String) && File.exist?(file_format)
-        # load a format from a ruby file
-        require file_format
-        klass_name = File.basename(file_format, '.rb').split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')
-        klass = Object.const_get(klass_name)
-
-      elsif File.exist?("#{File.dirname(__FILE__)}/file_format/#{file_format}.rb")
-        # load a provided file format
-        require "#{File.dirname(__FILE__)}/file_format/#{file_format}"
-        klass_name = file_format.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')
-        klass = RequestLogAnalyzer::FileFormat.const_get(klass_name)
-        
-      end
-      
-      klass.new # return an instance of the class
-    end
-    
     def line_definitions
       @line_definitions ||= self.class.line_definer.line_definitions
     end

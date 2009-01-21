@@ -3,8 +3,8 @@ require File.dirname(__FILE__) + '/spec_helper'
 describe RequestLogAnalyzer::FileFormat, :format_definition do
   
   before(:each) do
-    @first_file_format = Class.new(RequestLogAnalyzer::FileFormat)
-    @second_file_format = Class.new(RequestLogAnalyzer::FileFormat)
+    @first_file_format = Class.new(RequestLogAnalyzer::FileFormat::Base)
+    @second_file_format = Class.new(RequestLogAnalyzer::FileFormat::Base)
   end
     
   it "should specify lines with a hash" do

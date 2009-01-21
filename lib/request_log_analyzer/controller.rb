@@ -147,12 +147,8 @@ module RequestLogAnalyzer
     
     # Adds an aggregator to the controller. The aggregator will be called for every request 
     # that is parsed from the provided sources (see add_source)
-    def add_aggregator(agg)
-      if agg.kind_of?(Symbol)
-        require File.dirname(__FILE__) + "/aggregator/#{agg}"
-        agg = RequestLogAnalyzer::Aggregator.const_get(agg.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join(''))
-      end
-      
+    def add_aggregator(agg)      
+      agg = RequestLogAnalyzer::Aggregator.const_get(RequestLogAnalyzer::to_camelcase(agg)) if agg.kind_of?(Symbol)
       @aggregators << agg.new(@source, @options)
     end
     
@@ -160,11 +156,7 @@ module RequestLogAnalyzer
     
     # Adds a request filter to the controller.
     def add_filter(filter, filter_options = {})
-      if filter.kind_of?(Symbol)
-        require File.dirname(__FILE__) + "/filter/#{filter}"
-        filter = RequestLogAnalyzer::Filter.const_get(filter.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join(''))
-      end
-      
+      filter = RequestLogAnalyzer::Filter.const_get(RequestLogAnalyzer::to_camelcase(filter)) if filter.kind_of?(Symbol)
       @filters << filter.new(file_format, @options.merge(filter_options))
     end
     
@@ -177,8 +169,6 @@ module RequestLogAnalyzer
     # 5. Call report on every aggregator
     # 6. Finalize Source
     def run!
-      
-
       
       @filters.each { |filter| filter.prepare }
       @aggregators.each { |agg| agg.prepare }

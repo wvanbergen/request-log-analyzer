@@ -1,5 +1,5 @@
 module RequestLogAnalyzer::Tracker
-
+  
   # Determines the average hourly spread of the parsed requests.
   # This spread is shown in a graph form.
   #
@@ -26,15 +26,15 @@ module RequestLogAnalyzer::Tracker
   #   17:00 - 213 hits        : ░░░░░
   #   18:00 - 107 hits        : ░░
   #   ................
-  class HourlySpread < RequestLogAnalyzer::Tracker::Base
+  class HourlySpread < Base
 
     attr_reader :first, :last, :request_time_graph
-  
+
     def prepare
       options[:field] ||= :timestamp
       @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     end
-              
+            
     def update(request)
       request = request.attributes
       timestamp = request[options[:field]]
@@ -43,10 +43,10 @@ module RequestLogAnalyzer::Tracker
       @first = timestamp if @first.nil? || timestamp < @first
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
-  
+
     def report(output)
       output.title("Requests graph - average per day per hour")
-      
+    
       if @request_time_graph == [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         output << "None found.\n"
         return
@@ -56,12 +56,12 @@ module RequestLogAnalyzer::Tracker
       last_date      = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
       days           = (@last && @first) ? (last_date - first_date).ceil : 1
       total_requests = @request_time_graph.inject(0) { |sum, value| sum + value }
-      
+    
       output.table({}, {:align => :right}, {:type => :ratio, :width => :rest, :treshold => 0.15}) do |rows|
         @request_time_graph.each_with_index do |requests, index|
           ratio = requests.to_f / total_requests.to_f
           requests_per_day = requests / days
-      
+    
           rows << ["#{index.to_s.rjust(3)}:00", "#{requests_per_day} hits", ratio]
         end
       end

@@ -19,48 +19,49 @@ module RequestLogAnalyzer::Tracker
   #  EmployeeController#update.html [POST]          |    4647 |  2731.23s |     0.59s
   #  EmployeeController#index.html [GET]            |    5802 |  1477.32s |     0.25s
   #  .............
-  class Duration < RequestLogAnalyzer::Tracker::Base
+  class Duration < Base
+    
     attr_reader :categories
-  
+
     def prepare
       raise "No duration field set up for category tracker #{self.inspect}" unless options[:duration]
       raise "No categorizer set up for duration tracker #{self.inspect}" unless options[:category]
-    
+  
       @categories = {}
     end
-  
+
     def update(request)
       category = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
       duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
-    
+  
       if !duration.nil? && !category.nil?
         @categories[category] ||= {:count => 0, :total_duration => 0.0}
         @categories[category][:count] += 1
         @categories[category][:total_duration] += duration
       end
     end
-  
+
     def report_table(output, amount = 10, options = {}, &block)
-      
+    
       output.title(options[:title])
-      
+    
       top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
       output.table({:title => 'Action'}, {:title => 'Hits', :align => :right, :min_width => 4}, 
             {:title => 'Cumulative', :align => :right, :min_width => 10}, {:title => 'Average', :align => :right, :min_width => 8}) do |rows|
-        
+      
         top_categories.each do |(cat, info)|
           rows << [cat, info[:count], "%0.02fs" % info[:total_duration], "%0.02fs" % (info[:total_duration] / info[:count])]
         end        
       end
 
     end
-  
+
     def report(output)
 
       options[:title]  ||= 'Request duration'
       options[:report] ||= [:total, :average]
       options[:top]    ||= 20
-    
+  
       options[:report].each do |report|
         case report
         when :average

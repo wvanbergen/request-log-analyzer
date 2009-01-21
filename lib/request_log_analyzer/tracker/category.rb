@@ -1,5 +1,5 @@
 module RequestLogAnalyzer::Tracker
-
+  
   # Catagorize requests.
   # Count and analyze requests for a specific attribute 
   #
@@ -19,10 +19,10 @@ module RequestLogAnalyzer::Tracker
   #  PUT    |  13685 hits (28.4%) |░░░░░░░░░░░
   #  POST   |  11662 hits (24.2%) |░░░░░░░░░
   #  DELETE |    512 hits (1.1%)  |
-  class Category < RequestLogAnalyzer::Tracker::Base
-  
+  class Category < Base
+
     attr_reader :categories
-  
+
     def prepare
       raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
       @categories = {}
@@ -30,7 +30,7 @@ module RequestLogAnalyzer::Tracker
         options[:all_categories].each { |cat| @categories[cat] = 0 }
       end
     end
-              
+            
     def update(request)
       cat = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
       if !cat.nil? || options[:nils]
@@ -38,10 +38,10 @@ module RequestLogAnalyzer::Tracker
         @categories[cat] += 1
       end
     end
-  
+
     def report(output)
       output.title(options[:title]) if options[:title]
-      
+    
       if @categories.empty?
         output << "None found.\n" 
       else
@@ -57,6 +57,5 @@ module RequestLogAnalyzer::Tracker
 
       end
     end
-
   end
 end

@@ -1,14 +1,12 @@
-module RequestLogAnalyzer
+module RequestLogAnalyzer::Output
+
+  def self.const_missing(const)
+    RequestLogAnalyzer::load_default_class_file(self, const)
+  end
   
-  class Output
+  class Base
     
     attr_accessor :io, :options, :style
-    
-    def self.const_missing(const)
-      filename = const.to_s.gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase
-      require File.dirname(__FILE__) + '/output/' + filename
-      self.const_get(const)
-    end
     
     def initialize(io, options = {})
       @io      = io

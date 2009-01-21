@@ -1,7 +1,4 @@
 require File.dirname(__FILE__) + '/spec_helper'
-require File.dirname(__FILE__) + '/../lib/request_log_analyzer/filter/timespan'
-require File.dirname(__FILE__) + '/../lib/request_log_analyzer/filter/field'
-require File.dirname(__FILE__) + '/../lib/request_log_analyzer/filter/anonimize'
 
 describe RequestLogAnalyzer::Filter::Timespan, 'both before and after'  do
   include RequestLogAnalyzerSpecHelper

@@ -1,4 +1,4 @@
-class SpecFormat < RequestLogAnalyzer::FileFormat
+class SpecFormat < RequestLogAnalyzer::FileFormat::Base
 
   format_definition.first do |line|
     line.header = true

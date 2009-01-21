@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../tracker/base'
+require File.dirname(__FILE__) + '/../tracker'
 
 module RequestLogAnalyzer::Aggregator
 
@@ -33,8 +33,7 @@ module RequestLogAnalyzer::Aggregator
       end      
       
       def track(tracker_klass, options = {})
-        require "#{File.dirname(__FILE__)}/../tracker/#{tracker_klass}"
-        tracker_klass = RequestLogAnalyzer::Tracker.const_get(tracker_klass.to_s.split(/[^a-z0-9]/i).map{ |w| w.capitalize }.join('')) if tracker_klass.kind_of?(Symbol)
+        tracker_klass = RequestLogAnalyzer::Tracker.const_get(RequestLogAnalyzer::to_camelcase(tracker_klass)) if tracker_klass.kind_of?(Symbol)
         @trackers << tracker_klass.new(options)
       end
     end
