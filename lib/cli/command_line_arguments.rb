@@ -140,8 +140,8 @@ module CommandLine
       end
     end
     
-    OPTION_REGEXP  = /^\-\-([A-z0-9-]+)$/;
-    ALIASES_REGEXP = /^\-([A-z0-9]+)$/
+    OPTION_REGEXP  = /^\-\-([A-Za-z0-9-]+)$/;
+    ALIASES_REGEXP = /^\-([A-Aa-z0-9]+)$/
     
     attr_reader :definition
     attr_reader :tokens

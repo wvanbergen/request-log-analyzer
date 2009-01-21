@@ -6,7 +6,7 @@ module RequestLogAnalyzer
     end
 
     def anonymizer_for_url(value, capture_definition)
-      value.sub(/^https?\:\/\/[A-z0-9\.-]+\//, "http://example.com/")
+      value.sub(/^https?\:\/\/[A-Za-z0-9\.-]+\//, "http://example.com/")
     end
   end  
   

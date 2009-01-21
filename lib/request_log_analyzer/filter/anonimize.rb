@@ -15,7 +15,7 @@ module RequestLogAnalyzer::Filter
     end
 
     def anonymize_url(value)
-      return value.sub(/^https?\:\/\/[A-z0-9\.-]+\//, "http://example.com/")
+      return value.sub(/^https?\:\/\/[A-Za-z0-9\.-]+\//, "http://example.com/")
     end
     
     def fuzz(value)
