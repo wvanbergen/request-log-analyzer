@@ -28,6 +28,22 @@ module RequestLogAnalyzerSpecHelper
       format.create_request(fields)      
     end
   end
+
+  def mock_io
+    mio = mock('IO')
+    mio.stub!(:print)
+    mio.stub!(:puts)    
+    mio.stub!(:write)
+    return mio
+  end
+  
+  def mock_output
+    output = mock('RequestLogAnalyzer::Output')
+    output.stub!(:header)
+    output.stub!(:footer)    
+    output.stub!(:io).and_return(mock_io)
+    return output
+  end
   
 end
 

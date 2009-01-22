@@ -4,42 +4,59 @@ describe RequestLogAnalyzer::Controller do
 
   include RequestLogAnalyzerSpecHelper
 
-  # it "should include the file format module" do
-  #   controller = RequestLogAnalyzer::Controller.new(:rails)
-  #   (class << controller; self; end).ancestors.include?(RequestLogAnalyzer::FileFormat::Rails)
-  # end
-
-  it "should call the aggregators when run" do
+  it "should use a custom output generator correctly" do
     
-    mock_output = mock('output')
-    mock_output.stub!(:io).and_return($stdout)
+    mock_output = mock('RequestLogAnalyzer::Output::Base')
+    mock_output.stub!(:io).and_return(mock_io)
     mock_output.should_receive(:header)
     mock_output.should_receive(:footer)
+
+    file_format = RequestLogAnalyzer::FileFormat.load(:rails)
+    source      = RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => log_fixture(:rails_1x))  
+    controller  = RequestLogAnalyzer::Controller.new(source, :output => mock_output)
+
+    controller.run!
+  end
+
+  it "should call aggregators when run" do
     
     file_format = RequestLogAnalyzer::FileFormat.load(:rails)
     source      = RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => log_fixture(:rails_1x))  
     controller  = RequestLogAnalyzer::Controller.new(source, :output => mock_output)
     
-    mock_aggregator = mock('aggregator')
+    mock_aggregator = mock('RequestLogAnalyzer::Aggregator::Base')
     mock_aggregator.should_receive(:prepare).once.ordered
     mock_aggregator.should_receive(:aggregate).with(an_instance_of(file_format.class::Request)).at_least(:twice).ordered
     mock_aggregator.should_receive(:finalize).once.ordered
     mock_aggregator.should_receive(:report).once.ordered
-    
-    another_mock_aggregator = mock('another aggregator')
-    another_mock_aggregator.should_receive(:prepare).once.ordered
-    another_mock_aggregator.should_receive(:aggregate).with(an_instance_of(file_format.class::Request)).at_least(:twice).ordered
-    another_mock_aggregator.should_receive(:finalize).once.ordered  
-    another_mock_aggregator.should_receive(:report).once.ordered  
-
-    controller.aggregators << mock_aggregator << another_mock_aggregator
+  
+    controller.aggregators << mock_aggregator
     controller.run!
   end
   
-  it "should run well from the command line" do
-    temp_file = "#{File.dirname(__FILE__)}/fixtures/temp.txt"
-    system("#{File.dirname(__FILE__)}/../bin/request-log-analyzer #{log_fixture(:rails_1x)} > #{temp_file}").should be_true
+  it "should call filters when run" do
+    file_format = RequestLogAnalyzer::FileFormat.load(:rails)
+    source      = RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => log_fixture(:rails_1x))  
+    controller  = RequestLogAnalyzer::Controller.new(source, :output => mock_output)
+    
+    mock_filter = mock('RequestLogAnalyzer::Filter::Base')
+    mock_filter.should_receive(:prepare).once.ordered
+    mock_filter.should_receive(:filter).at_least(:twice)
+    
+    controller.filters << mock_filter
+    controller.run!
+  end
+  
+  it "should run well from the command line with the most important features" do
+    
+    temp_file = "#{File.dirname(__FILE__)}/fixtures/report.txt"
+    temp_db   = "#{File.dirname(__FILE__)}/fixtures/output.db"
+    binary = "#{File.dirname(__FILE__)}/../bin/request-log-analyzer"
+  
+    system("#{binary} #{log_fixture(:rails_1x)} --database #{temp_db} --select Controller PeopleController --file #{temp_file} > /dev/null").should be_true
+  
     File.unlink(temp_file)
+    File.unlink(temp_db)    
   end
   
 end
