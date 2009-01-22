@@ -159,6 +159,7 @@ module RequestLogAnalyzer::Source
     # The default controller will send the request to every running aggegator.
     def handle_request(request, &block)
       @parsed_requests += 1
+      request.validate
       accepted = block_given? ? yield(request) : true
       @skipped_requests += 1 if not accepted
     end    

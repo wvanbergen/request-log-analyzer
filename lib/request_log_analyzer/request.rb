@@ -129,6 +129,10 @@ module RequestLogAnalyzer
       header_found && footer_found      
     end
     
+    # This function is called before a Requests is yielded.
+    def validate
+    end
+    
     # Returns the first timestamp encountered in a request. 
     def timestamp
       first(:timestamp)

@@ -86,12 +86,16 @@ module RequestLogAnalyzer::FileFormat
       analyze.category :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
     end
 
+    # Define a custom Request class for the Rails file format to speed up timestamp handling
+    # and to ensure that a format is always set.
     class Request < RequestLogAnalyzer::Request
 
+      # Do not use DateTime.parse
       def convert_timestamp(value, definition)
         value.gsub(/[^0-9]/, '')[0...14].to_i unless value.nil?
       end
       
+      # Set 'html' as default format for a request
       def convert_format(value, definition)
         value || 'html'
       end
