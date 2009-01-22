@@ -1,21 +1,9 @@
 module RequestLogAnalyzer
   
-  module Anonymizers
-    def anonymizer_for_ip(value, capture_definition)
-      '127.0.0.1'
-    end
-
-    def anonymizer_for_url(value, capture_definition)
-      value.sub(/^https?\:\/\/[A-Za-z0-9\.-]+\//, "http://example.com/")
-    end
-  end  
-  
   # The line definition class is used to specify what lines should be parsed from the log file.
   # It contains functionality to match a line against the definition and parse the information
   # from this line. This is used by the LogParser class when parsing a log file..
   class LineDefinition
-
-    include RequestLogAnalyzer::Anonymizers
 
     class Definer
       
@@ -52,20 +40,6 @@ module RequestLogAnalyzer
       return definition
     end
     
-    # Converts a parsed value (String) to the desired value using some heuristics.
-    def convert_value(value, type)
-      case type
-      when :integer;   value.to_i
-      when :float;     value.to_f
-      when :decimal;   value.to_f          
-      when :symbol;    value.to_sym
-      when :sec;       value.to_f
-      when :msec;      value.to_f / 1000
-      when :timestamp; value.gsub(/[^0-9]/,'')[0..13].to_i # Retrieve with: DateTime.parse(value, '%Y%m%d%H%M%S')
-      else value
-      end
-    end
-    
     # Checks whether a given line matches this definition. 
     # It will return false if a line does not match. If the line matches, a hash is returned
     # with all the fields parsed from that line as content.
@@ -74,17 +48,7 @@ module RequestLogAnalyzer
     def matches(line, lineno = nil, parser = nil)
       if @teaser.nil? || @teaser =~ line
         if match_data = line.match(@regexp)
-          request_info = { :line_type => name, :lineno => lineno }
-          
-          captures.each_with_index do |capture, index|
-            next if capture == :ignore
-
-            if match_data.captures[index]
-              request_info[capture[:name]] = convert_value(match_data.captures[index], capture[:type])
-            end
-
-          end
-          return request_info
+          return { :line_definition => self, :lineno => lineno, :captures => match_data.captures}
         else
           if @teaser && parser
             parser.warn(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")
@@ -97,63 +61,23 @@ module RequestLogAnalyzer
     end
     
     alias :=~ :matches
-    
-    def anonymize_value(value, capture_definition)
-      if capture_definition[:anonymize].respond_to?(:call)
-        capture_definition[:anonymize].call(value, capture_definition)
+
+    def match_for(line, request, lineno = nil, parser = nil)
+      if match_info = matches(line, lineno, parser)
+        convert_captured_values(match_info[:captures], request)
       else
-        case capture_definition[:anonymize]
-        when nil;   value
-        when false; value
-        when true;  '***'
-        when :slightly; anonymize_slightly(value, capture_definition)
-        else 
-          method_name = "anonymizer_for_#{capture_definition[:anonymize]}".to_sym
-          self.respond_to?(method_name) ? self.send(method_name, value, capture_definition) : '***'
-        end
+        false
       end
-    end
-    
-    def anonymize_slightly(value, capture_definition)  
-      case capture_definition[:type]
-      when :integer
-        (value.to_i * (0.8 + rand * 0.4)).to_i
-      when :double
-        (value.to_f * (0.8 + rand * 0.4)).to_f          
-      when :msec
-        (value.to_i * (0.8 + rand * 0.4)).to_i
-      when :sec
-        (value.to_f * (0.8 + rand * 0.4)).to_f
-      when :timestamp
-        (DateTime.parse(value) + (rand(100) - 50)).to_s
-      else
-        puts "Cannot anonymize #{capture_definition[:type].inspect} slightly, using ***"
-        '***'
-      end  
     end
 
-    # Anonymize a log line
-    def anonymize(line, options = {})
-      if self.teaser.nil? || self.teaser =~ line
-        if self.regexp =~ line
-          pos_adjustment = 0
-          captures.each_with_index do |capture, index|
-            unless $~[index + 1].nil?
-              anonymized_value = anonymize_value($~[index + 1], capture).to_s
-              line[($~.begin(index + 1) + pos_adjustment)...($~.end(index + 1) + pos_adjustment)] = anonymized_value
-              pos_adjustment += anonymized_value.length - $~[index + 1].length                    
-            end
-          end
-          line
-        elsif self.teaser.nil?
-          nil
-        else
-          options[:discard_teaser_lines] ? "" : line
-        end
-      else
-        nil
+    def convert_captured_values(values, request)
+      value_hash = {}
+      captures.each_with_index do |capture, index|
+        value_hash[capture[:name]] ||= request.convert_value(values[index], capture)
       end
+      return value_hash
     end
+
   end
   
 end

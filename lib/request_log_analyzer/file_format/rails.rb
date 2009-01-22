@@ -10,8 +10,8 @@ module RequestLogAnalyzer::FileFormat
       line.captures << { :name => :controller, :type  => :string } \
                     << { :name => :action,     :type  => :string } \
                     << { :name => :format,     :type  => :string } \
-                    << { :name => :ip,         :type  => :string, :anonymize => :ip } \
-                    << { :name => :timestamp,  :type  => :timestamp, :anonymize => :slightly } \
+                    << { :name => :ip,         :type  => :string } \
+                    << { :name => :timestamp,  :type  => :timestamp } \
                     << { :name => :method,     :type  => :string }
     end
 
@@ -28,7 +28,7 @@ module RequestLogAnalyzer::FileFormat
                     << { :name => :message,     :type => :string } \
                     << { :name => :line,        :type => :integer } \
                     << { :name => :file,        :type => :string } \
-                    << { :name => :stack_trace, :type => :string, :anonymize => true }
+                    << { :name => :stack_trace, :type => :string }
     end
 
 
@@ -49,17 +49,17 @@ module RequestLogAnalyzer::FileFormat
       line.teaser = /Completed in /
       line.regexp = Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})")
     
-      line.captures << { :name => :duration, :type => :sec,    :anonymize => :slightly } \
-                    << { :name => :view,     :type => :sec,    :anonymize => :slightly } \
-                    << { :name => :db,       :type => :sec,    :anonymize => :slightly } \
+      line.captures << { :name => :duration, :type => :duration, :unit => :sec } \
+                    << { :name => :view,     :type => :duration, :unit => :sec } \
+                    << { :name => :db,       :type => :duration, :unit => :sec } \
                     << { :name => :status,   :type => :integer } \
-                    << { :name => :url,      :type => :string, :anonymize => :url } # Old variant 
+                    << { :name => :url,      :type => :string } # Old variant 
                   
-      line.captures << { :name => :duration, :type => :msec,   :anonymize => :slightly } \
-                    << { :name => :view,     :type => :msec,   :anonymize => :slightly } \
-                    << { :name => :db,       :type => :msec,   :anonymize => :slightly } \
-                    << { :name => :status,   :type => :integer} \
-                    << { :name => :url,      :type => :string, :anonymize => :url }  # 2.2 variant 
+      line.captures << { :name => :duration, :type => :duration, :unit => :msec } \
+                    << { :name => :view,     :type => :duration, :unit => :msec } \
+                    << { :name => :db,       :type => :duration, :unit => :msec } \
+                    << { :name => :status,   :type => :integer } \
+                    << { :name => :url,      :type => :string }  # 2.2 variant 
     end
 
 

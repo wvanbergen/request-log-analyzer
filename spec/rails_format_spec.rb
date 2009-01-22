@@ -80,6 +80,7 @@ describe "RequestLogAnalyzer::FileFormat::RailsDevelopment - Rails with developm
   
   before(:each) do
     @file_format = RequestLogAnalyzer::FileFormat.load(:rails_development)
+    @request = @file_format.create_request
   end
   
   it "should have a valid language definitions" do
@@ -87,33 +88,33 @@ describe "RequestLogAnalyzer::FileFormat::RailsDevelopment - Rails with developm
   end
   
   it "should parse a rendered line" do
-    info = @file_format.line_definitions[:rendered].matches("Rendered layouts/_footer (2.9ms)")
+    info = @file_format.line_definitions[:rendered].match_for("Rendered layouts/_footer (2.9ms)", @request)
     info[:render_file].should == 'layouts/_footer'
     info[:render_duration].should == 0.0029
   end
   
   it "should parse a query executed line with colors" do
-    info = @file_format.line_definitions[:query_executed].matches(" [4;36;1mUser Load (0.4ms)[0m   [0;1mSELECT * FROM `users` WHERE (`users`.`id` = 18205844) [0m")
+    info = @file_format.line_definitions[:query_executed].match_for(" [4;36;1mUser Load (0.4ms)[0m   [0;1mSELECT * FROM `users` WHERE (`users`.`id` = 18205844) [0m", @request)
     info[:query_class].should == 'User'
     info[:query_duration].should == 0.0004
     info[:query_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 18205844)'
   end  
   
   it "should parse a query executed line without colors" do
-    info = @file_format.line_definitions[:query_executed].matches(" User Load (0.4ms)   SELECT * FROM `users` WHERE (`users`.`id` = 18205844) ")
+    info = @file_format.line_definitions[:query_executed].match_for(" User Load (0.4ms)   SELECT * FROM `users` WHERE (`users`.`id` = 18205844) ", @request)
     info[:query_class].should == 'User'
     info[:query_duration].should == 0.0004
     info[:query_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 18205844)'    
   end  
   
   it "should parse a cached query line with colors" do
-    info = @file_format.line_definitions[:query_cached].matches(' [4;35;1mCACHE (0.0ms)[0m   [0mSELECT * FROM `users` WHERE (`users`.`id` = 0) [0m')
+    info = @file_format.line_definitions[:query_cached].match_for(' [4;35;1mCACHE (0.0ms)[0m   [0mSELECT * FROM `users` WHERE (`users`.`id` = 0) [0m', @request)
     info[:cached_duration].should == 0.0
     info[:cached_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 0)'   
   end
   
   it "should parse a cached query line without colors" do
-    info = @file_format.line_definitions[:query_cached].matches(' CACHE (0.0ms)   SELECT * FROM `users` WHERE (`users`.`id` = 0) ')
+    info = @file_format.line_definitions[:query_cached].match_for(' CACHE (0.0ms)   SELECT * FROM `users` WHERE (`users`.`id` = 0) ', @request)
     info[:cached_duration].should == 0.0
     info[:cached_sql].should == 'SELECT * FROM `users` WHERE (`users`.`id` = 0)'   
   end  

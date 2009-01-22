@@ -27,14 +27,6 @@ begin
       strip.switch(:keep_junk_lines, :j)      
     end
     
-    command_line.command(:anonymize) do |anonymize|
-      anonymize.minimum_parameters = 1
-      anonymize.option(:format, :alias => :f, :default => 'rails')            
-      anonymize.option(:output, :alias => :o)
-      anonymize.switch(:discard_teaser_lines, :t)
-      anonymize.switch(:keep_junk_lines, :j)      
-    end
-    
     command_line.option(:format, :alias => :f, :default => 'rails')
     command_line.option(:file, :alias => :e)
     command_line.switch(:assume_correct_order)
@@ -111,9 +103,6 @@ when :install
 when :strip
   require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'  
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
-when :anonymize
-  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'    
-  RequestLogAnalyzer::LogProcessor.build(:anonymize, arguments).run!  
 else 
   puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
   puts "Website: http://github.com/wvanbergen/request-log-analyzer"

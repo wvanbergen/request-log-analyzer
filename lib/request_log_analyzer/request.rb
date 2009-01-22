@@ -9,7 +9,45 @@ module RequestLogAnalyzer
   # Request#every(field_name) returns all values corresponding to the given field name as array.
   class Request
   
+    module Converters
+      
+      def convert_value(value, capture_definition)
+        custom_converter_method = "convert_#{capture_definition[:type]}".to_sym
+        if respond_to?(custom_converter_method) 
+          send(custom_converter_method, value, capture_definition)
+        elsif !value.nil? 
+          case capture_definition[:type]
+          when :decimal;  value.to_f
+          when :float;    value.to_f
+          when :double;   value.to_f
+          when :integer;  value.to_i
+          when :int;      value.to_i
+          when :symbol;   value.to_sym
+          else;           value.to_s
+          end
+        else 
+          nil
+        end
+      end
+      
+      # Slow default method to parse timestamps
+      def convert_timestamp(value, capture_definition)
+        DateTime.parse(value) unless value.nil?
+      end
+      
+      def convert_duration(value, capture_definition)
+        if value.nil?
+          nil
+        elsif capture_definition[:unit] == :msec
+          value.to_f / 1000.0      
+        else
+          value.to_f
+        end
+      end
+    end
+  
     include RequestLogAnalyzer::FileFormat::Awareness
+    include Converters
   
     attr_reader :lines
     attr_reader :attributes
@@ -32,12 +70,22 @@ module RequestLogAnalyzer
      
     # Adds another line to the request.
     # The line should be provides as a hash of the fields parsed from the line.
-    def add_parsed_line (request_info_hash)
-      @lines << request_info_hash
-      @attributes = request_info_hash.merge(@attributes)
+    def add_parsed_line (parsed_line)
+      value_hash = parsed_line[:line_definition].convert_captured_values(parsed_line[:captures], self)
+      value_hash[:line_type] = parsed_line[:line_definition].name
+      value_hash[:lineno] = parsed_line[:lineno]
+      add_line_hash(value_hash)
     end
     
-    alias :<< :add_parsed_line
+    def add_line_hash(value_hash)
+      @lines << value_hash
+      @attributes = value_hash.merge(@attributes)      
+    end
+    
+    
+    def <<(hash)
+      hash[:line_definition] ? add_parsed_line(hash) : add_line_hash(hash)
+    end
     
     # Checks whether the given line type was parsed from the log file for this request
     def has_line_type?(line_type)

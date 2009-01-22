@@ -28,10 +28,9 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
   
   it "should parse all request values when spanned over multiple files" do
     @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)]) do |request|
-      request.lines.should have(4).items
-      
+      request.lines.should have(4).items      
       request[:request_no].should == 1
-      request[:test_capture].should == "amazing"      
+      request[:test_capture].should == "Testing is amazing" # Note the custom converter     
     end
   end  
   

@@ -29,7 +29,7 @@ describe RequestLogAnalyzer::Source::LogParser, :merb do
     @log_parser.parse_file(log_fixture(:merb)) { |found_request| request ||= found_request }
     
     request.should be_completed
-    #request[:timestamp].should == DateTime.parse('Fri Aug 29 11:10:23 +0200 2008') # FIX ME
+    request[:timestamp].should == DateTime.parse('Fri Aug 29 11:10:23 +0200 2008')
     request[:dispatch_time].should == 0.243424
     request[:after_filters_time].should == 6.9e-05
     request[:before_filters_time].should == 0.213213

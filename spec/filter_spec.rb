@@ -134,11 +134,11 @@ describe RequestLogAnalyzer::Filter::Field, 'regexp in accept mode' do
   end  
 end
 
-describe RequestLogAnalyzer::Filter::Anonimize, 'anonimize request' do
+describe RequestLogAnalyzer::Filter::Anonymize, 'anonymize request' do
   include RequestLogAnalyzerSpecHelper
 
   before(:each) do
-    @filter = RequestLogAnalyzer::Filter::Anonimize.new(spec_format)
+    @filter = RequestLogAnalyzer::Filter::Anonymize.new(spec_format)
     @filter.prepare
   end
   
@@ -150,7 +150,7 @@ describe RequestLogAnalyzer::Filter::Anonimize, 'anonimize request' do
     @filter.filter(request(:url => 'https://test.mysite.com/employees'))[:url].should eql('http://example.com/employees')
   end
 
-  it "should anonimize url" do
+  it "should fuzz durations" do
     @filter.filter(request(:duration => 100))[:duration].should_not eql(100)
   end
   

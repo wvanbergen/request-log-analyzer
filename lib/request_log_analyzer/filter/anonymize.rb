@@ -1,11 +1,11 @@
 module RequestLogAnalyzer::Filter
   
-  # Filter to select or reject a specific field
+  # Filter to anonymize parsed values
   # Options
   # * <tt>:mode</tt> :reject or :accept.
   # * <tt>:field</tt> Specific field to accept or reject.
   # * <tt>:value</tt> Value that the field should match to be accepted or rejected.
-  class Anonimize < Base
+  class Anonymize < Base
    
     def prepare
     end

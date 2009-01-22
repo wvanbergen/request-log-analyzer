@@ -6,12 +6,9 @@ module RequestLogAnalyzer
   # contents of the line, remain it intact or remove it altogether, based on the current
   # file format
   #
-  # Currently, two processors are supported, :strip and :anonymize. 
+  # Currently, one processors is supported:
   #  * :strip will remove all irrelevent lines (according to the file format) from the 
   #    sources. A compact, information packed log will remain/.
-  #  * :anonymize will anonymize sensitive information from the lines according to the 
-  #    anonymization rules in the file format. The result can be passed to third parties
-  #    without privacy concerns.
   #
   class LogProcessor
     
@@ -21,8 +18,8 @@ module RequestLogAnalyzer
     attr_accessor :output_file
    
     # Builds a logprocessor instance from the arguments given on the command line
-    # <tt>command</tt> The command hat was used to start the log processor. This can either be 
-    #   :strip or :anonymize. This will set the processing mode.
+    # <tt>command</tt> The command hat was used to start the log processor. This will set the 
+    #    processing mode. Currently, only :strip is supported.
     # <tt>arguments</tt> The parsed command line arguments (a CommandLine::Arguments instance)
     def self.build(command, arguments)
       
@@ -43,7 +40,7 @@ module RequestLogAnalyzer
     
     # Initializes a new LogProcessor instance.
     # <tt>format</tt> The file format to use (e.g. :rails).
-    # <tt>mode</tt> The processing mode (:anonymize or :strip)
+    # <tt>mode</tt> The processing mode
     # <tt>options</tt> A hash with options to take into account
     def initialize(format, mode, options = {})
       @options = options
@@ -61,12 +58,11 @@ module RequestLogAnalyzer
     end
 
     # Processes an input stream by iteration over each line and processing it according to
-    # the current operation mode (:strip, :anonymize)
+    # the current operation mode
     # <tt>io</tt> The IO instance to process.
     def process_io(io)
       case mode
         when :strip;     io.each_line { |line| @output << strip_line(line) }
-        when :anonymize; io.each_line { |line| @output << anonymize_line(line) }
       end
     end
     
@@ -75,22 +71,6 @@ module RequestLogAnalyzer
     # <tt>line</tt> The line to strip
     def strip_line(line)
       file_format.line_definitions.any? { |name, definition| definition =~ line } ? line : ""
-    end
-
-    # Returns an anonymized version of the provided line. This can be a copy of the line it self, 
-    # an empty string or a string in which some substrings are substituted for anonymized values.
-    # <tt>line</tt> The line to anonymize
-    def anonymize_line(line)
-      anonymized_line = nil
-      file_format.line_definitions.detect { |name, definition| anonymized_line = definition.anonymize(line, options) }
-      
-      if anonymized_line
-        return anonymized_line
-      elsif options[:keep_junk_lines]
-        return line
-      else
-        return ""
-      end
     end
 
     # Runs the log processing by setting up the output stream and iterating over all the

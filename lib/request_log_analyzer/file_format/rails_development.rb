@@ -10,8 +10,8 @@ module RequestLogAnalyzer::FileFormat
       line.captures << { :name => :controller, :type  => :string } \
                     << { :name => :action,     :type  => :string } \
                     << { :name => :format,     :type  => :string } \
-                    << { :name => :ip,         :type  => :string, :anonymize => :ip } \
-                    << { :name => :timestamp,  :type  => :timestamp, :anonymize => :slightly } \
+                    << { :name => :ip,         :type  => :string } \
+                    << { :name => :timestamp,  :type  => :timestamp } \
                     << { :name => :method,     :type  => :string }
     end
 
@@ -25,14 +25,14 @@ module RequestLogAnalyzer::FileFormat
       line.teaser = /Rendered /
       line.regexp = /Rendered (\w+(?:\/\w+)+) \((\d+\.\d+)ms\)/
       line.captures << { :name => :render_file,     :type  => :string } \
-                    << { :name => :render_duration, :type  => :msec }
+                    << { :name => :render_duration, :type  => :duration, :unit => :msec }
     end
   
     #  [4;36;1mUser Load (0.4ms)[0m   [0;1mSELECT * FROM `users` WHERE (`users`.`id` = 18205844) [0m
     line_definition :query_executed do |line|
       line.regexp = /\s+(?:\e\[4;36;1m)?((?:\w+::)*\w+) Load \((\d+\.\d+)ms\)(?:\e\[0m)?\s+(?:\e\[0;1m)?(.+) (?:\e\[0m)?/
       line.captures << { :name => :query_class,    :type  => :string } \
-                    << { :name => :query_duration, :type  => :msec } \
+                    << { :name => :query_duration, :type  => :duration, :unit => :msec } \
                     << { :name => :query_sql,      :type  => :string }
     end
 
@@ -40,7 +40,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :query_cached do |line|
       line.teaser = /\s+(?:\e\[4;35;1m)?CACHE \((\d+\.\d+)ms\)(?:\e\[0m)?\s+(?:\e\[0m)?(.+) (?:\e\[0m)?/  
       line.regexp = /\s+(?:\e\[4;35;1m)?CACHE \((\d+\.\d+)ms\)(?:\e\[0m)?\s+(?:\e\[0m)?(.+) (?:\e\[0m)?/
-      line.captures << { :name => :cached_duration, :type  => :msec } \
+      line.captures << { :name => :cached_duration, :type  => :duration, :unit => :msec } \
                     << { :name => :cached_sql,      :type  => :string }
     end  
   
@@ -52,7 +52,7 @@ module RequestLogAnalyzer::FileFormat
                     << { :name => :message,     :type => :string } \
                     << { :name => :line,        :type => :integer } \
                     << { :name => :file,        :type => :string } \
-                    << { :name => :stack_trace, :type => :string, :anonymize => true }
+                    << { :name => :stack_trace, :type => :string }
     end
 
 
@@ -73,17 +73,17 @@ module RequestLogAnalyzer::FileFormat
       line.teaser = /Completed in /
       line.regexp = Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})")
     
-      line.captures << { :name => :duration, :type => :sec,    :anonymize => :slightly } \
-                    << { :name => :view,     :type => :sec,    :anonymize => :slightly } \
-                    << { :name => :db,       :type => :sec,    :anonymize => :slightly } \
+      line.captures << { :name => :duration, :type => :duration } \
+                    << { :name => :view,     :type => :duration } \
+                    << { :name => :db,       :type => :duration } \
                     << { :name => :status,   :type => :integer } \
-                    << { :name => :url,      :type => :string, :anonymize => :url } # Old variant 
+                    << { :name => :url,      :type => :string } # Old variant 
                   
-      line.captures << { :name => :duration, :type => :msec,   :anonymize => :slightly } \
-                    << { :name => :view,     :type => :msec,   :anonymize => :slightly } \
-                    << { :name => :db,       :type => :msec,   :anonymize => :slightly } \
+      line.captures << { :name => :duration, :type => :duration, :unit => :msec } \
+                    << { :name => :view,     :type => :duration, :unit => :msec } \
+                    << { :name => :db,       :type => :duration, :unit => :msec } \
                     << { :name => :status,   :type => :integer} \
-                    << { :name => :url,      :type => :string, :anonymize => :url }  # 2.2 variant 
+                    << { :name => :url,      :type => :string }  # 2.2 variant 
     end
 
     REQUEST_CATEGORIZER = Proc.new do |request|

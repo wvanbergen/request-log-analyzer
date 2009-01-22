@@ -131,7 +131,6 @@ module RequestLogAnalyzer::Source
       if header_line?(request_data)
         unless @current_request.nil?
           if options[:assume_correct_order]
-            @parsed_requests += 1
             handle_request(@current_request, &block) #yield @current_request
             @current_request = @file_format.create_request(request_data)
           else
@@ -146,7 +145,6 @@ module RequestLogAnalyzer::Source
         unless @current_request.nil?
           @current_request << request_data
           if footer_line?(request_data)
-            @parsed_requests += 1
             handle_request(@current_request, &block) # yield @current_request
             @current_request = nil 
           end
@@ -167,12 +165,12 @@ module RequestLogAnalyzer::Source
 
     # Checks whether a given line hash is a header line.
     def header_line?(hash)
-      file_format.line_definitions[hash[:line_type]].header
+      hash[:line_definition].header
     end
 
     # Checks whether a given line hash is a footer line.    
     def footer_line?(hash)
-      file_format.line_definitions[hash[:line_type]].footer  
+      hash[:line_definition].footer
     end 
   end
 

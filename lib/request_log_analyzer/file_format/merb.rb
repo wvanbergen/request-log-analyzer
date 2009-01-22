@@ -7,7 +7,7 @@ module RequestLogAnalyzer::FileFormat
       line.header = true
       line.teaser = /Started/
       line.regexp = /Started request handling\:\ (.+)/
-      line.captures << { :name => :timestamp, :type => :timestamp, :anonymize => :slightly }
+      line.captures << { :name => :timestamp, :type => :timestamp }
     end    
     
     # ~ Params: {"action"=>"create", "controller"=>"session"}
@@ -23,10 +23,10 @@ module RequestLogAnalyzer::FileFormat
       line.footer = true
       line.teaser = /\{:dispatch_time/
       line.regexp = /\{\:dispatch_time=>(\d+\.\d+(?:e-?\d+)?), (?:\:after_filters_time=>(\d+\.\d+(?:e-?\d+)?), )?(?:\:before_filters_time=>(\d+\.\d+(?:e-?\d+)?), )?\:action_time=>(\d+\.\d+(?:e-?\d+)?)\}/
-      line.captures << { :name => :dispatch_time,       :type => :sec, :anonymize => :slightly } \
-                    << { :name => :after_filters_time,  :type => :sec, :anonymize => :slightly } \
-                    << { :name => :before_filters_time, :type => :sec, :anonymize => :slightly } \
-                    << { :name => :action_time,         :type => :sec, :anonymize => :slightly }
+      line.captures << { :name => :dispatch_time,       :type => :duration } \
+                    << { :name => :after_filters_time,  :type => :duration } \
+                    << { :name => :before_filters_time, :type => :duration } \
+                    << { :name => :action_time,         :type => :duration }
     end
     
     
