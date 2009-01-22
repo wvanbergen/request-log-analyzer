@@ -32,7 +32,7 @@ module RequestLogAnalyzer
       
       # Slow default method to parse timestamps
       def convert_timestamp(value, capture_definition)
-        DateTime.parse(value) unless value.nil?
+        DateTime.parse(value).strftime('%Y%m%d%H%M%S').to_i unless value.nil?
       end
       
       def convert_duration(value, capture_definition)

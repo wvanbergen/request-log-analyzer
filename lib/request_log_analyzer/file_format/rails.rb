@@ -9,7 +9,7 @@ module RequestLogAnalyzer::FileFormat
       line.regexp = /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
       line.captures << { :name => :controller, :type  => :string } \
                     << { :name => :action,     :type  => :string } \
-                    << { :name => :format,     :type  => :string } \
+                    << { :name => :format,     :type  => :format } \
                     << { :name => :ip,         :type  => :string } \
                     << { :name => :timestamp,  :type  => :timestamp } \
                     << { :name => :method,     :type  => :string }
@@ -65,8 +65,7 @@ module RequestLogAnalyzer::FileFormat
 
 
     REQUEST_CATEGORIZER = Proc.new do |request|
-      format = request[:format] || 'html'
-      "#{request[:controller]}##{request[:action]}.#{format} [#{request[:method]}]"
+      "#{request[:controller]}##{request[:action]}.#{request[:format]} [#{request[:method]}]"
     end
 
     report do |analyze|
@@ -85,6 +84,17 @@ module RequestLogAnalyzer::FileFormat
             
       analyze.hourly_spread :line_type => :processing
       analyze.category :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
+    end
+
+    class Request < RequestLogAnalyzer::Request
+
+      def convert_timestamp(value, definition)
+        value.gsub(/[^0-9]/, '')[0...14].to_i unless value.nil?
+      end
+      
+      def convert_format(value, definition)
+        value || 'html'
+      end
     end
 
   end

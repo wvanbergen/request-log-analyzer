@@ -108,5 +108,12 @@ module RequestLogAnalyzer::FileFormat
       analyze.hourly_spread :line_type => :processing
       analyze.category :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
     end
+    
+    class Request < RequestLogAnalyzer::Request
+
+      def convert_timestamp(value, definition)
+        value.gsub(/[^0-9]/)[0...14].to_i unless value.nil?
+      end
+    end    
   end
 end

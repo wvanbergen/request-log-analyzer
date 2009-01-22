@@ -29,7 +29,7 @@ module RequestLogAnalyzer::Filter
     def filter(request)
       return nil unless request
       
-      found_field = request.every(@field).any? { |value| @value === value }
+      found_field = request.every(@field).any? { |value| @value === value.to_s }
       
       return nil if !found_field && @mode == :select
       return nil if found_field && @mode == :reject
