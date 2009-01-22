@@ -22,8 +22,6 @@ module RequestLogAnalyzer::Filter
     # Returns nil otherwise
     # <tt>request</tt> Request object.
     def filter(request)
-      return nil unless request
-      
       if @after && @before && request.timestamp <= @before && @after <= request.timestamp
         return request
       elsif @after && @before.nil? && @after <= request.timestamp
