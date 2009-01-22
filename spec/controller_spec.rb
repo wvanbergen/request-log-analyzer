@@ -18,7 +18,7 @@ describe RequestLogAnalyzer::Controller do
     controller.run!
   end
 
-  it "should call aggregators when run" do
+  it "should call aggregators correctly when run" do
     
     file_format = RequestLogAnalyzer::FileFormat.load(:rails)
     source      = RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => log_fixture(:rails_1x))  
@@ -42,6 +42,8 @@ describe RequestLogAnalyzer::Controller do
     mock_filter = mock('RequestLogAnalyzer::Filter::Base')
     mock_filter.should_receive(:prepare).once.ordered
     mock_filter.should_receive(:filter).at_least(:twice)
+    
+    controller.should_not_receive(:aggregate_request)
     
     controller.filters << mock_filter
     controller.run!
