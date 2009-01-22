@@ -24,7 +24,14 @@ module RequestLogAnalyzer::FileFormat
     elsif file_format.kind_of?(String) && File.exist?(file_format)
       # load a format from a ruby file
       require file_format
-      klass = Object.const_get(RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb')))
+      const = RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb'))
+      if RequestLogAnalyzer::FileFormat.const_defined?(const)
+        klass = RequestLogAnalyzer::FileFormat.const_get(const)
+      elsif Object.const_defined?(const)
+        klass = Object.const_get(const)
+      else
+        raise "Cannot load class #{const} from #{file_format}!"
+      end
 
     else
       # load a provided file format
