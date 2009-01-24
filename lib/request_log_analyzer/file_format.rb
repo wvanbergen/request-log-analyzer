@@ -78,6 +78,7 @@ module RequestLogAnalyzer::FileFormat
         subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request)) unless subclass.const_defined?('Request')
       else
         
+        # Copy the line and report definer from the parent class.
         subclass.class_eval do 
           instance_variable_set(:@line_definer, superclass.line_definer)
           instance_variable_set(:@report_definer, superclass.report_definer)
