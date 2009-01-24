@@ -1,6 +1,5 @@
 module RequestLogAnalyzer::FileFormat
   
-  
   def self.const_missing(const)
     RequestLogAnalyzer::load_default_class_file(self, const)
   end  
@@ -38,7 +37,10 @@ module RequestLogAnalyzer::FileFormat
       klass = RequestLogAnalyzer::FileFormat.const_get(RequestLogAnalyzer::to_camelcase(file_format))      
     end
     
-    raise if klass.nil?
+    # check the returned klass to see if it can be used
+    raise "Could not load a file format from #{file_format.inspect}" if klass.nil?
+    raise "Invalid FileFormat class" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
+    
     @current_file_format = klass.new # return an instance of the class
   end  
   
@@ -63,18 +65,29 @@ module RequestLogAnalyzer::FileFormat
       
     # Registers the line definer instance for a subclass.
     def self.inherited(subclass)
-       subclass.instance_variable_set(:@line_definer, RequestLogAnalyzer::LineDefinition::Definer.new)
-       subclass.class_eval { class << self; attr_accessor :line_definer; end } 
-       subclass.class_eval { class << self; attr_accessor :report_definer; end }
-       
-       unless subclass.const_defined?('Request')
-         subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request))         
-       end
+      if subclass.superclass == RequestLogAnalyzer::FileFormat::Base
+        subclass.class_eval do 
+
+          @@line_definer   = RequestLogAnalyzer::LineDefinition::Definer.new
+          @@report_definer = RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
+
+          def self.line_definer; @@line_definer; end
+          def self.report_definer; @@report_definer; end         
+        end
+
+        unless subclass.const_defined?('Request')
+          subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request))         
+        end
+      else
+        unless subclass.const_defined?('Request')
+          subclass.const_set('Request', Class.new(subclass.superclass::Request))         
+        end
+      end
     end    
     
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
-      @line_definer.send(name, &block)
+      @@line_definer.send(name, &block)
     end
     
     def create_request(*hashes)
@@ -84,16 +97,15 @@ module RequestLogAnalyzer::FileFormat
     # Specifies multiple line definitions at once using a block
     def self.format_definition(&block)
       if block_given?
-        yield(@line_definer) 
+        yield self.line_definer
       else
-        return @line_definer
+        return self.line_definer
       end
     end
     
     # Specifies the summary report using a block.
     def self.report(&block)
-      @report_definer = RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
-      yield(@report_definer)
+      yield(self.report_definer)
     end
 
     # Returns all line definitions
@@ -103,7 +115,7 @@ module RequestLogAnalyzer::FileFormat
     
     # Returns all the defined trackers for the summary report.
     def report_trackers
-      self.class.instance_variable_get(:@report_definer).trackers rescue []
+      self.class.report_definer.trackers# =>  rescue []
     end
     
     # Checks whether the line definitions form a valid language.
