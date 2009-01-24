@@ -66,28 +66,32 @@ module RequestLogAnalyzer::FileFormat
     # Registers the line definer instance for a subclass.
     def self.inherited(subclass)
       if subclass.superclass == RequestLogAnalyzer::FileFormat::Base
+        
+        # Create aline and report definer for this class
         subclass.class_eval do 
+          instance_variable_set(:@line_definer, RequestLogAnalyzer::LineDefinition::Definer.new)
+          instance_variable_set(:@report_definer, RequestLogAnalyzer::Aggregator::Summarizer::Definer.new)
+          class << self; attr_accessor :line_definer, :report_definer; end
+        end        
 
-          @@line_definer   = RequestLogAnalyzer::LineDefinition::Definer.new
-          @@report_definer = RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
-
-          def self.line_definer; @@line_definer; end
-          def self.report_definer; @@report_definer; end         
-        end
-
-        unless subclass.const_defined?('Request')
-          subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request))         
-        end
+        # Create a custom Request class for this file format
+        subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request)) unless subclass.const_defined?('Request')
       else
-        unless subclass.const_defined?('Request')
-          subclass.const_set('Request', Class.new(subclass.superclass::Request))         
-        end
+        
+        subclass.class_eval do 
+          instance_variable_set(:@line_definer, superclass.line_definer)
+          instance_variable_set(:@report_definer, superclass.report_definer)
+          class << self; attr_accessor :line_definer, :report_definer; end
+        end        
+        
+        # Create a custom Request class based on the superclass's Request class
+        subclass.const_set('Request', Class.new(subclass.superclass::Request)) unless subclass.const_defined?('Request')
       end
     end    
     
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
-      @@line_definer.send(name, &block)
+      @line_definer.send(name, &block)
     end
     
     def create_request(*hashes)

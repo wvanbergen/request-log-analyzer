@@ -22,7 +22,7 @@ class SpecFormat < RequestLogAnalyzer::FileFormat::Base
   end
   
   report do |analyze|
-    analyze.category :test_capture, :title => 'What is testing exactly?'
+    analyze.frequency :test_capture, :title => 'What is testing exactly?'
   end
   
   class Request < RequestLogAnalyzer::Request

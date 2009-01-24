@@ -50,13 +50,13 @@ describe RequestLogAnalyzer::FileFormat, :format_definition do
       line.first_test :regexp => /test/, :captures => []
     end
     
+
     @second_file_format.format_definition do |line|
       line.second_test :regexp => /test/, :captures => []
     end
 
+    @first_file_format.line_definer.should_not eql(@second_file_format.line_definer)
     @first_file_format.new.should have(1).line_definitions    
-    @first_file_format.new.line_definitions[:first_test].should_not be_nil
-    @second_file_format.new.should have(1).line_definitions        
     @second_file_format.new.line_definitions[:second_test].should_not be_nil
   end  
 end
