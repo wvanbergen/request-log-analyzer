@@ -31,13 +31,28 @@ module RequestLogAnalyzer::Tracker
     end
 
     def update(request)
-      category = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
-      duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
+      if options[:multiple]
+        categories = request.every(options[:category])
+        durations  = request.every(options[:duration])
+        
+        if categories.length == durations.length
+          categories.each_with_index do |category, index|
+            @categories[category] ||= {:count => 0, :total_duration => 0.0}
+            @categories[category][:count] += 1
+            @categories[category][:total_duration] += durations[index]
+          end
+        else
+          raise "Capture mismatch for multiple values in a request"
+        end
+      else
+        category = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
+        duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
   
-      if !duration.nil? && !category.nil?
-        @categories[category] ||= {:count => 0, :total_duration => 0.0}
-        @categories[category][:count] += 1
-        @categories[category][:total_duration] += duration
+        if !duration.nil? && !category.nil?
+          @categories[category] ||= {:count => 0, :total_duration => 0.0}
+          @categories[category][:count] += 1
+          @categories[category][:total_duration] += duration
+        end
       end
     end
 
