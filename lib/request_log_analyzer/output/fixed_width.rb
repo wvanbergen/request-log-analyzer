@@ -126,8 +126,12 @@ module RequestLogAnalyzer::Output
       end
      
       if column_widths.include?(nil)
+        fill_column = columns[column_widths.index(nil)]
         width_left = options[:width] - ((columns.length - 1) * (style[:cell_separator] ? 3 : 1)) - column_widths.compact.inject(0) { |sum, col| sum + col}
-        column_widths[column_widths.index(nil)] = width_left
+        column_widths[column_widths.index(nil)] = case fill_column[:type]
+          when :ratio; width_left # max out
+          else;        [width_left, fill_column[:actual_width]].min
+        end
       end
     
       # Print table header
