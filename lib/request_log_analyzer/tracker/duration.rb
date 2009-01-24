@@ -61,7 +61,7 @@ module RequestLogAnalyzer::Tracker
       output.title(options[:title])
     
       top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
-      output.table({:title => 'Action'}, {:title => 'Hits', :align => :right, :min_width => 4}, 
+      output.table({:title => 'Category', :width => :rest}, {:title => 'Hits', :align => :right, :min_width => 4}, 
             {:title => 'Cumulative', :align => :right, :min_width => 10}, {:title => 'Average', :align => :right, :min_width => 8}) do |rows|
       
         top_categories.each do |(cat, info)|
