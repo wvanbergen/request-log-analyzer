@@ -70,20 +70,20 @@ module RequestLogAnalyzer::FileFormat
 
     report do |analyze|
       analyze.timespan :line_type => :processing
-      analyze.category :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20, :line_type => :processing
-      analyze.category :method, :title => 'HTTP methods'
-      analyze.category :status, :title => 'HTTP statuses returned'
-      analyze.category :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits'
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20, :line_type => :processing
+      analyze.frequency :method, :title => 'HTTP methods'
+      analyze.frequency :status, :title => 'HTTP statuses returned'
+      analyze.frequency :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits'
     
       analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
       analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
       analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
     
-      analyze.category :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', 
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', 
               :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20
             
       analyze.hourly_spread :line_type => :processing
-      analyze.category :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
+      analyze.frequency :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
     end
 
     # Define a custom Request class for the Rails file format to speed up timestamp handling

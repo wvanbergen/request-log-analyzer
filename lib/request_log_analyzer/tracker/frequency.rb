@@ -1,6 +1,6 @@
 module RequestLogAnalyzer::Tracker
   
-  # Catagorize requests.
+  # Catagorize requests by frequency.
   # Count and analyze requests for a specific attribute 
   #
   # Accepts the following options:
@@ -19,7 +19,7 @@ module RequestLogAnalyzer::Tracker
   #  PUT    |  13685 hits (28.4%) |░░░░░░░░░░░
   #  POST   |  11662 hits (24.2%) |░░░░░░░░░
   #  DELETE |    512 hits (1.1%)  |
-  class Category < Base
+  class Frequency < Base
 
     attr_reader :categories
 

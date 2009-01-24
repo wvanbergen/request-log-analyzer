@@ -20,11 +20,11 @@ module RequestLogAnalyzer::Aggregator
         track(tracker_method, args.first)
       end
       
-      def category(category_field, options = {})
+      def frequency(category_field, options = {})
         if category_field.kind_of?(Symbol)
-          track(:category, options.merge(:category => category_field))
+          track(:frequency, options.merge(:category => category_field))
         elsif category_field.kind_of?(Hash)
-          track(:category, category_field.merge(options))
+          track(:frequency, category_field.merge(options))
         end
       end
       
