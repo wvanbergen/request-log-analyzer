@@ -104,7 +104,11 @@ module RequestLogAnalyzer::FileFormat
     end
     
     # Specifies the summary report using a block.
-    def self.report(&block)
+    def self.report(mode = :append, &block)
+      if mode == :overwrite
+        self.report_definer.reset!
+      end
+      
       yield(self.report_definer)
     end
 

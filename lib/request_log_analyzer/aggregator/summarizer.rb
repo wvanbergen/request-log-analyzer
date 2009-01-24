@@ -12,6 +12,10 @@ module RequestLogAnalyzer::Aggregator
         @trackers = []
       end
       
+      def reset!
+        @trackers = []
+      end
+      
       def method_missing(tracker_method, *args)
         track(tracker_method, args.first)
       end
