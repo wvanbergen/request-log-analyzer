@@ -4,3 +4,4 @@ request-log-analyzer-*.gem
 requests.db
 /pkg
 /doc
+/tmp
