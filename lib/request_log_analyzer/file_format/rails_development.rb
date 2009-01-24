@@ -38,7 +38,7 @@ module RequestLogAnalyzer::FileFormat
     
     class Request < Rails::Request
       def convert_sql(sql, definition) 
-        sql.gsub(/\b\d+\b/, ':int').gsub(/'[^']*'/, ':string')
+        sql.gsub(/\b\d+\b/, ':int').gsub(/`([^`]+)`/, '\1').gsub(/'[^']*'/, ':string')
       end
     end
   end
