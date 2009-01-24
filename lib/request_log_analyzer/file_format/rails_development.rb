@@ -31,7 +31,7 @@ module RequestLogAnalyzer::FileFormat
               :amount => 20, :title => 'Partial rendering duration'
               
       analyze.duration :query_duration, :category => :query_sql, :multiple_per_request => true, 
-              :amount => 20, :title => 'Query duration per model'
+              :amount => 20, :title => 'Query duration'
               
     end  
     
