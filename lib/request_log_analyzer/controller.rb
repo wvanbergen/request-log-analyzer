@@ -64,7 +64,7 @@ module RequestLogAnalyzer
       
       controller = Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format, options), options)
 
-      options[:assume_correct_order] = arguments[:assume_correct_order]
+      options[:parse_strategy] = arguments[:parse_strategy]
       
       # register filters        
       if arguments[:after] || arguments[:before]

@@ -50,7 +50,7 @@ describe RequestLogAnalyzer::Source::LogParser, :warnings do
   include RequestLogAnalyzerSpecHelper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format)
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format, :parse_strategy => 'cautious')
   end
     
   it "should warn about teaser matching problems" do

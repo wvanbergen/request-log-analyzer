@@ -1,7 +1,9 @@
 module RequestLogAnalyzer::FileFormat
   
+  # The RailsDevelopment FileFormat is an extention to the default Rails file format. It includes
+  # all lines of the normal Rails file format, but parses SQL queries and partial rendering lines
+  # as well.
   class RailsDevelopment < Rails
-  
   
     # Rendered layouts/_footer (2.9ms)
     line_definition :rendered do |line|
@@ -26,7 +28,9 @@ module RequestLogAnalyzer::FileFormat
                     << { :name => :cached_sql,      :type  => :sql }
     end  
 
+    # Define the reporting for the additional parsed lines
     report(:append) do |analyze|
+      
       analyze.duration :render_duration, :category => :render_file, :multiple_per_request => true, 
               :amount => 20, :title => 'Partial rendering duration'
               
@@ -35,10 +39,12 @@ module RequestLogAnalyzer::FileFormat
               
     end  
     
-    
+    # Add a converter method for the SQL fields the the Rails request class
     class Request < Rails::Request
+      
+      # Sanitizes SQL queries so that they can be grouped
       def convert_sql(sql, definition) 
-        sql.gsub(/\b\d+\b/, ':int').gsub(/`([^`]+)`/, '\1').gsub(/'[^']*'/, ':string')
+        sql.gsub(/\b\d+\b/, ':int').gsub(/`([^`]+)`/, '\1').gsub(/'[^']*'/, ':string').rstrip
       end
     end
   end

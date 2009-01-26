@@ -12,6 +12,10 @@ module RequestLogAnalyzer
       def initialize
         @line_definitions = {}
       end
+
+      def initialize_copy(other)
+        @line_definitions = other.line_definitions.dup
+      end
       
       def method_missing(name, *args, &block)
         if block_given?
@@ -33,7 +37,7 @@ module RequestLogAnalyzer
       @captures = []
       definition.each { |key, value| self.send("#{key.to_s}=".to_sym, value) }
     end
-    
+        
     def self.define(name, &block)
       definition = self.new(name)
       yield(definition) if block_given?
