@@ -11,6 +11,10 @@ module RequestLogAnalyzer::Aggregator
       def initialize
         @trackers = []
       end
+
+      def initialize_copy(other)
+        @trackers = other.trackers.dup
+      end
       
       def reset!
         @trackers = []
