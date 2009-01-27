@@ -36,7 +36,7 @@ module RequestLogAnalyzer::Source
     def prepare
     end
     
-    def requests(&block)
+    def each_request(&block)
       return true
     end
 

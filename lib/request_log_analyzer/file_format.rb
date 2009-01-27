@@ -95,8 +95,12 @@ module RequestLogAnalyzer::FileFormat
       @line_definer.send(name, &block)
     end
     
+    def request_class
+      self.class::Request
+    end
+    
     def request(*hashes)
-      self.class::Request.create(self, *hashes)
+      request_class.create(self, *hashes)
     end
     
     # Specifies multiple line definitions at once using a block

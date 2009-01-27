@@ -35,10 +35,18 @@ module RequestLogAnalyzerSpecHelper
     source.stub!(:parsed_requests).and_return(2)
     source.stub!(:skipped_requests).and_return(1)    
     source.stub!(:parse_lines).and_return(10)
-    source.stub!(:each_request) do
-      yield spec_format.request(:field => 'value1')
-      yield spec_format.request(:field => 'value2')      
+    
+    source.stub!(:warning=)
+    source.stub!(:progress=)
+
+    source.stub!(:prepare)
+    source.stub!(:finalize)
+        
+    source.stub!(:each_request).and_return do |block|
+      block.call(spec_format.request(:field => 'value1'))
+      block.call(spec_format.request(:field => 'value2'))
     end
+    
     return source
   end
 
