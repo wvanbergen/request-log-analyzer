@@ -1,8 +1,8 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Controller do
 
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
 
   it "should use a custom output generator correctly" do
     
@@ -21,7 +21,7 @@ describe RequestLogAnalyzer::Controller do
     
     mock_aggregator = mock('RequestLogAnalyzer::Aggregator::Base')
     mock_aggregator.should_receive(:prepare).once.ordered
-    mock_aggregator.should_receive(:aggregate).with(an_instance_of(spec_format.request_class)).twice.ordered
+    mock_aggregator.should_receive(:aggregate).with(an_instance_of(testing_format.request_class)).twice.ordered
     mock_aggregator.should_receive(:finalize).once.ordered
     mock_aggregator.should_receive(:report).once.ordered
   
@@ -38,18 +38,6 @@ describe RequestLogAnalyzer::Controller do
     
     controller.filters << mock_filter
     controller.run!
-  end
-  
-  it "should run well from the command line with the most important features" do
-    
-    temp_file = "#{File.dirname(__FILE__)}/fixtures/report.txt"
-    temp_db   = "#{File.dirname(__FILE__)}/fixtures/output.db"
-    binary = "#{File.dirname(__FILE__)}/../bin/request-log-analyzer"
-  
-    system("#{binary} #{log_fixture(:rails_1x)} --database #{temp_db} --select Controller PeopleController --file #{temp_file} > /dev/null").should be_true
-  
-    File.unlink(temp_file)
-    File.unlink(temp_db)    
   end
   
 end

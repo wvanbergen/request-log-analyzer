@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Source::LogParser, :requests do
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format)
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)
   end
   
   it "should have multiple line definitions" do
@@ -16,13 +16,13 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
   end
   
   it "should parse more lines than requests" do
-    @log_parser.should_receive(:handle_request).with(an_instance_of(SpecFormat::Request)).twice
+    @log_parser.should_receive(:handle_request).with(an_instance_of(TestingFormat::Request)).twice
     @log_parser.parse_file(log_fixture(:test_language_combined))
     @log_parser.parsed_lines.should > 2    
   end
   
   it "should parse requests spanned over multiple files" do
-    @log_parser.should_receive(:handle_request).with(an_instance_of(SpecFormat::Request)).once
+    @log_parser.should_receive(:handle_request).with(an_instance_of(TestingFormat::Request)).once
     @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)])
   end
   
@@ -47,10 +47,10 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
 end
 
 describe RequestLogAnalyzer::Source::LogParser, :warnings do
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::Source::LogParser.new(spec_format, :parse_strategy => 'cautious')
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format, :parse_strategy => 'cautious')
   end
     
   it "should warn about teaser matching problems" do

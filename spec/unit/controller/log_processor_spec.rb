@@ -1,12 +1,13 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../../spec_helper'
+
 require 'request_log_analyzer/log_processor'
 
 describe RequestLogAnalyzer::LogProcessor, 'stripping log files' do
 
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
-    @log_stripper = RequestLogAnalyzer::LogProcessor.new(spec_format, :strip, {})
+    @log_stripper = RequestLogAnalyzer::LogProcessor.new(testing_format, :strip, {})
   end
   
   it "should remove a junk line" do

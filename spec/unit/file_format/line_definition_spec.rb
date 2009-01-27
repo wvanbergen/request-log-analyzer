@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::LineDefinition, :parsing do
   
@@ -35,10 +35,10 @@ end
 
 describe RequestLogAnalyzer::LineDefinition, :converting do
 
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
-    @file_format = spec_format
+    @file_format = testing_format
     @request = @file_format.request
   end
   

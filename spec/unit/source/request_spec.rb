@@ -1,11 +1,11 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Request, :incomplete_request do
   
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
-    @incomplete_request = spec_format.request
+    @incomplete_request = testing_format.request
     @incomplete_request << { :line_type => :test, :lineno => 1, :test_capture => 'awesome!' }
   end
   
@@ -34,10 +34,10 @@ end
 
 describe RequestLogAnalyzer::Request, :completed_request do
   
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
-    @completed_request = spec_format.request
+    @completed_request = testing_format.request
     @completed_request << { :line_type => :first, :lineno =>  1, :name => 'first line!' }    
     @completed_request << { :line_type => :test,  :lineno =>  4, :test_capture => 'testing' }        
     @completed_request << { :line_type => :test,  :lineno =>  7, :test_capture => 'testing some more' }            

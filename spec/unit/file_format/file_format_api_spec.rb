@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::FileFormat, :format_definition do
   
@@ -63,7 +63,18 @@ end
 
 describe RequestLogAnalyzer::FileFormat, :load do
 
-  include RequestLogAnalyzerSpecHelper
+  include RequestLogAnalyzer::Spec::Helper
+
+  it "should return an instance of a FileFormat class" do
+    @file_format = RequestLogAnalyzer::FileFormat.load(TestingFormat)
+    @file_format.should be_kind_of(TestingFormat)
+  end
+
+
+  it "should return itself if it already is a FileFormat::Base instance" do
+    @file_format = RequestLogAnalyzer::FileFormat.load(testing_format)
+    @file_format.should be_kind_of(TestingFormat)
+  end
 
   it "should load a predefined file format from the /file_format dir" do
     @file_format = RequestLogAnalyzer::FileFormat.load(:rails)
@@ -71,8 +82,9 @@ describe RequestLogAnalyzer::FileFormat, :load do
   end
   
   it "should load a provided format file" do
-    @file_format = RequestLogAnalyzer::FileFormat.load(format_file(:spec_format))
-    @file_format.should be_kind_of(SpecFormat)
+    format_filename = File.dirname(__FILE__) + '/../../lib/testing_format.rb'
+    @file_format = RequestLogAnalyzer::FileFormat.load(format_filename)
+    @file_format.should be_kind_of(TestingFormat)
   end
   
 end
