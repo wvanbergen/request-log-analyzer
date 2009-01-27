@@ -23,11 +23,12 @@ rescue
   end
 end
 
-# Copies request-log-analyzer analyzer rake tasks into the /lib/tasks folder of a rails project.
-# Raises if it cannot find ./lib/tasks
-# <tt>install_type</tt> Defaults to rails.
-def install_rake_tasks(install_type = 'rails')
-  if install_type == 'rails'
+# Copies request-log-analyzer analyzer rake tasks into the /lib/tasks folder of a project, for easy access and
+# environment integration.
+# <tt>install_type</tt> Type of project to install into. Defaults to :rails.
+# Raises if it cannot find the project folder or if the install_type is now known.
+def install_rake_tasks(install_type = :rails)
+  if install_type.to_sym == :rails
     require 'ftools'
     if File.directory?('./lib/tasks/')
       File.copy(File.dirname(__FILE__) + '/../tasks/request_log_analyzer.rake', './lib/tasks/request_log_analyze.rake')
@@ -38,7 +39,7 @@ def install_rake_tasks(install_type = 'rails')
       puts "Installation aborted."
     end
   else
-    raise "Cannot perform this install type! (#{install_type})"
+    raise "Cannot perform this install type! (#{install_type.to_s})"
   end
 end
 
