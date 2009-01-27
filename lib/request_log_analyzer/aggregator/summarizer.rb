@@ -103,7 +103,7 @@ module RequestLogAnalyzer::Aggregator
         output.title("Parse warnings")
         
         output.puts "Parseable lines were ancountered without a header line before it. It"
-        ourput.puts "could be that logging is not setup correctly for your application."
+        output.puts "could be that logging is not setup correctly for your application."
         output.puts "Visit this website for logging configuration tips:"
         output.puts output.link("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging")
         output.puts
