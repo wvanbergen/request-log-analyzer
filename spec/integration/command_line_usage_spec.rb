@@ -38,6 +38,16 @@ describe RequestLogAnalyzer, 'running from command line' do
     File.exist?(TEMP_REPORT_FILE).should be_true
   end
 
+  it "should write only ASCII characters to a file with the --file option" do  
+    run("#{log_fixture(:rails_1x)} --file #{TEMP_REPORT_FILE}")
+    /^[\x00-\x7F]*$/.match(File.read(TEMP_REPORT_FILE)).should be_true
+  end
+
+  it "should write HTML if --output HTML is provided" do
+    output = run("#{log_fixture(:rails_1x)} --output HTML")
+    output.any? { |line| /<html.*>/ =~ line}
+  end
+  
   it "should run with the --database option" do  
     run("#{log_fixture(:rails_1x)} --database #{TEMP_DATABASE_FILE}")
     File.exist?(TEMP_DATABASE_FILE).should be_true
