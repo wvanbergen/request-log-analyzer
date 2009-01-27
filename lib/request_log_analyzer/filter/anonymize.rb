@@ -7,9 +7,6 @@ module RequestLogAnalyzer::Filter
   # * <tt>:value</tt> Value that the field should match to be accepted or rejected.
   class Anonymize < Base
    
-    def prepare
-    end
-
     def generate_random_ip
       "#{rand(256)}.#{rand(256)}.#{rand(256)}.#{rand(256)}"
     end

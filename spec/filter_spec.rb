@@ -5,7 +5,6 @@ describe RequestLogAnalyzer::Filter::Timespan, 'both before and after'  do
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Timespan.new(spec_format, :after => DateTime.parse('2009-01-01'), :before => DateTime.parse('2009-02-02'))
-    @filter.prepare
   end
   
   it "should reject a request before the after date" do
@@ -26,7 +25,6 @@ describe RequestLogAnalyzer::Filter::Timespan, 'only before'  do
   
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Timespan.new(spec_format, :before => DateTime.parse('2009-02-02'))    
-    @filter.prepare
   end
   
   it "should accept a request before the after date" do
@@ -47,7 +45,6 @@ describe RequestLogAnalyzer::Filter::Timespan, 'only after'  do
   
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Timespan.new(spec_format, :after => DateTime.parse('2009-01-01'))
-    @filter.prepare
   end
   
   it "should reject a request before the after date" do
@@ -68,7 +65,6 @@ describe RequestLogAnalyzer::Filter::Field, 'string in accept mode' do
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Field.new(spec_format, :field => :test, :value => 'test', :mode => :select)
-    @filter.prepare
   end
   
   it "should reject a request if the field value does not match" do
@@ -93,7 +89,6 @@ describe RequestLogAnalyzer::Filter::Field, 'string in reject mode' do
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Field.new(spec_format, :field => :test, :value => 'test', :mode => :reject)
-    @filter.prepare
   end
   
   it "should accept a request if the field value does not match" do
@@ -118,7 +113,6 @@ describe RequestLogAnalyzer::Filter::Field, 'regexp in accept mode' do
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Field.new(spec_format, :field => :test, :value => '/test/', :mode => :select)
-    @filter.prepare
   end
   
   it "should reject a request if the field value does not match" do
@@ -139,7 +133,6 @@ describe RequestLogAnalyzer::Filter::Anonymize, 'anonymize request' do
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Anonymize.new(spec_format)
-    @filter.prepare
   end
   
   it "should anonimize ip" do

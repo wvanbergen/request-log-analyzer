@@ -33,9 +33,7 @@ describe RequestLogAnalyzer::Controller do
     controller  = RequestLogAnalyzer::Controller.new(mock_source, :output => mock_output)
     
     mock_filter = mock('RequestLogAnalyzer::Filter::Base')
-    mock_filter.should_receive(:prepare).once.ordered
-    mock_filter.should_receive(:filter).twice
-    
+    mock_filter.should_receive(:filter).twice.and_return(nil)
     controller.should_not_receive(:aggregate_request)
     
     controller.filters << mock_filter

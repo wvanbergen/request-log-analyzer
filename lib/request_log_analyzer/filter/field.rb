@@ -9,8 +9,13 @@ module RequestLogAnalyzer::Filter
    
     attr_reader :field, :value, :mode
    
+    def initialize(file_format, options = {})
+      super(file_format, options)
+      setup_filter
+    end
+   
     # Setup mode, field and value.
-    def prepare
+    def setup_filter
       @mode = (@options[:mode] || :accept).to_sym
       @field = @options[:field].to_sym
       

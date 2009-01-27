@@ -182,7 +182,6 @@ module RequestLogAnalyzer
     # 6. Finalize Source
     def run!
       
-      @filters.each { |filter| filter.prepare }
       @aggregators.each { |agg| agg.prepare }
       
       begin

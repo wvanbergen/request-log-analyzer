@@ -8,9 +8,15 @@ module RequestLogAnalyzer::Filter
    
     attr_reader :before, :after
    
+    def initialize(file_format, options = {})
+      super(file_format, options)
+      setup_filter
+    end
+   
+   
     # Convert the timestamp to the correct formats for quick timestamp comparisons.
     # These are stored in the before and after attr_reader fields.
-    def prepare
+    def setup_filter
       @after  = @options[:after].strftime('%Y%m%d%H%M%S').to_i  if options[:after]     
       @before = @options[:before].strftime('%Y%m%d%H%M%S').to_i if options[:before]
     end

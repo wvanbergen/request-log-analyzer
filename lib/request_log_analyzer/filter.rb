@@ -23,10 +23,6 @@ module RequestLogAnalyzer::Filter
       register_file_format(format)
     end
     
-    # Initialize the filter
-    def prepare
-    end
-    
     # Return the request if the request should be kept.
     # Return nil otherwise.
     def filter(request)
