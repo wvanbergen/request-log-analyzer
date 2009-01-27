@@ -11,6 +11,9 @@ module RequestLogAnalyzer::Source
   # occurs.
   class LogParser < Base
 
+    DEFAULT_PARSE_STRATEGY = 'assume-correct'
+    PARSE_STRATEGIES = ['cautious', 'assume-correct']
+
     attr_reader :source_files
 
     # Initializes the parser instance.
@@ -25,9 +28,10 @@ module RequestLogAnalyzer::Source
       @skipped_requests = 0
       @current_io       = nil
       @source_files     = options[:source_files]
-
-      # install the file format module (see RequestLogAnalyzer::FileFormat)
-      # and register all the line definitions to the parser
+      
+      @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
+      raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
+      
       self.register_file_format(format)
     end
     
@@ -69,24 +73,17 @@ module RequestLogAnalyzer::Source
     # Yeilds a Hash when it encounters a chunk of information.
     def parse_io(io, options = {}, &block)
 
-      # parse every line type by default
-      line_types = options[:line_types] || file_format.line_definitions.keys
-
-      # check whether all provided line types are valid
-      unknown = line_types.reject { |line_type| file_format.line_definitions.has_key?(line_type) }
-      raise "Unknown line types: #{unknown.join(', ')}" unless unknown.empty?
-
       @current_io = io
       @current_io.each_line do |line|
 
         @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
 
         request_data = nil
-        line_types.each do |line_type|
-          line_type_definition = file_format.line_definitions[line_type]
-          break if request_data = line_type_definition.matches(line, @current_io.lineno, self)
+        file_format.line_definitions.each do |line_type, definition|
+          request_data = definition.matches(line, @current_io.lineno, self)
+          break if request_data
         end
-
+        
         if request_data
           @parsed_lines += 1
           update_current_request(request_data, &block)
@@ -130,12 +127,13 @@ module RequestLogAnalyzer::Source
     def update_current_request(request_data, &block)
       if header_line?(request_data)
         unless @current_request.nil?
-          if options[:assume_correct_order]
-            handle_request(@current_request, &block) #yield @current_request
+          case options[:parse_strategy]
+          when 'assume-correct'
+            handle_request(@current_request, &block)
             @current_request = @file_format.request(request_data)
-          else
+          when 'cautious'
             @skipped_lines += 1
-            warn(:unclosed_request, "Encountered header line, but previous request was not closed!")
+            warn(:unclosed_request, "Encountered header line (#{request_data[:line_definition].name.inspect}), but previous request was not closed!")
             @current_request = nil # remove all data that was parsed, skip next request as well.
           end
         else
@@ -150,7 +148,7 @@ module RequestLogAnalyzer::Source
           end
         else
           @skipped_lines += 1
-          warn(:no_current_request, "Parsebale line found outside of a request!")
+          warn(:no_current_request, "Parsebale line (#{request_data[:line_definition].name.inspect}) found outside of a request!")
         end
       end
     end

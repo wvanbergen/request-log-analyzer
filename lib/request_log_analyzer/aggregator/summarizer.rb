@@ -9,6 +9,10 @@ module RequestLogAnalyzer::Aggregator
       def initialize
         @trackers = []
       end
+
+      def initialize_copy(other)
+        @trackers = other.trackers.dup
+      end
       
       def reset!
         @trackers = []
@@ -88,19 +92,19 @@ module RequestLogAnalyzer::Aggregator
           rows << ['Parsed request:', source.parsed_requests]
           rows << ['Skipped lines:',  source.skipped_lines]
         
-          rows <<  ["Warnings:", @warnings_encountered.map { |(key, value)| "#{key.inspect}: #{value}" }.join(', ')] if has_warnings?
+          rows << ["Warnings:", @warnings_encountered.map { |(key, value)| "#{key}: #{value}" }.join(', ')] if has_warnings?
         end
       end
       output << "\n"
     end
     
     def report_footer(output)
-      if has_serious_warnings?     
-        
+      if has_log_ordering_warnings?
         output.title("Parse warnings")
         
-        output.puts "Multiple warnings were encountered during parsing. Possibly, your logging "
-        output.puts "is not setup correctly. Visit this website for logging configuration tips:"
+        output.puts "Parseable lines were ancountered without a header line before it. It"
+        ourput.puts "could be that logging is not setup correctly for your application."
+        output.puts "Visit this website for logging configuration tips:"
         output.puts output.link("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging")
         output.puts
       end
@@ -110,8 +114,8 @@ module RequestLogAnalyzer::Aggregator
        @warnings_encountered.inject(0) { |result, (key, value)| result += value } > 0
     end
     
-    def has_serious_warnings?
-      @warnings_encountered.inject(0) { |result, (key, value)| result += value } > 10
+    def has_log_ordering_warnings?
+      @warnings_encountered[:no_current_request] && @warnings_encountered[:no_current_request] > 0
     end
     
     def warning(type, message, lineno)

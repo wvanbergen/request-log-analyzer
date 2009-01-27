@@ -80,8 +80,8 @@ module RequestLogAnalyzer::FileFormat
         
         # Copy the line and report definer from the parent class.
         subclass.class_eval do 
-          instance_variable_set(:@line_definer, superclass.line_definer)
-          instance_variable_set(:@report_definer, superclass.report_definer)
+          instance_variable_set(:@line_definer, superclass.line_definer.clone)
+          instance_variable_set(:@report_definer, superclass.report_definer.clone)
           class << self; attr_accessor :line_definer, :report_definer; end
         end        
         
