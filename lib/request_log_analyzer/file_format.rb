@@ -95,7 +95,7 @@ module RequestLogAnalyzer::FileFormat
       @line_definer.send(name, &block)
     end
     
-    def create_request(*hashes)
+    def request(*hashes)
       self.class::Request.create(self, *hashes)
     end
     

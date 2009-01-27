@@ -23,10 +23,23 @@ module RequestLogAnalyzerSpecHelper
   
   def request(fields, format = spec_format)
     if fields.kind_of?(Array)
-      format.create_request(*fields)
+      format.request(*fields)
     else
-      format.create_request(fields)      
+      format.request(fields)      
     end
+  end
+  
+  def mock_source
+    source = mock('RequestLogAnalyzer::Source::Base')
+    source.stub!(:file_format).and_return(spec_format)
+    source.stub!(:parsed_requests).and_return(2)
+    source.stub!(:skipped_requests).and_return(1)    
+    source.stub!(:parse_lines).and_return(10)
+    source.stub!(:each_request) do
+      yield spec_format.request(:field => 'value1')
+      yield spec_format.request(:field => 'value2')      
+    end
+    return source
   end
 
   def mock_io
@@ -38,9 +51,15 @@ module RequestLogAnalyzerSpecHelper
   end
   
   def mock_output
-    output = mock('RequestLogAnalyzer::Output')
+    output = mock('RequestLogAnalyzer::Output::Base')
     output.stub!(:header)
-    output.stub!(:footer)    
+    output.stub!(:footer)   
+    output.stub!(:puts)
+    output.stub!(:<<)    
+    output.stub!(:title)
+    output.stub!(:line)
+    output.stub!(:with_style)    
+    output.stub!(:table) { yield [] }
     output.stub!(:io).and_return(mock_io)
     return output
   end

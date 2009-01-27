@@ -80,7 +80,7 @@ describe "RequestLogAnalyzer::FileFormat::RailsDevelopment - Rails with developm
   
   before(:each) do
     @file_format = RequestLogAnalyzer::FileFormat.load(:rails_development)
-    @request = @file_format.create_request
+    @request = @file_format.request
   end
   
   it "should have a valid language definitions" do

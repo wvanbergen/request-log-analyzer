@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + '/../tracker'
-
 module RequestLogAnalyzer::Aggregator
 
   class Summarizer < Base
@@ -58,7 +56,7 @@ module RequestLogAnalyzer::Aggregator
     def prepare
       raise "No trackers set up in Summarizer!" if @trackers.nil? || @trackers.empty?
       @trackers.each { |tracker| tracker.prepare }
-      end
+    end
     
     def aggregate(request)
       @trackers.each do |tracker|

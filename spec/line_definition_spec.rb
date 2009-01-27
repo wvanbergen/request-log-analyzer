@@ -39,7 +39,7 @@ describe RequestLogAnalyzer::LineDefinition, :converting do
   
   before(:each) do
     @file_format = spec_format
-    @request = @file_format.create_request
+    @request = @file_format.request
   end
   
   it "should convert captures to a hash of converted values" do
