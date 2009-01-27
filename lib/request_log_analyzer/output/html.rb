@@ -1,5 +1,6 @@
 module RequestLogAnalyzer::Output
   
+  # HTML Output class. Generated a HTML-formatted report, including CSS.
   class HTML < Base
   
     # def initialize(io, options = {})

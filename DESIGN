@@ -15,10 +15,7 @@ This allows you to easily add extra reports, filters and outputs.
 
 At the moment the supported sources are file and STDIN.
 In the future we want to be able to have a generated request database as source.
-This will make interactive downdrilling possible.
+This will make interactive down drilling possible.
 
-
-For the report generation output we now use the File and the STDOUT class, as they both support <<.
-In the future we want to have a OutputFile, OutputSTDOUT and OutputHTML class, so that reports can generate
-tables, lines and comments and push them into the output class.
+For report generation output can output to STDOUT and HTML.
 

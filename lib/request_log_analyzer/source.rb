@@ -4,6 +4,7 @@ module RequestLogAnalyzer::Source
     RequestLogAnalyzer::load_default_class_file(self, const)
   end
   
+  # Base Source class. All other sources inherit from this class
   class Base
     
     include RequestLogAnalyzer::FileFormat::Awareness

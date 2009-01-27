@@ -1,5 +1,7 @@
 module RequestLogAnalyzer::Output
   
+  # Fixed Width output class.
+  # Outputs a fixed width ASCII or UF8 report.
   class FixedWidth < Base
   
     module Monochrome

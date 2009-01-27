@@ -160,6 +160,9 @@ module RequestLogAnalyzer
       @filters << filter.new(file_format, @options.merge(filter_options))
     end
     
+    # Push a request through the entire filterchain (@filters).
+    # <tt>request</tt> The request to filter.
+    # Returns the filtered request or nil.
     def filter_request(request)
       @filters.each do |filter| 
         request = filter.filter(request)
@@ -168,7 +171,10 @@ module RequestLogAnalyzer
       return request
     end
     
+    # Push a request to all the aggregators (@aggregators).
+    # <tt>request</tt> The request to push to the aggregators.    
     def aggregate_request(request)
+      return unless request
       @aggregators.each { |agg| agg.aggregate(request) }
     end
     
@@ -186,8 +192,7 @@ module RequestLogAnalyzer
       
       begin
         @source.each_request do |request|
-          request = filter_request(request)
-          aggregate_request(request) unless request.nil?
+          aggregate_request(filter_request(request))
         end
       rescue Interrupt => e
         handle_progress(:interrupted)

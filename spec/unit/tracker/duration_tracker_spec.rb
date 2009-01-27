@@ -11,7 +11,7 @@ describe RequestLogAnalyzer::Tracker::Duration, 'static category' do
 
   it "should register a request in the right category" do
     @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.categories.should include('a')
+    @tracker.categories.keys.should include('a')
   end
  
   it "should register a hit in the right category" do

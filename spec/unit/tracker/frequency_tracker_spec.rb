@@ -12,7 +12,7 @@ describe RequestLogAnalyzer::Tracker::Frequency, 'static category' do
   
   it "should register a request in the right category" do
     @tracker.update(request(:category => 'a', :blah => 0.2))
-    @tracker.frequencies.should include('a')
+    @tracker.frequencies.keys.should include('a')
   end
   
   it "should register a request in the right category" do
