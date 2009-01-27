@@ -21,36 +21,48 @@ module RequestLogAnalyzer::Tracker
   #  DELETE |    512 hits (1.1%)  |
   class Frequency < Base
 
-    attr_reader :categories
+    attr_reader :frequencies
 
     def prepare
       raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
-      @categories = {}
+      @frequencies = {}
       if options[:all_categories].kind_of?(Enumerable)
-        options[:all_categories].each { |cat| @categories[cat] = 0 }
+        options[:all_categories].each { |cat| @frequencies[cat] = 0 }
       end
     end
             
     def update(request)
       cat = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
       if !cat.nil? || options[:nils]
-        @categories[cat] ||= 0
-        @categories[cat] += 1
+        @frequencies[cat] ||= 0
+        @frequencies[cat] += 1
       end
+    end
+
+    def frequency(cat)
+      frequencies[cat] || 0
+    end
+    
+    def overall_frequency
+      frequencies.inject(0) { |carry, item| carry + item[1] }
+    end
+    
+    def sorted_by_frequency
+      @frequencies.sort { |a, b| b[1] <=> a[1] }
     end
 
     def report(output)
       output.title(options[:title]) if options[:title]
     
-      if @categories.empty?
+      if @frequencies.empty?
         output << "None found.\n" 
       else
-        sorted_categories = @categories.sort { |a, b| b[1] <=> a[1] }
-        total_hits        = sorted_categories.inject(0) { |carry, item| carry + item[1] }
-        sorted_categories = sorted_categories.slice(0...options[:amount]) if options[:amount]
+        sorted_frequencies = @frequencies.sort { |a, b| b[1] <=> a[1] }
+        total_hits         = sorted_frequencies.inject(0) { |carry, item| carry + item[1] }
+        sorted_frequencies = sorted_frequencies.slice(0...options[:amount]) if options[:amount]
 
         output.table({:align => :left}, {:align => :right }, {:align => :right}, {:type => :ratio, :width => :rest}) do |rows|        
-          sorted_categories.each do |(cat, count)|
+          sorted_frequencies.each do |(cat, count)|
             rows << [cat, "#{count} hits", '%0.1f%%' % ((count.to_f / total_hits.to_f) * 100.0), (count.to_f / total_hits.to_f)]
           end
         end

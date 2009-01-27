@@ -37,9 +37,9 @@ module RequestLogAnalyzer::Tracker
         
         if categories.length == durations.length
           categories.each_with_index do |category, index|
-            @categories[category] ||= {:count => 0, :total_duration => 0.0}
-            @categories[category][:count] += 1
-            @categories[category][:total_duration] += durations[index]
+            @categories[category] ||= {:hits => 0, :cumulative => 0.0}
+            @categories[category][:hits] += 1
+            @categories[category][:cumulative] += durations[index]
           end
         else
           raise "Capture mismatch for multiple values in a request"
@@ -49,10 +49,54 @@ module RequestLogAnalyzer::Tracker
         duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
   
         if !duration.nil? && !category.nil?
-          @categories[category] ||= {:count => 0, :total_duration => 0.0}
-          @categories[category][:count] += 1
-          @categories[category][:total_duration] += duration
+          @categories[category] ||= {:hits => 0, :cumulative => 0.0}
+          @categories[category][:hits] += 1
+          @categories[category][:cumulative] += duration
         end
+      end
+    end
+    
+    def hits(cat)
+      categories[cat][:hits]
+    end
+    
+    def cumulative_duration(cat)
+      categories[cat][:cumulative]
+    end
+    
+    def average_duration(cat)
+      categories[cat][:cumulative] / categories[cat][:hits]  
+    end
+    
+    def overall_average_duration
+      overall_cumulative_duration / overall_hits
+    end
+    
+    def overall_cumulative_duration
+      categories.inject(0.0) { |sum, (name, cat)| sum + cat[:cumulative] }  
+    end
+    
+    def overall_hits
+      categories.inject(0) { |sum, (name, cat)| sum + cat[:hits] }
+    end
+
+    def sorted_by_hits
+      sorted_by(:hits)
+    end
+
+    def sorted_by_cumulative
+      sorted_by(:cumulative)
+    end
+
+    def sorted_by_average
+      sorted_by { |cat| cat[:cumulative] / cat[:hits] }
+    end
+          
+    def sorted_by(by = nil) 
+      if block_given?
+        categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) } 
+      else
+        categories.sort { |a, b| b[1][by] <=> a[1][by] } 
       end
     end
     
@@ -66,7 +110,7 @@ module RequestLogAnalyzer::Tracker
             {:title => 'Cumulative', :align => :right, :min_width => 10}, {:title => 'Average', :align => :right, :min_width => 8}) do |rows|
       
         top_categories.each do |(cat, info)|
-          rows << [cat, info[:count], "%0.02fs" % info[:total_duration], "%0.02fs" % (info[:total_duration] / info[:count])]
+          rows << [cat, info[:hits], "%0.02fs" % info[:cumulative], "%0.02fs" % (info[:cumulative] / info[:hits])]
         end        
       end
 
@@ -75,17 +119,17 @@ module RequestLogAnalyzer::Tracker
     def report(output)
 
       options[:title]  ||= 'Request duration'
-      options[:report] ||= [:total, :average]
+      options[:report] ||= [:cumulative, :average]
       options[:top]    ||= 20
   
       options[:report].each do |report|
         case report
         when :average
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time") { |request| request[:total_duration] / request[:count] }  
-        when :total
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time") { |request| request[:total_duration] }
+          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time") { |cat| cat[:cumulative] / cat[:hits] }  
+        when :cumulative
+          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time") { |cat| cat[:cumulative] }
         when :hits
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits") { |request| request[:count] }
+          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits") { |cat| cat[:hits] }
         else
           raise "Unknown duration report specified: #{report}!"
         end
