@@ -7,8 +7,6 @@ describe RequestLogAnalyzer, 'running from command line' do
   TEMPORARY_DIRECTORY = "#{File.dirname(__FILE__)}/../fixtures"
   TEMP_DATABASE_FILE  = TEMPORARY_DIRECTORY + "/output.db"
   TEMP_REPORT_FILE    = TEMPORARY_DIRECTORY + "/report"
-  
-  RLA_BINARY = "#{File.dirname(__FILE__)}/../../bin/request-log-analyzer"
 
   before(:each) do
     File.unlink(TEMP_DATABASE_FILE) if File.exist?(TEMP_DATABASE_FILE)
@@ -19,9 +17,40 @@ describe RequestLogAnalyzer, 'running from command line' do
     File.unlink(TEMP_DATABASE_FILE) if File.exist?(TEMP_DATABASE_FILE)
     File.unlink(TEMP_REPORT_FILE) if File.exist?(TEMP_REPORT_FILE)    
   end
+
+  it "should find 4 requests in default mode" do  
+    output = run("#{log_fixture(:rails_1x)}")
+    output.detect { |line| /Parsed requests\:\s*4/ =~ line }.should_not be_nil
+  end
+
+  it "should find 3 requests with a --select option" do  
+    output = run("#{log_fixture(:rails_1x)} --select controller PeopleController")
+    output.detect { |line| /Parsed requests\:\s*4/ =~ line }.should_not be_nil
+  end
+
+  it "should find 1 requests with a --reject option" do  
+    output = run("#{log_fixture(:rails_1x)} --reject controller PeopleController")
+    output.detect { |line| /Parsed requests\:\s*4/ =~ line }.should_not be_nil
+  end
   
-  it "should run well from the command line with the most important features" do  
-    system("#{RLA_BINARY} #{log_fixture(:rails_1x)} --database #{TEMP_DATABASE_FILE} --select Controller PeopleController --file #{TEMP_REPORT_FILE} > /dev/null").should be_true   
+  it "should write output to a file with the --file option" do  
+    run("#{log_fixture(:rails_1x)} --file #{TEMP_REPORT_FILE}")
+    File.exist?(TEMP_REPORT_FILE).should be_true
+  end
+
+  it "should run with the --database option" do  
+    run("#{log_fixture(:rails_1x)} --database #{TEMP_DATABASE_FILE}")
+    File.exist?(TEMP_DATABASE_FILE).should be_true
+  end
+
+  it "should use no colors in the report with the --boring option" do  
+    output = run("#{log_fixture(:rails_1x)} --boring")
+    output.any? { |line| /\e/ =~ line }.should be_false
+  end
+  
+  it "should use only ASCII characters in the report with the --boring option" do  
+    output = run("#{log_fixture(:rails_1x)} --boring")
+    output.all? { |line| /^[\x00-\x7F]*$/ =~ line }.should be_true
   end
   
 end

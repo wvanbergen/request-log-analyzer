@@ -44,19 +44,31 @@ module RequestLogAnalyzer::Tracker
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
 
+    def total_requests
+      @request_time_graph.inject(0) { |sum, value| sum + value }
+    end
+    
+    def first_timestamp
+      DateTime.parse(@first.to_s, '%Y%m%d%H%M%S') rescue nil
+    end
+    
+    def last_timestamp
+      DateTime.parse(@last.to_s, '%Y%m%d%H%M%S') rescue nil
+    end
+    
+    def timespan
+      last_timestamp - first_timestamp
+    end
+
     def report(output)
       output.title("Requests graph - average per day per hour")
     
-      if @request_time_graph == [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+      if total_requests == 0
         output << "None found.\n"
         return
       end
 
-      first_date     = DateTime.parse(@first.to_s, '%Y%m%d%H%M%S')
-      last_date      = DateTime.parse(@last.to_s, '%Y%m%d%H%M%S')
-      days           = (@last && @first) ? (last_date - first_date).ceil : 1
-      total_requests = @request_time_graph.inject(0) { |sum, value| sum + value }
-    
+      days = [1, timespan].max
       output.table({}, {:align => :right}, {:type => :ratio, :width => :rest, :treshold => 0.15}) do |rows|
         @request_time_graph.each_with_index do |requests, index|
           ratio = requests.to_f / total_requests.to_f

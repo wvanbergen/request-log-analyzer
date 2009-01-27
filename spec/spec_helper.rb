@@ -4,7 +4,8 @@ require 'rubygems'
 require 'spec'
 require 'request_log_analyzer'
 
-module RequestLogAnalyzer::Spec; end
+module RequestLogAnalyzer::Spec
+end
 
 require File.dirname(__FILE__) + '/lib/testing_format'
 require File.dirname(__FILE__) + '/lib/mocks'

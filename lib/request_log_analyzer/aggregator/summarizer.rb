@@ -88,9 +88,9 @@ module RequestLogAnalyzer::Aggregator
   
       output.with_style(:cell_separator => false) do 
         output.table({:width => 20}, {:font => :bold}) do |rows|
-          rows << ['Parsed lines:',   source.parsed_lines]
-          rows << ['Parsed request:', source.parsed_requests]
-          rows << ['Skipped lines:',  source.skipped_lines]
+          rows << ['Parsed lines:',    source.parsed_lines]
+          rows << ['Parsed requests:', source.parsed_requests]
+          rows << ['Skipped lines:',   source.skipped_lines]
         
           rows << ["Warnings:", @warnings_encountered.map { |(key, value)| "#{key}: #{value}" }.join(', ')] if has_warnings?
         end

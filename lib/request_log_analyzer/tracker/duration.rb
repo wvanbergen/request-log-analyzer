@@ -55,7 +55,8 @@ module RequestLogAnalyzer::Tracker
         end
       end
     end
-
+    
+    # Builds a result table using a provided sorting function 
     def report_table(output, amount = 10, options = {}, &block)
     
       output.title(options[:title])
@@ -86,7 +87,7 @@ module RequestLogAnalyzer::Tracker
         when :hits
           report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits") { |request| request[:count] }
         else
-          output << "Unknown duration report specified\n"
+          raise "Unknown duration report specified: #{report}!"
         end
       end
     end      
