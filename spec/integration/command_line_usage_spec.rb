@@ -63,4 +63,9 @@ describe RequestLogAnalyzer, 'running from command line' do
     output.all? { |line| /^[\x00-\x7F]*$/ =~ line }.should be_true
   end
   
+  it "should parse a Merb file if --format merb is set" do  
+    output = run("#{log_fixture(:merb)} --format merb")
+    output.detect { |line| /Parsed requests\:\s*11/ =~ line }.should_not be_nil   
+  end  
+  
 end
