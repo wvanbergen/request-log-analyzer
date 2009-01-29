@@ -5,9 +5,15 @@ module RequestLogAnalyzer::FileFormat
   # as well.
   class RailsDevelopment < Rails
   
+    #   Parameters: {"action"=>"demo", "controller"=>"page"}
+    line_definition :parameters do |line|
+      line.teaser = /Parameters/
+      line.regexp = /\s+Parameters:\s+(\{.*\})/
+      line.captures << { :name => :params, :type => :eval }
+    end
+  
     # Rendered layouts/_footer (2.9ms)
     line_definition :rendered do |line|
-      line.teaser = /Rendered /
       line.regexp = /Rendered (\w+(?:\/\w+)+) \((\d+\.\d+)ms\)/
       line.captures << { :name => :render_file,     :type  => :string } \
                     << { :name => :render_duration, :type  => :duration, :unit => :msec }

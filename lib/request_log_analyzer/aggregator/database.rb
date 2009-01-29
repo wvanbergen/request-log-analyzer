@@ -30,7 +30,7 @@ module RequestLogAnalyzer::Aggregator
     def aggregate(request)
       @request_object = @request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
-        class_columns = @orm_module.const_get("#{line[:line_type]}_line".classify).column_names
+        class_columns = @orm_module.const_get("#{line[:line_type]}_line".classify).column_names.reject { |column| ['id'].include?(column) }
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
