@@ -3,7 +3,7 @@
 This is a simple command line tool to analyze request log files of both Rails and
 Merb to produce a performance report. Its purpose is to find what actions are best candidates for optimization.
 
-* Analyzes Rails log files (all versions)
+* Analyzes Rails log files (all versions), Merb logs, or any other log format
 * Can combine multiple files (handy if you are using logrotate)
 * Uses several metrics, including cumulative request time, average request time, process blockers, database and rendering time, HTTP methods and statuses, Rails action cache statistics, etc.) (Sample output: http://wiki.github.com/wvanbergen/request-log-analyzer/sample-output)
 * Low memory footprint (server-safe)
