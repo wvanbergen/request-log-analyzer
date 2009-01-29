@@ -15,7 +15,8 @@ module RequestLogAnalyzer::FileFormat
     line_definition :params do |line|
       line.teaser = /Params/
       line.regexp = /Params\:\ (\{.+\})/
-      line.captures << { :name => :params, :type => :eval, :provides => { :controller => :string, :action => :string } }
+      line.captures << { :name => :params, :type => :eval, :provides => { 
+            :namespace => :string, :controller => :string, :action => :string, :format => :string } }
     end
 
     # ~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}
@@ -29,7 +30,12 @@ module RequestLogAnalyzer::FileFormat
                     << { :name => :action_time,         :type => :duration }
     end
     
-    REQUEST_CATEGORIZER = Proc.new { |request| "#{request[:controller]}##{request[:action]}" }
+    REQUEST_CATEGORIZER = Proc.new do |request| 
+      category = "#{request[:controller]}##{request[:action]}"
+      category = "#{request[:namespace]}::#{category}" if request[:namespace]
+      category = "#{category}.#{request[:format]}"     if request[:format]
+      category
+    end
     
     report do |analyze|
       analyze.timespan :line_type => :started
