@@ -4,6 +4,10 @@ require File.dirname(__FILE__) + '/cli/progressbar'
 module RequestLogAnalyzer
    
   VERSION = '1.1'
+  
+  def self.const_missing(const)
+    load_default_class_file(RequestLogAnalyzer, const)
+  end
     
   # Function to implement 
   def self.load_default_class_file(base, const)
@@ -25,13 +29,4 @@ module RequestLogAnalyzer
   end
 end
 
-require File.dirname(__FILE__) + '/request_log_analyzer/file_format'
-require File.dirname(__FILE__) + '/request_log_analyzer/line_definition'
-require File.dirname(__FILE__) + '/request_log_analyzer/request'
-require File.dirname(__FILE__) + '/request_log_analyzer/aggregator'
-require File.dirname(__FILE__) + '/request_log_analyzer/filter'
-require File.dirname(__FILE__) + '/request_log_analyzer/tracker'
-require File.dirname(__FILE__) + '/request_log_analyzer/controller'
-require File.dirname(__FILE__) + '/request_log_analyzer/source'
-require File.dirname(__FILE__) + '/request_log_analyzer/output'
 

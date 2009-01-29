@@ -14,6 +14,11 @@ class TestingFormat < RequestLogAnalyzer::FileFormat::Base
                      { :name => :duration, :type => :duration, :unit => :msec }]
   end
   
+  format_definition.eval do |line|
+    line.regexp = /evaluation (\{.*\})/
+    line.captures = [{ :name => :evaluated, :type => :eval }]
+  end 
+  
   format_definition.last do |line|
     line.footer = true
     line.teaser = /finishing /

@@ -15,7 +15,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :params do |line|
       line.teaser = /Params/
       line.regexp = /Params\:\ (\{.+\})/
-      line.captures << { :name => :action, :type => :params}
+      line.captures << { :name => :params, :type => :eval, :provides => { :controller => :string, :action => :string } }
     end
 
     # ~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}
@@ -29,25 +29,18 @@ module RequestLogAnalyzer::FileFormat
                     << { :name => :action_time,         :type => :duration }
     end
     
+    REQUEST_CATEGORIZER = Proc.new { |request| "#{request[:controller]}##{request[:action]}" }
     
     report do |analyze|
       analyze.timespan :line_type => :started
       analyze.hourly_spread :line_type => :started
       
-      analyze.duration :dispatch_time, :category => :action, :title => 'Request dispatch duration'
-      # analyze.duration :action_time, :category => :action, :title => 'Request action duration'
-      # analyze.duration :after_filters_time, :category => :action, :title => 'Request after_filter duration'
-      # analyze.duration :before_filters_time, :category => :action, :title => 'Request before_filter duration'
+      analyze.duration :dispatch_time, :category => REQUEST_CATEGORIZER, :title => 'Request dispatch duration'
+      # analyze.duration :action_time, :category => REQUEST_CATEGORIZER, :title => 'Request action duration'
+      # analyze.duration :after_filters_time, :category => REQUEST_CATEGORIZER, :title => 'Request after_filter duration'
+      # analyze.duration :before_filters_time, :category => REQUEST_CATEGORIZER, :title => 'Request before_filter duration'
     end
-    
-    
-    class Request < RequestLogAnalyzer::Request
-      def convert_params(value, definition)
-        hash = eval(value) rescue {}
-        "#{hash['controller']}##{hash['action']}"
-      end
-    end
-    
+        
   end
 
 end

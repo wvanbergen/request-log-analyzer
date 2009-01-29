@@ -48,10 +48,17 @@ describe RequestLogAnalyzer::LineDefinition, :converting do
   end
 
   it "should convert captures to a hash" do
-    hash = @file_format.line_definitions[:test].convert_captured_values(["willem", nil], @request)
-    hash[:test_capture].should == 'Testing is willem'
+    hash = @file_format.line_definitions[:test].convert_captured_values(["great", nil], @request)
+    hash[:test_capture].should == 'Testing is great'
     hash[:duration].should be_nil
   end
+  
+  it "should merge a hash capture into the line hash" do
+    hash = @file_format.line_definitions[:eval].convert_captured_values(["{ 'greating' => 'hello', 'what' => 'world'}"], @request)
+    hash[:evaluated].should be_kind_of(Hash)
+    hash[:greating].should == 'hello'
+    hash[:what].should == 'world'    
+  end  
 
   
 end
