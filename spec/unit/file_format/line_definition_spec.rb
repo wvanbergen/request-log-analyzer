@@ -55,7 +55,7 @@ describe RequestLogAnalyzer::LineDefinition, :converting do
   
   it "should merge a hash capture into the line hash" do
     hash = @file_format.line_definitions[:eval].convert_captured_values(["{ 'greating' => 'hello', 'what' => 'world'}"], @request)
-    hash[:evaluated].should be_kind_of(Hash)
+    hash[:evaluated].should == "{ 'greating' => 'hello', 'what' => 'world'}"
     hash[:greating].should == 'hello'
     hash[:what].should == 'world'    
   end  

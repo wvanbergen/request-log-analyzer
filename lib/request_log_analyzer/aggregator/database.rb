@@ -30,7 +30,9 @@ module RequestLogAnalyzer::Aggregator
     def aggregate(request)
       @request_object = @request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
-        attributes = line.reject { |k, v| [:line_type].include?(k) }
+        p @request_object.send("#{line[:line_type]}_lines").build
+        attributes = line.select { |(k, v)| p k; p v; @request_object.class.column_names.include?(k.to_s) }]
+        p attributes
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
       @request_object.save!
@@ -72,7 +74,16 @@ module RequestLogAnalyzer::Aggregator
         t.column(:request_id, :integer)
         t.column(:lineno, :integer)
         definition.captures.each do |capture|
-          t.column(capture[:name], column_type(capture))
+
+          # Add a field for every capture
+          t.column(capture[:name], column_type(capture[:type]))
+          
+          # If the capture provides other field as well, create them too
+          if capture[:provides].kind_of?(Hash)
+            capture[:provides].each do |field, field_type|
+              t.column(field, column_type(field_type))
+            end
+          end
         end
       end
       ActiveRecord::Migration.add_index("#{name}_lines", [:request_id])
@@ -136,12 +147,13 @@ module RequestLogAnalyzer::Aggregator
     
     # Function to determine the column type for a field
     # TODO: make more robust / include in file-format definition
-    def column_type(capture)
-      case capture[:type]
+    def column_type(type_indicator)
+      case type_indicator
+      when :eval;  :text
       when :sec;   :double
       when :msec;  :double
       when :float; :double
-      else         capture[:type]
+      else         type_indicator
       end
     end
   end

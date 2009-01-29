@@ -4,16 +4,11 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
 
   include RequestLogAnalyzer::Spec::Helper
 
-  TEST_DATABASE_FILE = File.dirname(__FILE__) + "/../../fixtures/requests.db"
-  
   before(:each) do
     log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)
-    @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => TEST_DATABASE_FILE)
+    @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => ':memory:')
   end
-  
-  after(:each) do
-    File.unlink(TEST_DATABASE_FILE) if File.exist?(TEST_DATABASE_FILE)
-  end
+
   
   it "should create the correct tables" do
     ActiveRecord::Migration.should_receive(:create_table).with("warnings")    
@@ -63,6 +58,13 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
     TestingFormat::Database::TestLine.column_names.should include('test_capture')    
   end
   
+  it "should create fields for provides" do
+    @database_inserter.prepare
+    TestingFormat::Database::EvalLine.column_names.should include('evaluated')    
+    TestingFormat::Database::EvalLine.column_names.should include('greating')
+    TestingFormat::Database::EvalLine.column_names.should include('what')    
+  end
+  
 end
 
 describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
@@ -70,17 +72,16 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
   
   before(:each) do
     log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)    
-    @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => TEST_DATABASE_FILE)
+    @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => ':memory:')
     @database_inserter.prepare
         
     @incomplete_request = testing_format.request( {:line_type => :first, :request_no => 564})
-    @completed_request = testing_format.request( {:line_type => :first, :request_no  => 564}, {:line_type => :test, :test_capture => "awesome"},
-                          {:line_type => :test, :test_capture => "indeed"}, {:line_type => :last, :request_no   => 564})    
+    @completed_request = testing_format.request( {:line_type => :first, :request_no  => 564}, 
+                          {:line_type => :test, :test_capture => "awesome"},
+                          {:line_type => :test, :test_capture => "indeed"}, 
+                          {:line_type => :eval, :evaluated => "{ 'greating' => 'howdy'}", :greating => 'howdy' }, 
+                          {:line_type => :last, :request_no   => 564})    
   end
-  
-  after(:each) do
-    File.unlink(TEST_DATABASE_FILE) if File.exist?(TEST_DATABASE_FILE)
-  end 
   
   it "should insert a record in the request table" do
     TestingFormat::Database::Request.count.should == 0
@@ -93,6 +94,7 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
     request = TestingFormat::Database::Request.first
     request.should have(2).test_lines
     request.should have(1).first_lines  
+    request.should have(1).eval_lines     
     request.should have(1).last_lines    
   end
   

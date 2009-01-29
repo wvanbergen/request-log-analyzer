@@ -16,7 +16,7 @@ class TestingFormat < RequestLogAnalyzer::FileFormat::Base
   
   format_definition.eval do |line|
     line.regexp = /evaluation (\{.*\})/
-    line.captures = [{ :name => :evaluated, :type => :eval }]
+    line.captures = [{ :name => :evaluated, :type => :eval, :provides => { :greating => :string, :what => :string } }]
   end 
   
   format_definition.last do |line|

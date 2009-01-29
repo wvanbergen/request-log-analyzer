@@ -78,10 +78,12 @@ module RequestLogAnalyzer
       value_hash = {}
       captures.each_with_index do |capture, index|
         converted = request.convert_value(values[index], capture)
-        value_hash[capture[:name]] ||= converted
         if converted.kind_of?(Hash)
+          value_hash[capture[:name]] = values[index]
           converted = converted.inject({}) { |h, (key, value)| h[key.to_sym] = value; h } 
           value_hash = converted.merge(value_hash) 
+        else
+          value_hash[capture[:name]] ||= converted
         end
       end
       return value_hash
