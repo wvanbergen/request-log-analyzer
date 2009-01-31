@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 require File.dirname(__FILE__) + '/../lib/request_log_analyzer'
 require File.dirname(__FILE__) + '/../lib/cli/command_line_arguments'
+require File.dirname(__FILE__) + '/../lib/cli/progressbar'
 require File.dirname(__FILE__) + '/../lib/cli/tools'
 
 # Parse the arguments given via commandline
