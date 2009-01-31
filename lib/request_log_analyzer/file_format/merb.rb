@@ -39,8 +39,8 @@ module RequestLogAnalyzer::FileFormat
     
     report do |analyze|
       analyze.timespan :line_type => :started
+      analyze.frequency :category => REQUEST_CATEGORIZER, :amount => 20, :title => "Top 20 by hits"
       analyze.hourly_spread :line_type => :started
-      
       analyze.duration :dispatch_time, :category => REQUEST_CATEGORIZER, :title => 'Request dispatch duration'
       # analyze.duration :action_time, :category => REQUEST_CATEGORIZER, :title => 'Request action duration'
       # analyze.duration :after_filters_time, :category => REQUEST_CATEGORIZER, :title => 'Request after_filter duration'
