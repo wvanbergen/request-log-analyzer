@@ -7,18 +7,24 @@ module RequestLogAnalyzer::Source
   # De order in which lines occur is used to combine lines to a single request. If these lines 
   # are mixed, requests cannot be combined properly. This can be the case if data is written to 
   # the log file simultaneously by different mongrel processes. This problem is detected by the 
-  # parser, but the requests that are mixed up cannot be parsed. It will emit warnings when this 
-  # occurs.
+  # parser. It will emit warnings when this occurs. LogParser supports multiple parse strategies 
+  # that deal differently with this problem.
   class LogParser < Base
 
+    # The default parse strategy that will be used to parse the input.
     DEFAULT_PARSE_STRATEGY = 'assume-correct'
+    
+    # All available parse strategies.
     PARSE_STRATEGIES = ['cautious', 'assume-correct']
 
     attr_reader :source_files
 
-    # Initializes the parser instance.
+    # Initializes the log file parser instance.
     # It will apply the language specific FileFormat module to this instance. It will use the line
-    # definitions in this module to parse any input.
+    # definitions in this module to parse any input that it is given (see parse_io).
+    #
+    # <tt>format</tt>:: The current file format instance
+    # <tt>options</tt>:: A hash of options that are used by the parser
     def initialize(format, options = {})      
       @line_definitions = {}
       @options          = options
@@ -35,7 +41,11 @@ module RequestLogAnalyzer::Source
       self.register_file_format(format)
     end
     
-    def each_request(options = {}, &block)
+    # Reads the input, which can either be a file, sequence of files or STDIN to parse
+    # lines specified in the FileFormat. This lines will be combined into Request instances,
+    # that will be yielded. The actual parsing occurs in the parse_io method.
+    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
+    def each_request(options = {}, &block) # :yields: request
       
       case @source_files
       when IO;     
@@ -50,28 +60,46 @@ module RequestLogAnalyzer::Source
       end
     end
 
-    # Parses a list of consequent files of the same format
-    def parse_files(files, options = {}, &block)
+    # Parses a list of subsequent files of the same format, by calling parse_file for every
+    # file in the array.
+    # <tt>files</tt>:: The Array of files that should be parsed
+    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
+    def parse_files(files, options = {}, &block) # :yields: request
       files.each { |file| parse_file(file, options, &block) }
     end
 
-    # Parses a file. 
-    # Creates an IO stream for the provided file, and sends it to parse_io for further handling
+    # Parses a log file. Creates an IO stream for the provided file, and sends it to parse_io for
+    # further handling. This method supports progress updates that can be used to display a progressbar
+    # <tt>file</tt>:: The file that should be parsed.
+    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.    
     def parse_file(file, options = {}, &block)
       @progress_handler.call(:started, file) if @progress_handler
       File.open(file, 'r') { |f| parse_io(f, options, &block) }
       @progress_handler.call(:finished, file) if @progress_handler
     end
 
+
+    # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
+    # because the length of a stream is not known.
+    # <tt>stream</tt>:: The IO stream that should be parsed.
+    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.    
     def parse_stream(stream, options = {}, &block)
       parse_io(stream, options, &block)
     end
 
-    # Finds a log line and then parses the information in the line.
-    # Yields a hash containing the information found. 
-    # <tt>*line_types</tt> The log line types to look for (defaults to LOG_LINES.keys).
-    # Yeilds a Hash when it encounters a chunk of information.
-    def parse_io(io, options = {}, &block)
+    # This method loops over each line of the input stream. It will try to parse this line as any of
+    # the lines that are defined by the current file format (see RequestLogAnalyazer::FileFormat).
+    # It will then combine these parsed line into requests using heuristics. These requests (see
+    # RequestLogAnalyzer::Request) will then be yielded for further processing in the pipeline.
+    #
+    # - RequestLogAnalyzer::LineDefinition#matches is called to test if a line matches a line definition of the file format.
+    # - update_current_request is used to combine parsed lines into requests using heuristics.
+    # - The method will yield progress updates if a progress handler is installed using progress=
+    # - The method will yield parse warnings if a warning handler is installed using warning=
+    #
+    # <tt>io</tt>:: The IO instance to use as source
+    # <tt>options</tt>:: A hash of options that can be used by the parser.
+    def parse_io(io, options = {}, &block) # :yields: request
 
       @current_io = io
       @current_io.each_line do |line|
@@ -95,12 +123,14 @@ module RequestLogAnalyzer::Source
       @current_io = nil
     end
 
-    # Add a block to this method to install a progress handler while parsing
+    # Add a block to this method to install a progress handler while parsing.
+    # <tt>proc</tt>:: The proc that will be called to handle progress update messages
     def progress=(proc)
       @progress_handler = proc
     end
 
-    # Add a block to this method to install a warning handler while parsing
+    # Add a block to this method to install a warning handler while parsing,
+    # <tt>proc</tt>:: The proc that will be called to handle parse warning messages    
     def warning=(proc)
       @warning_handler = proc
     end
