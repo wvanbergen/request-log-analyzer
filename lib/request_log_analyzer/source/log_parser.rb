@@ -135,9 +135,15 @@ module RequestLogAnalyzer::Source
       @warning_handler = proc
     end
 
-    # This method is called by the parser if it encounteres any problems.
-    # It will call the warning handler. The default controller will pass all warnings to every
-    # aggregator that is registered and running
+    # This method is called by the parser if it encounteres any parsing problems.
+    # It will call the installed warning handler if any. 
+    #
+    # By default, RequestLogAnalyzer::Controller will install a warning handler 
+    # that will pass the warnings to each aggregator so they can do something useful
+    # with it.
+    #
+    # <tt>type</tt>:: The warning type (a Symbol)
+    # <tt>message</tt>:: A message explaining the warning
     def warn(type, message)
       @warning_handler.call(type, message, @current_io.lineno) if @warning_handler
     end
@@ -148,13 +154,25 @@ module RequestLogAnalyzer::Source
     # new request when a header line is encountered en will emit the request when a footer line 
     # is encountered.
     #
+    # Combining the lines is done using heuristics. Problems can occur in this process. The
+    # current parse strategy defines how these cases are handled.
+    #
+    # When using the 'assume-correct' parse strategy (default):
+    # - Every line that is parsed before a header line is ignored as it cannot be included in 
+    #   any request. It will emit a :no_current_request warning.
+    # - If a header line is found before the previous requests was closed, the previous request 
+    #   will be yielded and a new request will be started.
+    #
+    # When using the 'cautious' parse strategy:
     # - Every line that is parsed before a header line is ignored as it cannot be included in 
     #   any request. It will emit a :no_current_request warning.
     # - A header line that is parsed before a request is closed by a footer line, is a sign of
-    #   an unprpertly ordered file. All data that is gathered for the request until then is 
-    #   discarded, the next request is ignored as well and a :unclosed_request warning is
+    #   an unproperly ordered file. All data that is gathered for the request until then is 
+    #   discarded and the next request is ignored as well. An :unclosed_request warning is
     #   emitted.
-    def update_current_request(request_data, &block)
+    #
+    # <tt>request_data</tt>:: A hash of data that was parsed from the last line.
+    def update_current_request(request_data, &block) # :yields: request
       if header_line?(request_data)
         unless @current_request.nil?
           case options[:parse_strategy]
@@ -183,21 +201,28 @@ module RequestLogAnalyzer::Source
       end
     end
     
-    # Handles the parsed request by calling the request handler.
-    # The default controller will send the request to every running aggegator.
-    def handle_request(request, &block)
+    # Handles the parsed request by sending it into the pipeline. 
+    #
+    # - It will call RequestLogAnalyzer::Request#validate on the request instance
+    # - It will send the request into the pipeline, checking whether it was accepted by all the filters.
+    # - It will update the parsed_requests and skipped_requests variables accordingly
+    #
+    # <tt>request</tt>:: The parsed request instance (RequestLogAnalyzer::Request)
+    def handle_request(request, &block) # :yields: request
       @parsed_requests += 1
       request.validate
       accepted = block_given? ? yield(request) : true
       @skipped_requests += 1 if not accepted
     end    
 
-    # Checks whether a given line hash is a header line.
+    # Checks whether a given line hash is a header line according to the current file format.
+    # <tt>hash</tt>:: A hash of data that was parsed from the line.    
     def header_line?(hash)
       hash[:line_definition].header
     end
 
-    # Checks whether a given line hash is a footer line.    
+    # Checks whether a given line hash is a footer line  according to the current file format.    
+    # <tt>hash</tt>:: A hash of data that was parsed from the line.    
     def footer_line?(hash)
       hash[:line_definition].footer
     end 
