@@ -96,6 +96,11 @@ module RequestLogAnalyzer::Aggregator
       class_name = "#{name}_line".camelize
       klass = Class.new(ActiveRecord::Base)
       klass.send(:belongs_to, :request)
+      
+      definition.captures.each do |capture|
+        klass.send(:serialize, capture[:name], Hash) if capture[:provides]
+      end
+      
       @orm_module.const_set(class_name, klass) unless @orm_module.const_defined?(class_name)
       @request_class.send(:has_many, "#{name}_lines".to_sym)
     end    

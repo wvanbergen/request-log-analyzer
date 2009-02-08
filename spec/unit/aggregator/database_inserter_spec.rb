@@ -79,7 +79,7 @@ describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
     @completed_request = testing_format.request( {:line_type => :first, :request_no  => 564}, 
                           {:line_type => :test, :test_capture => "awesome"},
                           {:line_type => :test, :test_capture => "indeed"}, 
-                          {:line_type => :eval, :evaluated => "{ 'greating' => 'howdy'}", :greating => 'howdy' }, 
+                          {:line_type => :eval, :evaluated => { :greating => 'howdy'}, :greating => 'howdy' }, 
                           {:line_type => :last, :request_no   => 564})    
   end
   

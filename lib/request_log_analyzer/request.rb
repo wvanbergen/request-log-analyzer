@@ -31,7 +31,9 @@ module RequestLogAnalyzer
       end
       
       def convert_eval(value, capture_definition)
-        eval(value)
+        eval(value).inject({}) { |h, (k, v)| h[k.to_sym] = v; h} 
+      rescue SyntaxError
+        nil
       end
       
       # Slow default method to parse timestamps
