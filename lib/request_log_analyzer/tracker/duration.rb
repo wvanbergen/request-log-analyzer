@@ -49,9 +49,11 @@ module RequestLogAnalyzer::Tracker
         duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
   
         if !duration.nil? && !category.nil?
-          @categories[category] ||= {:hits => 0, :cumulative => 0.0}
+          @categories[category] ||= {:hits => 0, :cumulative => 0.0, :min => duration, :max => duration }
           @categories[category][:hits] += 1
           @categories[category][:cumulative] += duration
+          @categories[category][:min] = duration if duration < @categories[category][:min]
+          @categories[category][:max] = duration if duration > @categories[category][:max]   
         end
       end
     end
@@ -63,6 +65,15 @@ module RequestLogAnalyzer::Tracker
     def cumulative_duration(cat)
       categories[cat][:cumulative]
     end
+
+    def min_duration(cat)
+      categories[cat][:min]
+    end
+
+    def max_duration(cat)
+      categories[cat][:max]
+    end
+
     
     def average_duration(cat)
       categories[cat][:cumulative] / categories[cat][:hits]  
@@ -107,10 +118,12 @@ module RequestLogAnalyzer::Tracker
     
       top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
       output.table({:title => 'Category', :width => :rest}, {:title => 'Hits', :align => :right, :min_width => 4}, 
-            {:title => 'Cumulative', :align => :right, :min_width => 10}, {:title => 'Average', :align => :right, :min_width => 8}) do |rows|
+            {:title => 'Cumulative', :align => :right, :min_width => 10}, {:title => 'Average', :align => :right, :min_width => 8},
+            {:title => 'Min', :align => :right}, {:title => 'Max', :align => :right}) do |rows|
       
         top_categories.each do |(cat, info)|
-          rows << [cat, info[:hits], "%0.02fs" % info[:cumulative], "%0.02fs" % (info[:cumulative] / info[:hits])]
+          rows << [cat, info[:hits], "%0.02fs" % info[:cumulative], "%0.02fs" % (info[:cumulative] / info[:hits]),
+                    "%0.02fs" % info[:min], "%0.02fs" % info[:max]]
         end        
       end
 

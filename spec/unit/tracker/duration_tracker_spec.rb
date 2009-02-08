@@ -41,6 +41,15 @@ describe RequestLogAnalyzer::Tracker::Duration, 'static category' do
     @tracker.average_duration('b').should == 0.35
   end
   
+  it "should set min and max duration correctly" do
+    @tracker.update(request(:category => 'a', :duration => 0.2))
+    @tracker.update(request(:category => 'b', :duration => 0.3))
+    @tracker.update(request(:category => 'b', :duration => 0.4))      
+    
+    @tracker.min_duration('b').should == 0.3
+    @tracker.max_duration('b').should == 0.4
+  end  
+  
 end
 
 describe RequestLogAnalyzer::Tracker::Duration, 'dynamic category' do
