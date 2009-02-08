@@ -5,3 +5,5 @@ requests.db
 /pkg
 /doc
 /tmp
+/classes
+/files
