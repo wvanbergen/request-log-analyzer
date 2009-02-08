@@ -162,14 +162,18 @@ module RequestLogAnalyzer::Output
                 bar << colorize(characters[:block] * (width.to_f * (row[index].to_f - column[:treshold])).round, :red) 
                 row_values.push(bar) 
               else
+                # Create a bar by combining block characters
                 row_values.push(characters[:block] * (width.to_f * row[index].to_f).round) 
               end
             else
+              # Too few characters for a ratio bar. Display nothing
               row_values.push('')
             end
           else
-            alignment = (columns[index][:align] == :right ? '' : '-')        
-            row_values.push("%#{alignment}#{width}s" % row[index].to_s[0...width])
+            alignment = (columns[index][:align] == :right ? '' : '-')
+            cell_value = "%#{alignment}#{width}s" % row[index].to_s[0...width]
+            cell_value = colorize(cell_value, :bold, :brown) if columns[index][:highlight]
+            row_values.push(cell_value)
           end
         end
         puts row_values.join(style[:cell_separator] ? " #{characters[:vertical_line]} " : ' ')      

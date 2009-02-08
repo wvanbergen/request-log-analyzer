@@ -74,7 +74,6 @@ module RequestLogAnalyzer::Tracker
       categories[cat][:max]
     end
 
-    
     def average_duration(cat)
       categories[cat][:cumulative] / categories[cat][:hits]  
     end
@@ -117,9 +116,12 @@ module RequestLogAnalyzer::Tracker
       output.title(options[:title])
     
       top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
-      output.table({:title => 'Category', :width => :rest}, {:title => 'Hits', :align => :right, :min_width => 4}, 
-            {:title => 'Cumulative', :align => :right, :min_width => 10}, {:title => 'Average', :align => :right, :min_width => 8},
-            {:title => 'Min', :align => :right}, {:title => 'Max', :align => :right}) do |rows|
+      output.table({:title => 'Category', :width => :rest}, 
+            {:title => 'Hits',       :align => :right, :highlight => (options[:sort] == :hits), :min_width => 4}, 
+            {:title => 'Cumulative', :align => :right, :highlight => (options[:sort] == :cumulative), :min_width => 10}, 
+            {:title => 'Average',    :align => :right, :highlight => (options[:sort] == :average), :min_width => 8},
+            {:title => 'Min',        :align => :right, :highlight => (options[:sort] == :min)}, 
+            {:title => 'Max',        :align => :right, :highlight => (options[:sort] == :max)}) do |rows|
       
         top_categories.each do |(cat, info)|
           rows << [cat, info[:hits], "%0.02fs" % info[:cumulative], "%0.02fs" % (info[:cumulative] / info[:hits]),
@@ -138,11 +140,11 @@ module RequestLogAnalyzer::Tracker
       options[:report].each do |report|
         case report
         when :average
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time") { |cat| cat[:cumulative] / cat[:hits] }  
+          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time", :sort => :average) { |cat| cat[:cumulative] / cat[:hits] }  
         when :cumulative
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time") { |cat| cat[:cumulative] }
+          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time", :sort => :cumulative) { |cat| cat[:cumulative] }
         when :hits
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits") { |cat| cat[:hits] }
+          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits", :sort => :hits) { |cat| cat[:hits] }
         else
           raise "Unknown duration report specified: #{report}!"
         end
