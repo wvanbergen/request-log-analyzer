@@ -48,7 +48,7 @@ module RequestLogAnalyzer::Tracker
         category = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
         duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
   
-        if !duration.nil? && !category.nil?
+        if duration.kind_of?(Float) && category.kind_of?(String)
           @categories[category] ||= {:hits => 0, :cumulative => 0.0, :min => duration, :max => duration }
           @categories[category][:hits] += 1
           @categories[category][:cumulative] += duration
