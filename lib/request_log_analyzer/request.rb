@@ -60,9 +60,9 @@ module RequestLogAnalyzer
         
     # Initializes a new Request object. 
     # It will apply the the provided FileFormat module to this instance.
-    def initialize(file_format)
+    def initialize(file_format, attributes = {})
       @lines = []
-      @attributes = {}
+      @attributes = attributes
       register_file_format(file_format)
     end
     

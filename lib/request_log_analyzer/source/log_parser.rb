@@ -78,7 +78,6 @@ module RequestLogAnalyzer::Source
       @progress_handler.call(:finished, file) if @progress_handler
     end
 
-
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
     # because the length of a stream is not known.
     # <tt>stream</tt>:: The IO stream that should be parsed.
