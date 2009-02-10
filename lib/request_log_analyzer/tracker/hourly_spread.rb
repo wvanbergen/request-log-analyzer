@@ -72,9 +72,8 @@ module RequestLogAnalyzer::Tracker
       output.table({}, {:align => :right}, {:type => :ratio, :width => :rest, :treshold => 0.15}) do |rows|
         @request_time_graph.each_with_index do |requests, index|
           ratio = requests.to_f / total_requests.to_f
-          requests_per_day = requests / days
-    
-          rows << ["#{index.to_s.rjust(3)}:00", "#{requests_per_day} hits", ratio]
+          requests_per_day = (requests / days).ceil
+          rows << ["#{index.to_s.rjust(3)}:00", "%d hits" % requests_per_day, ratio]
         end
       end
     end
