@@ -76,8 +76,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits'
     
       analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
-      analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
-      analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
+      analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
+      analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
     
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', 
               :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20
