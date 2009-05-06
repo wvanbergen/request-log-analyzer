@@ -153,11 +153,20 @@ module RequestLogAnalyzer::Aggregator
     # TODO: make more robust / include in file-format definition
     def column_type(type_indicator)
       case type_indicator
-      when :eval;  :text
-      when :sec;   :double
-      when :msec;  :double
-      when :float; :double
-      else         type_indicator
+      when :eval;      :text
+      when :text;      :text
+      when :string;    :string
+      when :sec;       :double
+      when :msec;      :double
+      when :duration;  :double
+      when :float;     :double
+      when :double;    :double
+      when :integer;   :integer
+      when :int;       :int
+      when :timestamp; :datetime
+      when :datetime;  :datetime
+      when :date;      :date
+      else             :string
       end
     end
   end
