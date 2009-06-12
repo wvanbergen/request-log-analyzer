@@ -13,7 +13,7 @@ module RequestLogAnalyzer
   
   # The current version of request-log-analyzer.
   # This will be diplayed in output reports etc.  
-  VERSION = '1.1'
+  VERSION = '1.1.7'
   
   # Loads constants in the RequestLogAnalyzer namespace using self.load_default_class_file(base, const)
   # <tt>const</tt>:: The constant that is not yet loaded in the RequestLogAnalyzer namespace. This should be passed as a string or symbol.
