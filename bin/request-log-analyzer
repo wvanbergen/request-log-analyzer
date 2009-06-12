@@ -43,6 +43,7 @@ begin
   end
   
 rescue CommandLine::Error => e
+  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
   puts "ARGUMENT ERROR: " + e.message if e.message
   puts
   puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
