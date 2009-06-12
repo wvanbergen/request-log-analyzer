@@ -210,6 +210,8 @@ module RequestLogAnalyzer
       if @output.io.kind_of?(File)
         puts
         puts "Report written to: " + File.expand_path(@output.io.path)
+        puts "Need an expert to analyze your application?"
+        puts "Contact either Willem van Bergen (willem@vanbergen.org) or Bart ten Brinke (info@retrosync.com)."
         puts "Thanks for using request-log-analyzer!"
         @output.io.close
       end

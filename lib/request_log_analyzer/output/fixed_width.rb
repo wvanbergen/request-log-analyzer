@@ -98,6 +98,8 @@ module RequestLogAnalyzer::Output
     
     def footer
       puts
+      puts "Need an expert to analyze your application?"
+      puts "Contact either Willem van Bergen (willem@vanbergen.org) or Bart ten Brinke (info@retrosync.com)."
       puts "Thanks for using request-log-analyzer!"
     end
     

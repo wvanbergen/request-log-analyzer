@@ -36,6 +36,9 @@ For more details and available command line options, see the project's wiki: htt
 
 == Additional information
 
+Do you have a rails application that is not performing as it should?
+If you need an expert to analyze your application, feel free to contact either Willem van Bergen (willem@vanbergen.org) or Bart ten Brinke (info@retrosync.com).
+
 * Project wiki at GitHub: http://wiki.github.com/wvanbergen/request-log-analyzer
 * RDoc documentation: http://wvanbergen.github.com/request-log-analyzer
 * wvanbergen's blog posts: http://techblog.floorplanner.com/tag/request-log-analyzer
