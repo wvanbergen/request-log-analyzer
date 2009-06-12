@@ -1,5 +1,10 @@
 require 'date'
 
+# Satisfy ruby 1.9 sensitivity about encoding.
+if defined? Encoding and Encoding.respond_to? 'default_external='
+  Encoding.default_external = 'binary'
+end
+
 # RequestLogAnalyzer is the base namespace in which all functionality of RequestLogAnalyzer is implemented.
 #
 # - This module itselfs contains some functions to help with class and source file loading.
