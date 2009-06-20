@@ -1,12 +1,29 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe RequestLogAnalyzer::Tracker::Timespan do
+describe RequestLogAnalyzer::Tracker::HourlySpread do
 
   include RequestLogAnalyzer::Spec::Helper
 
   before(:each) do
-    @tracker = RequestLogAnalyzer::Tracker::Timespan.new
+    @tracker = RequestLogAnalyzer::Tracker::HourlySpread.new
     @tracker.prepare
+  end
+
+  it "should store timestamps correctly" do
+    @tracker.update(request(:timestamp => 20090102000000))
+    @tracker.update(request(:timestamp => 20090101000000))    
+    @tracker.update(request(:timestamp => 20090103000000))        
+    
+    @tracker.request_time_graph[0].should eql(3)
+  end
+
+  it "should count the number of timestamps correctly" do
+    @tracker.update(request(:timestamp => 20090102000000))
+    @tracker.update(request(:timestamp => 20090101000000))    
+    @tracker.update(request(:timestamp => 20090103000000))        
+    @tracker.update(request(:timestamp => 20090103010000))        
+    
+    @tracker.total_requests.should eql(4)
   end
 
   it "should set the first request timestamp correctly" do
@@ -24,7 +41,7 @@ describe RequestLogAnalyzer::Tracker::Timespan do
 
     @tracker.last_timestamp.should == DateTime.parse('Januari 3, 2009 00:00:00')
   end
-  
+
   it "should return the correct timespan in days when multiple requests are given" do
     @tracker.update(request(:timestamp => 20090102000000))
     @tracker.update(request(:timestamp => 20090101000000))    
@@ -33,22 +50,14 @@ describe RequestLogAnalyzer::Tracker::Timespan do
     @tracker.timespan.should == 2          
   end
 
-  it "should return a timespan of 0 days when only one timestamp is set" do
-    @tracker.update(request(:timestamp => 20090103000000))  
-    @tracker.timespan.should == 0
-  end
-
-  it "should raise an error when no timestamp is set" do
-    lambda { @tracker.timespan }.should raise_error
-  end
 end
 
-describe RequestLogAnalyzer::Tracker::Timespan, 'reporting' do
+describe RequestLogAnalyzer::Tracker::HourlySpread, 'reporting' do
  
   include RequestLogAnalyzer::Spec::Helper
  
   before(:each) do
-    @tracker = RequestLogAnalyzer::Tracker::Timespan.new
+    @tracker = RequestLogAnalyzer::Tracker::HourlySpread.new
     @tracker.prepare
   end
 
@@ -57,9 +66,10 @@ describe RequestLogAnalyzer::Tracker::Timespan, 'reporting' do
   end
 
   it "should generate a report without errors when multiple requests were tracked" do
-    @tracker.update(request(:category => 'a', :timestamp => 20090102000000))
-    @tracker.update(request(:category => 'a', :timestamp => 20090101000000))
-    @tracker.update(request(:category => 'a', :timestamp => 20090103000000))  
+    @tracker.update(request(:timestamp => 20090102000000))
+    @tracker.update(request(:timestamp => 20090101000000))    
+    @tracker.update(request(:timestamp => 20090103000000))        
+    @tracker.update(request(:timestamp => 20090103010000))
     lambda { @tracker.report(mock_output) }.should_not raise_error
   end
 end

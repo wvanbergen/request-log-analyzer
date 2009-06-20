@@ -1,3 +1,4 @@
+# coding: utf-8
 module RequestLogAnalyzer::Output
   
   # Fixed Width output class.
