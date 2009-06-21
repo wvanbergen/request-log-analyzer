@@ -73,8 +73,7 @@ module RequestLogAnalyzer::Source
     def decompress_file?(filename)
       nice_command = "nice -n 5"
       
-      return "#{nice_command} gunzip -c -d #{filename}" if filename.match(/\.gz$/)
-      return "#{nice_command} gunzip -c -d #{filename}" if filename.match(/\.tar.gz$/)
+      return "#{nice_command} gunzip -c -d #{filename}" if filename.match(/\.tar.gz$/) || filename.match(/\.tgz$/) || filename.match(/\.gz$/)
       return "#{nice_command} bunzip2 -c -d #{filename}" if filename.match(/\.bz2$/)
       return "#{nice_command} unzip -p #{filename}" if filename.match(/\.zip$/)
 
@@ -84,8 +83,10 @@ module RequestLogAnalyzer::Source
     # Parses a log file. Creates an IO stream for the provided file, and sends it to parse_io for
     # further handling. This method supports progress updates that can be used to display a progressbar
     #
-    # If the logfile is compressed, it is uncompressed to stdout and pushed through the parse_stream function
-    # 
+    # If the logfile is compressed, it is uncompressed to stdout and read.
+    # TODO: Check if IO.popen encounters problems with the given command line.
+    # TODO: Fix progress bar that is broken for IO.popen, as it returns a single string.
+    #
     # <tt>file</tt>:: The file that should be parsed.
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.    
     def parse_file(file, options = {}, &block)

@@ -7,8 +7,9 @@ module RequestLogAnalyzer::Spec::Helper
     @testing_format ||= TestingFormat.new
   end
   
-  def log_fixture(name)
-    File.dirname(__FILE__) + "/../fixtures/#{name}.log"
+  # Load a log file from the fixture folder
+  def log_fixture(name, extention = "log")
+    File.dirname(__FILE__) + "/../fixtures/#{name}.#{extention}"
   end
 
   def request(fields, format = testing_format)

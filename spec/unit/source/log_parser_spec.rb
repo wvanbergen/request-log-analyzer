@@ -65,3 +65,42 @@ describe RequestLogAnalyzer::Source::LogParser, :warnings do
     @log_parser.parse_file(log_fixture(:test_order))    
   end  
 end
+
+describe RequestLogAnalyzer::Source::LogParser, :decompression do
+  include RequestLogAnalyzer::Spec::Helper
+  
+  before(:each) do
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat::Rails.new)
+  end
+    
+  it "should parse a rails gzipped log file" do
+    @log_parser.should_receive(:handle_request).once
+    @log_parser.parse_file(log_fixture(:decompression, "log.gz"))
+    @log_parser.parsed_lines.should > 0
+  end
+
+  it "should parse a rails tar gzipped log folder" do
+    @log_parser.should_receive(:handle_request).twice
+    @log_parser.parse_file(log_fixture(:decompression, "tar.gz"))
+    @log_parser.parsed_lines.should > 1
+  end
+
+  it "should parse a rails tar gzipped log folder" do
+    @log_parser.should_receive(:handle_request).twice
+    @log_parser.parse_file(log_fixture(:decompression, "tgz"))
+    @log_parser.parsed_lines.should > 1
+  end
+
+  it "should parse a rails bz2 zipped log file" do
+    @log_parser.should_receive(:handle_request).once
+    @log_parser.parse_file(log_fixture(:decompression, "log.bz2"))
+    @log_parser.parsed_lines.should > 0
+  end
+
+  it "should parse a rails zipped log file" do
+    @log_parser.should_receive(:handle_request).once
+    @log_parser.parse_file(log_fixture(:decompression, "log.zip"))
+    @log_parser.parsed_lines.should > 0
+  end
+  
+end
