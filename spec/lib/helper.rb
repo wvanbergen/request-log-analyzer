@@ -2,7 +2,7 @@ module RequestLogAnalyzer::Spec::Helper
   
   include RequestLogAnalyzer::Spec::Mocks
 
-
+  # Create or return a new TestingFormat
   def testing_format
     @testing_format ||= TestingFormat.new
   end
@@ -12,6 +12,7 @@ module RequestLogAnalyzer::Spec::Helper
     File.dirname(__FILE__) + "/../fixtures/#{name}.#{extention}"
   end
 
+  # Request loopback
   def request(fields, format = testing_format)
     if fields.kind_of?(Array)
       format.request(*fields)
@@ -20,6 +21,8 @@ module RequestLogAnalyzer::Spec::Helper
     end
   end
 
+  # Run a specific command
+  # Used to call request-log-analyzer through binary
   def run(arguments)
     binary = "#{File.dirname(__FILE__)}/../../bin/request-log-analyzer"
     arguments = arguments.join(' ') if arguments.kind_of?(Array)

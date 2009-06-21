@@ -14,8 +14,7 @@ module Rake
     def self.define_tasks!
       gem_task_builder = Rake::GithubGem.new      
       gem_task_builder.register_all_tasks!
-    end
-    
+    end    
 
     def initialize
       reload_gemspec!
