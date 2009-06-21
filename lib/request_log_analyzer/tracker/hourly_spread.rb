@@ -4,8 +4,10 @@ module RequestLogAnalyzer::Tracker
   # This spread is shown in a graph form.
   #
   # Accepts the following options:
-  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
   # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
+  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
+  # * <tt>:output</tt> Direct output here (defaults to STDOUT)
+  # * <tt>:unless</tt> Proc that has to return nil for a request to be passed to the tracker.
   #
   # Expects the following items in the update request hash
   # * <tt>:timestamp</tt> in YYYYMMDDHHMMSS format.
@@ -13,28 +15,31 @@ module RequestLogAnalyzer::Tracker
   # Example output:
   #  Requests graph - average per day per hour
   #  --------------------------------------------------
-  #    7:00 - 330 hits        : ░░░░░░░
-  #    8:00 - 704 hits        : ░░░░░░░░░░░░░░░░░
-  #    9:00 - 830 hits        : ░░░░░░░░░░░░░░░░░░░░
-  #   10:00 - 822 hits        : ░░░░░░░░░░░░░░░░░░░
-  #   11:00 - 823 hits        : ░░░░░░░░░░░░░░░░░░░
-  #   12:00 - 729 hits        : ░░░░░░░░░░░░░░░░░
-  #   13:00 - 614 hits        : ░░░░░░░░░░░░░░
-  #   14:00 - 690 hits        : ░░░░░░░░░░░░░░░░
-  #   15:00 - 492 hits        : ░░░░░░░░░░░
-  #   16:00 - 355 hits        : ░░░░░░░░
-  #   17:00 - 213 hits        : ░░░░░
-  #   18:00 - 107 hits        : ░░
+  #    7:00 - 330 hits        : =======
+  #    8:00 - 704 hits        : =================
+  #    9:00 - 830 hits        : ====================
+  #   10:00 - 822 hits        : ===================
+  #   11:00 - 823 hits        : ===================
+  #   12:00 - 729 hits        : =================
+  #   13:00 - 614 hits        : ==============
+  #   14:00 - 690 hits        : ================
+  #   15:00 - 492 hits        : ===========
+  #   16:00 - 355 hits        : ========
+  #   17:00 - 213 hits        : =====
+  #   18:00 - 107 hits        : ==
   #   ................
   class HourlySpread < Base
 
     attr_reader :first, :last, :request_time_graph
 
+    # Check if timestamp field is set in the options and prepare the result time graph.
     def prepare
       options[:field] ||= :timestamp
       @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     end
-            
+
+    # Check if the timestamp in the request and store it.
+    # <tt>request</tt> The request.
     def update(request)
       request = request.attributes
       timestamp = request[options[:field]]
@@ -44,22 +49,29 @@ module RequestLogAnalyzer::Tracker
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
 
+    # Total amount of requests tracked
     def total_requests
       @request_time_graph.inject(0) { |sum, value| sum + value }
     end
     
+    # First timestamp encountered
     def first_timestamp
       DateTime.parse(@first.to_s, '%Y%m%d%H%M%S') rescue nil
     end
     
+    # Last timestamp encountered
     def last_timestamp
       DateTime.parse(@last.to_s, '%Y%m%d%H%M%S') rescue nil
     end
     
+    # Difference between last and first timestamp.
     def timespan
       last_timestamp - first_timestamp
     end
 
+    # Generate an hourly spread report to the given output object.
+    # Any options for the report should have been set during initialize.
+    # <tt>output</tt> The output object
     def report(output)
       output.title("Requests graph - average per day per hour")
     

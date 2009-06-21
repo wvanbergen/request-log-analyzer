@@ -33,6 +33,7 @@ module RequestLogAnalyzer::Tracker
     end
 
     # Get the duration information fron the request and store it in the different categories.
+    # <tt>request</tt> The request.
     def update(request)
       if options[:multiple]
         categories = request.every(options[:category])

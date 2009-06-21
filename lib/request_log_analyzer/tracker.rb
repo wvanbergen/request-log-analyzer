@@ -9,9 +9,10 @@ module RequestLogAnalyzer::Tracker
   # Base Tracker class. All other trackers inherit from this class
   #
   # Accepts the following options:
-  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
   # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
+  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
   # * <tt>:output</tt> Direct output here (defaults to STDOUT)
+  # * <tt>:unless</tt> Proc that has to return nil for a request to be passed to the tracker.
   #
   # For example :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
   class Base
@@ -35,6 +36,7 @@ module RequestLogAnalyzer::Tracker
     end
     
     # Will be called with each request.
+    # <tt>request</tt> The request to track data in.
     def update(request)
     end
     
