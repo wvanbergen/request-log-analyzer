@@ -5,17 +5,28 @@ module RequestLogAnalyzer::Output
   # Outputs a fixed width ASCII or UF8 report.
   class FixedWidth < Base
   
+    # Mixin module. Will disable any colorizing.
     module Monochrome
       def colorize(text, *options)
         text
       end
     end
   
+    # Colorize module
     module Color
     
       STYLES = { :normal => 0, :bold => 1, :underscore => 4, :blink => 5, :inverse => 7, :concealed => 8 }
       COLORS = { :black  => 0, :blue => 4, :green => 2, :cyan => 6, :red => 1, :purple => 5, :brown => 3, :white => 7 }
     
+      # Colorize text
+      # <tt>text</tt> The text to colorize
+      # Options
+      #  * <tt>:background</tt> The background color to paint. Defined in Color::COLORS
+      #  * <tt>:color</tt> The foreground color to paint. Defined in Color::COLORS
+      #  * <tt>:on</tt> Alias for :background
+      #  * <tt>:style</tt> Font style, defined in Color::STYLES
+      # 
+      # Returns ASCII colored string
       def colorize(text, *options)
     
         font_style       = ''
@@ -49,6 +60,12 @@ module RequestLogAnalyzer::Output
       :utf   => { :horizontal_line => '━', :vertical_line => '┃', :block => '░' }
     }
   
+    # Initialize a report
+    # <tt>io</tt> iO Object (file, STDOUT, etc.)
+    # <tt>options</tt>
+    #  * <tt>:characters</tt> :utf for UTF8 or :ascii for ANSI compatible output. Defaults to :utf.
+    #  * <tt>:color</tt> If true, ASCII colorization is used, else Monochrome. Defaults to Monochrome.
+    #  * <tt>:width</tt> Output width in characters. Defaults to 80.
     def initialize(io, options = {})
       super(io, options)
       @options[:width]      ||= 80
@@ -59,26 +76,36 @@ module RequestLogAnalyzer::Output
       (class << self; self; end).send(:include, color_module) 
     end
   
+    # Write a string to the output object.
+    # <tt>str</tt> The string to write.
     def print(str)
       @io << str
     end
   
     alias :<< :print
   
+    # Write a string to the output object with a newline at the end.
+    # <tt>str</tt> The string to write.
     def puts(str = '')
       @io << str << "\n"
     end
   
+    # Write the title of a report
+    # <tt>title</tt> The title to write
     def title(title)
       puts
       puts colorize(title, :bold, :white)
       line(:green)
     end
     
+    # Write a line
     def line(*font)  
       puts colorize(characters[:horizontal_line] * @options[:width], *font)
     end
-  
+
+    # Write a link
+    # <tt>text</tt> The text in the link
+    # <tt>url</tt> The url to link to.
     def link(text, url = nil)
       if url.nil?
         colorize(text, :blue, :bold)
@@ -87,6 +114,7 @@ module RequestLogAnalyzer::Output
       end
     end
     
+    # Generate a header for a report    
     def header
       if io.kind_of?(File)
         puts "Request-log-analyzer summary report"
@@ -96,11 +124,15 @@ module RequestLogAnalyzer::Output
       end
     end
     
+    # Generate a footer for a report
     def footer
       puts
       puts "Thanks for using request-log-analyzer!"
     end
     
+    # Generate a report table and push it into the output object.
+    # <tt>*colums<tt> Columns hash
+    # <tt>&block</tt>: A block yeilding the rows.
     def table(*columns, &block)
     
       rows = Array.new
@@ -150,6 +182,7 @@ module RequestLogAnalyzer::Output
         line(:green)
       end
     
+      # Print the rows
       rows.each do |row|
         row_values = []
         columns.each_with_index do |column, index|

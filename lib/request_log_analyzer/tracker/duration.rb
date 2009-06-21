@@ -2,13 +2,14 @@ module RequestLogAnalyzer::Tracker
 
   # Analyze the duration of a specific attribute
   #
-  # Options:
-  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
-  # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
-  # * <tt>:title</tt> Title do be displayed above the report  
+  # === Options
+  # * <tt>:amount</tt> The amount of lines in the report
   # * <tt>:category</tt> Proc that handles request categorization for given fileformat (REQUEST_CATEGORIZER)
   # * <tt>:duration</tt> The field containing the duration in the request hash.
-  # * <tt>:amount</tt> The amount of lines in the report
+  # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
+  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
+  # * <tt>:title</tt> Title do be displayed above the report  
+  # * <tt>:unless</tt> Handle request if this proc is false for the handled request.
   #
   # The items in the update request hash are set during the creation of the Duration tracker.
   #
@@ -23,6 +24,7 @@ module RequestLogAnalyzer::Tracker
     
     attr_reader :categories
 
+    # Check if duration and catagory option have been received,
     def prepare
       raise "No duration field set up for category tracker #{self.inspect}" unless options[:duration]
       raise "No categorizer set up for duration tracker #{self.inspect}" unless options[:category]
@@ -30,6 +32,7 @@ module RequestLogAnalyzer::Tracker
       @categories = {}
     end
 
+    # Get the duration information fron the request and store it in the different categories.
     def update(request)
       if options[:multiple]
         categories = request.every(options[:category])
@@ -58,50 +61,68 @@ module RequestLogAnalyzer::Tracker
       end
     end
     
+    # Get the number of hits of a specific category.
+    # <tt>cat</tt> The category
     def hits(cat)
       categories[cat][:hits]
     end
     
+    # Get the total duration of a specific category.
+    # <tt>cat</tt> The category
     def cumulative_duration(cat)
       categories[cat][:cumulative]
     end
 
+    # Get the minimal duration of a specific category.
+    # <tt>cat</tt> The category
     def min_duration(cat)
       categories[cat][:min]
     end
 
+    # Get the maximum duration of a specific category.
+    # <tt>cat</tt> The category
     def max_duration(cat)
       categories[cat][:max]
     end
 
+    # Get the average duration of a specific category.
+    # <tt>cat</tt> The category
     def average_duration(cat)
       categories[cat][:cumulative] / categories[cat][:hits]  
     end
     
+    # Get the average duration of a all categories.
     def overall_average_duration
       overall_cumulative_duration / overall_hits
     end
     
+    # Get the cumlative duration of a all categories.
     def overall_cumulative_duration
       categories.inject(0.0) { |sum, (name, cat)| sum + cat[:cumulative] }  
     end
     
+    # Get the total hits of a all categories.
     def overall_hits
       categories.inject(0) { |sum, (name, cat)| sum + cat[:hits] }
     end
 
+    # Return categories sorted by hits.
     def sorted_by_hits
       sorted_by(:hits)
     end
 
+    # Return categories sorted by cumulative duration.
     def sorted_by_cumulative
       sorted_by(:cumulative)
     end
 
+    # Return categories sorted by cumulative duration.
     def sorted_by_average
       sorted_by { |cat| cat[:cumulative] / cat[:hits] }
     end
           
+    # Return categories sorted by a given key.
+    # <tt>by</tt> The key.
     def sorted_by(by = nil) 
       if block_given?
         categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) } 
@@ -110,7 +131,12 @@ module RequestLogAnalyzer::Tracker
       end
     end
     
-    # Builds a result table using a provided sorting function 
+    # Block function to build a result table using a provided sorting function.
+    # <tt>output</tt> The output object.
+    # <tt>amount</tt> The number of rows in the report table (default 10).
+    # === Options
+    #  * </tt>:title</tt> The title of the table
+    #  * </tt>:sort</tt> The key to sort on (:hits, :cumulative, :average, :min or :max)
     def report_table(output, amount = 10, options = {}, &block)
     
       output.title(options[:title])
@@ -131,6 +157,10 @@ module RequestLogAnalyzer::Tracker
 
     end
 
+    # Generate a request duration report to the given output object
+    # By default colulative and average duration are generated.
+    # Any options for the report should have been set during initialize.
+    # <tt>output</tt> The output object
     def report(output)
 
       options[:title]  ||= 'Request duration'

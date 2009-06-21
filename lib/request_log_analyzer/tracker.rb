@@ -18,19 +18,40 @@ module RequestLogAnalyzer::Tracker
     
     attr_reader :options
     
+    # Initialize the class
+    # Note that the options are only applicable if should_update? is not overwritten
+    # by the inheriting class.
+    # 
+    # === Options
+    # * <tt>:if</tt> Handle request if this proc is true for the handled request.
+    # * <tt>:unless</tt> Handle request if this proc is false for the handled request.
+    # * <tt>:line_type</tt> Line type this tracker will accept.
     def initialize(options ={})
       @options = options
     end
     
+    # Hook things that need to be done before running here.
     def prepare
     end
     
+    # Will be called with each request.
     def update(request)
     end
     
+    # Hook things that need to be done after running here.
     def finalize
     end
     
+    # Determine if we should run the update function at all.
+    # Usually the update function will be heavy, so a light check is done here
+    # determining if we need to call update at all.
+    #
+    # Default this checks if defined: 
+    #  * :line_type is also in the request hash.
+    #  * :if is true for this request.
+    #  * :unless if false for this request
+    #
+    # <tt>request</tt> The request object.
     def should_update?(request)
       return false if options[:line_type] && !request.has_line_type?(options[:line_type])
       
@@ -49,6 +70,9 @@ module RequestLogAnalyzer::Tracker
       return true
     end
     
+    # Hook report generation here.
+    # Defaults to self.inspect
+    # <tt>output</tt> The output object the report will be passed to.
     def report(output)
       output << self.inspect
       output << "\n"  

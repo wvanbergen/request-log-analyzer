@@ -1,10 +1,13 @@
-# Class used for generating outputs
+# Module for generating output
 module RequestLogAnalyzer::Output
 
+  # Load class files if needed
   def self.const_missing(const)
     RequestLogAnalyzer::load_default_class_file(self, const)
   end
   
+  # Base Class used for generating output for reports.
+  # All output should inherit fromt this class.
   class Base
     
     attr_accessor :io, :options, :style
