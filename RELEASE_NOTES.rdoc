@@ -1,0 +1,8 @@
+=== 1.2.1
+ * Compressed logfile support
+ * All files now have Rdoc
+ * Added release notes rdoc
+
+=== 1.2.0
+ * Ruby 1.9 support
+ * Rcov coverage 
