@@ -7,29 +7,40 @@ module RequestLogAnalyzer::Output
     #   super(io, options)
     # end
   
+    # Print a string to the io object.
     def print(str)
       @io << str
     end
 
     alias :<< :print
 
+    # Put a string with newline
     def puts(str = '')
       @io << str << "<br/>\n"
     end
 
+    # Place a title
     def title(title)
       @io.puts(tag(:h2, title))
     end
 
+    # Render a single line
+    # <tt>*font</tt> The font.
     def line(*font)  
       @io.puts(tag(:hr))
     end
-
+    
+    # Write a link
+    # <tt>text</tt> The text in the link
+    # <tt>url</tt> The url to link to.
     def link(text, url = nil)
       url = text if url.nil?
       tag(:a, text, :href => url)
     end
 
+    # Generate a report table in HTML and push it into the output object.
+    # <tt>*colums<tt> Columns hash
+    # <tt>&block</tt>: A block yeilding the rows.
     def table(*columns, &block)
       rows = Array.new
       yield(rows)
@@ -56,6 +67,7 @@ module RequestLogAnalyzer::Output
     
     end
   
+    # Genrate HTML header and associated stylesheet
     def header
       @io << "<html>"
       @io << tag(:head) do |headers|
@@ -127,6 +139,7 @@ module RequestLogAnalyzer::Output
       @io << tag(:p, "Version #{RequestLogAnalyzer::VERSION} - written by Willem van Bergen and Bart ten Brinke")
     end
   
+    # Generate a footer for a report
     def footer
       @io << tag(:hr) << tag(:h2, 'Thanks for using request-log-analyzer')
       @io << tag(:p, 'Please visit the ' + link('Request-log-analyzer website', 'http://github.com/wvanbergen/request-log-analyzer'))
@@ -135,6 +148,10 @@ module RequestLogAnalyzer::Output
   
     protected 
   
+    # HTML tag writer helper
+    # <tt>tag</tt> The tag to generate
+    # <tt>content</tt> The content inside the tag
+    # <tt>attributes</tt> Attributes to write in the tag
     def tag(tag, content = nil, attributes = nil)
       if block_given?
         attributes = content.nil? ? '' : ' ' + content.map { |(key, value)| "#{key}=\"#{value}\"" }.join(' ')
