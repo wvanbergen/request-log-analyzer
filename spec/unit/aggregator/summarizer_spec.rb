@@ -24,5 +24,5 @@ describe RequestLogAnalyzer::Aggregator::Summarizer do
   it "not raise exception when creating a report after aggregating no requests" do
     lambda { @summarizer.report(mock_output) }.should_not raise_error
   end
-
+  
 end

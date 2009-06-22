@@ -57,7 +57,7 @@ module RequestLogAnalyzer::Tracker
     
     # Return the methods sorted by frequency
     def sorted_by_frequency
-      Hash[*@frequencies.sort { |a, b| b[1] <=> a[1] }.flatten]
+      @frequencies.sort { |a, b| b[1] <=> a[1] }
     end
 
     # Generate a HTTP method frequency report to the given output object.

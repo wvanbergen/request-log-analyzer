@@ -10,7 +10,7 @@ describe RequestLogAnalyzer::Tracker::Base, "API test" do
     @summarizer = RequestLogAnalyzer::Aggregator::Summarizer.new(mock_source)
     @summarizer.trackers << @tracker
   end
-  
+    
   it "should receive :prepare when the summarizer is preparing" do
     @tracker.should_receive(:prepare).once    
     @summarizer.prepare
@@ -40,6 +40,12 @@ describe RequestLogAnalyzer::Tracker::Base, "API test" do
   it "should receive :report when the summary report is being built" do
     @tracker.should_receive(:report).with(anything).once   
     @summarizer.report(mock_output) 
+  end
+  
+  it "should receive :to_yaml object when finalizing" do
+    @summarizer.options[:dump] = temp_output_file(:dump)
+    @tracker.should_receive(:to_yaml_object).once
+    @summarizer.to_yaml
   end
   
 end
