@@ -17,13 +17,14 @@ begin
       strip.option(:format, :alias => :f, :default => 'rails')      
       strip.option(:output, :alias => :o)
       strip.switch(:discard_teaser_lines, :t)
-      strip.switch(:keep_junk_lines, :j)      
+      strip.switch(:keep_junk_lines, :j) 
     end
     
     command_line.option(:format, :alias => :f, :default => 'rails')
     command_line.option(:file, :alias => :e)
     command_line.option(:parse_strategy, :default => 'assume-correct')
-    
+    command_line.option(:dump)
+          
     command_line.option(:aggregator, :alias => :a, :multiple => true)
     command_line.option(:database, :alias => :d)    
 
@@ -61,6 +62,7 @@ rescue CommandLine::Error => e
   puts "  --debug                    Print debug information while parsing."
   puts "  --file <filename>          Output to file."
   puts "  --output <format>          Output format. Supports 'HTML' and 'FixedWidth' (default)"  
+  puts "  --dump <filename>          Dump the YAML formatted results in the given file"
   puts 
   puts "Examples:"
   puts "  request-log-analyzer development.log"

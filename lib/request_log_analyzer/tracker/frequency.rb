@@ -57,7 +57,7 @@ module RequestLogAnalyzer::Tracker
     
     # Return the methods sorted by frequency
     def sorted_by_frequency
-      @frequencies.sort { |a, b| b[1] <=> a[1] }
+      Hash[*@frequencies.sort { |a, b| b[1] <=> a[1] }.flatten]
     end
 
     # Generate a HTTP method frequency report to the given output object.
@@ -80,6 +80,15 @@ module RequestLogAnalyzer::Tracker
         end
 
       end
+    end
+    
+    def to_yaml_object
+      return nil if @frequencies.empty?
+      @frequencies
+    end
+    
+    def title
+      options[:title] || 'Request frequency'
     end
   end
 end

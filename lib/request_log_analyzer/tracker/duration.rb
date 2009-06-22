@@ -155,7 +155,6 @@ module RequestLogAnalyzer::Tracker
                     "%0.02fs" % info[:min], "%0.02fs" % info[:max]]
         end        
       end
-
     end
 
     # Generate a request duration report to the given output object
@@ -180,6 +179,15 @@ module RequestLogAnalyzer::Tracker
           raise "Unknown duration report specified: #{report}!"
         end
       end
-    end      
+    end
+    
+    def title
+      options[:title]  || 'Request duration'
+    end
+    
+    def to_yaml_object
+      return nil if @categories.empty?      
+      @categories
+    end
   end
 end

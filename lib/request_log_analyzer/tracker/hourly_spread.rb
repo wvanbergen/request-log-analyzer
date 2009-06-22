@@ -73,7 +73,7 @@ module RequestLogAnalyzer::Tracker
     # Any options for the report should have been set during initialize.
     # <tt>output</tt> The output object
     def report(output)
-      output.title("Requests graph - average per day per hour")
+      output.title(title)
     
       if total_requests == 0
         output << "None found.\n"
@@ -88,6 +88,18 @@ module RequestLogAnalyzer::Tracker
           rows << ["#{index.to_s.rjust(3)}:00", "%d hits" % requests_per_day, ratio]
         end
       end
+    end
+    
+    def title
+      options[:title] || "Request distribution per hour"
+    end
+    
+    def to_yaml_object
+      yaml_object = {}
+      @request_time_graph.each_with_index do |freq, hour|
+        yaml_object["#{hour}:00 - #{hour+1}:00"] = freq
+      end
+      yaml_object
     end
   end
 end

@@ -67,5 +67,14 @@ module RequestLogAnalyzer::Tracker
       end
     
     end
+    
+    def title
+      options[:title] || 'Request timespan'
+    end
+    
+    def to_yaml_object
+      { :first => first_timestamp, :last  =>last_timestamp }
+    end
+    
   end
 end

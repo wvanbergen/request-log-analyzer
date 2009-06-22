@@ -79,6 +79,14 @@ module RequestLogAnalyzer::Tracker
       output << self.inspect
       output << "\n"  
     end
+    
+    def title
+      self.class.to_s
+    end
+    
+    def to_yaml_object
+      nil
+    end
          
   end 
 end

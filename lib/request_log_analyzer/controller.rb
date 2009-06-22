@@ -34,6 +34,7 @@ module RequestLogAnalyzer
 
       options[:database] = arguments[:database] if arguments[:database]
       options[:debug]    = arguments[:debug]
+      options[:dump]     = arguments[:dump]
 
       output_class = RequestLogAnalyzer::Output::const_get(arguments[:output])
       if arguments[:file]
