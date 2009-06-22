@@ -90,10 +90,12 @@ module RequestLogAnalyzer::Tracker
       end
     end
     
+    # Returns the title of this tracker for reports
     def title
       options[:title] || "Request distribution per hour"
     end
     
+    # Returns the found frequencies per hour as a hash for YAML exporting
     def to_yaml_object
       yaml_object = {}
       @request_time_graph.each_with_index do |freq, hour|

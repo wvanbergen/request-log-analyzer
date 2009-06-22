@@ -181,10 +181,12 @@ module RequestLogAnalyzer::Tracker
       end
     end
     
+    # Returns the title of this tracker for reports
     def title
       options[:title]  || 'Request duration'
     end
     
+    # Returns all the categories and the tracked duration as a hash than can be exported to YAML
     def to_yaml_object
       return nil if @categories.empty?      
       @categories

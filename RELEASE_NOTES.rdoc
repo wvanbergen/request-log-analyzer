@@ -1,5 +1,6 @@
 === Master
  * Compressed logfile support
+ * Dump results to a parsable YAML file using --dump <filename>
  * All files now have Rdoc
  * Added release notes rdoc
 

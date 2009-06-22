@@ -82,11 +82,13 @@ module RequestLogAnalyzer::Tracker
       end
     end
     
+    # Returns a hash with the frequencies of every category that can be exported to YAML
     def to_yaml_object
       return nil if @frequencies.empty?
       @frequencies
     end
     
+    # Returns the title of this tracker for reports
     def title
       options[:title] || 'Request frequency'
     end

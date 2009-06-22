@@ -87,20 +87,23 @@ module RequestLogAnalyzer::Aggregator
       end
     end
     
-    # Call finalize on all trackers.
+    # Call finalize on all trackers. Saves a YAML dump if this is set in  the options.
     def finalize
       @trackers.each { |tracker| tracker.finalize }
       save_results_dump(options[:dump]) if options[:dump]
     end
     
+    # Saves the results of all the trackers in YAML format to a file.
+    # <tt>filename</tt> The file to store the YAML dump in.
     def save_results_dump(filename)
       File.open(filename, 'w') { |file| file.write(to_yaml) }
     end
     
-    # Exports all the tracker results to YAML
+    # Exports all the tracker results to YAML. It will call the to_yaml_object method
+    # for every tracker and combines these into a single YAML export.
     def to_yaml
       require 'yaml'
-       trackers_export = @trackers.inject({}) do |export, tracker|
+      trackers_export = @trackers.inject({}) do |export, tracker|
         export[tracker.title] = tracker.to_yaml_object; export
       end
       YAML::dump(trackers_export)

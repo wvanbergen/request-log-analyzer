@@ -80,10 +80,13 @@ module RequestLogAnalyzer::Tracker
       output << "\n"  
     end
     
+    # The title of this tracker. Used for reporting.
     def title
       self.class.to_s
     end
     
+    # This method is called by RequestLogAnalyzer::Aggregator:Summarizer to retrieve an
+    # object with all the results of this tracker, that can be dumped to YAML format.
     def to_yaml_object
       nil
     end

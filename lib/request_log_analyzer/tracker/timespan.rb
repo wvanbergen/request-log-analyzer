@@ -65,13 +65,14 @@ module RequestLogAnalyzer::Tracker
           end
         end
       end
-    
     end
     
+    # Returns the title of this tracker for reports
     def title
       options[:title] || 'Request timespan'
     end
     
+    # A hash that can be exported to YAML with the first and last timestamp encountered.
     def to_yaml_object
       { :first => first_timestamp, :last  =>last_timestamp }
     end
