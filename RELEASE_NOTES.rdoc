@@ -1,8 +1,9 @@
 === Master
  * Compressed logfile support
- * Dump results to a parsable YAML file using --dump <filename>
- * All files now have Rdoc
- * Added release notes rdoc
+ * Parsable YAML results as output (use --dump <filename> )
+ * Full Rdoc
+ * Release notes
+ * Updated rails take tasks
 
 === 1.2.0
  * Ruby 1.9 support
