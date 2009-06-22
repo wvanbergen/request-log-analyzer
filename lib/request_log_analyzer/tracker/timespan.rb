@@ -4,10 +4,11 @@ module RequestLogAnalyzer::Tracker
   # Also determines the amount of days inbetween these.
   #
   # Accepts the following options:
-  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
-  # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
   # * <tt>:field</tt> The timestamp field that is looked at. Defaults to :timestamp.
+  # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
+  # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
   # * <tt>:title</tt> Title do be displayed above the report.
+  # * <tt>:unless</tt> Proc that has to return nil for a request to be passed to the tracker.
   #
   # Expects the following items in the update request hash
   # * <tt>:timestamp</tt> in YYYYMMDDHHMMSS format.
@@ -20,10 +21,13 @@ module RequestLogAnalyzer::Tracker
 
     attr_reader :first, :last, :request_time_graph
 
+    # Check if timestamp field is set in the options.
     def prepare
       options[:field] ||= :timestamp
     end
             
+    # Check if the timestamp in the request and store it.
+    # <tt>request</tt> The request.
     def update(request)
       timestamp = request[options[:field]]
 
@@ -31,18 +35,24 @@ module RequestLogAnalyzer::Tracker
       @last  = timestamp if @last.nil?  || timestamp > @last
     end
 
+    # First timestamp encountered
     def first_timestamp
       DateTime.parse(@first.to_s, '%Y%m%d%H%M%S') rescue nil
     end
     
+    # Last timestamp encountered
     def last_timestamp
       DateTime.parse(@last.to_s, '%Y%m%d%H%M%S') rescue nil      
     end
     
+    # Difference between last and first timestamp.
     def timespan
       last_timestamp - first_timestamp
     end
 
+    # Generate an hourly spread report to the given output object.
+    # Any options for the report should have been set during initialize.
+    # <tt>output</tt> The output object
     def report(output)
       output.title(options[:title]) if options[:title]
     

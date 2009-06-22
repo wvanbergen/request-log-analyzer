@@ -1,9 +1,7 @@
 require 'date'
 
 # Satisfy ruby 1.9 sensitivity about encoding.
-if defined? Encoding and Encoding.respond_to? 'default_external='
-  Encoding.default_external = 'binary'
-end
+Encoding.default_external = 'binary' if defined? Encoding and Encoding.respond_to? 'default_external='
 
 # RequestLogAnalyzer is the base namespace in which all functionality of RequestLogAnalyzer is implemented.
 #
@@ -13,7 +11,7 @@ module RequestLogAnalyzer
   
   # The current version of request-log-analyzer.
   # This will be diplayed in output reports etc.  
-  VERSION = '1.1.7'
+  VERSION = '1.2.1'
   
   # Loads constants in the RequestLogAnalyzer namespace using self.load_default_class_file(base, const)
   # <tt>const</tt>:: The constant that is not yet loaded in the RequestLogAnalyzer namespace. This should be passed as a string or symbol.

@@ -4,10 +4,23 @@ require 'activerecord'
 module RequestLogAnalyzer::Source
   
   # Active Resource hook
-  class CompletedLine < ActiveRecord::Base
+  class Request < ActiveRecord::Base
+    has_many :completed_lines
+    has_many :processing_lines
     def convert(file_format)
-      RequestLogAnalyzer::Request.create(file_format, self.attributes)
+      send_attributes = self.attributes
+      send_attributes.merge!(self.completed_lines.first.attributes) if self.completed_lines.first
+      send_attributes.merge!(self.processing_lines.first.attributes) if self.processing_lines.first
+      return RequestLogAnalyzer::Request.new(file_format, send_attributes)
     end
+  end
+
+  class CompletedLine < ActiveRecord::Base
+    belongs_to :request
+  end
+
+  class ProcessingLine < ActiveRecord::Base
+    belongs_to :request
   end
 
   # The Database class gets log data from the database.
@@ -40,9 +53,11 @@ module RequestLogAnalyzer::Source
       ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => @source_files)
 
       @progress_handler.call(:started, @source_files) if @progress_handler
-        RequestLogAnalyzer::Source::CompletedLine.find(:all).each do |request|
+        RequestLogAnalyzer::Source::Request.find(:all).each do |request|
           @parsed_requests += 1
-          yield(request.convert(self.file_format))
+          @progress_handler.call(:progress, @parsed_requests) if @progress_handler
+          
+          yield request.convert(self.file_format)
         end
       
       @progress_handler.call(:finished, @source_files) if @progress_handler

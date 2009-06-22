@@ -63,6 +63,7 @@ module RequestLogAnalyzer
       end
       
       controller = Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format, options), options)
+      #controller = Controller.new(RequestLogAnalyzer::Source::Database.new(file_format, options), options)
 
       options[:parse_strategy] = arguments[:parse_strategy]
       

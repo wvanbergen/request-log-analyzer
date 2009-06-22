@@ -1,3 +1,4 @@
+# Simple log file specification, used to test log parser.
 class TestingFormat < RequestLogAnalyzer::FileFormat::Base
 
   format_definition.first do |line|

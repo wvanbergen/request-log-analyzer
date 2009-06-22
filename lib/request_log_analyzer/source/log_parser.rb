@@ -67,17 +67,40 @@ module RequestLogAnalyzer::Source
     def parse_files(files, options = {}, &block) # :yields: request
       files.each { |file| parse_file(file, options, &block) }
     end
+    
+    # Check if a file has a compressed extention in the filename.
+    # If recognized, return the command string used to decompress the file
+    def decompress_file?(filename)
+      nice_command = "nice -n 5"
+      
+      return "#{nice_command} gunzip -c -d #{filename}" if filename.match(/\.tar.gz$/) || filename.match(/\.tgz$/) || filename.match(/\.gz$/)
+      return "#{nice_command} bunzip2 -c -d #{filename}" if filename.match(/\.bz2$/)
+      return "#{nice_command} unzip -p #{filename}" if filename.match(/\.zip$/)
+
+      return ""
+    end
 
     # Parses a log file. Creates an IO stream for the provided file, and sends it to parse_io for
     # further handling. This method supports progress updates that can be used to display a progressbar
+    #
+    # If the logfile is compressed, it is uncompressed to stdout and read.
+    # TODO: Check if IO.popen encounters problems with the given command line.
+    # TODO: Fix progress bar that is broken for IO.popen, as it returns a single string.
+    #
     # <tt>file</tt>:: The file that should be parsed.
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.    
     def parse_file(file, options = {}, &block)
+
       @progress_handler.call(:started, file) if @progress_handler
-      File.open(file, 'r') { |f| parse_io(f, options, &block) }
+      
+      if decompress_file?(file).empty?
+        File.open(file, 'r') { |f| parse_io(f, options, &block) }
+      else
+        IO.popen(decompress_file?(file), 'r') { |f| parse_io(f, options, &block) }
+      end
+
       @progress_handler.call(:finished, file) if @progress_handler
     end
-
 
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
     # because the length of a stream is not known.
@@ -103,7 +126,7 @@ module RequestLogAnalyzer::Source
 
       @current_io = io
       @current_io.each_line do |line|
-
+        
         @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
 
         request_data = nil

@@ -1,7 +1,0 @@
-HACKING on request-log-analyzer
--------------------------------
-
-- See DESIGN for the basic internal design of request-log-analyzer
-- See http://wiki.github.com/wvanbergen/request-log-analyzer/development for
-  more information about developing
-- Contact me at my GitHub account for any questions: http://github.com/wvanbergen

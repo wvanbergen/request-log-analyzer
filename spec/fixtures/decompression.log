@@ -1,0 +1,12 @@
+Processing PageController#demo (for 127.0.0.1 at 2008-12-10 16:28:09) [GET]
+  Parameters: {"action"=>"demo", "controller"=>"page"}
+Logging in from session data...
+Logged in as test@example.com
+Using locale: en-US, http-accept: ["en-US"], session: , det browser: en-US, det domain: 
+Rendering template within layouts/demo
+Rendering page/demo
+Rendered shared/_analytics (0.2ms)
+Rendered layouts/_actions (0.6ms)
+Rendered layouts/_menu (2.2ms)
+Rendered layouts/_tabbar (0.5ms)
+Completed in 614ms (View: 120, DB: 31) | 200 OK [http://www.example.coml/demo]
