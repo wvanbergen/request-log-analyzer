@@ -11,7 +11,7 @@ This allows you to easily add extra reports, filters and outputs.
 2) Start chunk producer and push chunks through pipeline.
  Controller.start
 
-== Source
+=== Source
 RequestLogAnalyzer::Source is an Object that pushes requests into the chain.
 At the moment you can only use the log-parser as a source.
 It accepts files or stdin and can parse then into request objects using a RequestLogAnalyzer::FileFormat definition.
