@@ -1,4 +1,4 @@
-=== 1.2.1
+=== Master
  * Compressed logfile support
  * All files now have Rdoc
  * Added release notes rdoc
