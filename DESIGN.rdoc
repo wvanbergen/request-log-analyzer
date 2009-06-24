@@ -2,14 +2,13 @@
 RLA is set up like a simple pipe and filter system.
 
 This allows you to easily add extra reports, filters and outputs.
-
-1) Build pipeline.
                              -> Aggregator  (database)
   Source -> Filter -> Filter -> Aggregator  (summary report)  -> Output
                              -> Aggregator  (...)
-                             
-2) Start chunk producer and push chunks through pipeline.
- Controller.start
+
+When the pipeline has been constructed, we Start chunk producer (source) and push requests through pipeline.
+
+  Controller.start
 
 === Source
 RequestLogAnalyzer::Source is an Object that pushes requests into the chain.
@@ -32,11 +31,10 @@ For example: the Database aggregator will just store all the requests into a SQL
 generate a wide range of statistical reports from them.
 
 === Running the pipeline
-3) Gather output from pipeline.
-  Controller.report
-
 All Aggregators are asked to report what they have done. For example the database will report: I stuffed x requests
 into SQLite database Y. The Summarizer will output its reports.
+
+  Controller.report
 
 The output is pushed to a RequestLogAnalyzer::Output object, which takes care of the output.
 It can generate either ASCII, UTF8 or even HTML output.
