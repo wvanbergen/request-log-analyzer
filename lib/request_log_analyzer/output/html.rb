@@ -143,7 +143,7 @@ module RequestLogAnalyzer::Output
     def footer
       @io << tag(:hr) << tag(:h2, 'Thanks for using request-log-analyzer')
       @io << tag(:p, 'For more information please visit the ' + link('Request-log-analyzer website', 'http://github.com/wvanbergen/request-log-analyzer'))
-      @io << tag(:p, 'If you need an expert who can analyze your application, please contact: ' + link('Willem van Bergen', 'mailto:willem@vanbergen.org') + ' or ' + link('Bart ten Brinke', 'mailto:info@retrosync.com') + '.')
+      @io << tag(:p, 'If you need an expert who can analyze your application, mail to ' + link('contact@railsdoctors.com', 'mailto:contact@railsdoctors.com') + ' or visit us at ' + link('http://railsdoctors.com', 'http://railsdoctors.com') + '.')
       @io << "</body></html>\n"
     end
   

@@ -45,6 +45,8 @@ begin
   
 rescue CommandLine::Error => e
   puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
+  puts "Website: http://railsdoctors.com"
+  puts
   puts "ARGUMENT ERROR: " + e.message if e.message
   puts
   puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
@@ -84,7 +86,7 @@ when :strip
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
 else 
   puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
-  puts "Website: http://github.com/wvanbergen/request-log-analyzer"
+  puts "Website: http://railsdoctors.com"
   puts
 
   # Run the request_log_analyzer!

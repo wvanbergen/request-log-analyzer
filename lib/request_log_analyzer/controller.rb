@@ -213,7 +213,7 @@ module RequestLogAnalyzer
         puts
         puts "Report written to: " + File.expand_path(@output.io.path)
         puts "Need an expert to analyze your application?"
-        puts "Contact either Willem van Bergen (willem@vanbergen.org) or Bart ten Brinke (info@retrosync.com)."
+        puts "Mail to contact@railsdoctors.com or visit us at http://railsdoctors.com"
         puts "Thanks for using request-log-analyzer!"
         @output.io.close
       end
