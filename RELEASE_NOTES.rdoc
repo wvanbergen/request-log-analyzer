@@ -1,4 +1,4 @@
-=== Master
+=== 1.2.1
  * Compressed logfile support
  * Parsable YAML results as output (use --dump <filename> )
  * Full Rdoc
