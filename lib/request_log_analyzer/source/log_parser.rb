@@ -207,6 +207,10 @@ module RequestLogAnalyzer::Source
             warn(:unclosed_request, "Encountered header line (#{request_data[:line_definition].name.inspect}), but previous request was not closed!")
             @current_request = nil # remove all data that was parsed, skip next request as well.
           end
+          if footer_line?(request_data)
+            handle_request(@current_request, &block) # yield @current_request
+            @current_request = nil 
+          end
         else
           @current_request = @file_format.request(request_data)              
         end
