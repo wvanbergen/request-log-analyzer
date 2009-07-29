@@ -49,10 +49,12 @@ module RequestLogAnalyzer
     # with all the fields parsed from that line as content.
     # If the line definition has a teaser-check, a :teaser_check_failed warning will be emitted
     # if this teaser-check is passed, but the full regular exprssion does not ,atch.
-    def matches(line, lineno = nil, parser = nil)
+    def matches(filename, line, lineno = nil, pos = nil, parser = nil)
       if @teaser.nil? || @teaser =~ line
         if match_data = line.match(@regexp)
-          return { :line_definition => self, :lineno => lineno, :captures => match_data.captures}
+          return { :line_definition => self, :lineno => lineno, :pos => pos, 
+                   :filename => filename, :captures => match_data.captures
+                 }
         else
           if @teaser && parser
             parser.warn(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")

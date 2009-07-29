@@ -3,7 +3,7 @@ module RequestLogAnalyzer::Aggregator
   # Echo Aggregator. Writes everything passed to it 
   class Echo < Base
     
-    def prepare
+    def prepare(source)
       @warnings = ""
     end
     

@@ -88,7 +88,7 @@ module RequestLogAnalyzer
       arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
 
       # register the database 
-      controller.add_aggregator(:database)   if arguments[:database] && !arguments[:aggregator].include?('database')
+      controller.add_aggregator(:database) if arguments[:database] && !arguments[:aggregator].include?('database')
       controller.add_aggregator(:summarizer) if arguments[:aggregator].empty?
     
       # register the echo aggregator in debug mode
@@ -109,7 +109,6 @@ module RequestLogAnalyzer
     # * <tt>:colorize</tt> Colorize output
     # * <tt>:output</tt> All report outputs get << through this output.
     def initialize(source, options = {})
-
       @source      = source
       @options     = options
       @aggregators = []
@@ -189,8 +188,7 @@ module RequestLogAnalyzer
     # 5. Call report on every aggregator
     # 6. Finalize Source
     def run!
-      
-      @aggregators.each { |agg| agg.prepare }
+      @aggregators.each { |agg| agg.prepare(source) }
       install_signal_handlers
       
       @source.each_request do |request|

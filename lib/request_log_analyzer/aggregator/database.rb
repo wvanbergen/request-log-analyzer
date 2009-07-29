@@ -18,10 +18,13 @@ module RequestLogAnalyzer::Aggregator
 
     # Establishes a connection to the database and creates the necessary database schema for the
     # current file format
-    def prepare
+    def prepare(source)
       ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
-      File.unlink(options[:database]) if File.exist?(options[:database]) # TODO: keep old database?
+      # File.unlink(options[:database]) if File.exist?(options[:database]) # TODO: keep old database?
       create_database_schema!
+      if source.is_a?(RequestLogAnalyzer::Source::LogParser)
+        source.existing_files = files
+      end
     end
     
     # Aggregates a request into the database
@@ -32,16 +35,26 @@ module RequestLogAnalyzer::Aggregator
       request.lines.each do |line|
         class_columns = @orm_module.const_get("#{line[:line_type]}_line".classify).column_names.reject { |column| ['id'].include?(column) }
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
+        file = file_from_filename(line[:filename])
+        file.last_lineno = [file.last_lineno, line[:lineno]].max
+        file.last_pos    = [file.last_pos,    line[:pos]].max
+        attributes = attributes.merge(:file_id => file.id)
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
+      sleep 0.5
       @request_object.save!
     rescue SQLite3::SQLException => e
       raise Interrupt, e.message
+    rescue SQLite3::BusyException => e
+      puts "Database busy, waiting...."
+      sleep 0.3
+      retry
     end
     
     # Finalizes the aggregator by closing the connection to the database
     def finalize
       @request_count = @orm_module::Request.count
+      files.each {|_, file| file.save }
       ActiveRecord::Base.remove_connection
     end
     
@@ -61,6 +74,17 @@ module RequestLogAnalyzer::Aggregator
       output << "\n"
     end
     
+    # Returns a hash of filename => file from the database.
+    def files
+      if @file_class
+        @files ||= begin
+          result = {}
+          @file_class.all.each {|file| result[file.filename] = file}
+          result
+        end
+      end
+    end
+
     protected 
     
     # This function creates a database table for a given line definition.
@@ -69,11 +93,14 @@ module RequestLogAnalyzer::Aggregator
     # to the same request. It will also create an index in the request_id field to speed up queries.
     def create_database_table(name, definition)
       ActiveRecord::Migration.verbose = options[:debug]
-      ActiveRecord::Migration.create_table("#{name}_lines") do |t|
+      table_name = "#{name}_lines"
+      return if ActiveRecord::Base.connection.tables.include?(table_name)
+      ActiveRecord::Migration.create_table(table_name) do |t|
         t.column(:request_id, :integer)
-        t.column(:lineno, :integer)
+        t.column(:lineno,     :integer)
+        t.column(:file_id,    :integer)
+        
         definition.captures.each do |capture|
-
           # Add a field for every capture
           t.column(capture[:name], column_type(capture[:type]))
           
@@ -105,14 +132,29 @@ module RequestLogAnalyzer::Aggregator
       @request_class.send(:has_many, "#{name}_lines".to_sym)
     end    
     
+    # Creates a files table, which stores a row for each filename imported into the database.
+    def create_files_table_and_class
+      unless ActiveRecord::Base.connection.tables.include?("files")
+        ActiveRecord::Migration.verbose = options[:debug]
+        ActiveRecord::Migration.create_table("files") do |t|
+          t.string  :filename
+          t.integer :last_lineno, :default => 0
+          t.integer :last_pos,    :default => 0
+        end
+      end
+      @file_class = @orm_module.const_set('File', Class.new(ActiveRecord::Base))
+    end
+    
     # Creates a requests table, in which a record is created for every request. It also creates an
     # ActiveRecord::Base class to communicate with this table.
     def create_request_table_and_class
-      ActiveRecord::Migration.verbose = options[:debug]
-      ActiveRecord::Migration.create_table("requests") do |t|
-        t.integer :first_lineno
-        t.integer :last_lineno
-      end    
+      unless ActiveRecord::Base.connection.tables.include?("requests")
+        ActiveRecord::Migration.verbose = options[:debug]
+        ActiveRecord::Migration.create_table("requests") do |t|
+          t.integer :first_lineno
+          t.integer :last_lineno
+        end    
+      end
       
       @orm_module.const_set('Request', Class.new(ActiveRecord::Base)) unless @orm_module.const_defined?('Request')     
       @request_class = @orm_module.const_get('Request')
@@ -120,12 +162,14 @@ module RequestLogAnalyzer::Aggregator
 
     # Creates a warnings table and a corresponding Warning class to communicate with this table using ActiveRecord.
     def create_warning_table_and_class
-      ActiveRecord::Migration.verbose = options[:debug]
-      ActiveRecord::Migration.create_table("warnings") do |t|
-        t.string  :warning_type, :limit => 30, :null => false
-        t.string  :message
-        t.integer :lineno          
-      end    
+      unless ActiveRecord::Base.connection.tables.include?("warnings")
+        ActiveRecord::Migration.verbose = options[:debug]
+        ActiveRecord::Migration.create_table("warnings") do |t|
+          t.string  :warning_type, :limit => 30, :null => false
+          t.string  :message
+          t.integer :lineno          
+        end    
+      end
       
       @orm_module.const_set('Warning', Class.new(ActiveRecord::Base)) unless @orm_module.const_defined?('Warning')
     end
@@ -133,20 +177,30 @@ module RequestLogAnalyzer::Aggregator
     # Creates the database schema and related ActiveRecord::Base subclasses that correspond to the 
     # file format definition. These ORM classes will later be used to create records in the database.
     def create_database_schema!
-      
       if file_format.class.const_defined?('Database')
         @orm_module = file_format.class.const_get('Database')
       else
         @orm_module = file_format.class.const_set('Database', Module.new)
       end
-
+      
       create_request_table_and_class
       create_warning_table_and_class
+      create_files_table_and_class
       
       file_format.line_definitions.each do |name, definition|
         create_database_table(name, definition)
         create_activerecord_class(name, definition)
       end
+    end
+    
+    # Returns the file for the given filename. If one doesn't
+    # exist it will create one in the database.
+    def file_from_filename(filename)
+      unless file = files[filename]
+        file = @file_class.create(:filename => filename)
+        files[file.filename] = file
+      end
+      file
     end
     
     # Function to determine the column type for a field

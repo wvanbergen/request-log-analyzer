@@ -74,7 +74,7 @@ module RequestLogAnalyzer::Aggregator
     end
     
     # Call prepare on all trackers.
-    def prepare
+    def prepare(source)
       raise "No trackers set up in Summarizer!" if @trackers.nil? || @trackers.empty?
       @trackers.each { |tracker| tracker.prepare }
     end
