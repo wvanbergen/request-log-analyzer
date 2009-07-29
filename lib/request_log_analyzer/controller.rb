@@ -191,14 +191,11 @@ module RequestLogAnalyzer
     def run!
       
       @aggregators.each { |agg| agg.prepare }
+      install_signal_handlers
       
-      begin
-        @source.each_request do |request|
-          aggregate_request(filter_request(request))
-        end
-      rescue Interrupt => e
-        handle_progress(:interrupted)
-        puts "Caught interrupt! Stopped parsing."
+      @source.each_request do |request|
+        aggregate_request(filter_request(request))
+        break if @interrupted
       end
 
       @aggregators.each { |agg| agg.finalize }
@@ -216,6 +213,14 @@ module RequestLogAnalyzer
         puts "Mail to contact@railsdoctors.com or visit us at http://railsdoctors.com"
         puts "Thanks for using request-log-analyzer!"
         @output.io.close
+      end
+    end
+    
+    def install_signal_handlers
+      Signal.trap("INT") do
+        handle_progress(:interrupted)
+        puts "Caught interrupt! Stopping parsing..."
+        @interrupted = true
       end
     end
     
