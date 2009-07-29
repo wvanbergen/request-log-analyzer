@@ -41,7 +41,6 @@ module RequestLogAnalyzer::Aggregator
         attributes = attributes.merge(:file_id => file.id)
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
-      sleep 0.5
       @request_object.save!
     rescue SQLite3::SQLException => e
       raise Interrupt, e.message
