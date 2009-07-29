@@ -60,7 +60,8 @@ rescue CommandLine::Error => e
   puts
   puts "Output options:"
   puts "  --boring, -b               Output reports without ASCII colors."
-  puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
+  puts "  --database <filename>, -d: Either the path to a yaml file containing ActiveRecord connection"
+  puts "                             options or the path to a sqlite db (which may be non-existant)."
   puts "  --debug                    Print debug information while parsing."
   puts "  --file <filename>          Output to file."
   puts "  --output <format>          Output format. Supports 'HTML' and 'FixedWidth' (default)"  

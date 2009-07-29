@@ -19,7 +19,12 @@ module RequestLogAnalyzer::Aggregator
     # Establishes a connection to the database and creates the necessary database schema for the
     # current file format
     def prepare(source)
-      ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
+      if options[:database] =~ /\.(yml|yaml)$/
+        db_config = YAML.load(File.read(options[:database]))
+        ActiveRecord::Base.establish_connection(db_config)
+      else
+        ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
+      end
       # File.unlink(options[:database]) if File.exist?(options[:database]) # TODO: keep old database?
       create_database_schema!
       if source.is_a?(RequestLogAnalyzer::Source::LogParser)
