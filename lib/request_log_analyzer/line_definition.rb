@@ -28,7 +28,7 @@ module RequestLogAnalyzer
 
     attr_reader :name
     attr_accessor :teaser, :regexp, :captures
-    attr_accessor :header, :footer
+    attr_accessor :header, :footer, :uniq
     
     # Initializes the LineDefinition instance with a hash containing the different elements of
     # the definition.
@@ -59,10 +59,10 @@ module RequestLogAnalyzer
     def matches(filename, line, lineno = nil, pos = nil, parser = nil)
       if @teaser.nil? || @teaser =~ line
         if match_data = line.match(@regexp)
-          # p [:match, @teaser]
           return { :line_definition => self, :lineno => lineno, :pos => pos, 
                    :filename => filename, :captures => match_data.captures,
-                   :pid => (pid_index ? match_data.captures[pid_index].to_i : 0)
+                   :pid => (pid_index ? match_data.captures[pid_index].to_i : 0),
+                   :hash => nil #Digest::SHA1.hexdigest(line)
                  }
         else
           if @teaser && parser

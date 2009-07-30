@@ -134,7 +134,7 @@ module RequestLogAnalyzer
       when :started
         @progress_bar = CommandLine::ProgressBar.new(File.basename(value), File.size(value), STDOUT)
       when :finished
-        @progress_bar.finish
+        @progress_bar.finish if @progress_bar
         @progress_bar = nil
       when :interrupted
         if @progress_bar
@@ -142,7 +142,7 @@ module RequestLogAnalyzer
           @progress_bar = nil
         end
       when :progress
-        @progress_bar.set(value)
+        @progress_bar.set(value) if @progress_bar
       end
     end
     
@@ -176,7 +176,17 @@ module RequestLogAnalyzer
     # <tt>request</tt> The request to push to the aggregators.    
     def aggregate_request(request)
       return unless request
-      @aggregators.each { |agg| agg.aggregate(request) }
+      @aggregators.each { |agg| agg.aggregate(request, 
+                                  earliest_uncommitted_line,
+                                  earliest_uncommitted_pos) }
+    end
+    
+    def earliest_uncommitted_line
+      @source.current_requests.values.map {|req| req.first_lineno }.sort.first
+    end
+    
+    def earliest_uncommitted_pos
+      @source.current_requests.values.map {|req| req.first_pos }.sort.first
     end
     
     # Runs RequestLogAnalyzer

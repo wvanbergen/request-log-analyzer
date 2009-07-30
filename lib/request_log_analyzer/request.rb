@@ -82,6 +82,7 @@ module RequestLogAnalyzer
       value_hash[:lineno]    = parsed_line[:lineno]
       value_hash[:filename]  = parsed_line[:filename]
       value_hash[:pos]       = parsed_line[:pos]
+      value_hash[:hash]      = parsed_line[:hash]
       add_line_hash(value_hash)
     end
     
@@ -151,6 +152,14 @@ module RequestLogAnalyzer
     
     def last_lineno
       @lines.last[:lineno]
+    end
+    
+    def first_pos
+      @lines.first[:pos]
+    end
+    
+    def last_pos
+      @lines.last[:pos]
     end
   end
 end

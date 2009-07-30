@@ -81,7 +81,7 @@ module RequestLogAnalyzer::Aggregator
     
     # Pass all requests to trackers and let them update if necessary.
     # <tt>request</tt> The request to pass.
-    def aggregate(request)
+    def aggregate(request, _1, _2)
       @trackers.each do |tracker|
         tracker.update(request) if tracker.should_update?(request)
       end

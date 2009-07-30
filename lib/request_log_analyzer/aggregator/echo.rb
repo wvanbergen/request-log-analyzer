@@ -7,7 +7,7 @@ module RequestLogAnalyzer::Aggregator
       @warnings = ""
     end
     
-    def aggregate(request)
+    def aggregate(request, _1, _2)
       puts "\nRequest: " + request.inspect
     end
     

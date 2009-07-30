@@ -35,18 +35,21 @@ module RequestLogAnalyzer::Aggregator
     # Aggregates a request into the database
     # This will create a record in the requests table and create a record for every line that has been parsed,
     # in which the captured values will be stored.
-    def aggregate(request)
+    def aggregate(request, earliest_uncommitted_line, earliest_uncommitted_pos)
       @request_object = @request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
         class_columns = @orm_module.const_get("#{line[:line_type]}_line".classify).column_names.reject { |column| ['id'].include?(column) }
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
         file = file_from_filename(line[:filename])
-        file.last_lineno = [file.last_lineno, line[:lineno]].max
-        file.last_pos    = [file.last_pos,    line[:pos]].max if file.last_pos and line[:pos]
+        file.last_lineno = earliest_uncommitted_line
+        file.last_pos    = earliest_uncommitted_pos
         attributes = attributes.merge(:file_id => file.id)
+        @request_object.hashed_value = line[:hash]
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
-      @request_object.save!
+      # unless @request_class.exists?(:hashed_value => @request_object.hashed_value)
+        @request_object.save!
+      # end
     rescue SQLite3::SQLException => e
       raise Interrupt, e.message
     rescue SQLite3::BusyException => e
@@ -157,8 +160,10 @@ module RequestLogAnalyzer::Aggregator
         ActiveRecord::Migration.create_table("requests") do |t|
           t.integer :first_lineno
           t.integer :last_lineno
+          t.string  :hashed_value
         end    
       end
+      ActiveRecord::Migration.add_index("requests", [:hashed_value])
       
       @orm_module.const_set('Request', Class.new(ActiveRecord::Base)) unless @orm_module.const_defined?('Request')     
       @request_class = @orm_module.const_get('Request')

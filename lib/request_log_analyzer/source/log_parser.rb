@@ -17,7 +17,7 @@ module RequestLogAnalyzer::Source
     # All available parse strategies.
     PARSE_STRATEGIES = ['cautious', 'assume-correct']
 
-    attr_reader :source_files
+    attr_reader :source_files, :current_requests
     attr_accessor :existing_files
 
     # Initializes the log file parser instance.
@@ -114,7 +114,7 @@ module RequestLogAnalyzer::Source
     def skip_file?(filename)
       if @options[:database]
         if file = @existing_files[filename]
-          file.last_pos >= File.stat(filename).size
+          file.last_pos and file.last_pos >= File.stat(filename).size
         end
       end
     end
@@ -122,7 +122,7 @@ module RequestLogAnalyzer::Source
     def skip_to_last_pos(filename, f)
       if @options[:database]
         if file = @existing_files[filename]
-          f.pos = file.last_pos
+          f.pos    = file.last_pos || 0
           f.lineno = file.last_lineno
         end
       end
@@ -242,21 +242,21 @@ module RequestLogAnalyzer::Source
           end
           if footer_line?(request_data)
             handle_request(@current_requests[pid], &block) # yield @current_request
-            @current_requests[pid] = nil 
+            @current_requests.delete(pid) 
           end
         else
           @current_requests[pid] = @file_format.request(request_data)              
         end
         if footer_line?(request_data)
           handle_request(@current_requests[pid], &block) # yield @current_request
-          @current_requests[pid] = nil 
+          @current_requests.delete(pid) 
         end
       else
         if @current_requests[pid]
           @current_requests[pid] << request_data
           if footer_line?(request_data)
             handle_request(@current_requests[pid], &block) # yield @current_request
-            @current_requests[pid] = nil 
+            @current_requests.delete(pid) 
           end
         else
           @skipped_lines += 1
