@@ -35,6 +35,7 @@ module RequestLogAnalyzer::Source
       @skipped_requests = 0
       @current_io       = nil
       @source_files     = options[:source_files]
+      @current_requests = {}
       
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
       raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
@@ -158,7 +159,6 @@ module RequestLogAnalyzer::Source
           request_data = definition.matches(@current_file, line, @current_io.lineno, @current_io.pos, self)
           break if request_data
         end
-        
         if request_data
           @parsed_lines += 1
           update_current_request(request_data, &block)
@@ -220,34 +220,43 @@ module RequestLogAnalyzer::Source
     #
     # <tt>request_data</tt>:: A hash of data that was parsed from the last line.
     def update_current_request(request_data, &block) # :yields: request
+      pid = request_data[:pid]
+      if @using_pid == nil
+        @using_pid = !!pid
+      else
+        if @using_pid != !!pid
+          raise "Expected a pid"
+        end
+      end
       if header_line?(request_data)
-        if @current_request
+        if @current_requests[pid]
           case options[:parse_strategy]
           when 'assume-correct'
-            handle_request(@current_request, &block)
-            @current_request = @file_format.request(request_data)
+            handle_request(@current_requests[pid], &block)
+            @current_requests[pid] = @file_format.request(request_data)
           when 'cautious'
             @skipped_lines += 1
             warn(:unclosed_request, "Encountered header line (#{request_data[:line_definition].name.inspect}), but previous request was not closed!")
-            @current_request = nil # remove all data that was parsed, skip next request as well.
+            @current_requests[pid] = nil # remove all data that was parsed, skip next request as well.
           end
           if footer_line?(request_data)
-            handle_request(@current_request, &block) # yield @current_request
-            @current_request = nil 
+            handle_request(@current_requests[pid], &block) # yield @current_request
+            @current_requests[pid] = nil 
           end
         else
-          @current_request = @file_format.request(request_data)              
+          @current_requests[pid] = @file_format.request(request_data)              
         end
         if footer_line?(request_data)
-          handle_request(@current_request, &block) # yield @current_request
-          @current_request = nil 
+          handle_request(@current_requests[pid], &block) # yield @current_request
+          @current_requests[pid] = nil 
         end
       else
-        if @current_request
-          @current_request << request_data
+        if @current_requests[pid]
+          p request_data[:line_definition].teaser
+          @current_requests[pid] << request_data
           if footer_line?(request_data)
-            handle_request(@current_request, &block) # yield @current_request
-            @current_request = nil 
+            handle_request(@current_requests[pid], &block) # yield @current_request
+            @current_requests[pid] = nil 
           end
         else
           @skipped_lines += 1

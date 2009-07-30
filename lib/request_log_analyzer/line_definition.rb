@@ -43,6 +43,13 @@ module RequestLogAnalyzer
       yield(definition) if block_given?
       return definition
     end
+
+    def pid_index
+      @pid_index ||= begin
+        captures.each_with_index {|cap, ix| @pid_index = ix if cap[:name] == :pid }
+        @pid_index
+      end
+    end
     
     # Checks whether a given line matches this definition. 
     # It will return false if a line does not match. If the line matches, a hash is returned
@@ -52,8 +59,10 @@ module RequestLogAnalyzer
     def matches(filename, line, lineno = nil, pos = nil, parser = nil)
       if @teaser.nil? || @teaser =~ line
         if match_data = line.match(@regexp)
+          # p [:match, @teaser]
           return { :line_definition => self, :lineno => lineno, :pos => pos, 
-                   :filename => filename, :captures => match_data.captures
+                   :filename => filename, :captures => match_data.captures,
+                   :pid => (pid_index ? match_data.captures[pid_index].to_i : 0)
                  }
         else
           if @teaser && parser
