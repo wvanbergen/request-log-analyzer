@@ -42,7 +42,7 @@ module RequestLogAnalyzer::Aggregator
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
         file = file_from_filename(line[:filename])
         file.last_lineno = [file.last_lineno, line[:lineno]].max
-        file.last_pos    = [file.last_pos,    line[:pos]].max
+        file.last_pos    = [file.last_pos,    line[:pos]].max if file.last_pos and line[:pos]
         attributes = attributes.merge(:file_id => file.id)
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
@@ -143,7 +143,7 @@ module RequestLogAnalyzer::Aggregator
         ActiveRecord::Migration.create_table("files") do |t|
           t.string  :filename
           t.integer :last_lineno, :default => 0
-          t.integer :last_pos,    :default => 0
+          t.integer :last_pos
         end
       end
       @file_class = @orm_module.const_set('File', Class.new(ActiveRecord::Base))

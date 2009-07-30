@@ -156,7 +156,8 @@ module RequestLogAnalyzer::Source
 
         request_data = nil
         file_format.line_definitions.each do |line_type, definition|
-          request_data = definition.matches(@current_file, line, @current_io.lineno, @current_io.pos, self)
+          pos = (@current_io.kind_of?(File) ? @current_io.pos : nil)
+          request_data = definition.matches(@current_file, line, @current_io.lineno, pos, self)
           break if request_data
         end
         if request_data
@@ -252,7 +253,6 @@ module RequestLogAnalyzer::Source
         end
       else
         if @current_requests[pid]
-          p request_data[:line_definition].teaser
           @current_requests[pid] << request_data
           if footer_line?(request_data)
             handle_request(@current_requests[pid], &block) # yield @current_request
