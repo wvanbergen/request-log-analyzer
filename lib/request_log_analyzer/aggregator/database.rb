@@ -119,6 +119,11 @@ module RequestLogAnalyzer::Aggregator
           end
         end
       end
+      definition.captures.each do |capture|
+        if capture[:index]
+          ActiveRecord::Migration.add_index("#{name}_lines", [capture[:name]])
+        end
+      end
       ActiveRecord::Migration.add_index("#{name}_lines", [:request_id])
     end
     
@@ -162,8 +167,8 @@ module RequestLogAnalyzer::Aggregator
           t.integer :last_lineno
           t.string  :hashed_value
         end    
+        # ActiveRecord::Migration.add_index("requests", [:hashed_value])
       end
-      ActiveRecord::Migration.add_index("requests", [:hashed_value])
       
       @orm_module.const_set('Request', Class.new(ActiveRecord::Base)) unless @orm_module.const_defined?('Request')     
       @request_class = @orm_module.const_get('Request')
