@@ -17,8 +17,7 @@ module RequestLogAnalyzer::Source
     # All available parse strategies.
     PARSE_STRATEGIES = ['cautious', 'assume-correct']
 
-    attr_reader :source_files, :current_requests
-    attr_accessor :existing_files
+    attr_reader :source_files
 
     # Initializes the log file parser instance.
     # It will apply the language specific FileFormat module to this instance. It will use the line
@@ -26,7 +25,7 @@ module RequestLogAnalyzer::Source
     #
     # <tt>format</tt>:: The current file format instance
     # <tt>options</tt>:: A hash of options that are used by the parser
-    def initialize(format, options = {})
+    def initialize(format, options = {})      
       @line_definitions = {}
       @options          = options
       @parsed_lines     = 0
@@ -35,7 +34,6 @@ module RequestLogAnalyzer::Source
       @skipped_requests = 0
       @current_io       = nil
       @source_files     = options[:source_files]
-      @current_requests = {}
       
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
       raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
@@ -48,6 +46,7 @@ module RequestLogAnalyzer::Source
     # that will be yielded. The actual parsing occurs in the parse_io method.
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def each_request(options = {}, &block) # :yields: request
+      
       case @source_files
       when IO;     
         puts "Parsing from the standard input. Press CTRL+C to finish."
@@ -66,7 +65,7 @@ module RequestLogAnalyzer::Source
     # <tt>files</tt>:: The Array of files that should be parsed
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_files(files, options = {}, &block) # :yields: request
-      files.each {|file| parse_file(file, options, &block) }
+      files.each { |file| parse_file(file, options, &block) }
     end
     
     # Check if a file has a compressed extention in the filename.
@@ -91,43 +90,18 @@ module RequestLogAnalyzer::Source
     # <tt>file</tt>:: The file that should be parsed.
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.    
     def parse_file(file, options = {}, &block)
-      @current_file = File.expand_path(file)
-      return if skip_file?(@current_file)
+
       @progress_handler.call(:started, file) if @progress_handler
       
       if decompress_file?(file).empty?
-        File.open(file, 'r') do |f| 
-          skip_to_last_pos(@current_file, f)
-          parse_io(f, options, &block)
-        end
+        File.open(file, 'r') { |f| parse_io(f, options, &block) }
       else
-        IO.popen(decompress_file?(file), 'r') do |f| 
-          skip_to_last_pos(@current_file, f)
-          parse_io(f, options, &block)
-        end
+        IO.popen(decompress_file?(file), 'r') { |f| parse_io(f, options, &block) }
       end
 
       @progress_handler.call(:finished, file) if @progress_handler
-      @current_file = nil
     end
-    
-    def skip_file?(filename)
-      if @options[:database]
-        if file = @existing_files[filename]
-          file.last_pos and file.last_pos >= File.stat(filename).size
-        end
-      end
-    end
-    
-    def skip_to_last_pos(filename, f)
-      if @options[:database]
-        if file = @existing_files[filename]
-          f.pos    = file.last_pos || 0
-          f.lineno = file.last_lineno
-        end
-      end
-    end
-    
+
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
     # because the length of a stream is not known.
     # <tt>stream</tt>:: The IO stream that should be parsed.
@@ -152,14 +126,15 @@ module RequestLogAnalyzer::Source
 
       @current_io = io
       @current_io.each_line do |line|
+        
         @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
 
         request_data = nil
         file_format.line_definitions.each do |line_type, definition|
-          pos = (@current_io.kind_of?(File) ? @current_io.pos : nil)
-          request_data = definition.matches(@current_file, line, @current_io.lineno, pos, self)
+          request_data = definition.matches(line, @current_io.lineno, self)
           break if request_data
         end
+        
         if request_data
           @parsed_lines += 1
           update_current_request(request_data, &block)
@@ -221,42 +196,26 @@ module RequestLogAnalyzer::Source
     #
     # <tt>request_data</tt>:: A hash of data that was parsed from the last line.
     def update_current_request(request_data, &block) # :yields: request
-      pid = request_data[:pid]
-      if @using_pid == nil
-        @using_pid = !!pid
-      else
-        if @using_pid != !!pid
-          raise "Expected a pid"
-        end
-      end
       if header_line?(request_data)
-        if @current_requests[pid]
+        unless @current_request.nil?
           case options[:parse_strategy]
           when 'assume-correct'
-            handle_request(@current_requests[pid], &block)
-            @current_requests[pid] = @file_format.request(request_data)
+            handle_request(@current_request, &block)
+            @current_request = @file_format.request(request_data)
           when 'cautious'
             @skipped_lines += 1
             warn(:unclosed_request, "Encountered header line (#{request_data[:line_definition].name.inspect}), but previous request was not closed!")
-            @current_requests[pid] = nil # remove all data that was parsed, skip next request as well.
-          end
-          if footer_line?(request_data)
-            handle_request(@current_requests[pid], &block) # yield @current_request
-            @current_requests.delete(pid) 
+            @current_request = nil # remove all data that was parsed, skip next request as well.
           end
         else
-          @current_requests[pid] = @file_format.request(request_data)              
-        end
-        if footer_line?(request_data)
-          handle_request(@current_requests[pid], &block) # yield @current_request
-          @current_requests.delete(pid) 
+          @current_request = @file_format.request(request_data)              
         end
       else
-        if @current_requests[pid]
-          @current_requests[pid] << request_data
+        unless @current_request.nil?
+          @current_request << request_data
           if footer_line?(request_data)
-            handle_request(@current_requests[pid], &block) # yield @current_request
-            @current_requests.delete(pid) 
+            handle_request(@current_request, &block) # yield @current_request
+            @current_request = nil 
           end
         else
           @skipped_lines += 1

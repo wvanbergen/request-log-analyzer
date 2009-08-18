@@ -74,14 +74,14 @@ module RequestLogAnalyzer::Aggregator
     end
     
     # Call prepare on all trackers.
-    def prepare(source)
+    def prepare
       raise "No trackers set up in Summarizer!" if @trackers.nil? || @trackers.empty?
       @trackers.each { |tracker| tracker.prepare }
     end
     
     # Pass all requests to trackers and let them update if necessary.
     # <tt>request</tt> The request to pass.
-    def aggregate(request, _1, _2)
+    def aggregate(request)
       @trackers.each do |tracker|
         tracker.update(request) if tracker.should_update?(request)
       end

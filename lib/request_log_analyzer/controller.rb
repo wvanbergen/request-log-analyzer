@@ -88,7 +88,7 @@ module RequestLogAnalyzer
       arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
 
       # register the database 
-      controller.add_aggregator(:database) if arguments[:database] && !arguments[:aggregator].include?('database')
+      controller.add_aggregator(:database)   if arguments[:database] && !arguments[:aggregator].include?('database')
       controller.add_aggregator(:summarizer) if arguments[:aggregator].empty?
     
       # register the echo aggregator in debug mode
@@ -109,6 +109,7 @@ module RequestLogAnalyzer
     # * <tt>:colorize</tt> Colorize output
     # * <tt>:output</tt> All report outputs get << through this output.
     def initialize(source, options = {})
+
       @source      = source
       @options     = options
       @aggregators = []
@@ -134,7 +135,7 @@ module RequestLogAnalyzer
       when :started
         @progress_bar = CommandLine::ProgressBar.new(File.basename(value), File.size(value), STDOUT)
       when :finished
-        @progress_bar.finish if @progress_bar
+        @progress_bar.finish
         @progress_bar = nil
       when :interrupted
         if @progress_bar
@@ -142,7 +143,7 @@ module RequestLogAnalyzer
           @progress_bar = nil
         end
       when :progress
-        @progress_bar.set(value) if @progress_bar
+        @progress_bar.set(value)
       end
     end
     
@@ -176,17 +177,7 @@ module RequestLogAnalyzer
     # <tt>request</tt> The request to push to the aggregators.    
     def aggregate_request(request)
       return unless request
-      @aggregators.each { |agg| agg.aggregate(request, 
-                                  earliest_uncommitted_line,
-                                  earliest_uncommitted_pos) }
-    end
-    
-    def earliest_uncommitted_line
-      @source.current_requests.values.map {|req| req.first_lineno }.sort.first
-    end
-    
-    def earliest_uncommitted_pos
-      @source.current_requests.values.map {|req| req.first_pos }.sort.first
+      @aggregators.each { |agg| agg.aggregate(request) }
     end
     
     # Runs RequestLogAnalyzer
@@ -198,12 +189,16 @@ module RequestLogAnalyzer
     # 5. Call report on every aggregator
     # 6. Finalize Source
     def run!
-      @aggregators.each { |agg| agg.prepare(source) }
-      install_signal_handlers
       
-      @source.each_request do |request|
-        aggregate_request(filter_request(request))
-        break if @interrupted
+      @aggregators.each { |agg| agg.prepare }
+      
+      begin
+        @source.each_request do |request|
+          aggregate_request(filter_request(request))
+        end
+      rescue Interrupt => e
+        handle_progress(:interrupted)
+        puts "Caught interrupt! Stopped parsing."
       end
 
       @aggregators.each { |agg| agg.finalize }
@@ -221,14 +216,6 @@ module RequestLogAnalyzer
         puts "Mail to contact@railsdoctors.com or visit us at http://railsdoctors.com"
         puts "Thanks for using request-log-analyzer!"
         @output.io.close
-      end
-    end
-    
-    def install_signal_handlers
-      Signal.trap("INT") do
-        handle_progress(:interrupted)
-        puts "Caught interrupt! Stopping parsing..."
-        @interrupted = true
       end
     end
     

@@ -3,11 +3,11 @@ module RequestLogAnalyzer::Aggregator
   # Echo Aggregator. Writes everything passed to it 
   class Echo < Base
     
-    def prepare(source)
+    def prepare
       @warnings = ""
     end
     
-    def aggregate(request, _1, _2)
+    def aggregate(request)
       puts "\nRequest: " + request.inspect
     end
     

@@ -1,5 +1,4 @@
 require 'date'
-require 'digest/sha1'
 
 # Satisfy ruby 1.9 sensitivity about encoding.
 Encoding.default_external = 'binary' if defined? Encoding and Encoding.respond_to? 'default_external='

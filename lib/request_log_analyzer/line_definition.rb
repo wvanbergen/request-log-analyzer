@@ -28,7 +28,7 @@ module RequestLogAnalyzer
 
     attr_reader :name
     attr_accessor :teaser, :regexp, :captures
-    attr_accessor :header, :footer, :uniq
+    attr_accessor :header, :footer
     
     # Initializes the LineDefinition instance with a hash containing the different elements of
     # the definition.
@@ -43,27 +43,16 @@ module RequestLogAnalyzer
       yield(definition) if block_given?
       return definition
     end
-
-    def pid_index
-      @pid_index ||= begin
-        captures.each_with_index {|cap, ix| @pid_index = ix if cap[:name] == :pid }
-        @pid_index
-      end
-    end
     
     # Checks whether a given line matches this definition. 
     # It will return false if a line does not match. If the line matches, a hash is returned
     # with all the fields parsed from that line as content.
     # If the line definition has a teaser-check, a :teaser_check_failed warning will be emitted
     # if this teaser-check is passed, but the full regular exprssion does not ,atch.
-    def matches(filename, line, lineno = nil, pos = nil, parser = nil)
+    def matches(line, lineno = nil, parser = nil)
       if @teaser.nil? || @teaser =~ line
         if match_data = line.match(@regexp)
-          return { :line_definition => self, :lineno => lineno, :pos => pos, 
-                   :filename => filename, :captures => match_data.captures,
-                   :pid => (pid_index ? match_data.captures[pid_index].to_i : 0),
-                   :hash => nil #Digest::SHA1.hexdigest(line)
-                 }
+          return { :line_definition => self, :lineno => lineno, :captures => match_data.captures}
         else
           if @teaser && parser
             parser.warn(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")
