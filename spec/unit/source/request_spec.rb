@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Request, :incomplete_request do
   
-  include RequestLogAnalyzer::Spec::Helper
-  
   before(:each) do
     @incomplete_request = testing_format.request
     @incomplete_request << { :line_type => :test, :lineno => 1, :test_capture => 'awesome!' }
@@ -33,8 +31,6 @@ end
 
 
 describe RequestLogAnalyzer::Request, :completed_request do
-  
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @completed_request = testing_format.request

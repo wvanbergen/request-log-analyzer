@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Source::LogParser, "Rails" do
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(
@@ -79,7 +78,6 @@ describe RequestLogAnalyzer::Source::LogParser, "Rails" do
 end
 
 describe RequestLogAnalyzer::FileFormat::RailsDevelopment, "Rails with development details" do
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @file_format = RequestLogAnalyzer::FileFormat.load(:rails_development)

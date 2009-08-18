@@ -1,8 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Aggregator::Summarizer do
-  
-  include RequestLogAnalyzer::Spec::Helper
 
   before(:each) do
     @summarizer = RequestLogAnalyzer::Aggregator::Summarizer.new(mock_source, :output => mock_output)

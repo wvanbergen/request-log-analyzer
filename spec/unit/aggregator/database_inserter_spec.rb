@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
 
-  include RequestLogAnalyzer::Spec::Helper
-
   before(:each) do
     log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)
     @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => ':memory:')
@@ -70,7 +68,6 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
 end
 
 describe RequestLogAnalyzer::Aggregator::Database, "record insertion" do
-  include RequestLogAnalyzer::Spec::Helper  
   
   before(:each) do
     log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)    

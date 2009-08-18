@@ -4,8 +4,6 @@ require 'request_log_analyzer/log_processor'
 
 describe RequestLogAnalyzer::LogProcessor, 'stripping log files' do
 
-  include RequestLogAnalyzer::Spec::Helper
-  
   before(:each) do
     @log_stripper = RequestLogAnalyzer::LogProcessor.new(testing_format, :strip, {})
   end

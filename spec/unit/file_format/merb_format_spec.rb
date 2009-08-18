@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Source::LogParser, :merb do
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat.load(:merb))

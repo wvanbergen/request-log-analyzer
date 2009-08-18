@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Source::LogParser, :requests do
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)
@@ -51,7 +50,6 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
 end
 
 describe RequestLogAnalyzer::Source::LogParser, :warnings do
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format, :parse_strategy => 'cautious')
@@ -71,7 +69,6 @@ describe RequestLogAnalyzer::Source::LogParser, :warnings do
 end
 
 describe RequestLogAnalyzer::Source::LogParser, :decompression do
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat::Rails.new)

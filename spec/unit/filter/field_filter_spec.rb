@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Filter::Field, 'string in accept mode' do
-  include RequestLogAnalyzer::Spec::Helper
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Field.new(testing_format, :field => :test, :value => 'test', :mode => :select)
@@ -25,7 +24,6 @@ describe RequestLogAnalyzer::Filter::Field, 'string in accept mode' do
 end
 
 describe RequestLogAnalyzer::Filter::Field, 'string in reject mode' do
-  include RequestLogAnalyzer::Spec::Helper
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Field.new(testing_format, :field => :test, :value => 'test', :mode => :reject)
@@ -49,7 +47,6 @@ describe RequestLogAnalyzer::Filter::Field, 'string in reject mode' do
 end
 
 describe RequestLogAnalyzer::Filter::Field, 'regexp in accept mode' do
-  include RequestLogAnalyzer::Spec::Helper
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Field.new(testing_format, :field => :test, :value => '/test/', :mode => :select)

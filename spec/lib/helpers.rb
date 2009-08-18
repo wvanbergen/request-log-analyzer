@@ -1,7 +1,5 @@
-module RequestLogAnalyzer::Spec::Helper
+module RequestLogAnalyzer::Spec::Helpers
   
-  include RequestLogAnalyzer::Spec::Mocks
-
   # Create or return a new TestingFormat
   def testing_format
     @testing_format ||= TestingFormat.new

@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Filter::Anonymize, 'anonymize request' do
-  include RequestLogAnalyzer::Spec::Helper
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Anonymize.new(testing_format)

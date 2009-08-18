@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Tracker::Frequency, 'static category' do
   
-  include RequestLogAnalyzer::Spec::Helper
-
   before(:each) do
     @tracker = RequestLogAnalyzer::Tracker::Frequency.new(:category => :category)
     @tracker.prepare
@@ -36,8 +34,6 @@ end
 
 describe RequestLogAnalyzer::Tracker::Frequency, 'dynamic category' do
   
-  include RequestLogAnalyzer::Spec::Helper
-  
   before(:each) do
     @categorizer = Proc.new { |request| request[:duration] > 0.2 ? 'slow' : 'fast' }
     @tracker = RequestLogAnalyzer::Tracker::Frequency.new(:category => @categorizer)
@@ -58,8 +54,6 @@ end
 
 
 describe RequestLogAnalyzer::Tracker::Frequency, 'reporting' do
- 
-  include RequestLogAnalyzer::Spec::Helper
  
   before(:each) do
     @tracker = RequestLogAnalyzer::Tracker::Frequency.new(:category => :category)

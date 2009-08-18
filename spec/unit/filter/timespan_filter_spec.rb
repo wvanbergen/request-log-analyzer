@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Filter::Timespan, 'both before and after'  do
-  include RequestLogAnalyzer::Spec::Helper
 
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Timespan.new(testing_format, :after => DateTime.parse('2009-01-01'), :before => DateTime.parse('2009-02-02'))
@@ -21,7 +20,6 @@ describe RequestLogAnalyzer::Filter::Timespan, 'both before and after'  do
 end
 
 describe RequestLogAnalyzer::Filter::Timespan, 'only before'  do
-  include RequestLogAnalyzer::Spec::Helper
   
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Timespan.new(testing_format, :before => DateTime.parse('2009-02-02'))    
@@ -41,7 +39,6 @@ describe RequestLogAnalyzer::Filter::Timespan, 'only before'  do
 end
 
 describe RequestLogAnalyzer::Filter::Timespan, 'only after'  do  
-  include RequestLogAnalyzer::Spec::Helper 
   
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Timespan.new(testing_format, :after => DateTime.parse('2009-01-01'))

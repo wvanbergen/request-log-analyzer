@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Tracker::Timespan do
 
-  include RequestLogAnalyzer::Spec::Helper
-
   before(:each) do
     @tracker = RequestLogAnalyzer::Tracker::Timespan.new
     @tracker.prepare
@@ -44,8 +42,6 @@ describe RequestLogAnalyzer::Tracker::Timespan do
 end
 
 describe RequestLogAnalyzer::Tracker::Timespan, 'reporting' do
- 
-  include RequestLogAnalyzer::Spec::Helper
  
   before(:each) do
     @tracker = RequestLogAnalyzer::Tracker::Timespan.new

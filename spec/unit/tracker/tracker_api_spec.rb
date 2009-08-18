@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Tracker::Base, "API test" do
 
-  include RequestLogAnalyzer::Spec::Helper
-  
   before(:each) do
     @tracker    = Class.new(RequestLogAnalyzer::Tracker::Base).new
     

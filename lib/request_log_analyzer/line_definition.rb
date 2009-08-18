@@ -66,6 +66,8 @@ module RequestLogAnalyzer
     
     alias :=~ :matches
 
+    # matches the line and converts the captured values using the request's
+    # convert_value function.
     def match_for(line, request, lineno = nil, parser = nil)
       if match_info = matches(line, lineno, parser)
         convert_captured_values(match_info[:captures], request)
@@ -74,11 +76,18 @@ module RequestLogAnalyzer
       end
     end
 
+    # Updates a captures hash using the converters specified in the request
+    # and handle the :provides option in the line definition.
     def convert_captured_values(values, request)
       value_hash = {}
       captures.each_with_index do |capture, index|
+        
+        # convert the value using the request convert_value function
         converted = request.convert_value(values[index], capture)
         value_hash[capture[:name]] ||= converted
+        
+        # Add items directly to the resulting hash from the converted value
+        # if it is a hash and they are set in the :provides hash for this line definition
         if converted.kind_of?(Hash) && capture[:provides].kind_of?(Hash)
           capture[:provides].each do |name, type|
             value_hash[name] ||= request.convert_value(converted[name], { :type => type })

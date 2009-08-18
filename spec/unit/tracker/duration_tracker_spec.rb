@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Tracker::Duration, 'static category' do
   
-  include RequestLogAnalyzer::Spec::Helper
-
   before(:each) do
     @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => :category)
     @tracker.prepare
@@ -54,8 +52,6 @@ end
 
 describe RequestLogAnalyzer::Tracker::Duration, 'dynamic category' do
   
-  include RequestLogAnalyzer::Spec::Helper
-  
   before(:each) do
     @categorizer = Proc.new { |request| request[:duration] > 0.2 ? 'slow' : 'fast' }
     @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => @categorizer)
@@ -74,8 +70,6 @@ describe RequestLogAnalyzer::Tracker::Duration, 'dynamic category' do
 end
 
 describe RequestLogAnalyzer::Tracker::Duration, 'reporting' do
- 
-  include RequestLogAnalyzer::Spec::Helper
  
   before(:each) do
     @tracker = RequestLogAnalyzer::Tracker::Duration.new(:category => :category, :duration => :duration)

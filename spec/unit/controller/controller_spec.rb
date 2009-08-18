@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Controller do
 
-  include RequestLogAnalyzer::Spec::Helper
-
   it "should use a custom output generator correctly" do
     
     mock_output = mock('RequestLogAnalyzer::Output::Base')

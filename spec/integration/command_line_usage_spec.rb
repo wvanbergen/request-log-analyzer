@@ -2,8 +2,6 @@ require File.dirname(__FILE__) + '/../spec_helper.rb'
 
 describe RequestLogAnalyzer, 'running from command line' do
   
-  include RequestLogAnalyzer::Spec::Helper
-
   before(:each) do
     cleanup_temp_files!
   end
