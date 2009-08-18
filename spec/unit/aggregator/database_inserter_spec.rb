@@ -17,11 +17,13 @@ describe RequestLogAnalyzer::Aggregator::Database, "schema creation" do
     ActiveRecord::Migration.should_receive(:create_table).with("test_lines")        
     ActiveRecord::Migration.should_receive(:create_table).with("eval_lines")    
     ActiveRecord::Migration.should_receive(:create_table).with("last_lines")
+    ActiveRecord::Migration.should_receive(:create_table).with("combined_lines")
 
-    ActiveRecord::Migration.should_receive(:add_index).with("eval_lines",  [:request_id])
-    ActiveRecord::Migration.should_receive(:add_index).with("first_lines", [:request_id])    
-    ActiveRecord::Migration.should_receive(:add_index).with("test_lines",  [:request_id])
-    ActiveRecord::Migration.should_receive(:add_index).with("last_lines",  [:request_id])
+    ActiveRecord::Migration.should_receive(:add_index).with("eval_lines",     [:request_id])
+    ActiveRecord::Migration.should_receive(:add_index).with("first_lines",    [:request_id])    
+    ActiveRecord::Migration.should_receive(:add_index).with("test_lines",     [:request_id])
+    ActiveRecord::Migration.should_receive(:add_index).with("last_lines",     [:request_id])
+    ActiveRecord::Migration.should_receive(:add_index).with("combined_lines", [:request_id])    
 
     @database_inserter.prepare
   end

@@ -27,6 +27,12 @@ class TestingFormat < RequestLogAnalyzer::FileFormat::Base
     line.captures = [{ :name => :request_no, :type => :integer }]
   end
   
+  format_definition.combined do |line|
+    line.header = true
+    line.footer = true
+    line.regexp = /this is a header and footer line/
+  end
+  
   report do |analyze|
     analyze.frequency :test_capture, :title => 'What is testing exactly?'
   end

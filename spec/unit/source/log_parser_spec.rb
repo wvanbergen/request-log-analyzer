@@ -42,8 +42,12 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
       request[:test_capture].should_not be_nil      
     end
     io.close
-  end  
+  end
   
+  it "should parse a request that only consists of one line" do
+    @log_parser.parse_file(log_fixture(:header_and_footer))
+    @log_parser.parsed_requests.should == 2
+  end
 end
 
 describe RequestLogAnalyzer::Source::LogParser, :warnings do
