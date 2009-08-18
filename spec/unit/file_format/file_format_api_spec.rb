@@ -20,7 +20,7 @@ describe RequestLogAnalyzer::FileFormat, :format_definition do
     @format_instance.line_definitions[:hash_test].should_not be_nil
   end
   
-  it "should specift lines directly" do
+  it "should specify line definitions directly within the file_format" do
     @first_file_format.new.should have(0).line_definitions    
     
     @first_file_format.format_definition.direct_test do |line|
@@ -30,7 +30,7 @@ describe RequestLogAnalyzer::FileFormat, :format_definition do
     @first_file_format.new.line_definitions[:direct_test].should_not be_nil
   end
  
-  it "specify lines with a block" do
+  it "specify lines with a block for the format definition" do
     
     @first_file_format.new.should have(0).line_definitions    
     
