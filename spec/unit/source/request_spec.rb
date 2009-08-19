@@ -65,4 +65,16 @@ describe RequestLogAnalyzer::Request, :completed_request do
     @completed_request.every(:test_capture).should == ['testing', "testing some more"]
   end
   
+  it "should have set the first lineno" do
+    @completed_request.first_lineno.should eql(1)
+  end
+
+  it "should have set the last lineno" do
+    @completed_request.last_lineno.should eql(10)
+  end
+
+  it "should have set the timestamp field" do
+    @completed_request.timestamp.should_not be_nil
+  end
+  
 end
