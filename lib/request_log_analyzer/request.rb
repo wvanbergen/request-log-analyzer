@@ -145,11 +145,11 @@ module RequestLogAnalyzer
     end
     
     def first_lineno
-      @lines.first[:lineno]
+      @lines.map { |line| line[:lineno] }.reject { |v| v.nil? }.min
     end
     
     def last_lineno
-      @lines.last[:lineno]
+      @lines.map { |line| line[:lineno] }.reject { |v| v.nil? }.max
     end
   end
 end
