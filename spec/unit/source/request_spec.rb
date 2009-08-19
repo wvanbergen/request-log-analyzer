@@ -74,6 +74,8 @@ describe RequestLogAnalyzer::Request, :completed_request do
   end
 
   it "should have set the timestamp field" do
+    @completed_request = testing_format.request
+    @completed_request << { :line_type => :first, :lineno =>  1, :name => 'first line!', :timestamp => Time.now}    
     @completed_request.timestamp.should_not be_nil
   end
   
