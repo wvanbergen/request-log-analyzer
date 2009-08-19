@@ -1,3 +1,12 @@
+=== 1.2.3
+ * Refactored database functions
+ * Cleaned up specs and tried some heckle
+ * Interrupts are handled more gracefully
+ * Moved munin tracker to seperate Github project (http://github.com/barttenbrinke/munin-plugins-rails/)
+
+=== 1.2.2
+ * Not released
+
 === 1.2.1
  * Compressed logfile support
  * Parsable YAML results as output (use --dump <filename> )
