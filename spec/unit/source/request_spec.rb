@@ -76,5 +76,10 @@ describe RequestLogAnalyzer::Request, :completed_request do
   it "should not have a timestamp if no such field is captured" do
     @completed_request.timestamp.should be_nil
   end
+
+  it "should set return a timestamp field if such a field is captured" do
+    @completed_request << { :line_type => :first, :lineno =>  1, :name => 'first line!', :timestamp => Time.now}    
+    @completed_request.timestamp.should_not be_nil
+  end
   
 end
