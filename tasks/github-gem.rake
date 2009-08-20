@@ -14,7 +14,8 @@ module Rake
     def self.define_tasks!
       gem_task_builder = Rake::GithubGem.new      
       gem_task_builder.register_all_tasks!
-    end    
+    end
+    
 
     def initialize
       reload_gemspec!
@@ -37,8 +38,18 @@ module Rake
         desc "Releases a new version of #{@name}"
         task(:release => release_dependencies) { release_task } 
         
+        namespace(:release) do
+          release_checks = [:check_clean_master_branch, :check_version, :build]
+          release_checks.push 'doc:compile' if has_rdoc?
+          release_checks.unshift 'test' if has_tests?
+          release_checks.unshift 'spec' if has_specs?          
+          
+          desc "Test release conditions"
+          task(:check => release_checks) { release_check_task }
+        end
+        
         # helper task for releasing
-        task(:check_clean_master_branch) { verify_clean_status('master') }
+        task(:check_clean_master_branch) { verify_fast_forward('master', 'origin', 'master'); verify_clean_status('master') }
         task(:check_version) { verify_version(ENV['VERSION'] || @specification.version) }
         task(:version => [:check_version]) { set_gem_version! }
         task(:create_tag) { create_version_tag! }
@@ -165,13 +176,17 @@ module Rake
     
     def verify_current_branch(branch)
       run_command('git branch').detect { |line| /^\* (.+)/ =~ line }
-      raise "You are currently not working in the master branch!" unless branch == $1
+      raise "You are currently not working in the #{branch} branch!" unless branch == $1
     end
     
-    def verify_clean_status(on_branch = nil)
-      sh "git fetch"
+    def verify_fast_forward(local_branch = 'master', remote = 'origin', remote_branch = 'master')
+      sh "git fetch #{remote} #{remote_branch}"
+      lines = run_command("git rev-list #{local_branch}..remotes/#{remote}/#{remote_branch}")
+      raise "Remote branch #{remote}/#{remote_branch} has commits that are not yet incorporated in local #{local_branch} branch" unless lines.length == 0
+    end
+    
+    def verify_clean_status(on_branch = nil)      
       lines = run_command('git status')
-      raise "You don't have the most recent version available. Run git pull first." if /^\# Your branch is behind/ =~ lines[1]
       raise "You are currently not working in the #{on_branch} branch!" unless on_branch.nil? || (/^\# On branch (.+)/ =~ lines.first && $1 == on_branch)
       raise "Your master branch contains modifications!" unless /^nothing to commit \(working directory clean\)/ =~ lines.last
     end
@@ -242,6 +257,14 @@ module Rake
       puts
       puts '------------------------------------------------------------'
       puts "Released #{@name} - version #{@specification.version}"
+    end
+    
+    def release_check_task
+      puts
+      puts '------------------------------------------------------------'
+      puts "Checked all conditions for a release of version #{ENV['VERSION'] || @specification.version}!"
+      puts 'You should be safe to do a release now.'
+      puts '------------------------------------------------------------'
     end
   end
 end
