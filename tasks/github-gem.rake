@@ -45,17 +45,7 @@ module Rake
           release_checks.unshift 'spec' if has_specs?          
           
           desc "Test release conditions"
-<<<<<<< HEAD:tasks/github-gem.rake
-          task(:check => release_checks) do
-            puts
-            puts '-------------------------------------------------------'
-            puts "Checked all conditions for a releaseof version #{ENV['VERSION'] || @specification.version}! "
-            puts 'You should be safe to do a release now.'
-            puts '-------------------------------------------------------'            
-          end
-=======
           task(:check => release_checks) { release_check_task }
->>>>>>> origin/master:tasks/github-gem.rake
         end
         
         # helper task for releasing
