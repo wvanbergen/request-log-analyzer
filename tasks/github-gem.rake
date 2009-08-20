@@ -14,7 +14,8 @@ module Rake
     def self.define_tasks!
       gem_task_builder = Rake::GithubGem.new      
       gem_task_builder.register_all_tasks!
-    end    
+    end
+    
 
     def initialize
       reload_gemspec!
@@ -36,6 +37,22 @@ module Rake
                 
         desc "Releases a new version of #{@name}"
         task(:release => release_dependencies) { release_task } 
+        
+        namespace(:release) do
+          release_checks = [:check_clean_master_branch, :check_version, :build]
+          release_checks.push 'doc:compile' if has_rdoc?
+          release_checks.unshift 'test' if has_tests?
+          release_checks.unshift 'spec' if has_specs?          
+          
+          desc "Test release conditions"
+          task(:check => release_checks) do
+            puts
+            puts '-------------------------------------------------------'
+            puts "Checked all conditions for a releaseof version #{ENV['VERSION'] || @specification.version}! "
+            puts 'You should be safe to do a release now.'
+            puts '-------------------------------------------------------'            
+          end
+        end
         
         # helper task for releasing
         task(:check_clean_master_branch) { verify_clean_status('master') }
@@ -165,10 +182,10 @@ module Rake
     
     def verify_current_branch(branch)
       run_command('git branch').detect { |line| /^\* (.+)/ =~ line }
-      raise "You are currently not working in the master branch!" unless branch == $1
+      raise "You are currently not working in the #{branch} branch!" unless branch == $1
     end
     
-    def verify_clean_status(on_branch = nil)
+    def verify_clean_status(on_branch = nil)      
       sh "git fetch"
       lines = run_command('git status')
       raise "You don't have the most recent version available. Run git pull first." if /^\# Your branch is behind/ =~ lines[1]
