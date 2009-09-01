@@ -64,6 +64,11 @@ module RequestLogAnalyzer::Aggregator
       output << "\n"
     end
     
+    # Retreives the connection that is used for the database inserter
+    def connection
+      orm_module::Base.connection
+    end    
+    
     protected 
     
     # Create a module and a default subclass of ActiveRecord::Base on which to establish the database connection
@@ -84,11 +89,11 @@ module RequestLogAnalyzer::Aggregator
     # Established a connection with the database for this session
     def establish_database_connection!
       orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
-      ActiveRecord::Migration.class_eval("def self.connection; #{@orm_module.to_s}::Base.connection; end ")
+      #ActiveRecord::Migration.class_eval("def self.connection; #{@orm_module.to_s}::Base.connection; end ")
     end    
     
     def remove_database_connection!
-      ActiveRecord::Migration.class_eval("def self.connection; ActiveRecord::Base.connection; end ")      
+      #ActiveRecord::Migration.class_eval("def self.connection; ActiveRecord::Base.connection; end ")      
       orm_module::Base.remove_connection
     end
     
@@ -97,8 +102,7 @@ module RequestLogAnalyzer::Aggregator
     # what line in the original file the line was found, and a request_id to link lines related
     # to the same request. It will also create an index in the request_id field to speed up queries.
     def create_database_table(definition)
-      ActiveRecord::Migration.verbose = options[:debug] # keep it down a notch please
-      ActiveRecord::Migration.create_table("#{definition.name}_lines") do |t|
+      connection.create_table("#{definition.name}_lines") do |t|
         
         # Add default fields for every line type
         t.column(:request_id, :integer)
@@ -114,7 +118,7 @@ module RequestLogAnalyzer::Aggregator
       end
       
       # Create an index on the request_id column to support faster querying
-      ActiveRecord::Migration.add_index("#{definition.name}_lines", [:request_id])
+      connection.add_index("#{definition.name}_lines", [:request_id])
     end
     
     # Creates an ActiveRecord class for a given line definition.
@@ -137,10 +141,9 @@ module RequestLogAnalyzer::Aggregator
     # Creates a requests table, in which a record is created for every request. It also creates an
     # ActiveRecord::Base class to communicate with this table.
     def create_request_table_and_class
-      ActiveRecord::Migration.verbose = options[:debug]
-      ActiveRecord::Migration.create_table("requests") do |t|
-        t.integer :first_lineno
-        t.integer :last_lineno
+      connection.create_table("requests") do |t|
+        t.column :first_lineno, :integer
+        t.column :last_lineno,  :integer
       end    
       
       orm_module.const_set('Request', Class.new(orm_module::Base)) unless orm_module.const_defined?('Request')     
@@ -149,11 +152,10 @@ module RequestLogAnalyzer::Aggregator
 
     # Creates a warnings table and a corresponding Warning class to communicate with this table using ActiveRecord.
     def create_warning_table_and_class
-      ActiveRecord::Migration.verbose = options[:debug]
-      ActiveRecord::Migration.create_table("warnings") do |t|
-        t.string  :warning_type, :limit => 30, :null => false
-        t.string  :message
-        t.integer :lineno          
+      connection.create_table("warnings") do |t|
+        t.column  :warning_type, :string, :limit => 30, :null => false
+        t.column  :message, :string
+        t.column  :lineno, :integer
       end    
       
       orm_module.const_set('Warning', Class.new(orm_module::Base)) unless orm_module.const_defined?('Warning')

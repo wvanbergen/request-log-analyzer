@@ -8,7 +8,7 @@ describe RequestLogAnalyzer::Aggregator::Database do
     
     @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, { :regexp   => /Testing (\w+), tries\: (\d+)/,
                           :captures => [{ :name => :what, :type => :string }, { :name => :tries, :type => :integer },
-                            { :name => :evaluated, :type => :hash, :provides => {:evaluated_field => :duration} }]})    
+                            { :name => :evaluated, :type => :hash, :provides => {:evaluated_field => :duration} }]})                               
   end
   
   # The prepare method is called before the parsing starts. It should establish a connection
@@ -36,43 +36,41 @@ describe RequestLogAnalyzer::Aggregator::Database do
   describe '#create_database_table' do
     
     before(:each) do
-      @table_creator = mock('create_table block')
-      @table_creator.stub!(:column)
-      ActiveRecord::Migration.stub!(:create_table).and_yield(@table_creator)
-      ActiveRecord::Migration.stub!(:add_index)
+      @connection = mock_migrator
+      @database_inserter.stub!(:connection).and_return(@connection)
     end
     
     it "should create a table based on the line type name" do
-      ActiveRecord::Migration.should_receive(:create_table).with('test_lines')
+      @connection.should_receive(:create_table).with('test_lines')
       @database_inserter.send(:create_database_table, @line_definition)
     end    
     
     it "should create an index on the request_id field" do
-      ActiveRecord::Migration.should_receive(:add_index).with('test_lines', [:request_id])
+      @connection.should_receive(:add_index).with('test_lines', [:request_id])
       @database_inserter.send(:create_database_table, @line_definition)
     end
     
     it "should create a request_id field to link the requests together" do
-      @table_creator.should_receive(:column).with(:request_id, :integer)
+      @connection.table_creator.should_receive(:column).with(:request_id, :integer)
       @database_inserter.send(:create_database_table, @line_definition)
     end
     
     it "should create a lineno field to save the location of the line in the original file" do
-      @table_creator.should_receive(:column).with(:lineno, :integer)
+      @connection.table_creator.should_receive(:column).with(:lineno, :integer)
       @database_inserter.send(:create_database_table, @line_definition)
     end
     
     it "should create a field of the correct type for every defined field" do
-      @table_creator.should_receive(:column).with(:what, :string)
-      @table_creator.should_receive(:column).with(:tries, :integer)
+      @connection.table_creator.should_receive(:column).with(:what, :string)
+      @connection.table_creator.should_receive(:column).with(:tries, :integer)
       # :hash capture type should map on a :text field type
-      @table_creator.should_receive(:column).with(:evaluated, :text) 
+      @connection.table_creator.should_receive(:column).with(:evaluated, :text) 
       @database_inserter.send(:create_database_table, @line_definition)      
     end
     
     it "should create a field of the correct type for every provided field" do
       # :duration capture type should map on a :double field type
-      @table_creator.should_receive(:column).with(:evaluated_field, :double) 
+      @connection.table_creator.should_receive(:column).with(:evaluated_field, :double) 
       @database_inserter.send(:create_database_table, @line_definition)   
     end
   end
@@ -129,21 +127,19 @@ describe RequestLogAnalyzer::Aggregator::Database do
     before(:each) do
       @line_type_cnt = testing_format.line_definitions.length
 
-      #Make sure no actual migrations occur
-      ActiveRecord::Migration.stub!(:add_index)
-      ActiveRecord::Migration.stub!(:create_table)
+      @connection = mock_migrator
+      @database_inserter.stub!(:connection).and_return(@connection)      
       
       # Stub the expected method calls for the preparation
       @database_inserter.stub!(:create_database_table)
       @database_inserter.stub!(:create_activerecord_class) 
 
-      
       # Make sure the ORM module exists
       @database_inserter.send(:initialize_orm_module!)
     end
 
     it "should create a requests table to join request lines" do
-      ActiveRecord::Migration.should_receive(:create_table).with("requests")
+      @connection.should_receive(:create_table).with("requests")
       @database_inserter.send :create_database_schema!
     end
         
@@ -153,7 +149,7 @@ describe RequestLogAnalyzer::Aggregator::Database do
     end
     
     it "should create a warnings table for logging parse warnings" do
-      ActiveRecord::Migration.should_receive(:create_table).with("warnings")
+      @connection.should_receive(:create_table).with("warnings")
       @database_inserter.send :create_database_schema!
     end
 
