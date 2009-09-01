@@ -1,0 +1,9 @@
+Aug 31 18:35:23 typekit-web001 merb:  ~
+Aug 31 18:35:23 typekit-web001 merb: cache: [GET /] miss
+Aug 31 18:35:24 typekit-web001 merb:  ~ Started request handling: Mon Aug 31 18:35:25 +0000 2009
+Aug 31 18:35:24 typekit-web001 merb:  ~ Routed to: {"action"=>"index", "controller"=>"home"}
+Aug 31 18:35:24 typekit-web001 merb:  ~ Params: {"action"=>"index", "controller"=>"home"}
+Aug 31 18:35:24 typekit-web001 merb:  ~ In repository block default
+Aug 31 18:35:24 typekit-web001 merb:  ~ (0.000000) SELECT `id`, `created_at`, `updated_at`, `braintree_vault_id`, `cancelled_at` FROM `accounts` WHERE (`id` IN (6214)) ORDER BY `id`
+Aug 31 18:35:24 typekit-web001 merb:  ~ Redirecting to: /plans (302)
+Aug 31 18:35:24 typekit-web001 merb:  ~ {:after_filters_time=>0.0, :before_filters_time=>0.0, :dispatch_time=>0.012001, :action_time=>0.012001}

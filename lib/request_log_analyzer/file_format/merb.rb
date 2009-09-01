@@ -16,18 +16,16 @@ module RequestLogAnalyzer::FileFormat
       line.teaser = /Params/
       line.regexp = /Params\:\ (\{.+\})/
       line.captures << { :name => :params, :type => :eval, :provides => { 
-            :namespace => :string, :controller => :string, :action => :string, :format => :string } }
+            :namespace => :string, :controller => :string, :action => :string, :format => :string, :method => :string } }
     end
 
     # ~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}
     line_definition :completed do |line|
       line.footer = true
-      line.teaser = /\{:dispatch_time/
-      line.regexp = /\{\:dispatch_time=>(\d+\.\d+(?:e-?\d+)?), (?:\:after_filters_time=>(\d+\.\d+(?:e-?\d+)?), )?(?:\:before_filters_time=>(\d+\.\d+(?:e-?\d+)?), )?\:action_time=>(\d+\.\d+(?:e-?\d+)?)\}/
-      line.captures << { :name => :dispatch_time,       :type => :duration } \
-                    << { :name => :after_filters_time,  :type => :duration } \
-                    << { :name => :before_filters_time, :type => :duration } \
-                    << { :name => :action_time,         :type => :duration }
+      line.regexp = /(\{.*\:dispatch_time\s*=>\s*\d+\.\d+.*\})/
+      line.captures << { :name => :times_hash, :type => :eval, :provides => {
+            :dispatch_time => :duration, :after_filters_time => :duration,
+            :before_filters_time => :duration, :action_time => :duration } }
     end
     
     REQUEST_CATEGORIZER = Proc.new do |request| 

@@ -23,15 +23,34 @@ describe RequestLogAnalyzer::Source::LogParser, :merb do
     @log_parser.parse_file(log_fixture(:merb))
   end
   
-  it "should parse all details from a request correctly" do
+  it "should parse all details from the first request correctly" do
     request = nil
     @log_parser.parse_file(log_fixture(:merb)) { |found_request| request ||= found_request }
     
     request.should be_completed
+    request[:controller].should == 'session'
+    request[:action].should == 'destroy'    
+    request[:method].should == 'delete'
+    request[:params].should be_kind_of(Hash)      
     request[:timestamp].should == 20080829111023 # 'Fri Aug 29 11:10:23 +0200 2008'
     request[:dispatch_time].should == 0.243424
     request[:after_filters_time].should == 6.9e-05
     request[:before_filters_time].should == 0.213213
     request[:action_time].should == 0.241652
+
+  end
+  
+  it "should parse a prefixed Merb file correctly" do
+    request = nil
+    @log_parser.parse_file(log_fixture(:merb_prefixed)) { |found_request| request ||= found_request }
+    
+    request.should be_completed
+    request[:timestamp].should == 20090831183525
+    request[:controller].should == 'home'
+    request[:action].should == 'index'
+    request[:dispatch_time].should == 0.012001
+    request[:after_filters_time].should == 0.0
+    request[:before_filters_time].should == 0.0
+    request[:action_time].should == 0.012001
   end
 end
