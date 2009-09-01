@@ -85,7 +85,7 @@ when :strip
   require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'  
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
 else 
-  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
+  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer.version}"
   puts "Website: http://railsdoctors.com"
   puts
 
