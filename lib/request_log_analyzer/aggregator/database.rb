@@ -130,8 +130,8 @@ module RequestLogAnalyzer::Aggregator
       klass = Class.new(orm_module::Base)
       klass.send(:belongs_to, :request)
       
-      definition.captures.each do |capture|
-        klass.send(:serialize, capture[:name], Hash) if capture[:provides]
+      definition.captures.select { |c| c.has_key?(:provides) }.each do |capture|
+        klass.send(:serialize, capture[:name], Hash)
       end
       
       orm_module.const_set(class_name, klass) unless orm_module.const_defined?(class_name)
