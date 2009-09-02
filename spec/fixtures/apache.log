@@ -1,0 +1,5 @@
+125.76.230.10 - - [02/Sep/2009:03:33:46 +0200] "GET /cart/install.txt HTTP/1.1" 404 214 "-" "Toata dragostea mea pentru diavola"
+125.76.230.10 - - [02/Sep/2009:03:33:47 +0200] "GET /store/install.txt HTTP/1.1" 404 215 "-" "Toata dragostea mea pentru diavola"
+10.0.1.1 - - [02/Sep/2009:05:08:33 +0200] "GET / HTTP/1.1" 200 30 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9"
+10.0.1.1 - - [02/Sep/2009:06:41:51 +0200] "GET / HTTP/1.1" 200 30 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9"
+69.41.0.45 - - [02/Sep/2009:12:02:40 +0200] "GET //phpMyAdmin/ HTTP/1.1" 404 209 "-" "Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)"
