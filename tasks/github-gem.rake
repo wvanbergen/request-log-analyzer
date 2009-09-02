@@ -182,7 +182,7 @@ module GithubGem
     end
     
     def tag_version_task
-      git.add_tag("#{gemspec.name}-#{gemspec_version}")
+      git.add_tag("#{gemspec.name}-#{gemspec.version}")
     end
     
     def push_changes_task
@@ -192,7 +192,7 @@ module GithubGem
     def release_task
       puts
       puts '------------------------------------------------------------'
-      puts "Released #{gemspec.name} version #{gemspec_version}"
+      puts "Released #{gemspec.name} version #{gemspec.version}"
     end
     
     private
@@ -214,7 +214,7 @@ module GithubGem
     # Updates the VERSION file with the new version
     def update_version_file(version)
       if File.exists?('VERSION')
-        File.open('VERSION', 'w') { |f| f << version } 
+        File.open('VERSION', 'w') { |f| f << version.to_s } 
         modified_files << 'VERSION'
       end
     end
@@ -222,7 +222,7 @@ module GithubGem
     # Updates the VERSION constant in the main include file if it exists
     def update_version_constant(version)
      file_contents = File.read(main_include)
-     if file_contents.sub!(/^(\s+VERSION\s*=\s*)[^\s].*$/) { $1 + version.inspect }
+     if file_contents.sub!(/^(\s+VERSION\s*=\s*)[^\s].*$/) { $1 + version.to_s.inspect }
        File.open(main_include, 'w') { |f| f << file_contents }      
        modified_files << main_include
      end
