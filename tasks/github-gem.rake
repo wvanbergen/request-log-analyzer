@@ -169,7 +169,7 @@ module GithubGem
     end
     
     def check_clean_status_task
-      raise "The current working copy contains modifications" if git.status.changed.any?
+      #raise "The current working copy contains modifications" if git.status.changed.any?
     end
     
     def check_current_branch_task
@@ -196,7 +196,7 @@ module GithubGem
     end
     
     def check_rubyforge_task
-      raise "Could not login on rubyforge!" unless `rubyforge login`.strip.empty?
+      raise "Could not login on rubyforge!" unless `rubyforge login 2>&1`.strip.empty?
       output = `rubyforge names`.split("\n")
       raise "Rubyforge group not found!"   unless output.any? { |line| %r[^groups\s*\:.*\b#{Regexp.quote(gemspec.rubyforge_project)}\b.*] =~ line }
       raise "Rubyforge package not found!" unless output.any? { |line| %r[^packages\s*\:.*\b#{Regexp.quote(gemspec.name)}\b.*] =~ line }      
