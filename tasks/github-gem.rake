@@ -1,272 +1,256 @@
 require 'rubygems'
-require 'rubyforge'
 require 'rake'
 require 'rake/tasklib'
 require 'date'
+require 'git'
 
-module Rake 
+module GithubGem
   
-  class GithubGem < TaskLib
+  def self.detect_gemspec_file
+    FileList['*.gemspec'].first
+  end
+  
+  def self.detect_main_include
+    if detect_gemspec_file =~ /^(\.*)\.gemspec$/ && File.exist?("lib/#{$1}.rb")
+      "lib/#{$1}.rb"
+    elsif FileList['lib/*.rb'].length == 1
+      FileList['lib/*.rb'].first
+    else
+      raise "Could not detect main include file!"
+    end
+  end
+  
+  class RakeTasks
     
-    attr_accessor :name
-    attr_accessor :specification
-   
-    def self.define_tasks!
-      gem_task_builder = Rake::GithubGem.new      
-      gem_task_builder.register_all_tasks!
+    attr_reader   :gemspec, :modified_files, :git
+    attr_accessor :gemspec_file, :task_namespace, :main_include, :root_dir, :spec_pattern, :test_pattern, :remote, :remote_branch, :local_branch
+    
+    def initialize(task_namespace = :gem)
+      @gemspec_file   = GithubGem.detect_gemspec_file
+      @task_namespace = task_namespace
+      @main_include   = GithubGem.detect_main_include
+      @modified_files = []
+      @root_dir       = Dir.pwd
+      @test_pattern   = 'test/**/*_test.rb'
+      @spec_pattern   = 'spec/**/*_spec.rb'
+      @local_branch   = 'master'
+      @remote         = 'origin'
+      @remote_branch  = 'master'
+      
+      
+      yield(self) if block_given?
+
+      @git = Git.open(@root_dir)      
+      load_gemspec!      
+      define_tasks!
     end
     
-
-    def initialize
-      reload_gemspec!
-    end
-
-    def register_all_tasks!
-      namespace(:gem) do
-        desc "Updates the file lists for this gem"
-        task(:manifest) { manifest_task }
-
-        desc "Releases a new version of #{@name}"
-        task(:build => [:manifest]) { build_task } 
-        
-        
-        release_dependencies = [:check_clean_master_branch, :version, :build, :create_tag]
-        release_dependencies.push 'doc:publish' if has_rdoc?
-        release_dependencies.unshift 'test' if has_tests?
-        release_dependencies.unshift 'spec' if has_specs?
-                
-        desc "Releases a new version of #{@name}"
-        task(:release => release_dependencies) { release_task } 
-        
-        namespace(:release) do
-          release_checks = [:check_clean_master_branch, :check_version, :build]
-          release_checks.push 'doc:compile' if has_rdoc?
-          release_checks.unshift 'test' if has_tests?
-          release_checks.unshift 'spec' if has_specs?          
-          
-          desc "Test release conditions"
-          task(:check => release_checks) { release_check_task }
-        end
-        
-        # helper task for releasing
-        task(:check_clean_master_branch) { verify_fast_forward('master', 'origin', 'master'); verify_clean_status('master') }
-        task(:check_version) { verify_version(ENV['VERSION'] || @specification.version) }
-        task(:version => [:check_version]) { set_gem_version! }
-        task(:create_tag) { create_version_tag! }
-      end
-      
-      # Register RDoc tasks
-      if has_rdoc?
-        require 'rake/rdoctask'
-        
-        namespace(:doc) do 
-          desc 'Generate documentation for request-log-analyzer'
-          Rake::RDocTask.new(:compile) do |rdoc|
-            rdoc.rdoc_dir = 'doc'
-            rdoc.title    = @name
-            rdoc.options += @specification.rdoc_options
-            rdoc.rdoc_files.include(@specification.extra_rdoc_files)
-            rdoc.rdoc_files.include('lib/**/*.rb')
-          end
-          
-          desc "Publish RDoc files for #{@name} to Github"
-          task(:publish => :compile) do
-            sh 'git checkout gh-pages'
-            sh 'git pull origin gh-pages'
-            sh 'cp -rf doc/* .'
-            sh "git commit -am \"Publishing newest RDoc documentation for #{@name}\""
-            sh "git push origin gh-pages"
-            sh "git checkout master"
-          end
-        end
-      end
+    protected
     
-      # Setup :spec task if RSpec files exist
-      if has_specs?
-        require 'spec/rake/spectask'
+    def define_test_tasks!
+      require 'rake/testtask'
 
-        desc "Run all specs for #{@name}"
-        Spec::Rake::SpecTask.new(:spec) do |t|
-          t.spec_files = FileList['spec/**/*_spec.rb']
-        end
-      end
-      
-      # Setup :test task if unit test files exist
-      if has_tests?
-        require 'rake/testtask'
-
-        desc "Run all unit tests for #{@name}"
-        Rake::TestTask.new(:test) do |t|
-          t.pattern = 'test/**/*_test.rb'
+      namespace(:test) do
+        Rake::TestTask.new(:basic) do |t|
+          t.pattern = test_pattern
           t.verbose = true
           t.libs << 'test'
         end
-      end      
-    end
-    
-    protected 
-
-    def has_rdoc?
-      @specification.has_rdoc
-    end
-
-    def has_specs?
-      Dir['spec/**/*_spec.rb'].any?
-    end
-    
-    def has_tests?
-      Dir['test/**/*_test.rb'].any?
-    end
-
-    def reload_gemspec!
-      raise "No gemspec file found!" if gemspec_file.nil?      
-      spec = File.read(gemspec_file)
-      @specification = eval(spec)
-      @name = specification.name  
-    end
-
-    def run_command(command)
-      lines = []
-      IO.popen(command) { |f| lines = f.readlines }
-      return lines
-    end
-    
-    def git_modified?(file)
-      return !run_command('git status').detect { |line| Regexp.new(Regexp.quote(file)) =~ line }.nil?
-    end
-    
-    def git_commit_file(file, message, branch = nil)
-      verify_current_branch(branch) unless branch.nil?
-      if git_modified?(file)
-        sh "git add #{file}"
-        sh "git commit -m \"#{message}\""
-      else
-        raise "#{file} is not modified and cannot be committed!"
       end
-    end
-    
-    def git_create_tag(tag_name, message)
-      sh "git tag -a \"#{tag_name}\" -m \"#{message}\""
-    end
-    
-    def git_push(remote = 'origin', branch = 'master', options = [])
-      verify_clean_status(branch)
-      options_str = options.map { |o| "--#{o}"}.join(' ')
-      sh "git push #{options_str} #{remote} #{branch}"
-    end
-    
-    def gemspec_version=(new_version)
-      spec = File.read(gemspec_file)
-      spec.gsub!(/^(\s*s\.version\s*=\s*)('|")(.+)('|")(\s*)$/) { "#{$1}'#{new_version}'#{$5}" }
-      spec.gsub!(/^(\s*s\.date\s*=\s*)('|")(.+)('|")(\s*)$/) { "#{$1}'#{Date.today.strftime('%Y-%m-%d')}'#{$5}" }    
-      File.open(gemspec_file, 'w') { |f| f << spec }
-      reload_gemspec!      
-    end
-    
-    def gemspec_date=(new_date)
-      spec = File.read(gemspec_file)
-      spec.gsub!(/^(\s*s\.date\s*=\s*)('|")(.+)('|")(\s*)$/) { "#{$1}'#{new_date.strftime('%Y-%m-%d')}'#{$5}" }    
-      File.open(gemspec_file, 'w') { |f| f << spec }
-      reload_gemspec!       
-    end
-    
-    def gemspec_file 
-      @gemspec_file ||= Dir['*.gemspec'].first
-    end
-    
-    def verify_current_branch(branch)
-      run_command('git branch').detect { |line| /^\* (.+)/ =~ line }
-      raise "You are currently not working in the #{branch} branch!" unless branch == $1
-    end
-    
-    def verify_fast_forward(local_branch = 'master', remote = 'origin', remote_branch = 'master')
-      sh "git fetch #{remote}"
-      lines = run_command("git rev-list #{local_branch}..remotes/#{remote}/#{remote_branch}")
-      raise "Remote branch #{remote}/#{remote_branch} has commits that are not yet incorporated in local #{local_branch} branch" unless lines.length == 0
-    end
-    
-    def verify_clean_status(on_branch = nil)      
-      lines = run_command('git status')
-      raise "You are currently not working in the #{on_branch} branch!" unless on_branch.nil? || (/^\# On branch (.+)/ =~ lines.first && $1 == on_branch)
-      raise "Your master branch contains modifications!" unless /^nothing to commit \(working directory clean\)/ =~ lines.last
-    end
-    
-    def verify_version(new_version)
-      newest_version = run_command('git tag').map { |tag| tag.split(name + '-').last }.compact.map { |v| Gem::Version.new(v) }.max
-      raise "This version number (#{new_version}) is not higher than the highest tagged version (#{newest_version})" if !newest_version.nil? && newest_version >= Gem::Version.new(new_version.to_s)
-    end
-    
-    def set_gem_version!
-      # update gemspec file
-      self.gemspec_version = ENV['VERSION'] if Gem::Version.correct?(ENV['VERSION'])
-      self.gemspec_date    = Date.today
-    end
-
-    def manifest_task
-      verify_current_branch('master')
       
-      list = Dir['**/*'].sort
-      list -= [gemspec_file]
+      desc "Run all unit tests for #{gemspec.name}"
+      task(:test => ['test:basic'])
+    end
+    
+    def define_rspec_tasks!
+      require 'spec/rake/spectask'
 
-      if File.exist?('.gitignore')
-        File.read('.gitignore').each_line do |glob|
-          glob = glob.chomp.sub(/^\//, '')
-          list -= Dir[glob]
-          list -= Dir["#{glob}/**/*"] if File.directory?(glob) and !File.symlink?(glob)
+      namespace(:spec) do
+        desc "Verify all RSpec examples for #{gemspec.name}"
+        Spec::Rake::SpecTask.new(:basic) do |t|
+          t.spec_files = FileList[spec_pattern]
         end
+        
+        desc "Verify all RSpec examples for #{gemspec.name} and output specdoc"
+        Spec::Rake::SpecTask.new(:specdoc) do |t|
+          t.spec_files = FileList[spec_pattern]
+          t.spec_opts << '--format' << 'specdoc' << '--color'
+        end
+        
+        desc "Run RCov on specs for #{gemspec.name}"
+        Spec::Rake::SpecTask.new(:rcov) do |t|
+          t.spec_files = FileList[spec_pattern]
+          t.rcov = true
+          t.rcov_opts = ['--exclude', '"spec/*,gems/*"', '--rails']          
+        end          
       end
       
-      # update the spec file
-      spec = File.read(gemspec_file)
-      spec.gsub! /^(\s* s.(test_)?files \s* = \s* )( \[ [^\]]* \] | %w\( [^)]* \) )/mx do
-        assignment = $1
-        bunch = $2 ? list.grep(/^(test.*_test\.rb|spec.*_spec.rb)$/) : list
-        '%s%%w(%s)' % [assignment, bunch.join(' ')]
-      end
+      desc "Verify all RSpec examples for #{gemspec.name} and output specdoc"
+      task(:spec => ['spec:specdoc'])      
+    end
+    
+    # Defines the rake tasks
+    def define_tasks!
+      
+      define_test_tasks!  if has_tests?
+      define_rspec_tasks! if has_specs?
+      
+      namespace(@task_namespace) do
+        desc "Updates the filelist in the gemspec file"
+        task(:manifest) { manifest_task } 
+        
+        desc "Builds the .gem package"
+        task(:build => :manifest) { build_task }
 
-      File.open(gemspec_file, 'w') { |f| f << spec }
-      reload_gemspec!
+        desc "Sets the version of the gem in the gemspec"
+        task(:set_version => [:check_version, :check_current_branch]) { version_task }
+        task(:check_version => :fetch_origin) { check_version_task }      
+        
+        task(:fetch_origin) { fetch_origin_task }
+        task(:check_current_branch) { check_current_branch_task }        
+        task(:check_clean_status) { check_clean_status_task }
+        task(:check_not_diverged => :fetch_origin) { check_not_diverged_task }
+        
+        checks = [:check_current_branch, :check_clean_status, :check_not_diversed, :check_version]
+        checks.unshift('spec:basic') if has_specs?
+        checks.unshift('test:basic') if has_tests?
+        
+        desc "Perform all checks that would occur before a release"
+        task(:release_checks => checks) 
+
+        desc "Release a new verison of the gem"
+        task(:release => [:release_checks, :set_version, :build, :push_changes]) { release_task }
+        
+        task(:push_changes => [:commit_modified_files, :tag_version]) { push_changes_task }
+        task(:tag_version) { tag_version_task }
+        task(:commit_modified_files) { commit_modified_files_task }
+      end
+    end
+    
+    def manifest_task
+      # Load all the gem's files using "git ls-files"
+      repository_files = git.ls_files.keys
+      test_files       = Dir[test_pattern] + Dir[spec_pattern]
+      
+      update_gemspec(:files, repository_files)
+      update_gemspec(:test_files, repository_files & test_files)
     end
     
     def build_task
-      sh "gem build #{gemspec_file}"
+      sh "gem build -q #{gemspec_file}"
       Dir.mkdir('pkg') unless File.exist?('pkg')
-      sh "mv #{name}-#{specification.version}.gem pkg/#{name}-#{specification.version}.gem" 
+      sh "mv #{gemspec.name}-#{gemspec.version}.gem pkg/#{gemspec.name}-#{gemspec.version}.gem" 
     end
     
-    def install_task
-      raise "#{name} .gem file not found" unless File.exist?("pkg/#{name}-#{specification.version}.gem")
-      sh "gem install pkg/#{name}-#{specification.version}.gem"
+    def version_task
+      update_gemspec(:version, ENV['VERSION']) if ENV['VERSION']
+      update_gemspec(:date, Date.today)
+      
+      update_version_file(gemspec.version)
+      update_version_constant(gemspec.version)
     end
     
-    def uninstall_task
-      raise "#{name} .gem file not found" unless File.exist?("pkg/#{name}-#{specification.version}.gem")
-      sh "gem uninstall #{name}"
-    end    
+    def check_version_task
+      raise "#{ENV['VERSION']} is not a valid version number!" if ENV['VERSION'] && !Gem::Version.correct?(ENV['VERSION'])
+      proposed_version = Gem::Version.new(ENV['VERSION'] || gemspec.version)
+      # Loads the latest version number using the created tags
+      newest_version   = git.tags.map { |tag| tag.name.split('-').last }.compact.map { |v| Gem::Version.new(v) }.max      
+      raise "This version (#{proposed_version}) is not higher than the highest tagged version (#{newest_version})" if newest_version && newest_version >= proposed_version
+    end
     
-    def create_version_tag!
-      # commit the gemspec file
-      git_commit_file(gemspec_file, "Updated #{gemspec_file} for release of version #{@specification.version}") if git_modified?(gemspec_file)
-
-      # create tag and push changes
-      git_create_tag("#{@name}-#{@specification.version}", "Tagged version #{@specification.version}")
-      git_push('origin', 'master', [:tags])     
+    def check_not_diverged_task
+      raise "The current branch is diverged from the remote branch!" if git.log.between('HEAD', git.branches["#{remote}/#{remote_branch}"].gcommit).any?
+    end
+    
+    def check_clean_status_task
+      raise "The current working copy contains modifications" if git.status.any?
+    end
+    
+    def check_current_branch_task
+      raise "Currently not on #{local_branch} branch!" unless git.branch.name == local_branch.to_s
+    end
+    
+    def fetch_origin_task
+      git.fetch('origin')
+    end
+    
+    def commit_modified_files_task
+      if modified_files.any?
+        modified_files.each { |file| git.add(file) }
+        git.commit("Released #{gemspec.name} gem version #{gemspec.version}")
+      end
+    end
+    
+    def tag_version_task
+      git.add_tag("#{gemspec.name}-#{gemspec_version}")
+    end
+    
+    def push_changes_task
+      git.push(remote, remote_branch, true)
     end
     
     def release_task
       puts
       puts '------------------------------------------------------------'
-      puts "Released #{@name} - version #{@specification.version}"
+      puts "Released #{gemspec.name} version #{gemspec_version}"
     end
     
-    def release_check_task
-      puts
-      puts '------------------------------------------------------------'
-      puts "Checked all conditions for a release of version #{ENV['VERSION'] || @specification.version}!"
-      puts 'You should be safe to do a release now.'
-      puts '------------------------------------------------------------'
+    private
+    
+    def has_specs?
+      FileList[spec_pattern].any?
     end
+    
+    def has_tests?
+      FileList[test_pattern].any?
+    end
+    
+    
+    # Loads the gemspec file
+    def load_gemspec!
+      @gemspec = eval(File.read(@gemspec_file))
+    end
+    
+    # Updates the VERSION file with the new version
+    def update_version_file(version)
+      if File.exists?('VERSION')
+        File.open('VERSION', 'w') { |f| f << version } 
+        modified_files << 'VERSION'
+      end
+    end
+    
+    # Updates the VERSION constant in the main include file if it exists
+    def update_version_constant(version)
+     file_contents = File.read(main_include)
+     if file_contents.sub!(/^(\s+VERSION\s*=\s*)[^\s].*$/) { $1 + version.inspect }
+       File.open(main_include, 'w') { |f| f << spec }      
+       modified_files << main_include
+     end
+    end
+    
+    # Updates an attribute of the gemspec file.
+    # This function will open the file, and search/replace the attribute using a regular expression.
+    def update_gemspec(attribute, new_value, literal = false)
+      
+      unless literal
+        new_value = case new_value
+          when Array        then "%w(#{new_value.join(' ')})"
+          when Hash, String then new_value.inspect
+          when Date         then new_value.strftime('%Y-%m-%d').inspect 
+          else              raise "Cannot write value #{new_value.inspect} to gemspec file!"
+        end
+      end
+      
+      spec   = File.read(gemspec_file)
+      regexp = Regexp.new('^(\s+\w+\.' + Regexp.quote(attribute.to_s) + '\s*=\s*)[^\s].*$')
+      if spec.sub!(regexp) { $1 + new_value }
+        File.open(gemspec_file, 'w') { |f| f << spec }      
+        modified_files << gemspec_file
+            
+        # Reload the gemspec so the changes are incorporated
+        load_gemspec!
+      end
+    end
+    
   end
 end
-
-Rake::GithubGem.define_tasks!
