@@ -119,7 +119,7 @@ module RequestLogAnalyzer::Output
       if io.kind_of?(File)
         puts "Request-log-analyzer summary report"
         line
-        puts "Version #{RequestLogAnalyzer.version} - written by Willem van Bergen and Bart ten Brinke"
+        puts "Version #{RequestLogAnalyzer::VERSION} - written by Willem van Bergen and Bart ten Brinke"
         puts "Request-log-analyzer website: http://github.com/wvanbergen/request-log-analyzer"
       end
     end

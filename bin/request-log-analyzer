@@ -44,7 +44,7 @@ begin
   end
   
 rescue CommandLine::Error => e
-  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer.version}"
+  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
   puts "Website: http://railsdoctors.com"
   puts
   puts "ARGUMENT ERROR: " + e.message if e.message

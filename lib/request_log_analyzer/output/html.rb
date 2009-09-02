@@ -136,7 +136,7 @@ module RequestLogAnalyzer::Output
       end
       @io << '<body>'
       @io << tag(:h1, 'Request-log-analyzer summary report')
-      @io << tag(:p, "Version #{RequestLogAnalyzer.version} - written by Willem van Bergen and Bart ten Brinke")
+      @io << tag(:p, "Version #{RequestLogAnalyzer::VERSION} - written by Willem van Bergen and Bart ten Brinke")
     end
   
     # Generate a footer for a report
