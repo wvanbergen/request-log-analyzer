@@ -125,13 +125,13 @@ module RequestLogAnalyzer::Source
     def parse_io(io, options = {}, &block) # :yields: request
 
       @current_io = io
+      lineno = 0
       @current_io.each_line do |line|
-        
         @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
 
         request_data = nil
         file_format.line_definitions.each do |line_type, definition|
-          request_data = definition.matches(line, @current_io.lineno, self)
+          request_data = definition.matches(line, lineno, self)
           break if request_data
         end
         
@@ -139,6 +139,7 @@ module RequestLogAnalyzer::Source
           @parsed_lines += 1
           update_current_request(request_data, &block)
         end
+        lineno += 1
       end
 
       warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
@@ -197,7 +198,7 @@ module RequestLogAnalyzer::Source
     # <tt>request_data</tt>:: A hash of data that was parsed from the last line.
     def update_current_request(request_data, &block) # :yields: request
       if header_line?(request_data)
-        unless @current_request.nil?
+        if @current_request
           case options[:parse_strategy]
           when 'assume-correct'
             handle_request(@current_request, &block)
@@ -207,15 +208,13 @@ module RequestLogAnalyzer::Source
             warn(:unclosed_request, "Encountered header line (#{request_data[:line_definition].name.inspect}), but previous request was not closed!")
             @current_request = nil # remove all data that was parsed, skip next request as well.
           end
-          if footer_line?(request_data)
-            handle_request(@current_request, &block) # yield @current_request
-            @current_request = nil 
-          end
+        elsif footer_line?(request_data)
+          handle_request(@file_format.request(request_data), &block)
         else
-          @current_request = @file_format.request(request_data)              
+          @current_request = @file_format.request(request_data)
         end
       else
-        unless @current_request.nil?
+        if @current_request
           @current_request << request_data
           if footer_line?(request_data)
             handle_request(@current_request, &block) # yield @current_request
