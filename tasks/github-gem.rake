@@ -114,14 +114,20 @@ module GithubGem
         checks = [:check_current_branch, :check_clean_status, :check_not_diverged, :check_version]
         checks.unshift('spec:basic') if has_specs?
         checks.unshift('test:basic') if has_tests?
-        
+        checks.push << [:check_rubyforge] if gemspec.rubyforge_project
+                
         desc "Perform all checks that would occur before a release"
         task(:release_checks => checks) 
 
-        desc "Release a new verison of the gem"
-        task(:release => [:release_checks, :set_version, :build, :push_changes]) { release_task }
+        release_tasks = [:release_checks, :set_version, :build, :github_release]
+        release_tasks << [:rubyforge_release] if gemspec.rubyforge_project
         
-        task(:push_changes => [:commit_modified_files, :tag_version]) { push_changes_task }
+        desc "Release a new verison of the gem"
+        task(:release => release_tasks) { release_task }
+        
+        task(:check_rubyforge)   { check_rubyforge_task }
+        task(:rubyforge_release) { rubyforge_release_task }
+        task(:github_release => [:commit_modified_files, :tag_version]) { github_release_task }
         task(:tag_version) { tag_version_task }
         task(:commit_modified_files) { commit_modified_files_task }
       end
@@ -185,8 +191,19 @@ module GithubGem
       git.add_tag("#{gemspec.name}-#{gemspec.version}")
     end
     
-    def push_changes_task
+    def github_release_task
       git.push(remote, remote_branch, true)
+    end
+    
+    def check_rubyforge_task
+      raise "Could not login on rubyforge!" unless `rubyforge login`.strip.empty?
+      output = `rubyforge names`.split("\n")
+      raise "Rubyforge group not found!"   unless output.any? { |line| %r[^groups\s*\:.*\b#{Regexp.quote(gemspec.rubyforge_project)}\b.*] =~ line }
+      raise "Rubyforge package not found!" unless output.any? { |line| %r[^packages\s*\:.*\b#{Regexp.quote(gemspec.name)}\b.*] =~ line }      
+    end
+    
+    def rubyforge_release_task
+      sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version, "pgk/#{gemspec.name}-#{gemspec.version}.gem"
     end
     
     def release_task
