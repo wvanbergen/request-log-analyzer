@@ -9,16 +9,9 @@ Encoding.default_external = 'binary' if defined? Encoding and Encoding.respond_t
 # - The actual application resides in the RequestLogAnalyzer::Controller class.
 module RequestLogAnalyzer
   
-  # The full path of the .gemspec file of the request-log-analyze gem
-  GEMSPEC_FILE = File.expand_path(File.dirname(__FILE__) + '/../request-log-analyzer.gemspec')
-  
-  # Returns the current version of request-log-anaylzer by reading the .gemspec file
-  def self.version
-    @version ||= begin
-      File.readlines(GEMSPEC_FILE).detect { |line| line =~ /^\s*\w+\.version\s*=\s*(?:\'|\")([^\s]+)(?:\'|\")\s*(?:;|$)/ }
-      $1
-    end
-  end
+  # The current version of request-log-analyzer.
+  # This will be diplayed in output reports etc.  
+  VERSION = '1.2.5'
   
   # Loads constants in the RequestLogAnalyzer namespace using self.load_default_class_file(base, const)
   # <tt>const</tt>:: The constant that is not yet loaded in the RequestLogAnalyzer namespace. This should be passed as a string or symbol.

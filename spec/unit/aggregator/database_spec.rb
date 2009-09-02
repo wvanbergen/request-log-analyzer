@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Aggregator::Database do
 
-  before(:each) do
+  before(:all) do
     log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)
     @database_inserter = RequestLogAnalyzer::Aggregator::Database.new(log_parser, :database => ':memory:')
     
@@ -16,12 +16,18 @@ describe RequestLogAnalyzer::Aggregator::Database do
   describe '#prepare' do
 
     before(:each) do
-      @database_inserter.stub!(:establish_database_connection!)      
+      @database_inserter.stub!(:initialize_orm_module!)
+      @database_inserter.stub!(:establish_database_connection!)
       @database_inserter.stub!(:create_database_schema!)
     end
 
+    it 'should create the ORM mdoule in which the classes can be created' do
+      @database_inserter.should_receive(:initialize_orm_module!)
+      @database_inserter.prepare
+    end
+
     it 'should establish the database connection' do
-      @database_inserter.should_receive(:establish_database_connection!)      
+      @database_inserter.should_receive(:establish_database_connection!)
       @database_inserter.prepare
     end
     
@@ -29,6 +35,30 @@ describe RequestLogAnalyzer::Aggregator::Database do
       @database_inserter.should_receive(:create_database_schema!)
       @database_inserter.prepare
     end
+  end
+  
+  # The database inserter creates is own "Database" module within the file format 
+  # class to create all the classes that are needed.
+  describe '#initialize_orm_module!' do
+    
+    before(:all) { @database_inserter.send(:deinitialize_orm_module!) }
+    after(:all)  { @database_inserter.send(:initialize_orm_module!) }
+    
+    before(:each) { @database_inserter.send(:initialize_orm_module!) }
+    after(:each)  { @database_inserter.send(:deinitialize_orm_module!) }
+    
+    it "should create a Database module under the file format's class" do
+      testing_format.class.should be_const_defined('Database')
+    end
+    
+    it "should define a Base class in the Database module" do
+      testing_format.class::Database.should be_const_defined('Base')
+    end
+    
+    it "should create a ActiveRecord::Base class in the Database module" do
+      testing_format.class::Database::Base.ancestors.should include(ActiveRecord::Base)
+    end
+    
   end
   
   # The create_database_table method should create a database table according to the line definition,

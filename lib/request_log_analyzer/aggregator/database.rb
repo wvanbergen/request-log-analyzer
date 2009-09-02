@@ -46,6 +46,7 @@ module RequestLogAnalyzer::Aggregator
     def finalize
       @request_count = orm_module::Request.count
       remove_database_connection!
+      deinitialize_orm_module!
     end
     
     # Records w warining in the warnings table.
@@ -84,14 +85,20 @@ module RequestLogAnalyzer::Aggregator
         orm_base_class.abstract_class = true
         orm_module.const_set('Base', orm_base_class)
       end
-    end    
-    
+    end
+
+    # Deinitializes the ORM module and the ActiveRecord::Base subclass.
+    def deinitialize_orm_module!
+      file_format.class.send(:remove_const, 'Database') if file_format.class.const_defined?('Database')
+      @orm_module = nil
+    end
+
     # Established a connection with the database for this session
     def establish_database_connection!
       orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
       #ActiveRecord::Migration.class_eval("def self.connection; #{@orm_module.to_s}::Base.connection; end ")
-    end    
-    
+    end
+
     def remove_database_connection!
       #ActiveRecord::Migration.class_eval("def self.connection; ActiveRecord::Base.connection; end ")      
       orm_module::Base.remove_connection
