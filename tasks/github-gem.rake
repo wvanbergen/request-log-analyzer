@@ -223,7 +223,7 @@ module GithubGem
     def update_version_constant(version)
      file_contents = File.read(main_include)
      if file_contents.sub!(/^(\s+VERSION\s*=\s*)[^\s].*$/) { $1 + version.inspect }
-       File.open(main_include, 'w') { |f| f << spec }      
+       File.open(main_include, 'w') { |f| f << file_contents }      
        modified_files << main_include
      end
     end
