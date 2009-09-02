@@ -111,7 +111,7 @@ module GithubGem
         task(:check_clean_status) { check_clean_status_task }
         task(:check_not_diverged => :fetch_origin) { check_not_diverged_task }
         
-        checks = [:check_current_branch, :check_clean_status, :check_not_diversed, :check_version]
+        checks = [:check_current_branch, :check_clean_status, :check_not_diverged, :check_version]
         checks.unshift('spec:basic') if has_specs?
         checks.unshift('test:basic') if has_tests?
         
@@ -163,7 +163,7 @@ module GithubGem
     end
     
     def check_clean_status_task
-      raise "The current working copy contains modifications" if git.status.any?
+      raise "The current working copy contains modifications" if git.status.changed.any?
     end
     
     def check_current_branch_task
