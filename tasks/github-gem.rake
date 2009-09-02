@@ -203,7 +203,7 @@ module GithubGem
     end
     
     def rubyforge_release_task
-      sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version, "pgk/#{gemspec.name}-#{gemspec.version}.gem"
+      sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version.to_s, "pkg/#{gemspec.name}-#{gemspec.version}.gem"
     end
     
     def release_task
