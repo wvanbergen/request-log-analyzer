@@ -129,15 +129,9 @@ module RequestLogAnalyzer::Source
       @current_io.each_line do |line|
         @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
 
-        request_data = nil
-        file_format.line_definitions.each do |line_type, definition|
-          request_data = definition.matches(line, lineno, self)
-          break if request_data
-        end
-        
-        if request_data
+        if request_data = file_format.parse_line(line, self)
           @parsed_lines += 1
-          update_current_request(request_data, &block)
+          update_current_request(request_data.merge(:lineno => lineno), &block)
         end
         lineno += 1
       end

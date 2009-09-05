@@ -142,5 +142,14 @@ module RequestLogAnalyzer::FileFormat
     def setup_environment(controller)
       
     end
+    
+    def parse_line(line, parser = nil)
+      request_data = nil
+      self.line_definitions.each do |line_type, definition|
+        request_data = definition.matches(line, parser)
+        break if request_data
+      end
+      return request_data
+    end
   end
 end

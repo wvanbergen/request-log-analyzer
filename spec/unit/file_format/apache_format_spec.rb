@@ -13,7 +13,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
   end
   
   it "should parse a valid access log line" do
-    @file_format.line_definitions[:access].matches(@sample, 1, nil).should be_kind_of(Hash)
+    @file_format.line_definitions[:access].matches(@sample).should be_kind_of(Hash)
   end
 
   it "should read the correct values from a valid access log line" do
