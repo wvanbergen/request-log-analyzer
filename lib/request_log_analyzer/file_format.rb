@@ -143,10 +143,10 @@ module RequestLogAnalyzer::FileFormat
       
     end
     
-    def parse_line(line, parser = nil)
+    def parse_line(line, &warning_handler)
       request_data = nil
       self.line_definitions.each do |line_type, definition|
-        request_data = definition.matches(line, parser)
+        request_data = definition.matches(line, &warning_handler)
         break if request_data
       end
       return request_data

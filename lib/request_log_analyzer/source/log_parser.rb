@@ -17,7 +17,7 @@ module RequestLogAnalyzer::Source
     # All available parse strategies.
     PARSE_STRATEGIES = ['cautious', 'assume-correct']
 
-    attr_reader :source_files
+    attr_reader :source_files, :current_file, :current_lineno
 
     # Initializes the log file parser instance.
     # It will apply the language specific FileFormat module to this instance. It will use the line
@@ -32,7 +32,8 @@ module RequestLogAnalyzer::Source
       @parsed_requests  = 0
       @skipped_lines    = 0
       @skipped_requests = 0
-      @current_io       = nil
+      @current_file     = nil
+      @current_lineno   = nil
       @source_files     = options[:source_files]
       
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
@@ -124,21 +125,21 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A hash of options that can be used by the parser.
     def parse_io(io, options = {}, &block) # :yields: request
 
-      @current_io = io
-      lineno = 0
-      @current_io.each_line do |line|
-        @progress_handler.call(:progress, @current_io.pos) if @progress_handler && @current_io.kind_of?(File)
+      @current_lineno = 0
+      io.each_line do |line|
+        @progress_handler.call(:progress, io.pos) if @progress_handler && io.kind_of?(File)
 
-        if request_data = file_format.parse_line(line, self)
+        if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
           @parsed_lines += 1
-          update_current_request(request_data.merge(:lineno => lineno), &block)
+          update_current_request(request_data.merge(:lineno => @current_lineno), &block)
         end
-        lineno += 1
+        
+        @current_lineno += 1
       end
 
       warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
 
-      @current_io = nil
+      @current_lineno = nil
     end
 
     # Add a block to this method to install a progress handler while parsing.
@@ -163,7 +164,7 @@ module RequestLogAnalyzer::Source
     # <tt>type</tt>:: The warning type (a Symbol)
     # <tt>message</tt>:: A message explaining the warning
     def warn(type, message)
-      @warning_handler.call(type, message, @current_io.lineno) if @warning_handler
+      @warning_handler.call(type, message, @current_lineno) if @warning_handler
     end
 
     protected

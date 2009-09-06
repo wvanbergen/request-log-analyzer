@@ -49,13 +49,13 @@ module RequestLogAnalyzer
     # with all the fields parsed from that line as content.
     # If the line definition has a teaser-check, a :teaser_check_failed warning will be emitted
     # if this teaser-check is passed, but the full regular exprssion does not ,atch.
-    def matches(line, parser = nil)
+    def matches(line, &warning_handler)
       if @teaser.nil? || @teaser =~ line
         if match_data = line.match(@regexp)
           return { :line_definition => self, :captures => match_data.captures}
         else
-          if @teaser && parser
-            parser.warn(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")
+          if @teaser && warning_handler
+            warning_handler.call(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")
           end
           return false
         end
@@ -68,8 +68,8 @@ module RequestLogAnalyzer
 
     # matches the line and converts the captured values using the request's
     # convert_value function.
-    def match_for(line, request, parser = nil)
-      if match_info = matches(line, parser)
+    def match_for(line, request, &warning_handler)
+      if match_info = matches(line, &warning_handler)
         convert_captured_values(match_info[:captures], request)
       else
         false
