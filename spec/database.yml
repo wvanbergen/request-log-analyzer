@@ -1,0 +1,17 @@
+sqlite3:
+  adapter: "sqlite3"
+  database: ":memory:"
+
+# mysql:
+#   adapter: "mysql"
+#   host: "localhost"
+#   username: "root"
+#   password:
+#   database: "rla_test"
+
+# postgresql:
+#   adapter: "postgresql"
+#   host: "localhost"
+#   username: "rla"
+#   password: "rla"
+#   database: "rla_test"

@@ -23,7 +23,6 @@ module RequestLogAnalyzer::Aggregator
     def prepare
       initialize_orm_module!
       establish_database_connection!
-      File.unlink(options[:database]) if File.exist?(options[:database]) # TODO: keep old database?
       create_database_schema!
     end
     
@@ -95,12 +94,32 @@ module RequestLogAnalyzer::Aggregator
 
     # Established a connection with the database for this session
     def establish_database_connection!
-      orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
-      #ActiveRecord::Migration.class_eval("def self.connection; #{@orm_module.to_s}::Base.connection; end ")
+      if options[:database].kind_of?(Hash)
+        orm_module::Base.establish_connection(options[:database])
+      elsif options[:database] == ':memory:'
+        orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
+      elsif connection_hash = self.class.parse_database_connection_string(options[:database])
+        orm_module::Base.establish_connection(connection_hash)
+      elsif File.exist?(options[:database])
+        orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
+      else
+        orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
+      end
     end
-
+    
+    def self.parse_database_connection_string(string)
+      hash = {}
+      if string =~ /^(?:\w+=(?:[^;])*;)*\w+=(?:[^;])*$/
+        string.scan(/(\w+)=([^;]*);?/) { |variable, value| hash[variable.to_sym] = value }
+      elsif string =~ /^(\w+)\:\/\/(?:(?:([^:]+)(?:\:([^:]+))?\@)?([\w\.-]+)\/)?([\w\:\-\.\/]+)$/
+        hash[:adapter], hash[:username], hash[:password], hash[:host], hash[:database] = $1, $2, $3, $4, $5
+        hash.delete_if { |k, v| v.nil? }
+      end
+      return hash.empty? ? nil : hash
+    end
+    
+    # Closes the connection to the database
     def remove_database_connection!
-      #ActiveRecord::Migration.class_eval("def self.connection; ActiveRecord::Base.connection; end ")      
       orm_module::Base.remove_connection
     end
     
@@ -192,6 +211,16 @@ module RequestLogAnalyzer::Aggregator
       file_format.line_definitions.each do |name, definition|
         create_database_table(definition)
         create_activerecord_class(definition)
+      end
+    end
+    
+    def drop_database_schema!
+      connection.drop_table(:sources)  rescue false
+      connection.drop_table(:requests) rescue false
+      connection.drop_table(:warnings) rescue false
+      
+      file_format.line_definitions.each do |name, definition|
+        connection.drop_table("#{definition.name}_lines") rescue false
       end
     end
     

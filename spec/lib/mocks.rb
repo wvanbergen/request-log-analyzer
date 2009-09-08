@@ -43,15 +43,15 @@ module RequestLogAnalyzer::Spec::Mocks
     return output
   end
   
-  def mock_migrator
+  def mock_connection
     table_creator = mock('ActiveRecord table creator')
     table_creator.stub!(:column)
     
-    migrator = mock('ActiveRecord::Base.connection for migrations')
-    migrator.stub!(:add_index)
-    migrator.stub!(:create_table).and_yield(table_creator).and_return(true)
-    migrator.stub!(:table_creator).and_return(table_creator)
-    return migrator
+    connection = mock('ActiveRecord::Base.connection')
+    connection.stub!(:add_index)
+    connection.stub!(:create_table).and_yield(table_creator).and_return(true)
+    connection.stub!(:table_creator).and_return(table_creator)
+    return connection
   end
   
   
