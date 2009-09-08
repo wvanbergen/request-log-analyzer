@@ -130,23 +130,28 @@ module RequestLogAnalyzer::Aggregator
     # what line in the original file the line was found, and a request_id to link lines related
     # to the same request. It will also create an index in the request_id field to speed up queries.
     def create_database_table(definition)
-      connection.create_table("#{definition.name}_lines") do |t|
+      table_name = "#{definition.name}_lines".to_sym
+      unless connection.table_exists?(table_name)
+        connection.create_table(table_name) do |t|
         
-        # Add default fields for every line type
-        t.column(:request_id, :integer)
-        t.column(:lineno, :integer)
+          # Add default fields for every line type
+          t.column(:request_id, :integer)
+          t.column(:lineno, :integer)
         
-        definition.captures.each do |capture|
-          # Add a field for every capture
-          t.column(capture[:name], column_type(capture[:type]))
+          definition.captures.each do |capture|
+            # Add a field for every capture
+            t.column(capture[:name], column_type(capture[:type]))
 
-          # If the capture provides other field as well, create columns for them, too
-          capture[:provides].each { |field, field_type| t.column(field, column_type(field_type)) } if capture[:provides].kind_of?(Hash)
+            # If the capture provides other field as well, create columns for them, too
+            capture[:provides].each { |field, field_type| t.column(field, column_type(field_type)) } if capture[:provides].kind_of?(Hash)
+          end
         end
-      end
       
-      # Create an index on the request_id column to support faster querying
-      connection.add_index("#{definition.name}_lines", [:request_id])
+        # Create an index on the request_id column to support faster querying
+        connection.add_index(table_name, [:request_id])
+      else
+        # assume correct. TODO: check table for problems
+      end
     end
     
     # Creates an ActiveRecord class for a given line definition.
@@ -169,10 +174,12 @@ module RequestLogAnalyzer::Aggregator
     # Creates a requests table, in which a record is created for every parsed request. 
     # It also creates an ActiveRecord::Base class to communicate with this table.
     def create_request_table_and_class
-      connection.create_table("requests") do |t|
-        t.column :first_lineno, :integer
-        t.column :last_lineno,  :integer
-      end    
+      unless connection.table_exists?(:requests)
+        connection.create_table(:requests) do |t|
+          t.column :first_lineno, :integer
+          t.column :last_lineno,  :integer
+        end    
+      end
       
       orm_module.const_set('Request', Class.new(orm_module::Base)) unless orm_module.const_defined?('Request')     
       @request_class = orm_module.const_get('Request')
@@ -181,10 +188,12 @@ module RequestLogAnalyzer::Aggregator
     # Creates a sources table, in which a record is created for every file that is parsed. 
     # It also creates an ActiveRecord::Base ORM class for the table.
     def create_source_table_and_class
-      connection.create_table('sources') do |t|
-        t.column :filename, :string
-        t.column :mtime,    :datetime
-        t.column :filesize, :integer
+      unless connection.table_exists?(:sources)
+        connection.create_table(:sources) do |t|
+          t.column :filename, :string
+          t.column :mtime,    :datetime
+          t.column :filesize, :integer
+        end
       end
       
       orm_module.const_set('Source', Class.new(orm_module::Base)) unless orm_module.const_defined?('Source')
@@ -193,11 +202,13 @@ module RequestLogAnalyzer::Aggregator
 
     # Creates a warnings table and a corresponding Warning class to communicate with this table using ActiveRecord.
     def create_warning_table_and_class
-      connection.create_table("warnings") do |t|
-        t.column  :warning_type, :string, :limit => 30, :null => false
-        t.column  :message, :string
-        t.column  :lineno, :integer
-      end    
+      unless connection.table_exists?(:warnings)
+        connection.create_table(:warnings) do |t|
+          t.column  :warning_type, :string, :limit => 30, :null => false
+          t.column  :message, :string
+          t.column  :lineno, :integer
+        end    
+      end
       
       orm_module.const_set('Warning', Class.new(orm_module::Base)) unless orm_module.const_defined?('Warning')
       @warning_class = orm_module.const_get('Warning')
@@ -217,12 +228,13 @@ module RequestLogAnalyzer::Aggregator
     end
     
     def drop_database_schema!
-      connection.drop_table(:sources)  rescue false
-      connection.drop_table(:requests) rescue false
-      connection.drop_table(:warnings) rescue false
+      connection.drop_table(:sources)  if connection.table_exists?(:sources)
+      connection.drop_table(:requests) if connection.table_exists?(:requests)
+      connection.drop_table(:warnings) if connection.table_exists?(:warnings)
       
       file_format.line_definitions.each do |name, definition|
-        connection.drop_table("#{definition.name}_lines") rescue false
+        table_name = "#{definition.name}_lines".to_sym
+        connection.drop_table(table_name) if connection.table_exists?(table_name)
       end
     end
     

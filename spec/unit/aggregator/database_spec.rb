@@ -78,12 +78,19 @@ describe RequestLogAnalyzer::Aggregator::Database do
     end  
 
     it "should create a table based on the line type name" do
-      @connection.should_receive(:create_table).with('test_lines')
+      @connection.should_receive(:create_table).with(:test_lines)
       @database_inserter.send(:create_database_table, @line_definition)
-    end    
+    end
+
+    it "should not create a table based on the line type name if it already exists" do
+      @connection.stub!(:table_exists?).with(:test_lines).and_return(true)
+      @connection.should_not_receive(:create_table).with(:test_lines)
+      @database_inserter.send(:create_database_table, @line_definition)
+    end
+
 
     it "should create an index on the request_id field" do
-      @connection.should_receive(:add_index).with('test_lines', [:request_id])
+      @connection.should_receive(:add_index).with(:test_lines, [:request_id])
       @database_inserter.send(:create_database_table, @line_definition)
     end
 
@@ -192,7 +199,7 @@ describe RequestLogAnalyzer::Aggregator::Database do
     end
 
     it "should create a requests table to join request lines" do
-      @connection.should_receive(:create_table).with("requests")
+      @connection.should_receive(:create_table).with(:requests)
       @database_inserter.send :create_database_schema!
     end
     
@@ -202,7 +209,7 @@ describe RequestLogAnalyzer::Aggregator::Database do
     end
 
     it "should create a warnings table for logging parse warnings" do
-      @connection.should_receive(:create_table).with("warnings")
+      @connection.should_receive(:create_table).with(:warnings)
       @database_inserter.send :create_database_schema!
     end
 
@@ -212,7 +219,7 @@ describe RequestLogAnalyzer::Aggregator::Database do
     end
 
     it "should create a sources table to track parsed files" do
-      @connection.should_receive(:create_table).with("sources")
+      @connection.should_receive(:create_table).with(:sources)
       @database_inserter.send :create_database_schema!
     end    
 
