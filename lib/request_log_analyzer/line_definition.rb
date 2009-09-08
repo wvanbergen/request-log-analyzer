@@ -30,6 +30,9 @@ module RequestLogAnalyzer
     attr_accessor :teaser, :regexp, :captures
     attr_accessor :header, :footer
     
+    alias_method :header?, :header
+    alias_method :footer?, :footer
+    
     # Initializes the LineDefinition instance with a hash containing the different elements of
     # the definition.
     def initialize(name, definition = {})

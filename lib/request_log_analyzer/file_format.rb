@@ -112,17 +112,14 @@ module RequestLogAnalyzer::FileFormat
     
     # Specifies the summary report using a block.
     def self.report(mode = :append, &block)
-      if mode == :overwrite
-        self.report_definer.reset!
-      end
-      
+      self.report_definer.reset! if mode == :overwrite
       yield(self.report_definer)
     end
     
     
     ####################################################################################
     # Instantiation
-    ####################################################################################    
+    ####################################################################################
     
     def self.create(*args)
       # Ignore arguments
@@ -135,7 +132,7 @@ module RequestLogAnalyzer::FileFormat
     
     ####################################################################################
     # INSTANCE methods
-    ####################################################################################    
+    ####################################################################################
     
     def request_class
       self.class::Request

@@ -13,9 +13,9 @@ module RequestLogAnalyzer::Spec::Matchers
     end
     
     def matches?(file_format)
-      if file_format.create.line_definitions.include?(@line_type)
-        ld = file_format.create.line_definitions[@line_type]
-        @captures.all? { |c| ld.captures.include?(c) }
+      file_format = file_format.create if file_format.kind_of?(Class)
+      if ld = file_format.line_definitions[@line_type]
+        @captures.all? { |c| ld.captures.map { |cd| cd[:name] }.include?(c) }
       else
         false
       end

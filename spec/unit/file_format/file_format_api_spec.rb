@@ -16,7 +16,7 @@ describe RequestLogAnalyzer::FileFormat do
  
     it "specify lines with a block for the format definition" do
       @first_file_format.format_definition do |format|
-        format.block_test :regexp => /test (\w+)/, :captures => [:tester]
+        format.block_test :regexp => /test (\w+)/, :captures => [{:name => :tester, :type => :string}]
       end 
           
       @first_file_format.should have_line_definition(:block_test).capturing(:tester)
