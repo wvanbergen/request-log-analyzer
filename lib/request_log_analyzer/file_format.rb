@@ -10,7 +10,7 @@ module RequestLogAnalyzer::FileFormat
   # * A FileFormat class (of which an imstance will be returned)
   # * A filename (from which the FileFormat class is loaded)
   # * A symbol of a built-in file format (e.g. :rails)
-  def self.load(file_format)
+  def self.load(file_format, *args)
     klass = nil
     if file_format.kind_of?(RequestLogAnalyzer::FileFormat::Base)
       # this already is a file format! return itself
@@ -41,7 +41,7 @@ module RequestLogAnalyzer::FileFormat
     raise "Could not load a file format from #{file_format.inspect}" if klass.nil?
     raise "Invalid FileFormat class" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
     
-    @current_file_format = klass.new # return an instance of the class
+    @current_file_format = klass.create(*args) # return an instance of the class
   end  
   
   # Makes classes aware of a file format by registering the file_format variable
@@ -62,7 +62,13 @@ module RequestLogAnalyzer::FileFormat
   # A subclass of this class is instantiated when request-log-analyzer is started and this instance
   # is shared with all components of the application so they can act on the specifics of the format
   class Base
-      
+    
+    attr_reader :line_definitions, :report_trackers
+    
+    ####################################################################################
+    # CLASS METHODS for format definition
+    ####################################################################################
+    
     # Registers the line definer instance for a subclass.
     def self.inherited(subclass)
       if subclass.superclass == RequestLogAnalyzer::FileFormat::Base
@@ -94,15 +100,7 @@ module RequestLogAnalyzer::FileFormat
     def self.line_definition(name, &block)
       @line_definer.send(name, &block)
     end
-    
-    def request_class
-      self.class::Request
-    end
-    
-    def request(*hashes)
-      request_class.create(self, *hashes)
-    end
-    
+        
     # Specifies multiple line definitions at once using a block
     def self.format_definition(&block)
       if block_given?
@@ -120,15 +118,31 @@ module RequestLogAnalyzer::FileFormat
       
       yield(self.report_definer)
     end
-
-    # Returns all line definitions
-    def line_definitions
-      @line_definitions ||= self.class.line_definer.line_definitions
+    
+    
+    ####################################################################################
+    # Instantiation
+    ####################################################################################    
+    
+    def self.create(*args)
+      # Ignore arguments
+      return self.new(line_definer.line_definitions, report_definer.trackers)
+    end    
+    
+    def initialize(line_definitions = [], report_trackers = [])
+      @line_definitions, @report_trackers = line_definitions, report_trackers
+    end    
+    
+    ####################################################################################
+    # INSTANCE methods
+    ####################################################################################    
+    
+    def request_class
+      self.class::Request
     end
     
-    # Returns all the defined trackers for the summary report.
-    def report_trackers
-      self.class.report_definer.trackers# =>  rescue []
+    def request(*hashes)
+      request_class.create(self, *hashes)
     end
     
     # Checks whether the line definitions form a valid language.

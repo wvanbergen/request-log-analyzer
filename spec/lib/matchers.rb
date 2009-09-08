@@ -13,8 +13,8 @@ module RequestLogAnalyzer::Spec::Matchers
     end
     
     def matches?(file_format)
-      if file_format.new.line_definitions.include?(@line_type)
-        ld = file_format.new.line_definitions[@line_type]
+      if file_format.create.line_definitions.include?(@line_type)
+        ld = file_format.create.line_definitions[@line_type]
         @captures.all? { |c| ld.captures.include?(c) }
       else
         false

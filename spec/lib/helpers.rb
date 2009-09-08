@@ -2,7 +2,7 @@ module RequestLogAnalyzer::Spec::Helpers
   
   # Create or return a new TestingFormat
   def testing_format
-    @testing_format ||= TestingFormat.new
+    @testing_format ||= TestingFormat.create
   end
   
   # Load a log file from the fixture folder

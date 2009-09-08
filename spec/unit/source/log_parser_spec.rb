@@ -71,7 +71,7 @@ end
 describe RequestLogAnalyzer::Source::LogParser, :decompression do
   
   before(:each) do
-    @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat::Rails.new)
+    @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat::Rails.create)
   end
     
   it "should parse a rails gzipped log file" do
