@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name    = 'request-log-analyzer'
-  s.version = "1.2.8"
+  s.version = "1.2.9"
   s.date    = "2009-09-08"
   
   s.rubyforge_project = 'r-l-a'
