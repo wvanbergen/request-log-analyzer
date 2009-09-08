@@ -24,7 +24,7 @@ module RequestLogAnalyzer::Aggregator
       
       # Include missing trackers through method missing.
       def method_missing(tracker_method, *args)
-        track(tracker_method, args.first)
+        track(tracker_method, *args)
       end
       
       # Track the frequency of a specific category

@@ -21,6 +21,8 @@ begin
     end
     
     command_line.option(:format, :alias => :f, :default => 'rails')
+    command_line.option(:apache_format)
+    
     command_line.option(:file, :alias => :e)
     command_line.option(:parse_strategy, :default => 'assume-correct')
     command_line.option(:dump)

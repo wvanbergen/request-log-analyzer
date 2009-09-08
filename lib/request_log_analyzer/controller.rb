@@ -46,7 +46,11 @@ module RequestLogAnalyzer
       end
                 
       # Create the controller with the correct file format
-      file_format = RequestLogAnalyzer::FileFormat.load(arguments[:format])
+      file_format = if arguments[:apache_format]
+          RequestLogAnalyzer::FileFormat.load(:apache, arguments[:apache_format])
+        else 
+          RequestLogAnalyzer::FileFormat.load(arguments[:format])
+        end
 
       # register sources
       if arguments.parameters.length == 1
