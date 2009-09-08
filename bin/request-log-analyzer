@@ -1,8 +1,9 @@
 #!/usr/bin/ruby
-require File.dirname(__FILE__) + '/../lib/request_log_analyzer'
-require File.dirname(__FILE__) + '/../lib/cli/command_line_arguments'
-require File.dirname(__FILE__) + '/../lib/cli/progressbar'
-require File.dirname(__FILE__) + '/../lib/cli/tools'
+$:.unshift(File.dirname(__FILE__) + '/../lib')
+require 'request_log_analyzer'
+require 'cli/command_line_arguments'
+require 'lib/cli/progressbar'
+require 'lib/cli/tools'
 
 # Parse the arguments given via commandline
 begin
@@ -11,24 +12,30 @@ begin
     command_line.command(:install) do |install|
       install.parameters = 1
     end
-    
+
+    command_line.command(:console) do |cons|
+      cons.option(:database, :alias => :d, :required => true)
+      cons.option(:format, :alias => :f, :default => 'rails')
+      cons.option(:apache_format)
+    end
+
     command_line.command(:strip) do |strip|
       strip.minimum_parameters = 1
-      strip.option(:format, :alias => :f, :default => 'rails')      
+      strip.option(:format, :alias => :f, :default => 'rails')
       strip.option(:output, :alias => :o)
       strip.switch(:discard_teaser_lines, :t)
       strip.switch(:keep_junk_lines, :j) 
     end
-    
+
     command_line.option(:format, :alias => :f, :default => 'rails')
     command_line.option(:apache_format)
-    
+
     command_line.option(:file, :alias => :e)
     command_line.option(:parse_strategy, :default => 'assume-correct')
     command_line.option(:dump)
-          
+
     command_line.option(:aggregator, :alias => :a, :multiple => true)
-    
+
     command_line.option(:database, :alias => :d)
     command_line.switch(:reset_database)
 
@@ -36,17 +43,17 @@ begin
     command_line.option(:select, :multiple => true, :parameters => 2)
     command_line.option(:reject, :multiple => true, :parameters => 2)
     command_line.option(:after)
-    command_line.option(:before)    
-    
+    command_line.option(:before)
+
     command_line.switch(:boring, :b)
-    command_line.option(:output, :alias => :o, :default => 'FixedWidth')    
+    command_line.option(:output, :alias => :o, :default => 'FixedWidth')
     command_line.option(:report_width, :default => terminal_width - 1)
-    
+
     command_line.switch(:debug)
-    
-    command_line.minimum_parameters = 1    
+
+    command_line.minimum_parameters = 1
   end
-  
+
 rescue CommandLine::Error => e
   puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
   puts "Website: http://railsdoctors.com"
@@ -85,11 +92,14 @@ end
 case arguments.command
 when :install
   install_rake_tasks(arguments.parameters[0])
+when :console
+  require 'cli/database_console'
+  DatabaseConsole.new(arguments).run!
 when :strip
-  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'  
+  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
 else 
-  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
+  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
   puts "Website: http://railsdoctors.com"
   puts
 
