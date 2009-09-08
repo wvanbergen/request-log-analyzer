@@ -44,6 +44,14 @@ module RequestLogAnalyzer::Spec::Mocks
     return output
   end
   
+  def mock_database(*stubs)
+    database = mock('RequestLogAnalyzer::Database')
+    database.stub!(:connect)
+    database.stub!(:connection).and_return(mock_connection)
+    stubs.each { |s| database.stub!(s)}
+    return database
+  end
+  
   def mock_connection
     table_creator = mock('ActiveRecord table creator')
     table_creator.stub!(:column)

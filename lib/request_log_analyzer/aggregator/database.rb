@@ -1,5 +1,3 @@
-require 'rubygems'
-require 'activerecord'
 
 module RequestLogAnalyzer::Aggregator
 
@@ -16,26 +14,25 @@ module RequestLogAnalyzer::Aggregator
   # created to log all parse warnings.
   class Database < Base
 
-    attr_reader :request_class, :request_count, :orm_module, :warning_class, :source_class, :sources
+    attr_reader :request_count, :sources, :database
 
     # Establishes a connection to the database and creates the necessary database schema for the
     # current file format
     def prepare
       @sources = {}
-      initialize_orm_module!
-      establish_database_connection!
+      @database = RequestLogAnalyzer::Database.new(file_format, options[:database])
       
-      drop_database_schema! if options[:reset_database]
-      create_database_schema!
+      database.drop_database_schema! if options[:reset_database]
+      database.create_database_schema!
     end
     
     # Aggregates a request into the database
     # This will create a record in the requests table and create a record for every line that has been parsed,
     # in which the captured values will be stored.
     def aggregate(request)
-      @request_object = request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
+      @request_object = database.request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
-        class_columns = orm_module.const_get("#{line[:line_type]}_line".classify).column_names.reject { |column| ['id'].include?(column) }
+        class_columns = database.get_class(line[:line_type]).column_names.reject { |column| ['id'].include?(column) }
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
         attributes[:source] = @current_source
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
@@ -47,21 +44,21 @@ module RequestLogAnalyzer::Aggregator
     
     # Finalizes the aggregator by closing the connection to the database
     def finalize
-      @request_count = orm_module::Request.count
-      remove_database_connection!
-      deinitialize_orm_module!
+      @request_count = database.request_class.count
+      database.disconnect
+      database.remove_orm_classes!
     end
     
     # Records w warining in the warnings table.
     def warning(type, message, lineno)
-      warning_class.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
+      database.warning_class.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
     
     # Records source changes in the sources table
     def source_change(change, filename)
       case change
       when :started
-        @sources[filename] = source_class.create!(:filename => filename)
+        @sources[filename] = database.source_class.create!(:filename => filename)
         @current_source = @sources[filename]
       when :finished
         @sources[filename].update_attributes!(:filesize => File.size(filename), :mtime => File.mtime(filename))
@@ -80,203 +77,5 @@ module RequestLogAnalyzer::Aggregator
       output << "\n"
     end
     
-    # Retreives the connection that is used for the database inserter
-    def connection
-      orm_module::Base.connection
-    end    
-    
-    protected 
-    
-    # Create a module and a default subclass of ActiveRecord::Base on which to establish the database connection
-    def initialize_orm_module!
-      
-      # Create a Database module in the file format if it does not yet exists
-      file_format.class.const_set('Database', Module.new) unless file_format.class.const_defined?('Database')
-      @orm_module = file_format.class.const_get('Database')
-      
-      # Register the base activerecord class
-      unless orm_module.const_defined?('Base')
-        orm_base_class = Class.new(ActiveRecord::Base)
-        orm_base_class.abstract_class = true
-        orm_module.const_set('Base', orm_base_class)
-      end
-    end
-
-    # Deinitializes the ORM module and the ActiveRecord::Base subclass.
-    def deinitialize_orm_module!
-      file_format.class.send(:remove_const, 'Database') if file_format.class.const_defined?('Database')
-      @orm_module = nil
-    end
-
-    # Established a connection with the database for this session
-    def establish_database_connection!
-      if options[:database].kind_of?(Hash)
-        orm_module::Base.establish_connection(options[:database])
-      elsif options[:database] == ':memory:'
-        orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-      elsif connection_hash = self.class.parse_database_connection_string(options[:database])
-        orm_module::Base.establish_connection(connection_hash)
-      elsif File.exist?(options[:database])
-        orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
-      else
-        orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => options[:database])
-      end
-    end
-    
-    def self.parse_database_connection_string(string)
-      hash = {}
-      if string =~ /^(?:\w+=(?:[^;])*;)*\w+=(?:[^;])*$/
-        string.scan(/(\w+)=([^;]*);?/) { |variable, value| hash[variable.to_sym] = value }
-      elsif string =~ /^(\w+)\:\/\/(?:(?:([^:]+)(?:\:([^:]+))?\@)?([\w\.-]+)\/)?([\w\:\-\.\/]+)$/
-        hash[:adapter], hash[:username], hash[:password], hash[:host], hash[:database] = $1, $2, $3, $4, $5
-        hash.delete_if { |k, v| v.nil? }
-      end
-      return hash.empty? ? nil : hash
-    end
-    
-    # Closes the connection to the database
-    def remove_database_connection!
-      orm_module::Base.remove_connection
-    end
-    
-    # This function creates a database table for a given line definition.
-    # It will create a field for every capture in the line, and adds a lineno field to indicate at
-    # what line in the original file the line was found, and a request_id to link lines related
-    # to the same request. It will also create an index in the request_id field to speed up queries.
-    def create_database_table(definition)
-      table_name = "#{definition.name}_lines".to_sym
-      unless connection.table_exists?(table_name)
-        connection.create_table(table_name) do |t|
-        
-          # Add default fields for every line type
-          t.column(:request_id, :integer)
-          t.column(:source_id, :integer)
-          t.column(:lineno, :integer)
-        
-          definition.captures.each do |capture|
-            # Add a field for every capture
-            t.column(capture[:name], column_type(capture[:type]))
-
-            # If the capture provides other field as well, create columns for them, too
-            capture[:provides].each { |field, field_type| t.column(field, column_type(field_type)) } if capture[:provides].kind_of?(Hash)
-          end
-        end
-      
-        # Create an index on the request_id column to support faster querying
-        connection.add_index(table_name, [:request_id])
-      else
-        # assume correct. 
-        # TODO: check table for problems
-      end
-    end
-    
-    # Creates an ActiveRecord class for a given line definition.
-    # A subclass of ActiveRecord::Base is created and an association with the Request class is
-    # created using belongs_to / has_many. This association will later be used to create records
-    # in the corresponding table. This table should already be created before this method is called.
-    def create_activerecord_class(definition)
-      class_name = "#{definition.name}_line".camelize
-      klass = Class.new(orm_module::Base)
-      klass.send(:belongs_to, :request)
-      klass.send(:belongs_to, :source)
-      
-      definition.captures.select { |c| c.has_key?(:provides) }.each do |capture|
-        klass.send(:serialize, capture[:name], Hash)
-      end
-      
-      orm_module.const_set(class_name, klass) unless orm_module.const_defined?(class_name)
-      request_class.send(:has_many, "#{definition.name}_lines".to_sym)
-    end
-
-    # Creates a requests table, in which a record is created for every parsed request. 
-    # It also creates an ActiveRecord::Base class to communicate with this table.
-    def create_request_table_and_class
-      unless connection.table_exists?(:requests)
-        connection.create_table(:requests) do |t|
-          t.column :first_lineno, :integer
-          t.column :last_lineno,  :integer
-        end    
-      end
-      
-      orm_module.const_set('Request', Class.new(orm_module::Base)) unless orm_module.const_defined?('Request')     
-      @request_class = orm_module.const_get('Request')
-    end
-
-    # Creates a sources table, in which a record is created for every file that is parsed. 
-    # It also creates an ActiveRecord::Base ORM class for the table.
-    def create_source_table_and_class
-      unless connection.table_exists?(:sources)
-        connection.create_table(:sources) do |t|
-          t.column :filename, :string
-          t.column :mtime,    :datetime
-          t.column :filesize, :integer
-        end
-      end
-      
-      orm_module.const_set('Source', Class.new(orm_module::Base)) unless orm_module.const_defined?('Source')
-      @source_class = orm_module.const_get('Source')      
-    end
-
-    # Creates a warnings table and a corresponding Warning class to communicate with this table using ActiveRecord.
-    def create_warning_table_and_class
-      unless connection.table_exists?(:warnings)
-        connection.create_table(:warnings) do |t|
-          t.column  :warning_type, :string, :limit => 30, :null => false
-          t.column  :message, :string
-          t.column  :source_id, :integer
-          t.column  :lineno, :integer
-        end    
-      end
-      
-      orm_module.const_set('Warning', Class.new(orm_module::Base)) unless orm_module.const_defined?('Warning')
-      @warning_class = orm_module.const_get('Warning')
-      @warning_class.send(:belongs_to, :source)
-    end
-    
-    # Creates the database schema and related ActiveRecord::Base subclasses that correspond to the 
-    # file format definition. These ORM classes will later be used to create records in the database.
-    def create_database_schema!
-      create_source_table_and_class
-      create_request_table_and_class
-      create_warning_table_and_class
-      
-      file_format.line_definitions.each do |name, definition|
-        create_database_table(definition)
-        create_activerecord_class(definition)
-      end
-    end
-    
-    def drop_database_schema!
-      connection.drop_table(:sources)  if connection.table_exists?(:sources)
-      connection.drop_table(:requests) if connection.table_exists?(:requests)
-      connection.drop_table(:warnings) if connection.table_exists?(:warnings)
-      
-      file_format.line_definitions.each do |name, definition|
-        table_name = "#{definition.name}_lines".to_sym
-        connection.drop_table(table_name) if connection.table_exists?(table_name)
-      end
-    end
-        
-    # Function to determine the column type for a field
-    # TODO: make more robust / include in file-format definition
-    def column_type(type_indicator)
-      case type_indicator
-      when :eval;      :text
-      when :hash;      :text
-      when :text;      :text
-      when :string;    :string
-      when :sec;       :double
-      when :msec;      :double
-      when :duration;  :double
-      when :float;     :double
-      when :double;    :double
-      when :integer;   :integer
-      when :int;       :int
-      when :timestamp; :datetime
-      when :datetime;  :datetime
-      when :date;      :date
-      else             :string
-      end
-    end
   end
 end
