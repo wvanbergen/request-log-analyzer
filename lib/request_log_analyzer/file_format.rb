@@ -72,7 +72,7 @@ module RequestLogAnalyzer::FileFormat
     # Registers the line definer instance for a subclass.
     def self.inherited(subclass)
       if subclass.superclass == RequestLogAnalyzer::FileFormat::Base
-        
+
         # Create aline and report definer for this class
         subclass.class_eval do 
           instance_variable_set(:@line_definer, RequestLogAnalyzer::LineDefinition::Definer.new)
@@ -83,24 +83,24 @@ module RequestLogAnalyzer::FileFormat
         # Create a custom Request class for this file format
         subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request)) unless subclass.const_defined?('Request')
       else
-        
+
         # Copy the line and report definer from the parent class.
         subclass.class_eval do 
           instance_variable_set(:@line_definer, superclass.line_definer.clone)
           instance_variable_set(:@report_definer, superclass.report_definer.clone)
           class << self; attr_accessor :line_definer, :report_definer; end
-        end        
-        
+        end
+
         # Create a custom Request class based on the superclass's Request class
         subclass.const_set('Request', Class.new(subclass.superclass::Request)) unless subclass.const_defined?('Request')
       end
-    end    
-    
+    end
+
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
       @line_definer.send(name, &block)
     end
-        
+
     # Specifies multiple line definitions at once using a block
     def self.format_definition(&block)
       if block_given?
@@ -109,57 +109,60 @@ module RequestLogAnalyzer::FileFormat
         return self.line_definer
       end
     end
-    
+
     # Specifies the summary report using a block.
     def self.report(mode = :append, &block)
       self.report_definer.reset! if mode == :overwrite
       yield(self.report_definer)
     end
-    
-    
+
     ####################################################################################
     # Instantiation
     ####################################################################################
-    
+
     def self.create(*args)
       # Ignore arguments
       return self.new(line_definer.line_definitions, report_definer.trackers)
-    end    
-    
+    end
+
     def initialize(line_definitions = [], report_trackers = [])
       @line_definitions, @report_trackers = line_definitions, report_trackers
-    end    
-    
+    end
+
     ####################################################################################
     # INSTANCE methods
     ####################################################################################
-    
+
+    # Returns the Request class of this file format
     def request_class
       self.class::Request
     end
-    
+
+    # Returns a Request instance with the given parsed lines that should be provided as hashes.
     def request(*hashes)
       request_class.create(self, *hashes)
     end
-    
+
     # Checks whether the line definitions form a valid language.
     # A file format should have at least a header and a footer line type
     def valid?
-      line_definitions.detect { |(name, ld)| ld.header } && line_definitions.detect { |(name, ld)| ld.footer }
+      line_definitions.any? { |(name, ld)| ld.header } && line_definitions.any? { |(name, ld)| ld.footer }
     end
-    
+
+    # Returns true if this language captures the given symbol in one of its line definitions
+    def captures?(name)
+      line_definitions.any? { |(name, ld)| ld.captures?(name) }
+    end
+
     # Function that a file format con implement to monkey patch the environment.
     # * <tt>controller</tt> The environment is provided as a controller instance
     def setup_environment(controller)
-      
     end
-    
+
+    # Parses a line by trying to parse it using every line definition in this file format
     def parse_line(line, &warning_handler)
       request_data = nil
-      self.line_definitions.each do |line_type, definition|
-        request_data = definition.matches(line, &warning_handler)
-        break if request_data
-      end
+      self.line_definitions.any? { |lt, definition| request_data = definition.matches(line, &warning_handler) }
       return request_data
     end
   end

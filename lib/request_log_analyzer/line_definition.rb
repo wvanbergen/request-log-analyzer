@@ -100,6 +100,11 @@ module RequestLogAnalyzer
       return value_hash
     end
 
+    # Returns true if this line captures values of the given name
+    def captures?(name)
+      captures.any? { |c| c[:name] == name }
+    end
+
   end
   
 end
