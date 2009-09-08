@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name    = 'request-log-analyzer'
+  s.name    = "request-log-analyzer"
   s.version = "1.2.9"
   s.date    = "2009-09-08"
   
@@ -9,14 +9,14 @@ Gem::Specification.new do |s|
   s.executables        = ['request-log-analyzer']
   s.default_executable = 'request-log-analyzer'
   
-  s.summary     = "A command line tool to analyze request logs for Rails, Merb and other application servers"
+  s.summary     = "A command line tool to analyze request logs for Apache, Rails, Merb and other application servers"
   s.description = <<-eos
     Request log analyzer's purpose is to find ot how your web application is being used and to focus your optimization efforts.
     This tool will parse all requests in the application's log file and aggregate the information. Once it is finished parsing 
     the log file(s), it will show the requests that take op most server time using various metrics. It can also insert all 
     parsed request information into a database so you can roll your own analysis. It supports Rails- and Merb-based applications 
-    out of the box, but file formats of other applications can easily be supported by supplying an easy to write log file format 
-    definition.
+    and Apache access log files out of the box, but file formats of other applications can easily be supported by supplying an 
+    easy to write log file format definition.
   eos
   
   s.rdoc_options << '--title' << s.name << '--main' << 'README.rdoc' << '--line-numbers' << '--inline-source'
