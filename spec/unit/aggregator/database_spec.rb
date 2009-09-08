@@ -183,10 +183,21 @@ describe RequestLogAnalyzer::Aggregator::Database do
       @database_inserter.send :create_database_schema!
     end
 
-    it "should create a Warnng class inheriting from ActiveRecord and the base class of the ORM module" do
+    it "should create a Warning class inheriting from ActiveRecord and the base class of the ORM module" do
       @database_inserter.send :create_database_schema!
       @database_inserter.warning_class.ancestors.should include(ActiveRecord::Base, @database_inserter.orm_module::Base)
     end
+    
+    it "should create a sources table to track parsed files" do
+      @connection.should_receive(:create_table).with("sources")
+      @database_inserter.send :create_database_schema!
+    end    
+
+    it "should create a Source ORM class" do
+      @database_inserter.send :create_database_schema!
+      @database_inserter.orm_module::Source.ancestors.should include(ActiveRecord::Base, @database_inserter.orm_module::Base)
+    end    
+
   
     it "should create a table for every line type" do
       @database_inserter.should_receive(:create_database_table).with(an_instance_of(RequestLogAnalyzer::LineDefinition)).exactly(@line_type_cnt).times

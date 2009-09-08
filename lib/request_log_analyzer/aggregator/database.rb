@@ -143,10 +143,10 @@ module RequestLogAnalyzer::Aggregator
       
       orm_module.const_set(class_name, klass) unless orm_module.const_defined?(class_name)
       request_class.send(:has_many, "#{definition.name}_lines".to_sym)
-    end    
-    
-    # Creates a requests table, in which a record is created for every request. It also creates an
-    # ActiveRecord::Base class to communicate with this table.
+    end
+
+    # Creates a requests table, in which a record is created for every parsed request. 
+    # It also creates an ActiveRecord::Base class to communicate with this table.
     def create_request_table_and_class
       connection.create_table("requests") do |t|
         t.column :first_lineno, :integer
@@ -155,6 +155,19 @@ module RequestLogAnalyzer::Aggregator
       
       orm_module.const_set('Request', Class.new(orm_module::Base)) unless orm_module.const_defined?('Request')     
       @request_class = orm_module.const_get('Request')
+    end
+
+    # Creates a sources table, in which a record is created for every file that is parsed. 
+    # It also creates an ActiveRecord::Base ORM class for the table.
+    def create_source_table_and_class
+      connection.create_table('sources') do |t|
+        t.column :filename, :string
+        t.column :mtime,    :datetime
+        t.column :filesize, :integer
+      end
+      
+      orm_module.const_set('Source', Class.new(orm_module::Base)) unless orm_module.const_defined?('Source')
+      @source_class = orm_module.const_get('Source')      
     end
 
     # Creates a warnings table and a corresponding Warning class to communicate with this table using ActiveRecord.
@@ -172,6 +185,7 @@ module RequestLogAnalyzer::Aggregator
     # Creates the database schema and related ActiveRecord::Base subclasses that correspond to the 
     # file format definition. These ORM classes will later be used to create records in the database.
     def create_database_schema!
+      create_source_table_and_class
       create_request_table_and_class
       create_warning_table_and_class
       
