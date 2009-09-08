@@ -32,7 +32,10 @@ module RequestLogAnalyzer
     def self.build(arguments)
       options = { }
 
-      options[:database] = arguments[:database] if arguments[:database]
+      # Database command line options
+      options[:database]       = arguments[:database] if arguments[:database]
+      options[:reset_database] = arguments[:reset_database]
+      
       options[:debug]    = arguments[:debug]
       options[:dump]     = arguments[:dump]
 

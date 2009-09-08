@@ -23,6 +23,8 @@ module RequestLogAnalyzer::Aggregator
     def prepare
       initialize_orm_module!
       establish_database_connection!
+      
+      drop_database_schema! if options[:reset_database]
       create_database_schema!
     end
     
