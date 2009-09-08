@@ -8,28 +8,69 @@ module RequestLogAnalyzer::FileFormat
   
   class Apache < Base
 
-    # 125.76.230.10 - - [02/Sep/2009:03:33:46 +0200] "GET /cart/install.txt HTTP/1.1" 404 214 "-" "Toata dragostea mea pentru diavola"
-    line_definition :access do |line|
-      line.header = true
-      line.footer = true
-      line.regexp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - - \[([^\]]{26})\] "([A-Z]+) ([^\s]+) HTTP\/(\d+(?:\.\d+)*)" (\d+) \d+ "-" "([^"]+)"/
-      line.captures << { :name => :ip_address,   :type => :string } \
-                    << { :name => :timestamp,    :type => :timestamp } \
-                    << { :name => :method,       :type => :string } \
-                    << { :name => :path,         :type => :string } \
-                    << { :name => :http_version, :type => :string } \
-                    << { :name => :status,       :type => :integer } \
-                    << { :name => :user_agent,   :type => :string }
-    end    
+    # A hash of predefined Apache log format strings
+    LOG_FORMAT_DEFAULTS = {
+      :common   => '%h %l %u %t "%r" %>s %b',
+      :combined => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"'
+    }
 
-    
-    report do |analyze|
-      analyze.timespan :line_type => :access
-      analyze.hourly_spread :line_type => :access
-      analyze.frequency :category => :method, :amount => 20, :title => "HTTP methods frequency"
-      analyze.frequency :category => :path,   :amount => 20, :title => "Most popular paths"
+    # A hash that defines how the log format directives should be parsed.
+    LOG_DIRECTIVES = {
+      'h' => { :regexp => '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', :captures => [{:name => :ip_address, :type => :string}] },
+      't' => { :regexp => '\[([^\]]{26})\]', :captures => [{:name => :timestamp, :type => :timestamp}] },
+      's' => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] },
+      'r' => { :regexp => '([A-Z]+) ([^\s]+) HTTP\/(\d+(?:\.\d+)*)', :captures => [{:name => :http_method, :type => :string},
+                       {:name => :path, :type => :string}, {:name => :http_version, :type => :string}]}
+    }
+
+    # Creates the Apache log format language based on a Apache log format string.
+    # It will set up the line definition and the report trackers according to the Apache access log format,
+    # which should be passed as first argument. By default, is uses the 'combined' log format.
+    def self.create(*args)
+      access_line =  access_line_definition(args.first)
+      self.new({ :access => access_line}, report_trackers(access_line))
     end
-  
+
+    # Creates the access log line definition based on the Apache log format string
+    def self.access_line_definition(format_string)
+      format_string ||= :combined
+      format_string   = LOG_FORMAT_DEFAULTS[format_string.to_sym] || format_string
+
+      line_regexp = ''
+      captures    = []
+      format_string.scan(/([^%]*)(?:%(?:\{([^\}]+)\})?>?([A-Za-z]))?/) do |literal, arg, variable|
+
+        line_regexp << Regexp.quote(literal) # Make sure to parse the literal before the directive
+        if variable
+          # Check if we recognize the log directive
+          if directive = LOG_DIRECTIVES[variable]
+            line_regexp << directive[:regexp]   # Parse the value of the directive
+            captures    += directive[:captures] # Add the directive's information to the captures
+          else
+            line_regexp << '.*' # Just accept any input for this literal
+          end
+        end
+      end
+      
+      # Return a new line definition object
+      return RequestLogAnalyzer::LineDefinition.new(:access, :regexp => Regexp.new(line_regexp),
+                                        :captures => captures, :header => true, :footer => true)
+    end
+
+    # Sets up the report trackers according to the access line definition.
+    def self.report_trackers(line_definition)
+      analyze = RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
+
+      analyze.timespan      if line_definition.captures?(:timestamp)
+      analyze.hourly_spread if line_definition.captures?(:timestamp)
+
+      analyze.frequency :category => :http_method, :amount => 20, :title => "HTTP methods"  if line_definition.captures?(:http_method)
+      analyze.frequency :category => :http_status, :amount => 20, :title => "HTTP statuses" if line_definition.captures?(:http_status)
+      analyze.frequency :category => :path, :amount => 20, :title => "Most popular URIs"    if line_definition.captures?(:path)
+
+      return analyze.trackers
+    end
+
     # Define a custom Request class for the Apache file format to speed up timestamp handling.
     class Request < RequestLogAnalyzer::Request
       
