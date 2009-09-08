@@ -55,13 +55,13 @@ describe RequestLogAnalyzer, 'running from command line' do
     output.all? { |line| /^[\x00-\x7F]*$/ =~ line }.should be_true
   end
 
-  it "should parse a Merb file if --apache-format is set" do
+  it "should parse a Merb file if --format merb is set" do
     output = run("#{log_fixture(:merb)} --format merb")
     output.detect { |line| /Parsed requests\:\s*11/ =~ line }.should_not be_nil
   end
 
-  it "should parse a Apache access log file if --format merb is set" do
-    output = run("#{log_fixture(:apache)} --apache-format combined")
+  it "should parse a Apache access log file if --apache-format is set" do
+    output = run("#{log_fixture(:apache_combined)} --apache-format combined")
     output.detect { |line| /Parsed requests\:\s*5/ =~ line }.should_not be_nil
   end
 
