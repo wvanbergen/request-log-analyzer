@@ -6,7 +6,6 @@ describe RequestLogAnalyzer::Aggregator::Database do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)
   end
   
-  
   # The prepare method is called before the parsing starts. It should establish a connection
   # to a database that is suitable for inserting requests later on.
   describe '#prepare' do

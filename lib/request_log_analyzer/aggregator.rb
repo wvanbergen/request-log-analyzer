@@ -44,6 +44,10 @@ module RequestLogAnalyzer::Aggregator
     # in this function.
     def report(output)
     end
+    
+    # The source_change function gets called when handling a source is started or finished.
+    def source_change(change, filename)
+    end
 
   end
 end

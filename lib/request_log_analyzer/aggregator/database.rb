@@ -16,11 +16,12 @@ module RequestLogAnalyzer::Aggregator
   # created to log all parse warnings.
   class Database < Base
 
-    attr_reader :request_class, :request_count, :orm_module, :warning_class
+    attr_reader :request_class, :request_count, :orm_module, :warning_class, :source_class, :sources
 
     # Establishes a connection to the database and creates the necessary database schema for the
     # current file format
     def prepare
+      @sources = {}
       initialize_orm_module!
       establish_database_connection!
       
@@ -36,6 +37,7 @@ module RequestLogAnalyzer::Aggregator
       request.lines.each do |line|
         class_columns = orm_module.const_get("#{line[:line_type]}_line".classify).column_names.reject { |column| ['id'].include?(column) }
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
+        attributes[:source] = @current_source
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
       @request_object.save!
@@ -53,6 +55,18 @@ module RequestLogAnalyzer::Aggregator
     # Records w warining in the warnings table.
     def warning(type, message, lineno)
       warning_class.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
+    end
+    
+    # Records source changes in the sources table
+    def source_change(change, filename)
+      case change
+      when :started
+        @sources[filename] = source_class.create!(:filename => filename)
+        @current_source = @sources[filename]
+      when :finished
+        @sources[filename].update_attributes!(:filesize => File.size(filename), :mtime => File.mtime(filename))
+        @current_source = nil
+      end
     end
     
     # Prints a short report of what has been inserted into the database
@@ -136,6 +150,7 @@ module RequestLogAnalyzer::Aggregator
         
           # Add default fields for every line type
           t.column(:request_id, :integer)
+          t.column(:source_id, :integer)
           t.column(:lineno, :integer)
         
           definition.captures.each do |capture|
@@ -150,7 +165,8 @@ module RequestLogAnalyzer::Aggregator
         # Create an index on the request_id column to support faster querying
         connection.add_index(table_name, [:request_id])
       else
-        # assume correct. TODO: check table for problems
+        # assume correct. 
+        # TODO: check table for problems
       end
     end
     
@@ -162,6 +178,7 @@ module RequestLogAnalyzer::Aggregator
       class_name = "#{definition.name}_line".camelize
       klass = Class.new(orm_module::Base)
       klass.send(:belongs_to, :request)
+      klass.send(:belongs_to, :source)
       
       definition.captures.select { |c| c.has_key?(:provides) }.each do |capture|
         klass.send(:serialize, capture[:name], Hash)
@@ -206,12 +223,14 @@ module RequestLogAnalyzer::Aggregator
         connection.create_table(:warnings) do |t|
           t.column  :warning_type, :string, :limit => 30, :null => false
           t.column  :message, :string
+          t.column  :source_id, :integer
           t.column  :lineno, :integer
         end    
       end
       
       orm_module.const_set('Warning', Class.new(orm_module::Base)) unless orm_module.const_defined?('Warning')
       @warning_class = orm_module.const_get('Warning')
+      @warning_class.send(:belongs_to, :source)
     end
     
     # Creates the database schema and related ActiveRecord::Base subclasses that correspond to the 
@@ -237,7 +256,7 @@ module RequestLogAnalyzer::Aggregator
         connection.drop_table(table_name) if connection.table_exists?(table_name)
       end
     end
-    
+        
     # Function to determine the column type for a field
     # TODO: make more robust / include in file-format definition
     def column_type(type_indicator)

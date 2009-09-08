@@ -9,6 +9,7 @@ module RequestLogAnalyzer::Spec::Mocks
     
     source.stub!(:warning=)
     source.stub!(:progress=)
+    source.stub!(:source_changes=)
 
     source.stub!(:prepare)
     source.stub!(:finalize)

@@ -11,6 +11,8 @@ module RequestLogAnalyzer::Source
   # that deal differently with this problem.
   class LogParser < Base
 
+    include Enumerable
+
     # The default parse strategy that will be used to parse the input.
     DEFAULT_PARSE_STRATEGY = 'assume-correct'
     
@@ -46,11 +48,11 @@ module RequestLogAnalyzer::Source
     # lines specified in the FileFormat. This lines will be combined into Request instances,
     # that will be yielded. The actual parsing occurs in the parse_io method.
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
-    def each_request(options = {}, &block) # :yields: request
+    def each_request(options = {}, &block) # :yields: :request, request
       
       case @source_files
       when IO;     
-        puts "Parsing from the standard input. Press CTRL+C to finish."
+        puts "Parsing from the standard input. Press CTRL+C to finish." # FIXME: not here
         parse_stream(@source_files, options, &block) 
       when String
         parse_file(@source_files, options, &block) 
@@ -60,6 +62,9 @@ module RequestLogAnalyzer::Source
         raise "Unknown source provided"
       end
     end
+    
+    # Make sure the Enumerable methods work as expected
+    alias_method :each, :each_request
 
     # Parses a list of subsequent files of the same format, by calling parse_file for every
     # file in the array.
@@ -89,10 +94,11 @@ module RequestLogAnalyzer::Source
     # TODO: Fix progress bar that is broken for IO.popen, as it returns a single string.
     #
     # <tt>file</tt>:: The file that should be parsed.
-    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.    
+    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_file(file, options = {}, &block)
 
-      @progress_handler.call(:started, file) if @progress_handler
+      @progress_handler.call(:started, file)       if @progress_handler
+      @source_changes_handler.call(:started, file) if @source_changes_handler
       
       if decompress_file?(file).empty?
         File.open(file, 'r') { |f| parse_io(f, options, &block) }
@@ -100,7 +106,8 @@ module RequestLogAnalyzer::Source
         IO.popen(decompress_file?(file), 'r') { |f| parse_io(f, options, &block) }
       end
 
-      @progress_handler.call(:finished, file) if @progress_handler
+      @source_changes_handler.call(:finished, file) if @source_changes_handler
+      @progress_handler.call(:finished, file)       if @progress_handler
     end
 
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
@@ -149,9 +156,15 @@ module RequestLogAnalyzer::Source
     end
 
     # Add a block to this method to install a warning handler while parsing,
-    # <tt>proc</tt>:: The proc that will be called to handle parse warning messages    
+    # <tt>proc</tt>:: The proc that will be called to handle parse warning messages
     def warning=(proc)
       @warning_handler = proc
+    end
+    
+    # Add a block to this method to install a source change handler while parsing,
+    # <tt>proc</tt>:: The proc that will be called to handle source changes
+    def source_changes=(proc)
+      @source_changes_handler = proc
     end
 
     # This method is called by the parser if it encounteres any parsing problems.
@@ -229,11 +242,11 @@ module RequestLogAnalyzer::Source
     # - It will update the parsed_requests and skipped_requests variables accordingly
     #
     # <tt>request</tt>:: The parsed request instance (RequestLogAnalyzer::Request)
-    def handle_request(request, &block) # :yields: request
+    def handle_request(request, &block) # :yields: :request, request
       @parsed_requests += 1
       request.validate
       accepted = block_given? ? yield(request) : true
-      @skipped_requests += 1 if not accepted
+      @skipped_requests += 1 unless accepted
     end    
 
     # Checks whether a given line hash is a header line according to the current file format.

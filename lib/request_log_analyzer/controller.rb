@@ -131,6 +131,8 @@ module RequestLogAnalyzer
 
       # Handle progress messagess
       @source.progress = lambda { |message, value| handle_progress(message, value) } if @source
+      
+      @source.source_changes = lambda { |change, filename| handle_source_change(change, filename) } if @source
     end
     
     # Progress function.
@@ -152,6 +154,11 @@ module RequestLogAnalyzer
       when :progress
         @progress_bar.set(value)
       end
+    end
+    
+    # Source change handler
+    def handle_source_change(change, filename)
+      @aggregators.each { |agg| agg.source_change(change, File.expand_path(filename, Dir.pwd)) }
     end
     
     # Adds an aggregator to the controller. The aggregator will be called for every request 
