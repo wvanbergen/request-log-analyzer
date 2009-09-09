@@ -95,8 +95,8 @@ module RequestLogAnalyzer
       arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
 
       # register the database 
-      controller.add_aggregator(:database)   if arguments[:database] && !arguments[:aggregator].include?('database')
-      controller.add_aggregator(:summarizer) if arguments[:aggregator].empty?
+      controller.add_aggregator(:database_inserter)   if arguments[:database] && !arguments[:aggregator].include?('database')
+      controller.add_aggregator(:summarizer)          if arguments[:aggregator].empty?
     
       # register the echo aggregator in debug mode
       controller.add_aggregator(:echo) if arguments[:debug]

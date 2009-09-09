@@ -12,7 +12,7 @@ module RequestLogAnalyzer::Aggregator
   # For every line type, a separate table will be created with a request_id field to point to
   # the request record, and a field for every parsed value. Finally, a warnings table will be
   # created to log all parse warnings.
-  class Database < Base
+  class DatabaseInserter < Base
 
     attr_reader :request_count, :sources, :database
 
@@ -71,9 +71,10 @@ module RequestLogAnalyzer::Aggregator
       output.title('Request database created')
       
       output <<  "A database file has been created with all parsed request information.\n"
-      output <<  "#{@request_count} requests have been added to the database.\n"      
-      output <<  "To execute queries on this database, run the following command:\n"
-      output <<  output.colorize("  $ sqlite3 #{options[:database]}\n", :bold)
+      output <<  "#{@request_count} requests have been added to the database.\n"
+      output << "\n"
+      output <<  "To open a Ruby console to inspect the database, run the following command.\n"
+      output <<  output.colorize("  $ request-log-analyzer console -d #{options[:database]}\n", :bold)
       output << "\n"
     end
     
