@@ -1,15 +1,41 @@
 # Setup the include path
 $:.unshift(File.dirname(__FILE__) + '/..')
 
-# Load the file format
-if ENV['RLA_DBCONSOLE_FORMAT_ARGUMENT']
-  file_format = RequestLogAnalyzer::FileFormat.load(ENV['RLA_DBCONSOLE_FORMAT'], ENV['RLA_DBCONSOLE_FORMAT_ARGUMENT'])
-else
-  file_format = RequestLogAnalyzer::FileFormat.load(ENV['RLA_DBCONSOLE_FORMAT'])
-end
-
 $database = RequestLogAnalyzer::Database.new(ENV['RLA_DBCONSOLE_DATABASE'])
 $database.load_database_schema!
 
+require 'cli/tools'
+
+def wordwrap(string, max = 80, indent = "")
+  strings = [""]
+  string.split(", ").each do |item|
+    if strings.last.length == 0 || strings.last.length + item.length <= max
+      strings.last << item << ', '
+    else
+      strings << (item + ', ')
+    end
+  end
+  strings.map(&:strip).join("\n#{indent}").slice(0..-2)
+end
+
+class Request
+  def inspect
+    request_inspect = "Request[id: #{id}] <#{lines.first.source.filename}>\n"
+    
+    inspected_lines = lines.map do |line|
+      inspect_line = " - #{line.line_type} (line #{line.lineno})"
+      if (inspect_attributes = line.attributes.reject { |(k, v)| [:id, :source_id, :request_id, :lineno].include?(k.to_sym) }).any?
+        inspect_attributes = inspect_attributes.map { |(k,v)| "#{k} = #{v.inspect}" }.join(', ')
+        inspect_line << "\n    " + wordwrap(inspect_attributes, terminal_width - 4, "    ")
+      end
+      inspect_line
+    end
+    
+    request_inspect << inspected_lines.join("\n") << "\n\n"
+  end
+end
+
+puts "request-log-analyzer database console"
+puts "-------------------------------------"
 puts "The following ActiveRecord classes are available:"
 puts $database.orm_classes.join(", ")

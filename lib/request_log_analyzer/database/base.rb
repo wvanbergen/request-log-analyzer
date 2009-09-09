@@ -2,6 +2,18 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
   
   self.abstract_class = true
 
+  def <=>(other)
+    if (source_comparison = source_id <=> other.source_id) == 0
+      lineno <=> other.lineno
+    else
+      source_comparison
+    end
+  end
+
+  def line_type
+    self.class.name.underscore.gsub(/_line$/, '').to_sym
+  end
+
   cattr_accessor :database, :line_definition
 
   def self.subclass_from_line_definition(definition)

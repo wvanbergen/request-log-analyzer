@@ -33,6 +33,12 @@ class RequestLogAnalyzer::Database
     @request_class ||= begin
       klass = Class.new(RequestLogAnalyzer::Database::Base) do
         
+        def lines
+          lines = []
+          self.class.reflections.each { |r, d| lines += self.send(r).all }
+          lines.sort
+        end
+        
         # Creates the requests table
         def self.create_table!
           unless database.connection.table_exists?(:requests)
