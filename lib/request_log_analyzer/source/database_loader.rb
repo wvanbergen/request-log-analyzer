@@ -24,7 +24,7 @@ module RequestLogAnalyzer::Source
   end
 
   # The Database class gets log data from the database.
-  class Database < Base
+  class DatabaseLoader < Base
 
     attr_reader :source_files
     attr_reader :requests
