@@ -20,8 +20,7 @@ class DatabaseConsole
     end
     # ENV['RLA_DBCONSOLE_FORMAT_ARGS'] = arguments['database']
 
-    puts irb_command = "#{IRB} #{libaries_string} --simple-prompt"
-    exec(irb_command)    
+    exec("#{IRB} #{libaries_string} --simple-prompt")
   end
 end
 
