@@ -2,10 +2,54 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Database do
   
+  describe '#load_database_schema!' do
+    
+    context 'for a Rails request database' do
+      before(:all) do
+        @database = RequestLogAnalyzer::Database.new(log_fixture(:rails, :db))
+        @database.load_database_schema!
+      end
+    
+      after(:all) { @database.remove_orm_classes! }
+    
+      # FileFormat-agnostic classes
+      ['Warning', 'Request', 'Source'].each do |const|
+        it "should create the default #{const} constant" do
+          @database.orm_module.const_defined?(const).should be_true
+        end
+
+        it "should create the default #{const} class inheriting from ActiveRecord::Base and RequestLogAnalyzer::Database::Base" do
+          @database.orm_module.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
+        end
+      end
+    
+      # Fileformat-specific classes
+      ['CompletedLine', 'ProcessingLine'].each do |const|
+        it "should create the #{const} constant" do
+          @database.orm_module.const_defined?(const).should be_true
+        end
+
+        it "should create the #{const} class inheriting from ActiveRecord::Base and RequestLogAnalyzer::Database::Base" do
+          @database.orm_module.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
+        end
+      
+        it "should create a :belongs_to relation from the #{const} class to Request and Source" do
+          @database.orm_module.const_get(const).send(:reflections).should include(:request, :source)
+        end
+        
+        it "should create a :has_many relation from the Request and Source class to the #{const} class" do
+          @database.request_class.send(:reflections).should include(const.underscore.pluralize.to_sym)
+          @database.source_class.send(:reflections).should include(const.underscore.pluralize.to_sym)
+        end
+      end
+    end
+  end
+  
   describe '#create_database_schema!' do
 
     before(:all) do
-      @database = RequestLogAnalyzer::Database.new(testing_format, nil)
+      @database = RequestLogAnalyzer::Database.new
+      @database.file_format = testing_format
     end
 
     before(:each) do
@@ -15,7 +59,6 @@ describe RequestLogAnalyzer::Database do
       # Stub the expected method calls for the preparation, these will be tested separately
       @database.stub!(:create_database_table)
       @database.stub!(:create_activerecord_class) 
-
     end
 
     it "should create a requests table to join request lines" do
@@ -25,7 +68,7 @@ describe RequestLogAnalyzer::Database do
     
     it "should create a Request class inheriting from ActiveRecord and the base class of the ORM module" do
       @database.send :create_database_schema!
-      @database.request_class.ancestors.should include(ActiveRecord::Base, @database.orm_module::Base)
+      @database.request_class.ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
     end
 
     it "should create a warnings table for logging parse warnings" do
@@ -35,7 +78,7 @@ describe RequestLogAnalyzer::Database do
 
     it "should create a Warning class inheriting from ActiveRecord and the base class of the ORM module" do
       @database.send :create_database_schema!
-      @database.warning_class.ancestors.should include(ActiveRecord::Base, @database.orm_module::Base)
+      @database.warning_class.ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
     end
 
     it "should create a sources table to track parsed files" do
@@ -45,7 +88,7 @@ describe RequestLogAnalyzer::Database do
 
     it "should create a Source ORM class" do
       @database.send :create_database_schema!
-      @database.orm_module::Source.ancestors.should include(ActiveRecord::Base, @database.orm_module::Base)
+      @database.orm_module::Source.ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
     end
 
     it "should create a table for every line type" do
@@ -69,7 +112,7 @@ describe RequestLogAnalyzer::Database do
 
     before(:each) do
       
-      @database = RequestLogAnalyzer::Database.new(testing_format, nil)
+      @database = RequestLogAnalyzer::Database.new(@connection)
       @database.remove_orm_classes!
       
       @connection = mock_connection
@@ -93,46 +136,10 @@ describe RequestLogAnalyzer::Database do
 
     it "should create a class that inherits from ActiveRecord::Base and the base class of the ORM module" do
       @database.send(:create_activerecord_class, @line_definition)
-      @database.orm_module.const_get('TestLine').ancestors.should include(ActiveRecord::Base, @database.orm_module::Base)
-    end
-
-    describe 'defining the new ORM class' do
-      
-      before(:each) do
-        # Mock the newly created ORM class for the test_line
-        @orm_class = mock('Line ActiveRecord::Base class')
-        @orm_class.stub!(:belongs_to)
-        @orm_class.stub!(:serialize)
-        Class.stub!(:new).and_return(@orm_class)
-      end
-
-      it "should create a has_many relation on the Request class" do
-        @request_class.should_receive(:has_many).with(:test_lines)
-        @database.send(:create_activerecord_class, @line_definition)
-      end
-      
-      it "should create a has_many relation on the Request class" do
-        @source_class.should_receive(:has_many).with(:test_lines)
-        @database.send(:create_activerecord_class, @line_definition)
-      end      
-
-      it "should create a belongs_to relation to the Request class" do
-        @orm_class.should_receive(:belongs_to).with(:request)
-        @database.send(:create_activerecord_class, @line_definition)
-      end
-      
-      it "should create a belongs_to relation to the Source class" do
-        @orm_class.should_receive(:belongs_to).with(:source)
-        @database.send(:create_activerecord_class, @line_definition)
-      end      
-
-      it "should serialize the :evaluate field into the database" do
-        @orm_class.should_receive(:serialize).with(:evaluated, Hash)
-        @database.send(:create_activerecord_class, @line_definition)
-      end
+      @database.orm_module.const_get('TestLine').ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
     end
   end
-  
+    
   # The create_database_table method should create a database table according to the line definition,
   # so that parsed lines can be stored in it later on.
   describe '#create_database_table' do
@@ -142,7 +149,7 @@ describe RequestLogAnalyzer::Database do
                             :captures => [{ :name => :what, :type => :string }, { :name => :tries, :type => :integer },
                               { :name => :evaluated, :type => :hash, :provides => {:evaluated_field => :duration} }]})
 
-      @database = RequestLogAnalyzer::Database.new(testing_format, nil)
+      @database = RequestLogAnalyzer::Database.new
     end
     
     before(:each) do

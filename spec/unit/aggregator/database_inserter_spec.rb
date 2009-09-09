@@ -11,7 +11,7 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
   describe '#prepare' do
   
     before(:each) do
-      @database = mock_database(:create_database_schema!, :drop_database_schema!)
+      @database = mock_database(:create_database_schema!, :drop_database_schema!, :file_format=)
       @database_inserter = RequestLogAnalyzer::Aggregator::DatabaseInserter.new(@log_parser)
       RequestLogAnalyzer::Database.stub!(:new).and_return(@database)
     end
@@ -20,17 +20,27 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
       RequestLogAnalyzer::Database.should_receive(:new).and_return(@database)
       @database_inserter.prepare
     end
+    
+    it "should set the file_format" do
+      @database.should_receive(:file_format=).with(testing_format)
+      @database_inserter.prepare
+    end
   
     it 'should create the database schema during preparation' do
       @database.should_receive(:create_database_schema!)
       @database_inserter.prepare
     end
-    
-    it 'should create the database schema during preparation' do
+
+    it 'should not drop the database schema during preparation if not requested' do
+      @database.should_not_receive(:drop_database_schema!)
+      @database_inserter.prepare
+    end
+
+    it 'should drop the database schema during preparation if requested' do
       @database_inserter.options[:reset_database] = true
       @database.should_receive(:drop_database_schema!)
       @database_inserter.prepare
-    end    
+    end
   end
 
   test_databases.each do |name, connection|

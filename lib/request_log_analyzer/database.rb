@@ -3,78 +3,67 @@ require 'activerecord'
 
 class RequestLogAnalyzer::Database
 
-  def self.parse_connection_string(string)
-    hash = {}
-    if string =~ /^(?:\w+=(?:[^;])*;)*\w+=(?:[^;])*$/
-      string.scan(/(\w+)=([^;]*);?/) { |variable, value| hash[variable.to_sym] = value }
-    elsif string =~ /^(\w+)\:\/\/(?:(?:([^:]+)(?:\:([^:]+))?\@)?([\w\.-]+)\/)?([\w\:\-\.\/]+)$/
-      hash[:adapter], hash[:username], hash[:password], hash[:host], hash[:database] = $1, $2, $3, $4, $5
-      hash.delete_if { |k, v| v.nil? }
-    end
-    return hash.empty? ? nil : hash
-  end
-  
-  attr_reader :file_format, :orm_module
-  attr_reader :request_class, :warning_class, :source_class
-  
-  def initialize(file_format, connection_identifier, orm_module = nil)
-    @file_format = file_format 
+  def self.const_missing(const)
+    RequestLogAnalyzer::load_default_class_file(self, const)
+  end  
 
-    if orm_module.nil?
-      file_format.class.const_set('Database', Module.new) unless file_format.class.const_defined?('Database')
-      @orm_module = file_format.class.const_get('Database')
-    end
-    
-    create_base_orm_class!
+  include RequestLogAnalyzer::Database::Connection
+
+  attr_accessor :file_format
+  attr_reader :orm_module, :request_class, :warning_class, :source_class
+  
+  def initialize(connection_identifier = nil, orm_module = nil)
+    @orm_module = orm_module.nil? ? Object : orm_module
+    RequestLogAnalyzer::Database::Base.database = self
     connect(connection_identifier)
   end
-  
-  def create_base_orm_class!
-    # Register the base activerecord class
-    unless orm_module.const_defined?('Base')
-      orm_base_class = Class.new(ActiveRecord::Base)
-      orm_base_class.abstract_class = true
-      orm_module.const_set('Base', orm_base_class)
-    end  
-  end
-  
-  def remove_orm_classes!
-    
+
+  def remove_orm_classes!    
     orm_module.send(:remove_const, 'Request') if orm_module.const_defined?('Request')
     orm_module.send(:remove_const, 'Warning') if orm_module.const_defined?('Warning')
     orm_module.send(:remove_const, 'Source')  if orm_module.const_defined?('Source')
     
-    file_format.line_definitions.each do |name, definition| 
-      orm_module.send(:remove_const, "#{name}_line".camelize) if orm_module.const_defined?("#{name}_line".camelize)
+    if file_format
+      file_format.line_definitions.each do |name, definition| 
+        orm_module.send(:remove_const, "#{name}_line".camelize) if orm_module.const_defined?("#{name}_line".camelize)
+      end
     end
-  end
-  
-  def connect(connection_identifier)
-    if connection_identifier.kind_of?(Hash)
-      orm_module::Base.establish_connection(connection_identifier)
-    elsif connection_identifier == ':memory:'
-      orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-    elsif connection_hash = RequestLogAnalyzer::Database.parse_connection_string(connection_identifier)
-      orm_module::Base.establish_connection(connection_hash)
-    elsif connection_identifier.kind_of?(String) # Normal SQLite 3 database file
-      orm_module::Base.establish_connection(:adapter => 'sqlite3', :database => connection_identifier)
-    elsif connection_identifier.nil?
-      # Do nothing
-    else
-      raise "Cannot connect to database with #{connection_identifier.inspect}!"
-    end
-  end
-  
-  def disconnect
-    orm_module::Base.remove_connection
-  end
-  
-  def connection
-    orm_module::Base.connection
   end
   
   def get_class(line_type)
     orm_module.const_get("#{line_type}_line".camelize)
+  end
+  
+  def request_class
+    @request_class ||= begin
+      orm_module.const_set('Request', Class.new(RequestLogAnalyzer::Database::Base)) unless orm_module.const_defined?('Request')
+      orm_module.const_get('Request')
+    end
+  end
+  
+  def source_class
+    @source_class ||= begin
+      orm_module.const_set('Source', Class.new(RequestLogAnalyzer::Database::Base)) unless orm_module.const_defined?('Source')
+      orm_module.const_get('Source')
+    end
+  end
+  
+  def warning_class
+    @warning_class ||= begin
+      orm_module.const_set('Warning', Class.new(RequestLogAnalyzer::Database::Base)) unless orm_module.const_defined?('Warning')
+      orm_module.const_get('Warning')
+    end
+  end
+  
+  def load_database_schema!
+    connection.tables.each do |table|
+      case table.to_sym
+      when :warnings then warning_class
+      when :sources  then source_class
+      when :requests then request_class
+      else load_activerecord_class(table)
+      end
+    end
   end
   
   # This function creates a database table for a given line definition.
@@ -108,6 +97,14 @@ class RequestLogAnalyzer::Database
     end
   end
   
+  def load_activerecord_class(table)
+    class_name = table.singularize.camelize
+    unless orm_module.const_defined?(class_name)
+      orm_module.const_set(class_name, RequestLogAnalyzer::Database::Base.subclass_from_table(table))
+      klass = orm_module.const_get(class_name)
+    end
+  end  
+  
   # Creates an ActiveRecord class for a given line definition.
   # A subclass of ActiveRecord::Base is created and an association with the Request class is
   # created using belongs_to / has_many. This association will later be used to create records
@@ -115,17 +112,8 @@ class RequestLogAnalyzer::Database
   def create_activerecord_class(definition)
     class_name = "#{definition.name}_line".camelize
     unless orm_module.const_defined?(class_name)
-      orm_module.const_set(class_name, Class.new(orm_module::Base))
+      orm_module.const_set(class_name, RequestLogAnalyzer::Database::Base.subclass_from_line_definition(definition))
       klass = orm_module.const_get(class_name)
-      klass.send(:belongs_to, :request)
-      klass.send(:belongs_to, :source)
-          
-      definition.captures.select { |c| c.has_key?(:provides) }.each do |capture|
-        klass.send(:serialize, capture[:name], Hash)
-      end
-      
-      self.request_class.send(:has_many, "#{definition.name}_lines".to_sym)
-      self.source_class.send(:has_many, "#{definition.name}_lines".to_sym)
     end
   end
 
@@ -139,7 +127,7 @@ class RequestLogAnalyzer::Database
       end    
     end
     
-    orm_module.const_set('Request', Class.new(orm_module::Base)) unless orm_module.const_defined?('Request')
+    orm_module.const_set('Request', Class.new(RequestLogAnalyzer::Database::Base)) unless orm_module.const_defined?('Request')
     @request_class = orm_module.const_get('Request')
   end
 
@@ -154,7 +142,7 @@ class RequestLogAnalyzer::Database
       end
     end
     
-    orm_module.const_set('Source', Class.new(orm_module::Base)) unless orm_module.const_defined?('Source')
+    orm_module.const_set('Source', Class.new(RequestLogAnalyzer::Database::Base)) unless orm_module.const_defined?('Source')
     @source_class = orm_module.const_get('Source')      
   end
 
@@ -169,7 +157,7 @@ class RequestLogAnalyzer::Database
       end    
     end
     
-    orm_module.const_set('Warning', Class.new(orm_module::Base)) unless orm_module.const_defined?('Warning')
+    orm_module.const_set('Warning', Class.new(RequestLogAnalyzer::Database::Base)) unless orm_module.const_defined?('Warning')
     @warning_class = orm_module.const_get('Warning')
     @warning_class.send(:belongs_to, :source)
   end

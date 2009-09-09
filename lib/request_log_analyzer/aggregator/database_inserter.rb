@@ -20,7 +20,9 @@ module RequestLogAnalyzer::Aggregator
     # current file format
     def prepare
       @sources = {}
-      @database = RequestLogAnalyzer::Database.new(file_format, options[:database])
+      source.file_format.class.const_set('Database', Module.new) unless source.file_format.class.const_defined?('Database')
+      @database = RequestLogAnalyzer::Database.new(options[:database], source.file_format.class.const_get('Database'))
+      @database.file_format = source.file_format
       
       database.drop_database_schema! if options[:reset_database]
       database.create_database_schema!

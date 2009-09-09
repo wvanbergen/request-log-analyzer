@@ -47,6 +47,7 @@ module RequestLogAnalyzer::Spec::Mocks
   def mock_database(*stubs)
     database = mock('RequestLogAnalyzer::Database')
     database.stub!(:connect)
+    database.stub!(:disconnect)
     database.stub!(:connection).and_return(mock_connection)
     stubs.each { |s| database.stub!(s)}
     return database
