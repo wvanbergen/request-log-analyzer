@@ -14,6 +14,7 @@ describe RequestLogAnalyzer::Database::Base do
       @orm_class.stub!(:set_table_name)
       @orm_class.stub!(:belongs_to)
       @orm_class.stub!(:serialize)
+      @orm_class.stub!(:line_definition=)
       Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@orm_class)
       
       @request_class = mock('Request ActiveRecord::Base class')
@@ -29,6 +30,11 @@ describe RequestLogAnalyzer::Database::Base do
 
     it "should create a new subclass using the Base class as parent" do
       Class.should_receive(:new).with(RequestLogAnalyzer::Database::Base).and_return(@orm_class)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+    end
+    
+    it "should store the LineDefinition" do
+      @orm_class.should_receive(:line_definition=).with(@line_definition)
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
     end
 
@@ -85,6 +91,11 @@ describe RequestLogAnalyzer::Database::Base do
       Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@klass)
     end
     
+    it "should create a new subclass using the Base class as parent" do
+      Class.should_receive(:new).with(RequestLogAnalyzer::Database::Base).and_return(@klass)
+      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
+    end    
+    
     it "should set the table name" do
       @klass.should_receive(:set_table_name).with('completed_lines')
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
@@ -110,6 +121,70 @@ describe RequestLogAnalyzer::Database::Base do
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 
+  end
+
+  describe '#create_table' do
+
+    before(:all) do
+      @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, { :regexp   => /Testing (\w+), tries\: (\d+)/,
+                            :captures => [{ :name => :what, :type => :string }, { :name => :tries, :type => :integer },
+                              { :name => :evaluated, :type => :hash, :provides => {:evaluated_field => :duration} }]})
+    end
+
+    before(:each) do
+      @database = RequestLogAnalyzer::Database.new
+      @database.stub!(:connection).and_return(mock_connection)
+      @klass = @database.load_activerecord_class(@line_definition)
+      @klass.stub!(:table_exists?).and_return(false)
+    end
+
+    after(:each) do 
+      @klass.drop_table!
+      @database.remove_orm_classes!
+    end
+
+    it "should call create_table with the correct table name" do
+      @database.connection.should_receive(:create_table).with(:test_lines)
+      @klass.create_table!
+    end
+
+    it "should not create a table based on the line type name if it already exists" do
+      @klass.stub!(:table_exists?).and_return(true)
+      @database.connection.should_not_receive(:create_table).with(:test_lines)
+      @klass.create_table!
+    end
+
+    it "should create an index on the request_id field" do
+      @database.connection.should_receive(:add_index).with(:test_lines, [:request_id])
+      @klass.create_table!
+    end
+
+    it "should create an index on the source_id field" do
+      @database.connection.should_receive(:add_index).with(:test_lines, [:source_id])
+      @klass.create_table!
+    end
+
+    it "should create a request_id field to link the requests together" do
+      @database.connection.table_creator.should_receive(:column).with(:request_id, :integer)
+      @klass.create_table!
+    end
+
+    it "should create a lineno field to save the location of the line in the original file" do
+      @database.connection.table_creator.should_receive(:column).with(:lineno, :integer)
+      @klass.create_table!
+    end
+
+    it "should create a field of the correct type for every defined capture field" do
+      @database.connection.table_creator.should_receive(:column).with(:what, :string)
+      @database.connection.table_creator.should_receive(:column).with(:tries, :integer)
+      @database.connection.table_creator.should_receive(:column).with(:evaluated, :text) 
+      @klass.create_table!
+    end
+
+    it "should create a field of the correct type for every provided field" do
+      @database.connection.table_creator.should_receive(:column).with(:evaluated_field, :double) 
+      @klass.create_table!
+    end
   end
 end
 
