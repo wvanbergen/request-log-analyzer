@@ -6,10 +6,12 @@ require 'git'
 
 module GithubGem
   
+  # Detects the gemspc file of this project using heuristics.
   def self.detect_gemspec_file
     FileList['*.gemspec'].first
   end
   
+  # Detects the main include file of this project using heuristics
   def self.detect_main_include
     if detect_gemspec_file =~ /^(\.*)\.gemspec$/ && File.exist?("lib/#{$1}.rb")
       "lib/#{$1}.rb"
@@ -25,6 +27,8 @@ module GithubGem
     attr_reader   :gemspec, :modified_files, :git
     attr_accessor :gemspec_file, :task_namespace, :main_include, :root_dir, :spec_pattern, :test_pattern, :remote, :remote_branch, :local_branch
     
+    # Initializes the settings, yields itself for configuration 
+    # and defines the rake tasks based on the gemspec file.
     def initialize(task_namespace = :gem)
       @gemspec_file   = GithubGem.detect_gemspec_file
       @task_namespace = task_namespace
@@ -37,16 +41,16 @@ module GithubGem
       @remote         = 'origin'
       @remote_branch  = 'master'
       
-      
       yield(self) if block_given?
 
-      @git = Git.open(@root_dir)      
-      load_gemspec!      
+      @git = Git.open(@root_dir)
+      load_gemspec!
       define_tasks!
     end
     
     protected
     
+    # Define Unit test tasks
     def define_test_tasks!
       require 'rake/testtask'
 
@@ -62,6 +66,7 @@ module GithubGem
       task(:test => ['test:basic'])
     end
     
+    # Defines RSpec tasks
     def define_rspec_tasks!
       require 'spec/rake/spectask'
 
@@ -130,9 +135,14 @@ module GithubGem
         task(:github_release => [:commit_modified_files, :tag_version]) { github_release_task }
         task(:tag_version) { tag_version_task }
         task(:commit_modified_files) { commit_modified_files_task }
+        
+        desc "Updates the gem release tasks with the latest version on Github"
+        task(:update_tasks) { update_tasks_task }
       end
     end
     
+    # Updates the files list and test_files list in the gemspec file using the list of files
+    # in the repository and the spec/test file pattern.
     def manifest_task
       # Load all the gem's files using "git ls-files"
       repository_files = git.ls_files.keys
@@ -142,12 +152,15 @@ module GithubGem
       update_gemspec(:test_files, repository_files & test_files)
     end
     
+    # Builds the gem
     def build_task
       sh "gem build -q #{gemspec_file}"
       Dir.mkdir('pkg') unless File.exist?('pkg')
       sh "mv #{gemspec.name}-#{gemspec.version}.gem pkg/#{gemspec.name}-#{gemspec.version}.gem" 
     end
     
+    # Updates the version number in the gemspec file, the VERSION constant in the main
+    # include file and the contents of the VERSION file.
     def version_task
       update_gemspec(:version, ENV['VERSION']) if ENV['VERSION']
       update_gemspec(:date, Date.today)
@@ -164,22 +177,27 @@ module GithubGem
       raise "This version (#{proposed_version}) is not higher than the highest tagged version (#{newest_version})" if newest_version && newest_version >= proposed_version
     end
     
+    # Checks whether the current branch is not diverged from the remote branch
     def check_not_diverged_task
       raise "The current branch is diverged from the remote branch!" if git.log.between('HEAD', git.branches["#{remote}/#{remote_branch}"].gcommit).any?
     end
     
+    # Checks whether the repository status ic clean
     def check_clean_status_task
-      #raise "The current working copy contains modifications" if git.status.changed.any?
+      raise "The current working copy contains modifications" if git.status.changed.any?
     end
     
+    # Checks whether the current branch is correct
     def check_current_branch_task
       raise "Currently not on #{local_branch} branch!" unless git.branch.name == local_branch.to_s
     end
     
+    # Fetches the latest updates from Github
     def fetch_origin_task
       git.fetch('origin')
     end
     
+    # Commits every file that has been changed by the release task.
     def commit_modified_files_task
       if modified_files.any?
         modified_files.each { |file| git.add(file) }
@@ -187,25 +205,32 @@ module GithubGem
       end
     end
     
+    # Adds a tag for the released version
     def tag_version_task
       git.add_tag("#{gemspec.name}-#{gemspec.version}")
     end
     
+    # Pushes the changes and tag to github
     def github_release_task
       git.push(remote, remote_branch, true)
     end
     
+    # Checks whether Rubyforge is configured properly
     def check_rubyforge_task
-      raise "Could not login on rubyforge!" unless `rubyforge login 2>&1`.strip.empty?
+      # Login no longer necessary when using rubyforge 2.0.0 gem
+      # raise "Could not login on rubyforge!" unless `rubyforge login 2>&1`.strip.empty?
       output = `rubyforge names`.split("\n")
       raise "Rubyforge group not found!"   unless output.any? { |line| %r[^groups\s*\:.*\b#{Regexp.quote(gemspec.rubyforge_project)}\b.*] =~ line }
       raise "Rubyforge package not found!" unless output.any? { |line| %r[^packages\s*\:.*\b#{Regexp.quote(gemspec.name)}\b.*] =~ line }      
     end
     
+    # Task to release the .gem file toRubyforge.
     def rubyforge_release_task
       sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version.to_s, "pkg/#{gemspec.name}-#{gemspec.version}.gem"
     end
     
+    # Gem release task.
+    # All work is done by the task's dependencies, so just display a release completed message.
     def release_task
       puts
       puts '------------------------------------------------------------'
@@ -214,14 +239,15 @@ module GithubGem
     
     private
     
+    # Checks whether this project has any RSpec files
     def has_specs?
       FileList[spec_pattern].any?
     end
     
+    # Checks whether this project has any unit test files
     def has_tests?
       FileList[test_pattern].any?
     end
-    
     
     # Loads the gemspec file
     def load_gemspec!
@@ -267,6 +293,20 @@ module GithubGem
         # Reload the gemspec so the changes are incorporated
         load_gemspec!
       end
+    end
+    
+    # Updates the tasks file using the latest file found on Github
+    def update_tasks_task
+      require 'net/http'
+      
+      server = 'github.com'
+      path   = '/wvanbergen/github-gem/raw/master/tasks/github-gem.rake'
+      
+      Net::HTTP.start(server) do |http|
+        response = http.get(path)
+        open(__FILE__, "w") { |file| file.write(response.body) }
+      end
+      puts "Updated gem release tasks file with latest version."
     end
     
   end
