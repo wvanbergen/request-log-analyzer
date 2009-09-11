@@ -1,4 +1,3 @@
-require 'thread'
 module RequestLogAnalyzer::FileFormat
   
   def self.const_missing(const)
