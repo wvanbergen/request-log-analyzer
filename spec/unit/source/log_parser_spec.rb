@@ -14,6 +14,18 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
     @log_parser.file_format.should be_valid
   end
   
+  it "should set the :source for every parsed line" do
+    @log_parser.parse_file(log_fixture(:rails_22)) do |request|
+      request.lines.all? { |line| line[:source] == log_fixture(:rails_22) }.should be_true
+    end
+  end
+  
+  it "should set the :lineno for every parsed line" do
+    @log_parser.parse_file(log_fixture(:rails_22)) do |request|
+      request.lines.all? { |line| line.has_key?(:lineno) }.should be_true
+    end
+  end
+  
   it "should parse more lines than requests" do
     @log_parser.should_receive(:handle_request).with(an_instance_of(TestingFormat::Request)).twice
     @log_parser.parse_file(log_fixture(:test_language_combined))

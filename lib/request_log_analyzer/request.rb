@@ -80,12 +80,13 @@ module RequestLogAnalyzer
       value_hash = parsed_line[:line_definition].convert_captured_values(parsed_line[:captures], self)
       value_hash[:line_type] = parsed_line[:line_definition].name
       value_hash[:lineno] = parsed_line[:lineno]
+      value_hash[:source] = parsed_line[:source]
       add_line_hash(value_hash)
     end
     
     def add_line_hash(value_hash)
       @lines << value_hash
-      @attributes = value_hash.merge(@attributes)      
+      @attributes = value_hash.merge(@attributes)
     end
     
     

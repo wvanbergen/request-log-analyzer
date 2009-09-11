@@ -97,17 +97,19 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_file(file, options = {}, &block)
 
-      @progress_handler.call(:started, file)       if @progress_handler
-      @source_changes_handler.call(:started, file) if @source_changes_handler
+      @current_source = File.expand_path(file)
+      @progress_handler.call(:started, file)                  if @progress_handler
+      @source_changes_handler.call(:started, @current_source) if @source_changes_handler
       
       if decompress_file?(file).empty?
         File.open(file, 'r') { |f| parse_io(f, options, &block) }
       else
         IO.popen(decompress_file?(file), 'r') { |f| parse_io(f, options, &block) }
       end
-
-      @source_changes_handler.call(:finished, file) if @source_changes_handler
-      @progress_handler.call(:finished, file)       if @progress_handler
+      
+      @source_changes_handler.call(:finished, @current_source) if @source_changes_handler
+      @progress_handler.call(:finished, file)                  if @progress_handler
+      @current_source = nil
     end
 
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
@@ -131,21 +133,19 @@ module RequestLogAnalyzer::Source
     # <tt>io</tt>:: The IO instance to use as source
     # <tt>options</tt>:: A hash of options that can be used by the parser.
     def parse_io(io, options = {}, &block) # :yields: request
-
-      @current_lineno = 0
+      @current_lineno = 1
       io.each_line do |line|
         @progress_handler.call(:progress, io.pos) if @progress_handler && io.kind_of?(File)
-
+        
         if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
           @parsed_lines += 1
-          update_current_request(request_data.merge(:lineno => @current_lineno), &block)
+          update_current_request(request_data.merge(:source => @current_source, :lineno => @current_lineno), &block)
         end
         
         @current_lineno += 1
       end
-
+      
       warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
-
       @current_lineno = nil
     end
 
