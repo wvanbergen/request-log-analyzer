@@ -20,18 +20,19 @@ end
 
 class Request
   def inspect
-    request_inspect = "Request[id: #{id}] <#{lines.first.source.filename}>\n"
+    request_inspect = "Request[id: #{id}]"
+    request_inspect << " <#{lines.first.source.filename}>" if lines.first.source
     
     inspected_lines = lines.map do |line|
-      inspect_line = " - #{line.line_type} (line #{line.lineno})"
+      inspect_line = "   - #{line.line_type} (line #{line.lineno})"
       if (inspect_attributes = line.attributes.reject { |(k, v)| [:id, :source_id, :request_id, :lineno].include?(k.to_sym) }).any?
         inspect_attributes = inspect_attributes.map { |(k,v)| "#{k} = #{v.inspect}" }.join(', ')
-        inspect_line << "\n    " + wordwrap(inspect_attributes, terminal_width - 4, "    ")
+        inspect_line << "\n      " + wordwrap(inspect_attributes, terminal_width - 6, "      ")
       end
       inspect_line
     end
     
-    request_inspect << inspected_lines.join("\n") << "\n\n"
+    request_inspect << "\n" << inspected_lines.join("\n") << "\n\n"
   end
 end
 
