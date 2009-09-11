@@ -59,6 +59,7 @@ module RequestLogAnalyzer::Spec::Mocks
     
     connection = mock('ActiveRecord::Base.connection')
     connection.stub!(:add_index)
+    connection.stub!(:remove_index)
     connection.stub!(:table_exists?).and_return(false)
     connection.stub!(:create_table).and_yield(table_creator).and_return(true)
     connection.stub!(:table_creator).and_return(table_creator)
