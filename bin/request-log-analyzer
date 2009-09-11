@@ -31,6 +31,7 @@ begin
     command_line.option(:apache_format)
 
     command_line.option(:file, :alias => :e)
+    command_line.option(:mail, :alias => :m)
     command_line.option(:parse_strategy, :default => 'assume-correct')
     command_line.option(:dump)
 
@@ -74,6 +75,7 @@ rescue CommandLine::Error => e
   puts "  --database <filename>, -d: Creates an SQLite3 database of all the parsed request information."
   puts "  --debug                    Print debug information while parsing."
   puts "  --file <filename>          Output to file."
+  puts "  --mail <emailaddress>      Send report to an email address."
   puts "  --output <format>          Output format. Supports 'HTML' and 'FixedWidth' (default)"  
   puts "  --dump <filename>          Dump the YAML formatted results in the given file"
   puts 

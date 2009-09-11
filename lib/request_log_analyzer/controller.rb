@@ -43,6 +43,9 @@ module RequestLogAnalyzer
       if arguments[:file]
         output_file = File.new(arguments[:file], "w+")
         options[:output] = output_class.new(output_file, :width => 80, :color => false, :characters => :ascii)
+      elsif arguments[:mail]
+        output_mail = RequestLogAnalyzer::Mailer.new(arguments[:mail])
+        options[:output] = output_class.new(output_mail, :width => 80, :color => false, :characters => :ascii)        
       else
         options[:output] = output_class.new(STDOUT, :width => arguments[:report_width].to_i, 
             :color => !arguments[:boring], :characters => (arguments[:boring] ? :ascii : :utf))
@@ -227,6 +230,8 @@ module RequestLogAnalyzer
         puts "Mail to contact@railsdoctors.com or visit us at http://railsdoctors.com"
         puts "Thanks for using request-log-analyzer!"
         @output.io.close
+      elsif @output.io.kind_of?(RequestLogAnalyzer::Mailer)
+        @output.io.mail
       end
     end
     
