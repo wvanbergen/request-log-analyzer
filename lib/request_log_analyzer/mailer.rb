@@ -37,6 +37,10 @@ END_OF_MESSAGE
     def << string
       data << string
     end
+    
+    def puts string
+      data << string
+    end
 
   end
 end
