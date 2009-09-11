@@ -15,26 +15,26 @@ describe RequestLogAnalyzer::Database do
       # FileFormat-agnostic classes
       default_orm_class_names.each do |const|
         it "should create the default #{const} constant" do
-          @database.orm_module.const_defined?(const).should be_true
+          Object.const_defined?(const).should be_true
         end
 
         it "should create the default #{const} class inheriting from ActiveRecord::Base and RequestLogAnalyzer::Database::Base" do
-          @database.orm_module.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
+          Object.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
         end
       end
     
       # Some Fileformat-specific classes
       ['CompletedLine', 'ProcessingLine'].each do |const|
         it "should create the #{const} constant" do
-          @database.orm_module.const_defined?(const).should be_true
+          Object.const_defined?(const).should be_true
         end
 
         it "should create the #{const} class inheriting from ActiveRecord::Base and RequestLogAnalyzer::Database::Base" do
-          @database.orm_module.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
+          Object.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
         end
       
         it "should create a :belongs_to relation from the #{const} class to Request and Source" do
-          @database.orm_module.const_get(const).send(:reflections).should include(:request, :source)
+          Object.const_get(const).send(:reflections).should include(:request, :source)
         end
         
         it "should create a :has_many relation from the Request and Source class to the #{const} class" do
@@ -75,7 +75,7 @@ describe RequestLogAnalyzer::Database do
       
       it "should create the #{(name.to_s + '_line').camelize} class for #{name.inspect} lines" do
         @database.send :create_database_schema!
-        @database.orm_module.const_defined?("#{name}_line".camelize).should be_true
+        Object.const_defined?("#{name}_line".camelize).should be_true
       end
       
       it "should create the #{name.to_s + '_lines'} table for the parsed #{name.inspect} lines" do
@@ -127,12 +127,12 @@ describe RequestLogAnalyzer::Database do
     
     it "should define the class in the ORM module" do
       @database.load_activerecord_class(:test_lines)
-      @database.orm_module.const_defined?('TestLine').should be_true
+      Object.const_defined?('TestLine').should be_true
     end
     
     it "should add the class to the line_classes array of the database" do
       @database.load_activerecord_class(:test_lines)
-      @database.line_classes.should include(@database.orm_module.const_get('TestLine'))
+      @database.line_classes.should include(TestLine)
     end
   end
 end

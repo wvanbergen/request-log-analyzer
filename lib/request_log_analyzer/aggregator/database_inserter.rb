@@ -20,8 +20,7 @@ module RequestLogAnalyzer::Aggregator
     # current file format
     def prepare
       @sources = {}
-      source.file_format.class.const_set('Database', Module.new) unless source.file_format.class.const_defined?('Database')
-      @database = RequestLogAnalyzer::Database.new(options[:database], source.file_format.class.const_get('Database'))
+      @database = RequestLogAnalyzer::Database.new(options[:database])
       @database.file_format = source.file_format
       
       database.drop_database_schema! if options[:reset_database]
@@ -34,9 +33,9 @@ module RequestLogAnalyzer::Aggregator
     def aggregate(request)
       @request_object = database.request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
-        class_columns = database.get_class(line[:line_type]).column_names.reject { |column| ['id'].include?(column) }
+        class_columns = database.get_class(line[:line_type]).column_names.reject { |column| ['id', 'source_id', 'request_id'].include?(column) }
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
-        attributes[:source] = @current_source
+        attributes[:source_id] = @sources[line[:source]].id if @sources[line[:source]]
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
       @request_object.save!
@@ -61,10 +60,8 @@ module RequestLogAnalyzer::Aggregator
       case change
       when :started
         @sources[filename] = database.source_class.create!(:filename => filename)
-        @current_source = @sources[filename]
       when :finished
         @sources[filename].update_attributes!(:filesize => File.size(filename), :mtime => File.mtime(filename))
-        @current_source = nil
       end
     end
     

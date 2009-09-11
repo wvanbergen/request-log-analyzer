@@ -10,11 +10,10 @@ class RequestLogAnalyzer::Database
   include RequestLogAnalyzer::Database::Connection
 
   attr_accessor :file_format
-  attr_reader :orm_module, :request_class, :warning_class, :source_class, :line_classes
+  attr_reader :request_class, :warning_class, :source_class, :line_classes
   
-  def initialize(connection_identifier = nil, orm_module = nil)
+  def initialize(connection_identifier = nil)
     @line_classes = []
-    @orm_module = orm_module.nil? ? Object : orm_module
     RequestLogAnalyzer::Database::Base.database = self
     connect(connection_identifier)
   end
@@ -22,7 +21,7 @@ class RequestLogAnalyzer::Database
   # Returns the ORM class for the provided line type
   def get_class(line_type)
     line_type = line_type.name if line_type.respond_to?(:name)
-    orm_module.const_get("#{line_type}_line".camelize)
+    Object.const_get("#{line_type}_line".camelize)
   end
   
   # Returns the Request ORM class for the current database.
@@ -34,9 +33,11 @@ class RequestLogAnalyzer::Database
       klass = Class.new(RequestLogAnalyzer::Database::Base) do
         
         def lines
-          lines = []
-          self.class.reflections.each { |r, d| lines += self.send(r).all }
-          lines.sort
+          @lines ||= begin
+            lines = []
+            self.class.reflections.each { |r, d| lines += self.send(r).all }
+            lines.sort
+          end
         end
         
         # Creates the requests table
@@ -50,8 +51,8 @@ class RequestLogAnalyzer::Database
         end
       end
       
-      orm_module.const_set('Request', klass) 
-      orm_module.const_get('Request')
+      Object.const_set('Request', klass) 
+      Object.const_get('Request')
     end
   end
   
@@ -75,8 +76,8 @@ class RequestLogAnalyzer::Database
         end
       end
       
-      orm_module.const_set('Source', klass)
-      orm_module.const_get('Source')
+      Object.const_set('Source', klass)
+      Object.const_get('Source')
     end
   end
   
@@ -102,8 +103,8 @@ class RequestLogAnalyzer::Database
         end
       end
       
-      orm_module.const_set('Warning', klass)
-      orm_module.const_get('Warning')
+      Object.const_set('Warning', klass)
+      Object.const_get('Warning')
     end
   end
   
@@ -137,38 +138,38 @@ class RequestLogAnalyzer::Database
       klass      = RequestLogAnalyzer::Database::Base.subclass_from_line_definition(linedefinition_or_table)
     end
     
-    orm_module.const_set(klass_name, klass) # unless orm_module.const_defined?(klass_name)
-    klass = orm_module.const_get(klass_name)
+    Object.const_set(klass_name, klass)
+    klass = Object.const_get(klass_name)
     @line_classes << klass
     return klass
   end  
 
+  def fileformat_classes
+    raise "No file_format provided!" unless file_format
+    
+    default_classes = [request_class, source_class, warning_class]
+    line_classes    = file_format.line_definitions.map { |(name, definition)| load_activerecord_class(definition) }
+    return default_classes + line_classes
+  end
+
   # Creates the database schema and related ActiveRecord::Base subclasses that correspond to the 
   # file format definition. These ORM classes will later be used to create records in the database.
   def create_database_schema!
-    
-    raise "No file_format provided!" unless file_format
-    
-    # Create the default classes and corresponding tables
-    request_class.create_table!
-    warning_class.create_table!
-    source_class.create_table!
-    
-    # Creates a class and corresponding table for every line type in the file format
-    file_format.line_definitions.each { |name, definition| load_activerecord_class(definition).create_table! }
+    fileformat_classes.each { |klass| klass.create_table! }
   end
   
-  # Drops the tables of all the ORM classes
+  # Drops the table of all the ORM classes, and unregisters the classes
   def drop_database_schema!
-    orm_classes.map(&:drop_table!)
+    file_format ? fileformat_classes.map(&:drop_table!) : orm_classes.map(&:drop_table!)
+    remove_orm_classes!
   end
   
   # Unregisters every ORM class constant
   def remove_orm_classes!
     orm_classes.each do |klass|
       if klass.respond_to?(:name) && !klass.name.blank?
-        klass_base_name = klass.name.split('::').last
-        orm_module.send(:remove_const, klass_base_name) if orm_module.const_defined?(klass_base_name)
+#        klass_base_name = klass.name.split('::').last
+        Object.send(:remove_const, klass.name) if Object.const_defined?(klass.name)
       end
     end
   end

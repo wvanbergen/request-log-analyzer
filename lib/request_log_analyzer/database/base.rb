@@ -3,7 +3,7 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
   self.abstract_class = true
 
   def <=>(other)
-    if (source_comparison = source_id <=> other.source_id) == 0
+    if (source_id.nil? && other.source_id.nil?) || (source_comparison = source_id <=> other.source_id) == 0
       lineno <=> other.lineno
     else
       source_comparison
@@ -31,12 +31,12 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
       klass.send(:serialize, capture[:name], Hash)
     end
 
-    self.database.request_class.send :has_many, "#{definition.name}_lines".to_sym
-    self.database.source_class.send  :has_many, "#{definition.name}_lines".to_sym
-    
+    database.request_class.has_many  "#{definition.name}_lines".to_sym
+    database.source_class.has_many   "#{definition.name}_lines".to_sym
+
     return klass
   end
-  
+
   def self.subclass_from_table(table)
     raise "Table #{table} not found!" unless database.connection.table_exists?(table)
 
@@ -44,27 +44,29 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     klass.set_table_name(table)
 
     if klass.column_names.include?('request_id')
-      klass.send :belongs_to, :request
-      database.request_class.send :has_many, table.to_sym
+      klass.belongs_to :request
+      database.request_class.has_many table.to_sym
     end
     
     if klass.column_names.include?('source_id')
-      klass.send :belongs_to, :source
-      database.source_class.send :has_many, table.to_sym
+      klass.belongs_to :source
+      database.source_class.has_many table.to_sym
     end
     
     return klass
   end
   
   def self.drop_table!
-    self.database.connection.drop_table(self.table_name) if database.connection.table_exists?(self.table_name)
+    database.connection.remove_index(self.table_name, [:source_id])  rescue nil
+    database.connection.remove_index(self.table_name, [:request_id]) rescue nil
+    database.connection.drop_table(self.table_name) if database.connection.table_exists?(self.table_name)
   end
   
   def self.create_table!
     raise "No line_definition available to base table schema on!" unless self.line_definition
     
     unless table_exists?
-      self.database.connection.create_table(self.table_name.to_sym) do |t|
+      database.connection.create_table(table_name.to_sym) do |t|
       
         # Default fields
         t.column :request_id, :integer
@@ -82,8 +84,8 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     end
     
     # Add indices to table for more speedy querying
-    self.database.connection.add_index(self.table_name.to_sym, [:request_id])
-    self.database.connection.add_index(self.table_name.to_sym, [:source_id])
+    database.connection.add_index(self.table_name.to_sym, [:request_id]) # rescue
+    database.connection.add_index(self.table_name.to_sym, [:source_id])  # rescue
   end
   
   
