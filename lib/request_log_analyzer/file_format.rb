@@ -1,3 +1,4 @@
+require 'thread'
 module RequestLogAnalyzer::FileFormat
   
   def self.const_missing(const)
@@ -161,9 +162,14 @@ module RequestLogAnalyzer::FileFormat
 
     # Parses a line by trying to parse it using every line definition in this file format
     def parse_line(line, &warning_handler)
-      request_data = nil
-      self.line_definitions.any? { |lt, definition| request_data = definition.matches(line, &warning_handler) }
-      return request_data
+      return nil unless self.line_definitions.any?
+      
+      self.line_definitions.each do |lt, definition|
+        match = definition.matches(line, &warning_handler)
+        return match if match
+      end
+      
+      return nil
     end
   end
 end
