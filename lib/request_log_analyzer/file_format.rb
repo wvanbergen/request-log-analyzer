@@ -161,8 +161,6 @@ module RequestLogAnalyzer::FileFormat
 
     # Parses a line by trying to parse it using every line definition in this file format
     def parse_line(line, &warning_handler)
-      return nil unless self.line_definitions.any?
-      
       self.line_definitions.each do |lt, definition|
         match = definition.matches(line, &warning_handler)
         return match if match
