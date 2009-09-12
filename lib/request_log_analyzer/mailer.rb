@@ -17,7 +17,7 @@ module RequestLogAnalyzer
     end
     
     def mail
-      from        = @options[:from]        || 'info@railsdoctors.com'
+      from        = @options[:from]        || 'contact@railsdoctors.com'
       from_alias  = @options[:from_alias]  || 'Request-log-analyzer reporter'
       to_alias    = @options[:to_alias]    || to
       subject     = @options[:subjeect]    || "Request log analyzer report - generated on #{Time.now.to_s}"
