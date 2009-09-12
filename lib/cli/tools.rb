@@ -13,7 +13,7 @@ def terminal_width(default_width = 81)
   end
 rescue   
   begin 
-    IO.popen('stty -a') do |pipe|
+    IO.popen('stty -a 2>&1') do |pipe|
       column_line = pipe.detect { |line| /(\d+) columns/ =~ line }
       raise unless column_line
       $1.to_i
