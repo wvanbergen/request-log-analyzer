@@ -2,8 +2,8 @@
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 require 'request_log_analyzer'
 require 'cli/command_line_arguments'
-require 'lib/cli/progressbar'
-require 'lib/cli/tools'
+require 'cli/progressbar'
+require 'cli/tools'
 
 # Parse the arguments given via commandline
 begin
