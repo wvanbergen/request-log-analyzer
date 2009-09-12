@@ -33,11 +33,16 @@ module RequestLogAnalyzer::Source
     # The total number of parsed lines
     attr_reader :parsed_lines
 
+    # The number of skipped lines because of warnings
+    attr_reader :skipped_lines
+
     # The total number of parsed requests.
     attr_reader :parsed_requests
 
-    # The number of skipped lines because of warnings
-    attr_reader :skipped_lines
+    # The total number of skipped requests because of filters.
+    attr_reader :skipped_requests
+
+
 
     # Initializer, which will register the file format and save any options given as a hash.
     # <tt>format</tt>:: The file format instance

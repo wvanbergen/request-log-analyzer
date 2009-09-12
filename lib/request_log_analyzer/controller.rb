@@ -193,8 +193,9 @@ module RequestLogAnalyzer
     # Push a request to all the aggregators (@aggregators).
     # <tt>request</tt> The request to push to the aggregators.    
     def aggregate_request(request)
-      return unless request
+      return false unless request
       @aggregators.each { |agg| agg.aggregate(request) }
+      return true
     end
     
     # Runs RequestLogAnalyzer
@@ -211,8 +212,8 @@ module RequestLogAnalyzer
       install_signal_handlers
       
       @source.each_request do |request|
-        aggregate_request(filter_request(request))
         break if @interrupted
+        aggregate_request(filter_request(request))
       end
 
       @aggregators.each { |agg| agg.finalize }

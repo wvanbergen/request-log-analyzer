@@ -12,17 +12,17 @@ describe RequestLogAnalyzer, 'running from command line' do
 
   it "should find 4 requests in default mode" do
     output = run("#{log_fixture(:rails_1x)}")
-    output.detect { |line| /Parsed requests\:\s*4/ =~ line }.should_not be_nil
+    output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
   end
 
-  it "should find 3 requests with a --select option" do
+  it "should skip 1 requests with a --select option" do
     output = run("#{log_fixture(:rails_1x)} --select controller PeopleController")
-    output.detect { |line| /Parsed requests\:\s*4/ =~ line }.should_not be_nil
+    output.any? { |line| /^Skipped requests\:\s*1\s/ =~ line }.should be_true
   end
 
-  it "should find 1 requests with a --reject option" do
+  it "should skip 3 requests with a --reject option" do
     output = run("#{log_fixture(:rails_1x)} --reject controller PeopleController")
-    output.detect { |line| /Parsed requests\:\s*4/ =~ line }.should_not be_nil
+    output.any? { |line| /^Skipped requests\:\s*3\s/ =~ line }.should be_true
   end
 
   it "should write output to a file with the --file option" do
@@ -37,7 +37,7 @@ describe RequestLogAnalyzer, 'running from command line' do
 
   it "should write HTML if --output HTML is provided" do
     output = run("#{log_fixture(:rails_1x)} --output HTML")
-    output.any? { |line| /<html.*>/ =~ line}
+    output.any? { |line| /<html[^>]*>/ =~ line}.should be_true
   end
 
   it "should run with the --database option" do
@@ -57,17 +57,22 @@ describe RequestLogAnalyzer, 'running from command line' do
 
   it "should parse a Merb file if --format merb is set" do
     output = run("#{log_fixture(:merb)} --format merb")
-    output.detect { |line| /Parsed requests\:\s*11/ =~ line }.should_not be_nil
+    output.any? { |line| /Parsed requests\:\s*11/ =~ line }.should be_true
   end
 
   it "should parse a Apache access log file if --apache-format is set" do
     output = run("#{log_fixture(:apache_combined)} --apache-format combined")
-    output.detect { |line| /Parsed requests\:\s*5/ =~ line }.should_not be_nil
+    output.any? { |line| /Parsed requests\:\s*5/ =~ line }.should be_true
   end
 
   it "should dump the results to a YAML file" do
     run("#{log_fixture(:rails_1x)} --dump #{temp_output_file(:dump)}")
     File.exist?(temp_output_file(:dump)).should be_true
     YAML::load(File.read(temp_output_file(:dump))).should have_at_least(1).item
-  end  
+  end
+  
+  it "should parse 4 requests from the standard input" do
+    output = run("- < #{log_fixture(:rails_1x)}")
+    output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
+  end
 end
