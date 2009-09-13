@@ -51,7 +51,7 @@ module RequestLogAnalyzer::Source
     def each_request(options = {}, &block) # :yields: :request, request
       
       case @source_files
-      when IO;     
+      when IO
         puts "Parsing from the standard input. Press CTRL+C to finish." # FIXME: not here
         parse_stream(@source_files, options, &block) 
       when String
