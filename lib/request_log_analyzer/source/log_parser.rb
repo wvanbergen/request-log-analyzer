@@ -97,6 +97,7 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_file(file, options = {}, &block)
 
+      @progress_handler = @dormant_progress_handler
       @current_source = File.expand_path(file)
       @progress_handler.call(:started, file)                  if @progress_handler
       @source_changes_handler.call(:started, @current_source) if @source_changes_handler
@@ -110,6 +111,7 @@ module RequestLogAnalyzer::Source
       @source_changes_handler.call(:finished, @current_source) if @source_changes_handler
       @progress_handler.call(:finished, file)                  if @progress_handler
       @current_source = nil
+      @progress_handler = nil
     end
 
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
@@ -135,7 +137,7 @@ module RequestLogAnalyzer::Source
     def parse_io(io, options = {}, &block) # :yields: request
       @current_lineno = 1
       while line = io.gets
-        @progress_handler.call(:progress, io.pos) if @progress_handler && io.kind_of?(File)
+        @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 127 == 0
         
         if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
           @parsed_lines += 1
@@ -152,7 +154,7 @@ module RequestLogAnalyzer::Source
     # Add a block to this method to install a progress handler while parsing.
     # <tt>proc</tt>:: The proc that will be called to handle progress update messages
     def progress=(proc)
-      @progress_handler = proc
+      @dormant_progress_handler = proc
     end
 
     # Add a block to this method to install a warning handler while parsing,
