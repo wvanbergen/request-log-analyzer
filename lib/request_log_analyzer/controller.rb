@@ -35,10 +35,11 @@ module RequestLogAnalyzer
       # Database command line options
       options[:database]       = arguments[:database] if arguments[:database]
       options[:reset_database] = arguments[:reset_database]
-      
       options[:debug]    = arguments[:debug]
       options[:dump]     = arguments[:dump]
-
+      options[:parse_strategy] = arguments[:parse_strategy]
+      options[:no_progress]    = arguments[:no_progress]
+      
       output_class = RequestLogAnalyzer::Output::const_get(arguments[:output])
       if arguments[:file]
         output_file = File.new(arguments[:file], "w+")
@@ -75,10 +76,8 @@ module RequestLogAnalyzer
       
       controller = Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format, options), options)
       #controller = Controller.new(RequestLogAnalyzer::Source::DatabaseLoader.new(file_format, options), options)
-
-      options[:parse_strategy] = arguments[:parse_strategy]
       
-      # register filters        
+      # register filters
       if arguments[:after] || arguments[:before]
         filter_options = {}
         filter_options[:after]  = DateTime.parse(arguments[:after])  
@@ -133,8 +132,9 @@ module RequestLogAnalyzer
       @source.warning = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } } if @source
 
       # Handle progress messagess
-      @source.progress = lambda { |message, value| handle_progress(message, value) } if @source
+      @source.progress = lambda { |message, value| handle_progress(message, value) } if @source && !options[:no_progress]
       
+      # Handle source change messages
       @source.source_changes = lambda { |change, filename| handle_source_change(change, filename) } if @source
     end
     
