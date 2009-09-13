@@ -57,16 +57,20 @@ module RequestLogAnalyzer::Tracker
     def should_update?(request)
       return false if options[:line_type] && !request.has_line_type?(options[:line_type])
       
-      if options[:if].kind_of?(Symbol)
-        return false unless request[options[:if]]
-      elsif options[:if].respond_to?(:call)
-        return false unless options[:if].call(request)
+      if options[:if]
+        if options[:if].kind_of?(Symbol)
+          return false unless request[options[:if]]
+        elsif options[:if].respond_to?(:call)
+          return false unless options[:if].call(request)
+        end
       end
       
-      if options[:unless].kind_of?(Symbol)
-        return false if request[options[:unless]]
-      elsif options[:unless].respond_to?(:call)
-        return false if options[:unless].call(request)
+      if options[:unless]
+        if options[:unless].kind_of?(Symbol)
+          return false if request[options[:unless]]
+        elsif options[:unless].respond_to?(:call)
+          return false if options[:unless].call(request)
+        end
       end
       
       return true
