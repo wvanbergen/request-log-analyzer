@@ -28,7 +28,9 @@ module RequestLogAnalyzer::Tracker
     def prepare
       raise "No duration field set up for category tracker #{self.inspect}" unless options[:duration]
       raise "No categorizer set up for duration tracker #{self.inspect}" unless options[:category]
-  
+
+      @categorizer  = options[:category].respond_to?(:call) ? options[:category] : lambda { |request| request[options[:category]] }
+      @durationizer = options[:duration].respond_to?(:call) ? options[:duration] : lambda { |request| request[options[:duration]] }
       @categories = {}
     end
 
@@ -49,15 +51,15 @@ module RequestLogAnalyzer::Tracker
           raise "Capture mismatch for multiple values in a request"
         end
       else
-        category = options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
-        duration = options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
+        category = @categorizer.call(request)  # options[:category].respond_to?(:call) ? options[:category].call(request) : request[options[:category]]
+        duration = @durationizer.call(request) # options[:duration].respond_to?(:call) ? options[:duration].call(request) : request[options[:duration]]
   
         if duration.kind_of?(Float) && category.kind_of?(String)
           @categories[category] ||= {:hits => 0, :cumulative => 0.0, :min => duration, :max => duration }
           @categories[category][:hits] += 1
           @categories[category][:cumulative] += duration
           @categories[category][:min] = duration if duration < @categories[category][:min]
-          @categories[category][:max] = duration if duration > @categories[category][:max]   
+          @categories[category][:max] = duration if duration > @categories[category][:max]
         end
       end
     end
