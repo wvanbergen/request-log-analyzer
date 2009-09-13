@@ -73,10 +73,12 @@ module RequestLogAnalyzer
         options.store(:source_files, arguments.parameters)
       end
       
+      options[:parallel_lines] = [arguments[:parallel_lines].to_i, 1].max
+      options[:parse_strategy] = arguments[:parse_strategy]
+
       controller = Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format, options), options)
       #controller = Controller.new(RequestLogAnalyzer::Source::DatabaseLoader.new(file_format, options), options)
-
-      options[:parse_strategy] = arguments[:parse_strategy]
+      
       
       # register filters        
       if arguments[:after] || arguments[:before]

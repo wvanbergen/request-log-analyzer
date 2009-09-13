@@ -70,7 +70,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
     
     it "should read the correct values from a valid HTTP/1.0 access log line" do
-      @log_parser.parse_io(@sample_1) do |request|
+      @log_parser.parse_io(StringIO.new(@sample_1)) do |request|
         request[:remote_host].should  == '1.129.119.13'
         request[:timestamp].should    == 20090908075409
         request[:http_status].should  == 200
@@ -82,7 +82,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
     
     it "should read the correct values from a valid 200 access log line" do
-      @log_parser.parse_io(@sample_2) do |request|
+      @log_parser.parse_io(StringIO.new(@sample_2)) do |request|
         request[:remote_host].should  == '1.82.235.29'
         request[:timestamp].should    == 20090908075405
         request[:http_status].should  == 200
@@ -122,7 +122,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
 
     it "should read the correct values from a valid 404 access log line" do
-      @log_parser.parse_io(@sample_1) do |request|
+      @log_parser.parse_io(StringIO.new(@sample_1)) do |request|
         request[:remote_host].should  == '69.41.0.45'
         request[:timestamp].should    == 20090902120240
         request[:http_status].should  == 404
@@ -136,7 +136,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
     
     it "should read the correct values from a valid 200 access log line" do
-      @log_parser.parse_io(@sample_2) do |request|
+      @log_parser.parse_io(StringIO.new(@sample_2)) do |request|
         request[:remote_host].should  == '10.0.1.1'
         request[:timestamp].should    == 20090902050833
         request[:http_status].should  == 200
