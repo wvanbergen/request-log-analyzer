@@ -134,7 +134,7 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A hash of options that can be used by the parser.
     def parse_io(io, options = {}, &block) # :yields: request
       @current_lineno = 1
-      io.each_line do |line|
+      while line = io.gets
         @progress_handler.call(:progress, io.pos) if @progress_handler && io.kind_of?(File)
         
         if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
