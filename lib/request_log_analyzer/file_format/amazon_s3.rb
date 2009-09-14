@@ -29,6 +29,16 @@ module RequestLogAnalyzer::FileFormat
                        { :name => :user_agent,      :type => :user_agent }
     end
     
+    report do |analyze|
+      analyze.timespan
+      analyze.hourly_spread
+
+      analyze.frequency :category => lambda { |r| "#{request[:bucket]}/#{request[:key]}"}, :amount => 20, :title => "Most popular items"
+      analyze.duration :duration => :total_time, :category => lambda { |r| "#{request[:bucket]}/#{request[:key]}"}, :amount => 20, :title => "Duration"
+      analyze.frequency :category => :http_status, :title => 'HTTP status codes'
+      analyze.frequency :category => :error_code, :title => 'Error codes'
+    end
+    
     class Request < RequestLogAnalyzer::Request
       
       MONTHS = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
