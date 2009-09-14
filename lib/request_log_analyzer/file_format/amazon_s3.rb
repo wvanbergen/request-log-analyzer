@@ -33,8 +33,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.timespan
       analyze.hourly_spread
 
-      analyze.frequency :category => lambda { |r| "#{request[:bucket]}/#{request[:key]}"}, :amount => 20, :title => "Most popular items"
-      analyze.duration :duration => :total_time, :category => lambda { |r| "#{request[:bucket]}/#{request[:key]}"}, :amount => 20, :title => "Duration"
+      analyze.frequency :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Most popular items"
+      analyze.duration :duration => :total_time, :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Duration"
       analyze.frequency :category => :http_status, :title => 'HTTP status codes'
       analyze.frequency :category => :error_code, :title => 'Error codes'
     end
