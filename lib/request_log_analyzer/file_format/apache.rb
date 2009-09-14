@@ -20,13 +20,14 @@ module RequestLogAnalyzer::FileFormat
       'a' => { :regexp => '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', :captures => [{:name => :remote_ip, :type => :string}] },
       'b' => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :integer}] },
       'c' => { :regexp => '(\+|\-|\X)', :captures => [{:name => :connection_status, :type => :integer}] },
+      'D' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :msec}] },
       'l' => { :regexp => '([\w-]+)', :captures => [{:name => :remote_logname, :type => :nillable_string}] },
-      'T' => { :regexp => '((?:\d+(?:\.\d+)?)|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] },
+      'T' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] },
       't' => { :regexp => '\[([^\]]{26})\]', :captures => [{:name => :timestamp, :type => :timestamp}] },
       's' => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] },
       'u' => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] },
       'r' => { :regexp => '([A-Z]+) ([^\s]+) HTTP\/(\d+(?:\.\d+)*)', :captures => [{:name => :http_method, :type => :string},
-                       {:name => :path, :type => :string}, {:name => :http_version, :type => :string}]},
+                       {:name => :path, :type => :path}, {:name => :http_version, :type => :string}]},
       'i' => { 'Referer'    => { :regexp => '([^\s]+)', :captures => [{:name => :referer, :type => :nillable_string}] },
                'User-agent' => { :regexp => '(.*)',     :captures => [{:name => :user_agent, :type => :user_agent}] }
              }
@@ -101,6 +102,10 @@ module RequestLogAnalyzer::FileFormat
       def convert_timestamp(value, definition)
         d = /^(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2})/.match(value).captures
         "#{d[2]}#{MONTHS[d[1]]}#{d[0]}#{d[3]}#{d[4]}#{d[5]}".to_i
+      end
+      
+      def convert_path(value, definition)
+        value
       end
       
       def convert_user_agent(value, definition)
