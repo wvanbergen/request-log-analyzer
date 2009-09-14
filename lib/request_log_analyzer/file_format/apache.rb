@@ -1,14 +1,20 @@
-# 125.76.230.10 - - [02/Sep/2009:03:33:46 +0200] "GET /cart/install.txt HTTP/1.1" 404 214 "-" "Toata dragostea mea pentru diavola"
-# 125.76.230.10 - - [02/Sep/2009:03:33:47 +0200] "GET /store/install.txt HTTP/1.1" 404 215 "-" "Toata dragostea mea pentru diavola"
-# 10.0.1.1 - - [02/Sep/2009:05:08:33 +0200] "GET / HTTP/1.1" 200 30 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9"
-# 10.0.1.1 - - [02/Sep/2009:06:41:51 +0200] "GET / HTTP/1.1" 200 30 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9"
-# 69.41.0.45 - - [02/Sep/2009:12:02:40 +0200] "GET //phpMyAdmin/ HTTP/1.1" 404 209 "-" "Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)"
-
 module RequestLogAnalyzer::FileFormat
   
+  # The Apache file format is able to log Apache access.log files. 
+  #
+  # The access.log can be configured in Apache to have many different formats. In theory, this
+  # FileFormat can handle any format, but it must be aware of the log formatting that is used
+  # by sending the formatting string as parameter to the create method, e.g.:
+  #
+  #     RequestLogAnalyzer::FileFormat::Apache.create('%h %l %u %t "%r" %>s %b')
+  #
+  # It also supports the predefined Apache log formats "common" and "combined". The line
+  # definition and the report definition will be constructed using this file format string.
+  # From the command line, you can provide the format string using the <tt>--apache-format</tt>
+  # command line option.
   class Apache < Base
 
-    # A hash of predefined Apache log format strings
+    # A hash of predefined Apache log formats
     LOG_FORMAT_DEFAULTS = {
       :common   => '%h %l %u %t "%r" %>s %b',
       :combined => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"'
@@ -16,6 +22,7 @@ module RequestLogAnalyzer::FileFormat
 
     # A hash that defines how the log format directives should be parsed.
     LOG_DIRECTIVES = {
+      '%' => { :regexp => '%', :captures => [] },
       'h' => { :regexp => '([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)',  :captures => [{:name => :remote_host, :type => :string}] },
       'a' => { :regexp => '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', :captures => [{:name => :remote_ip, :type => :string}] },
       'b' => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :integer}] },
@@ -48,7 +55,7 @@ module RequestLogAnalyzer::FileFormat
 
       line_regexp = ''
       captures    = []
-      format_string.scan(/([^%]*)(?:%(?:\{([^\}]+)\})?>?([A-Za-z]))?/) do |literal, arg, variable|
+      format_string.scan(/([^%]*)(?:%(?:\{([^\}]+)\})?>?([A-Za-z%]))?/) do |literal, arg, variable|
 
         line_regexp << Regexp.quote(literal) # Make sure to parse the literal before the directive
         
@@ -61,6 +68,7 @@ module RequestLogAnalyzer::FileFormat
             line_regexp << directive[:regexp]   # Parse the value of the directive
             captures    += directive[:captures] # Add the directive's information to the captures
           else
+            puts "%#{directive} log directiven not yet supported, field is ignored."
             line_regexp << '.*' # Just accept any input for this literal
           end
         end
@@ -71,7 +79,7 @@ module RequestLogAnalyzer::FileFormat
                                         :captures => captures, :header => true, :footer => true)
     end
 
-    # Sets up the report trackers according to the access line definition.
+    # Sets up the report trackers according to the fields captured by the access line definition.
     def self.report_trackers(line_definition)
       analyze = RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
 
@@ -98,20 +106,26 @@ module RequestLogAnalyzer::FileFormat
       MONTHS = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
                 'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12' }
       
-      # Do not use DateTime.parse
+      # Do not use DateTime.parse, but parse the timestamp ourselves to return a integer
+      # to speed up parsing.
       def convert_timestamp(value, definition)
         d = /^(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2})/.match(value).captures
         "#{d[2]}#{MONTHS[d[1]]}#{d[0]}#{d[3]}#{d[4]}#{d[5]}".to_i
       end
       
+      # This function can be overridden to rewrite the path for better categorization in the
+      # reports.
       def convert_path(value, definition)
         value
       end
       
+      # This function can be overridden to simplify the user agent string for better 
+      # categorization in the reports
       def convert_user_agent(value, definition)
         value # TODO
       end
       
+      # Make sure that the string '-' is parsed as a nil value.
       def convert_nillable_string(value, definition)
         value == '-' ? nil : value
       end
