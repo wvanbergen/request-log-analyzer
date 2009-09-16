@@ -104,7 +104,7 @@ module RequestLogAnalyzer::Output
     end
 
     # Write a link
-    # <tt>text</tt> The text in the link
+    # <tt>text</tt> The text in the link, or the URL itself if no text is given
     # <tt>url</tt> The url to link to.
     def link(text, url = nil)
       if url.nil?
@@ -114,13 +114,13 @@ module RequestLogAnalyzer::Output
       end
     end
     
-    # Generate a header for a report    
+    # Generate a header for a report
     def header
       if io.kind_of?(File)
-        puts "Request-log-analyzer summary report"
-        line
+        puts colorize("Request-log-analyzer summary report", :white, :bold)
+        line(:green)
         puts "Version #{RequestLogAnalyzer::VERSION} - written by Willem van Bergen and Bart ten Brinke"
-        puts "Request-log-analyzer website: http://github.com/wvanbergen/request-log-analyzer"
+        puts "Website: #{link('http://github.com/wvanbergen/request-log-analyzer')}"
       end
     end
     
@@ -128,8 +128,9 @@ module RequestLogAnalyzer::Output
     def footer
       puts
       puts "Need an expert to analyze your application?"
-      puts "Mail to contact@railsdoctors.com or visit us at http://railsdoctors.com"
-      puts "Thanks for using request-log-analyzer!"
+      puts "Mail to #{link('contact@railsdoctors.com')} or visit us at #{link('http://railsdoctors.com')}."
+      line(:green)
+      puts "Thanks for using #{colorize('request-log-analyzer', :white, :bold)}!"
     end
     
     # Generate a report table and push it into the output object.

@@ -25,7 +25,7 @@ module RequestLogAnalyzer::Spec::Mocks
   def mock_io
     mio = mock('IO')
     mio.stub!(:print)
-    mio.stub!(:puts)    
+    mio.stub!(:puts)
     mio.stub!(:write)
     return mio
   end
@@ -35,12 +35,15 @@ module RequestLogAnalyzer::Spec::Mocks
     output.stub!(:header)
     output.stub!(:footer)   
     output.stub!(:puts)
-    output.stub!(:<<)    
+    output.stub!(:<<)
+    output.stub!(:colorize).and_return("Fancy text")
+    output.stub!(:link)
     output.stub!(:title)
     output.stub!(:line)
     output.stub!(:with_style)    
     output.stub!(:table).and_yield([])
     output.stub!(:io).and_return(mock_io)
+    
     return output
   end
   
