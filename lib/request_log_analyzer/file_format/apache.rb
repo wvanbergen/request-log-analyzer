@@ -17,26 +17,30 @@ module RequestLogAnalyzer::FileFormat
     # A hash of predefined Apache log formats
     LOG_FORMAT_DEFAULTS = {
       :common   => '%h %l %u %t "%r" %>s %b',
-      :combined => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"'
+      :combined => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"',
+      :rack     => '%h %l %u %t "%r" %>s %b %T',
+      :referer  => '%{Referer}i -> %U',
+      :agent    => '%{User-agent}i'
     }
-
+    
     # A hash that defines how the log format directives should be parsed.
     LOG_DIRECTIVES = {
       '%' => { :regexp => '%', :captures => [] },
       'h' => { :regexp => '([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)',  :captures => [{:name => :remote_host, :type => :string}] },
       'a' => { :regexp => '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', :captures => [{:name => :remote_ip, :type => :string}] },
-      'b' => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :integer}] },
+      'b' => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :traffic}] },
       'c' => { :regexp => '(\+|\-|\X)', :captures => [{:name => :connection_status, :type => :integer}] },
-      'D' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :msec}] },
+      'D' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :musec}] },
       'l' => { :regexp => '([\w-]+)', :captures => [{:name => :remote_logname, :type => :nillable_string}] },
-      'T' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] },
-      't' => { :regexp => '\[([^\]]{26})\]', :captures => [{:name => :timestamp, :type => :timestamp}] },
+      'T' => { :regexp => '((?:\d+(?:\.\d+))|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] },
+      't' => { :regexp => '\[(\d{2}\/[A-Za-z]{3}\/\d{4}.\d{2}:\d{2}:\d{2})(?: .\d{4})?\]', :captures => [{:name => :timestamp, :type => :timestamp}] },
       's' => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] },
       'u' => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] },
-      'r' => { :regexp => '([A-Z]+) ([^\s]+) HTTP\/(\d+(?:\.\d+)*)', :captures => [{:name => :http_method, :type => :string},
+      'U' => { :regexp => '(\/\S*)', :captures => [{:name => :path, :type => :string}] },
+      'r' => { :regexp => '([A-Z]+) (\S+) HTTP\/(\d+(?:\.\d+)*)', :captures => [{:name => :http_method, :type => :string},
                        {:name => :path, :type => :path}, {:name => :http_version, :type => :string}]},
-      'i' => { 'Referer'    => { :regexp => '([^\s]+)', :captures => [{:name => :referer, :type => :nillable_string}] },
-               'User-agent' => { :regexp => '(.*)',     :captures => [{:name => :user_agent, :type => :user_agent}] }
+      'i' => { 'Referer'    => { :regexp => '(\S+)', :captures => [{:name => :referer, :type => :nillable_string}] },
+               'User-agent' => { :regexp => '(.*)',  :captures => [{:name => :user_agent, :type => :user_agent}] }
              }
     }
 
@@ -97,6 +101,10 @@ module RequestLogAnalyzer::FileFormat
         analyze.duration :duration => :duration, :category => :path , :title => 'Request duration'
       end
 
+      if line_definition.captures?(:path) && line_definition.captures?(:bytes_sent)
+        analyze.traffic :traffic => :bytes_sent, :category => :path , :title => 'Traffic'
+      end
+
       return analyze.trackers
     end
 
@@ -109,7 +117,7 @@ module RequestLogAnalyzer::FileFormat
       # Do not use DateTime.parse, but parse the timestamp ourselves to return a integer
       # to speed up parsing.
       def convert_timestamp(value, definition)
-        d = /^(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2})/.match(value).captures
+        d = /^(\d{2})\/([A-Za-z]{3})\/(\d{4}).(\d{2}):(\d{2}):(\d{2})/.match(value).captures
         "#{d[2]}#{MONTHS[d[1]]}#{d[0]}#{d[3]}#{d[4]}#{d[5]}".to_i
       end
       

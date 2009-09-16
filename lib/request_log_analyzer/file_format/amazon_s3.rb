@@ -9,7 +9,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :access do |line|
       line.header = true
       line.footer = true
-      line.regexp = /^([^\ ]+) ([^\ ]+) \[([^\]]{26})\] (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]+)" "([^"]+)"/
+      line.regexp = /^([^\ ]+) ([^\ ]+) \[(\d{2}\/[A-Za-z]{3}\/\d{4}.\d{2}:\d{2}:\d{2})(?: .\d{4})?\] (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]+)" "([^"]+)"/
       line.captures << { :name => :bucket_owner,    :type => :string } << 
                        { :name => :bucket,          :type => :string } << 
                        { :name => :timestamp,       :type => :timestamp } <<
@@ -21,8 +21,8 @@ module RequestLogAnalyzer::FileFormat
                        { :name => :request_uri,     :type => :string } <<
                        { :name => :http_status,     :type => :integer } <<
                        { :name => :error_code,      :type => :nillable_string } <<
-                       { :name => :bytes_sent,      :type => :integer } <<
-                       { :name => :object_size,     :type => :integer } <<
+                       { :name => :bytes_sent,      :type => :traffic,  :unit => :byte } <<
+                       { :name => :object_size,     :type => :traffic,  :unit => :byte } <<
                        { :name => :total_time,      :type => :duration, :unit => :msec } <<
                        { :name => :turnaround_time, :type => :duration, :unit => :msec } <<
                        { :name => :referer,         :type => :referer } <<
@@ -34,7 +34,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.hourly_spread
 
       analyze.frequency :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Most popular items"
-      analyze.duration :duration => :total_time, :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Duration"
+      analyze.duration :duration => :total_time, :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Request duration"
+      analyze.traffic  :traffic => :bytes_sent,  :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Traffic"
       analyze.frequency :category => :http_status, :title => 'HTTP status codes'
       analyze.frequency :category => :error_code, :title => 'Error codes'
     end
@@ -47,7 +48,7 @@ module RequestLogAnalyzer::FileFormat
       # Do not use DateTime.parse, but parse the timestamp ourselves to return a integer
       # to speed up parsing.
       def convert_timestamp(value, definition)
-        d = /^(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2})/.match(value).captures
+        d = /^(\d{2})\/([A-Za-z]{3})\/(\d{4}).(\d{2}):(\d{2}):(\d{2})/.match(value).captures
         "#{d[2]}#{MONTHS[d[1]]}#{d[0]}#{d[3]}#{d[4]}#{d[5]}".to_i
       end
       

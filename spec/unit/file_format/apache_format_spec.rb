@@ -99,12 +99,49 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       @log_parser.parse_file(log_fixture(:apache_common)) { counter.hit! }
     end
   end
+  
+  context '"Rack" access log parser' do
+    before(:each) do
+      @file_format = RequestLogAnalyzer::FileFormat.load(:rack)
+      @log_parser  = RequestLogAnalyzer::Source::LogParser.new(@file_format)
+      @sample_1 = '127.0.0.1 - - [16/Sep/2009 06:40:08] "GET /favicon.ico HTTP/1.1" 500 63183 0.0453'
+    end
+    
+    it "should create a kind of an Apache file format" do
+      @file_format.should be_kind_of(RequestLogAnalyzer::FileFormat::Apache)
+    end
+    
+    it "should have a valid language definitions" do
+      @file_format.should be_valid
+    end
+
+    it "should parse a valid access log line" do
+      @file_format.line_definitions[:access].matches(@sample_1).should be_kind_of(Hash)
+    end
+
+    it "should not parse a valid access log line" do
+      @file_format.line_definitions[:access].matches('addasdsasadadssadasd').should be_false
+    end
+
+    it "should read the correct values from a valid 404 access log line" do
+      @log_parser.parse_io(StringIO.new(@sample_1)) do |request|
+        request[:remote_host].should  == '127.0.0.1'
+        request[:timestamp].should    == 20090916064008
+        request[:http_status].should  == 500
+        request[:http_method].should  == 'GET'
+        request[:http_version].should == '1.1'
+        request[:bytes_sent].should   == 63183
+        request[:user].should         == nil
+        request[:duration].should     == 0.0453
+      end
+    end
+  end
  
   context '"Combined" access log parsing' do
 
     before(:all) do
       @file_format = RequestLogAnalyzer::FileFormat.load(:apache, :combined)
-      @log_parser = RequestLogAnalyzer::Source::LogParser.new(@file_format)
+      @log_parser  = RequestLogAnalyzer::Source::LogParser.new(@file_format)
       @sample_1 = '69.41.0.45 - - [02/Sep/2009:12:02:40 +0200] "GET //phpMyAdmin/ HTTP/1.1" 404 209 "-" "Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)"'
       @sample_2 = '10.0.1.1 - - [02/Sep/2009:05:08:33 +0200] "GET / HTTP/1.1" 200 30 "-" "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9"'
     end
