@@ -10,7 +10,7 @@ Encoding.default_external = 'binary' if defined? Encoding and Encoding.respond_t
 module RequestLogAnalyzer
   
   # The current version of request-log-analyzer.
-  # This will be diplayed in output reports etc.  
+  # This will be diplayed in output reports etc.
   VERSION = "1.3.4"
 
   # Loads constants in the RequestLogAnalyzer namespace using self.load_default_class_file(base, const)
@@ -25,7 +25,7 @@ module RequestLogAnalyzer
   # <tt>const</tt>:: The constant to load from the base constant as a string or symbol. This should be 'Bar' or :Bar when the constant Foo::Bar is being loaded.
   def self.load_default_class_file(base, const)
     require "#{to_underscore("#{base.name}::#{const}")}"
-    base.const_get(const)
+    base.const_get(const) if base.const_defined?(const)
   end
 
   # Convert a string/symbol in camelcase (RequestLogAnalyzer::Controller) to underscores (request_log_analyzer/controller)
