@@ -41,13 +41,25 @@ module RequestLogAnalyzer
         DateTime.parse(value).strftime('%Y%m%d%H%M%S').to_i unless value.nil?
       end
       
+      def convert_traffic(value, capture_definition)
+        return nil if value.nil?
+        case capture_definition[:unit]
+        when :GB, :G, :gigabyte      then (value.to_f * 1000_000_000).round
+        when :GiB, :gibibyte         then (value.to_f * (2 ** 30)).round
+        when :MB, :M, :megabyte      then (value.to_f * 1000_000).round
+        when :MiB, :mebibyte         then (value.to_f * (2 ** 20)).round
+        when :KB, :K, :kilobyte, :kB then (value.to_f * 1000).round
+        when :KiB, :kibibyte         then (value.to_f * (2 ** 10)).round
+        else                              value.to_i
+        end
+      end
+      
       def convert_duration(value, capture_definition)
-        if value.nil?
-          nil
-        elsif capture_definition[:unit] == :msec
-          value.to_f / 1000.0      
-        else
-          value.to_f
+        return nil if value.nil?
+        case capture_definition[:unit]
+        when :microsec        then value.to_f / 1000000.0
+        when :msec, :millisec then value.to_f / 1000.0
+        else                       value.to_f
         end
       end
     end
