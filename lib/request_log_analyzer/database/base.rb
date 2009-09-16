@@ -13,8 +13,9 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
   def line_type
     self.class.name.underscore.gsub(/_line$/, '').to_sym
   end
-
-  cattr_accessor :database, :line_definition
+  
+  class_inheritable_accessor :line_definition
+  cattr_accessor :database
 
   def self.subclass_from_line_definition(definition)
     klass = Class.new(RequestLogAnalyzer::Database::Base)

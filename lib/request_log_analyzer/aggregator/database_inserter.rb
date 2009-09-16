@@ -57,11 +57,14 @@ module RequestLogAnalyzer::Aggregator
     
     # Records source changes in the sources table
     def source_change(change, filename)
-      case change
-      when :started
-        @sources[filename] = database.source_class.create!(:filename => filename)
-      when :finished
-        @sources[filename].update_attributes!(:filesize => File.size(filename), :mtime => File.mtime(filename))
+      if File.exist?(filename)
+        case change
+        when :started
+          p database.source_class
+          @sources[filename] = database.source_class.create!(:filename => filename)
+        when :finished
+          @sources[filename].update_attributes!(:filesize => File.size(filename), :mtime => File.mtime(filename))
+        end
       end
     end
     
