@@ -57,9 +57,9 @@ module RequestLogAnalyzer
       def convert_duration(value, capture_definition)
         return nil if value.nil?
         case capture_definition[:unit]
-        when :microsec        then value.to_f / 1000000.0
-        when :msec, :millisec then value.to_f / 1000.0
-        else                       value.to_f
+        when :microsec, :musec then value.to_f / 1000000.0
+        when :msec, :millisec  then value.to_f / 1000.0
+        else                        value.to_f
         end
       end
     end
