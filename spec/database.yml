@@ -1,3 +1,9 @@
+# This file determines what databases are used to test the database
+# functionality of request-log-analyzer. By default, only an SQLite3
+# memory database is enabled.
+#
+# The syntax of this file is exactly the same as Rails's database.yml.
+
 sqlite3:
   adapter: "sqlite3"
   database: ":memory:"
