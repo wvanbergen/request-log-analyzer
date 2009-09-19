@@ -42,19 +42,7 @@ module RequestLogAnalyzer::FileFormat
     raise "Invalid FileFormat class" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
     
     @current_file_format = klass.create(*args) # return an instance of the class
-  end  
-  
-  # Makes classes aware of a file format by registering the file_format variable
-  module Awareness
-    
-    def self.included(base)
-      base.send(:attr_reader, :file_format)
-    end
-    
-    def register_file_format(format)
-      @file_format = format
-    end
-  end  
+  end
 
   # Base class for all log file format definitions. This class provides functions for subclasses to 
   # define their LineDefinitions and to define a summary report.

@@ -7,28 +7,24 @@ module RequestLogAnalyzer::Filter
   end
   
   # Base filter class used to filter input requests.
-  # All filters should interit from this base.  
+  # All filters should interit from this base.
   class Base
     
-    include RequestLogAnalyzer::FileFormat::Awareness
-    
-    attr_reader :log_parser
-    attr_reader :options
+    attr_reader :file_format, :options
     
     # Initializer
     # <tt>format</tt> The file format
     # <tt>options</tt> Are passed to the filters.
     def initialize(format, options = {})
-      @options    = options
-      register_file_format(format)
+      @file_format = format
+      @options     = options
     end
     
     # Return the request if the request should be kept.
     # Return nil otherwise.
     def filter(request)
-      return nil unless request
-      return request
-    end   
+      request
+    end
   end
   
 end

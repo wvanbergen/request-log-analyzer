@@ -64,18 +64,16 @@ module RequestLogAnalyzer
       end
     end
   
-    include RequestLogAnalyzer::FileFormat::Awareness
     include Converters
   
-    attr_reader :lines
-    attr_reader :attributes
+    attr_reader :lines, :attributes, :file_format
         
     # Initializes a new Request object. 
     # It will apply the the provided FileFormat module to this instance.
     def initialize(file_format, attributes = {})
-      @lines = []
-      @attributes = attributes
-      register_file_format(file_format)
+      @lines       = []
+      @attributes  = attributes
+      @file_format = file_format
     end
     
     # Creates a new request that was parsed from the log with the given FileFormat. The hashes
@@ -86,8 +84,10 @@ module RequestLogAnalyzer
       return request
     end
      
-    # Adds another line to the request.
-    # The line should be provides as a hash of the fields parsed from the line.
+    # Adds another line to the request when it is parsed in the LogParser.
+    #
+    # The line should be provided as a hash with the attributes line_definition, :captures,
+    # :lineno and :source set. This function is called from LogParser.
     def add_parsed_line (parsed_line)
       value_hash = parsed_line[:line_definition].convert_captured_values(parsed_line[:captures], self)
       value_hash[:line_type] = parsed_line[:line_definition].name
@@ -96,12 +96,16 @@ module RequestLogAnalyzer
       add_line_hash(value_hash)
     end
     
+    # Adds another line to the request using a plain hash.
+    #
+    # The line should be provides as a hash of the fields parsed from the line.
     def add_line_hash(value_hash)
       @lines << value_hash
       @attributes = value_hash.merge(@attributes)
     end
     
-    
+    # Adds another line to the request. This method switches automatically between
+    # the add_line_hash and add_parsed_line based on the keys of the provided hash.
     def <<(hash)
       hash[:line_definition] ? add_parsed_line(hash) : add_line_hash(hash)
     end
@@ -109,7 +113,6 @@ module RequestLogAnalyzer
     # Checks whether the given line type was parsed from the log file for this request
     def has_line_type?(line_type)
       return true if @lines.length == 1 && @lines[0][:line_type] == line_type.to_sym
-      
       @lines.detect { |l| l[:line_type] == line_type.to_sym }
     end
     

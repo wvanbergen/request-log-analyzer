@@ -41,8 +41,7 @@ module RequestLogAnalyzer::Tracker
     # Check if the timestamp in the request and store it.
     # <tt>request</tt> The request.
     def update(request)
-      request = request.attributes
-      timestamp = request[options[:field]]
+      timestamp = request.first(options[:field])
 
       @request_time_graph[timestamp.to_s[8..9].to_i] +=1
       @first = timestamp if @first.nil? || timestamp < @first

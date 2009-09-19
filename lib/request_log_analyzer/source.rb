@@ -21,9 +21,6 @@ module RequestLogAnalyzer::Source
   # RequestLogAnalyzer::Request instances that will be fed through the pipleine.
   class Base
     
-    # Make the Spurce instance aware of the current file format
-    include RequestLogAnalyzer::FileFormat::Awareness
-
     # A hash of options
     attr_reader :options
 
@@ -42,14 +39,15 @@ module RequestLogAnalyzer::Source
     # The total number of skipped requests because of filters.
     attr_reader :skipped_requests
 
-
+    # The FileFormat instance that describes the format of this source.
+    attr_reader :file_format
 
     # Initializer, which will register the file format and save any options given as a hash.
     # <tt>format</tt>:: The file format instance
     # <tt>options</tt>:: A hash of options that can be used by a specific Source implementation
     def initialize(format, options = {})
-      @options    = options
-      register_file_format(format)
+      @options     = options
+      @file_format = format
     end
     
     # The prepare method is called before the RequestLogAnalyzer::Source::Base#each_request method is called.

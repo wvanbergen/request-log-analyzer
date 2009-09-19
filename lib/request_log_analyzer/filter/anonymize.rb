@@ -19,7 +19,8 @@ module RequestLogAnalyzer::Filter
       value * ((75 + rand(50)) / 100.0)
     end
 
-    def filter(request)    
+    def filter(request)
+      # TODO: request.attributes is bad practice
       request.attributes.each do |key, value|
         if key == :ip
           request.attributes[key] = generate_random_ip

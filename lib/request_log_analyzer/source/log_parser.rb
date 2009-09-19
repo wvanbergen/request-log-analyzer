@@ -27,9 +27,8 @@ module RequestLogAnalyzer::Source
     #
     # <tt>format</tt>:: The current file format instance
     # <tt>options</tt>:: A hash of options that are used by the parser
-    def initialize(format, options = {})      
-      @line_definitions = {}
-      @options          = options
+    def initialize(format, options = {})
+      super(format, options)
       @parsed_lines     = 0
       @parsed_requests  = 0
       @skipped_lines    = 0
@@ -40,8 +39,6 @@ module RequestLogAnalyzer::Source
       
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
       raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
-      
-      self.register_file_format(format)
     end
     
     # Reads the input, which can either be a file, sequence of files or STDIN to parse

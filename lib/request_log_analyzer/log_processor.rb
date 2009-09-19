@@ -12,11 +12,9 @@ module RequestLogAnalyzer
   #
   class LogProcessor
     
-    include RequestLogAnalyzer::FileFormat::Awareness
-    
-    attr_reader :mode, :options, :sources
+    attr_reader :mode, :options, :sources, :file_format
     attr_accessor :output_file
-   
+    
     # Builds a logprocessor instance from the arguments given on the command line
     # <tt>command</tt> The command hat was used to start the log processor. This will set the 
     #    processing mode. Currently, only :strip is supported.
@@ -43,11 +41,11 @@ module RequestLogAnalyzer
     # <tt>mode</tt> The processing mode
     # <tt>options</tt> A hash with options to take into account
     def initialize(format, mode, options = {})
-      @options = options
-      @mode    = mode
-      @sources = []
+      @options     = options
+      @mode        = mode
+      @sources     = []
+      @file_format = format
       $output_file = nil
-      self.register_file_format(format)
     end
     
     # Processes input files by opening it and sending the filestream to <code>process_io</code>,

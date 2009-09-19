@@ -8,16 +8,12 @@ module RequestLogAnalyzer::Aggregator
   # every aggregator should comply (by simply subclassing this class).
   class Base
     
-    include RequestLogAnalyzer::FileFormat::Awareness
-    
-    attr_reader :options
-    attr_reader :source
+    attr_reader :options, :source
 
     # Intializes a new RequestLogAnalyzer::Aggregator::Base instance
     # It will include the specific file format module.
     def initialize(source, options = {})
       @source = source
-      self.register_file_format(source.file_format)
       @options = options
     end
 

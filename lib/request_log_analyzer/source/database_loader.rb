@@ -26,8 +26,7 @@ module RequestLogAnalyzer::Source
   # The Database class gets log data from the database.
   class DatabaseLoader < Base
 
-    attr_reader :source_files
-    attr_reader :requests
+    attr_reader :source_files, :file_format, :requests
 
     # Initializes the log file parser instance.
     # It will apply the language specific FileFormat module to this instance. It will use the line
@@ -35,14 +34,11 @@ module RequestLogAnalyzer::Source
     #
     # <tt>format</tt>:: The current file format instance
     # <tt>options</tt>:: A hash of options that are used by the parser
-    def initialize(format, options = {})      
-      @line_definitions = {}
-      @options          = options
+    def initialize(format, options = {})
+      super(format, options)
       @source_files     = options[:source_files]
       @parsed_requests  = 0
       @requests         = []
-      
-      self.register_file_format(format)
     end
     
     # Reads the input, which can either be a file, sequence of files or STDIN to parse

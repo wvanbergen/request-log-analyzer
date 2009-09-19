@@ -17,14 +17,7 @@ module RequestLogAnalyzer
   # from several logrotated log files.
   class Controller
 
-    include RequestLogAnalyzer::FileFormat::Awareness
-    
-    attr_reader :aggregators
-    attr_reader :filters
-    attr_reader :log_parser
-    attr_reader :source
-    attr_reader :output
-    attr_reader :options
+    attr_reader :source, :filters, :aggregators, :output, :options
 
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
@@ -35,8 +28,8 @@ module RequestLogAnalyzer
       # Database command line options
       options[:database]       = arguments[:database] if arguments[:database]
       options[:reset_database] = arguments[:reset_database]
-      options[:debug]    = arguments[:debug]
-      options[:dump]     = arguments[:dump]
+      options[:debug]          = arguments[:debug]
+      options[:dump]           = arguments[:dump]
       options[:parse_strategy] = arguments[:parse_strategy]
       options[:no_progress]    = arguments[:no_progress]
       
@@ -125,17 +118,13 @@ module RequestLogAnalyzer
       @filters     = []
       @output      = options[:output]
       
-      # Requester format through RequestLogAnalyzer::FileFormat and construct the parser
-      register_file_format(@source.file_format) 
+      # Register the request format for this session after checking its validity
+      raise "Invalid file format!" unless @source.file_format.valid?
       
-      # Pass all warnings to every aggregator so they can do something useful with them.
-      @source.warning = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } } if @source
-
-      # Handle progress messagess
-      @source.progress = lambda { |message, value| handle_progress(message, value) } if @source && !options[:no_progress]
-      
-      # Handle source change messages
-      @source.source_changes = lambda { |change, filename| handle_source_change(change, filename) } if @source
+      # Install event handlers for wrnings, progress updates and source changes
+      @source.warning        = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } }
+      @source.progress       = lambda { |message, value| handle_progress(message, value) } unless options[:no_progress]
+      @source.source_changes = lambda { |change, filename| handle_source_change(change, filename) }
     end
     
     # Progress function.
@@ -176,7 +165,7 @@ module RequestLogAnalyzer
     # Adds a request filter to the controller.
     def add_filter(filter, filter_options = {})
       filter = RequestLogAnalyzer::Filter.const_get(RequestLogAnalyzer::to_camelcase(filter)) if filter.kind_of?(Symbol)
-      @filters << filter.new(file_format, @options.merge(filter_options))
+      @filters << filter.new(source.file_format, @options.merge(filter_options))
     end
     
     # Push a request through the entire filterchain (@filters).
