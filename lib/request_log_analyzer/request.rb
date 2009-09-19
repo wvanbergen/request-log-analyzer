@@ -9,27 +9,31 @@ module RequestLogAnalyzer
   # Request#every(field_name) returns all values corresponding to the given field name as array.
   class Request
   
+    def self.inherited(klass)
+      # klass.send(:include, Converters)
+    end
+  
     module Converters
-      
+
+      # Default converter function, which converts the parsed strings to a native Ruby type
+      # using the type indication in the line definition. It will use a custom connverter
+      # method if one is available.
       def convert_value(value, capture_definition)
-        custom_converter_method = "convert_#{capture_definition[:type]}".to_sym
-        if respond_to?(custom_converter_method) 
-          send(custom_converter_method, value, capture_definition)
-        elsif !value.nil? 
-          case capture_definition[:type]
-          when :decimal;  value.to_f
-          when :float;    value.to_f
-          when :double;   value.to_f
-          when :integer;  value.to_i
-          when :int;      value.to_i
-          when :symbol;   value.to_sym
-          else;           value.to_s
-          end
-        else 
-          nil
-        end
+        return nil if value.nil?
+        custom_converter_method = :"convert_#{capture_definition[:type]}"
+        send(custom_converter_method, value, capture_definition)
       end
       
+      def convert_string(value, capture_definition);  value; end
+      def convert_decimal(value, capture_definition); value.to_f; end
+      def convert_float(value, capture_definition);   value.to_f; end
+      def convert_decimal(value, capture_definition); value.to_f; end
+      def convert_int(value, capture_definition);     value.to_i; end
+      def convert_integer(value, capture_definition); value.to_i; end
+      def convert_sym(value, capture_definition);     value.to_sym; end
+      def convert_symbol(value, capture_definition);  value.to_sym; end
+      
+      # Converts :eval field, which should evaluate to a hash.
       def convert_eval(value, capture_definition)
         eval(value).inject({}) { |h, (k, v)| h[k.to_sym] = v; h} 
       rescue SyntaxError
@@ -38,11 +42,11 @@ module RequestLogAnalyzer
       
       # Slow default method to parse timestamps
       def convert_timestamp(value, capture_definition)
-        DateTime.parse(value).strftime('%Y%m%d%H%M%S').to_i unless value.nil?
+        DateTime.parse(value).strftime('%Y%m%d%H%M%S').to_i
       end
       
+      # Converts traffic fields to (whole) bytes based on the given unit.
       def convert_traffic(value, capture_definition)
-        return nil if value.nil?
         case capture_definition[:unit]
         when :GB, :G, :gigabyte      then (value.to_f * 1000_000_000).round
         when :GiB, :gibibyte         then (value.to_f * (2 ** 30)).round
@@ -54,8 +58,8 @@ module RequestLogAnalyzer
         end
       end
       
+      # Convert duration fields to float, and make sure the values are in seconds.
       def convert_duration(value, capture_definition)
-        return nil if value.nil?
         case capture_definition[:unit]
         when :microsec, :musec then value.to_f / 1000000.0
         when :msec, :millisec  then value.to_f / 1000.0
@@ -63,9 +67,9 @@ module RequestLogAnalyzer
         end
       end
     end
-  
+
     include Converters
-  
+
     attr_reader :lines, :attributes, :file_format
         
     # Initializes a new Request object. 
