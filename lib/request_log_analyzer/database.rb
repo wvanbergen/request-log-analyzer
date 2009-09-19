@@ -10,7 +10,7 @@ class RequestLogAnalyzer::Database
   include RequestLogAnalyzer::Database::Connection
 
   attr_accessor :file_format
-  attr_reader :request_class, :warning_class, :source_class, :line_classes
+  attr_reader :line_classes
   
   def initialize(connection_identifier = nil)
     @line_classes = []
@@ -24,97 +24,17 @@ class RequestLogAnalyzer::Database
     Object.const_get("#{line_type}_line".camelize)
   end
   
-  # Returns the Request ORM class for the current database.
-  #
-  # It will create the class if not previously done so. The class will
-  # include a create_table! method the migrate the database.
-  def request_class
-    @request_class ||= begin
-      klass = Class.new(RequestLogAnalyzer::Database::Base) do
-        
-        def lines
-          @lines ||= begin
-            lines = []
-            self.class.reflections.each { |r, d| lines += self.send(r).all }
-            lines.sort
-          end
-        end
-        
-        # Creates the requests table
-        def self.create_table!
-          unless database.connection.table_exists?(:requests)
-            database.connection.create_table(:requests) do |t|
-              t.column :first_lineno, :integer
-              t.column :last_lineno,  :integer
-            end
-          end
-        end
-      end
-      
-      Object.const_set('Request', klass) 
-      Object.const_get('Request')
-    end
-  end
-  
-  # Returns the Source ORM class for the current database.
-  #
-  # It will create the class if not previously done so. The class will
-  # include a create_table! method the migrate the database.  
-  def source_class
-    @source_class ||= begin
-      klass = Class.new(RequestLogAnalyzer::Database::Base) do
-        
-        # Creates the sources table
-        def self.create_table!
-          unless database.connection.table_exists?(:sources)
-            database.connection.create_table(:sources) do |t|
-              t.column :filename, :string
-              t.column :mtime,    :datetime
-              t.column :filesize, :integer
-            end
-          end
-        end
-      end
-      
-      Object.const_set('Source', klass)
-      Object.const_get('Source')
-    end
-  end
-  
-  
-  # Returns the Warning ORM class for the current database.
-  #
-  # It will create the class if not previously done so. The class will
-  # include a create_table! method the migrate the database.  
-  def warning_class
-    @warning_class ||= begin
-      klass = Class.new(RequestLogAnalyzer::Database::Base) do
-        
-        # Creates the warnings table
-        def self.create_table!
-          unless database.connection.table_exists?(:warnings)
-            database.connection.create_table(:warnings) do |t|
-              t.column  :warning_type, :string, :limit => 30, :null => false
-              t.column  :message, :string
-              t.column  :source_id, :integer
-              t.column  :lineno, :integer
-            end
-          end
-        end
-      end
-      
-      Object.const_set('Warning', klass)
-      Object.const_get('Warning')
-    end
+  def default_classes
+    [RequestLogAnalyzer::Database::Request, RequestLogAnalyzer::Database::Source, RequestLogAnalyzer::Database::Warning]
   end
   
   # Loads the ORM classes by inspecting the tables in the current database
   def load_database_schema!
     connection.tables.map do |table|
       case table.to_sym
-      when :warnings then warning_class
-      when :sources  then source_class
-      when :requests then request_class
+      when :warnings then RequestLogAnalyzer::Database::Warning
+      when :sources  then RequestLogAnalyzer::Database::Source
+      when :requests then RequestLogAnalyzer::Database::Request
       else load_activerecord_class(table)
       end
     end
@@ -122,7 +42,7 @@ class RequestLogAnalyzer::Database
   
   # Returns an array of all the ActiveRecord-bases ORM classes for this database
   def orm_classes
-    [warning_class, request_class, source_class] + line_classes
+    default_classes + line_classes
   end
   
   # Loads an ActiveRecord-based class that correspond to the given parameter, which can either be
@@ -146,8 +66,6 @@ class RequestLogAnalyzer::Database
 
   def fileformat_classes
     raise "No file_format provided!" unless file_format
-    
-    default_classes = [request_class, source_class, warning_class]
     line_classes    = file_format.line_definitions.map { |(name, definition)| load_activerecord_class(definition) }
     return default_classes + line_classes
   end
@@ -164,12 +82,19 @@ class RequestLogAnalyzer::Database
     remove_orm_classes!
   end
   
+  # Registers the default ORM classes in the default namespace
+  def register_default_orm_classes!
+    Object.const_set('Request', RequestLogAnalyzer::Database::Request)
+    Object.const_set('Source',  RequestLogAnalyzer::Database::Source)
+    Object.const_set('Warning', RequestLogAnalyzer::Database::Warning)
+  end
+  
   # Unregisters every ORM class constant
   def remove_orm_classes!
     orm_classes.each do |klass|
       if klass.respond_to?(:name) && !klass.name.blank?
-#        klass_base_name = klass.name.split('::').last
-        Object.send(:remove_const, klass.name) if Object.const_defined?(klass.name)
+        klass_name = klass.name.split('::').last
+        Object.send(:remove_const, klass_name) if Object.const_defined?(klass_name)
       end
     end
   end

@@ -31,7 +31,7 @@ module RequestLogAnalyzer::Aggregator
     # This will create a record in the requests table and create a record for every line that has been parsed,
     # in which the captured values will be stored.
     def aggregate(request)
-      @request_object = database.request_class.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
+      @request_object = RequestLogAnalyzer::Database::Request.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
         class_columns = database.get_class(line[:line_type]).column_names.reject { |column| ['id', 'source_id', 'request_id'].include?(column) }
         attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
@@ -45,14 +45,14 @@ module RequestLogAnalyzer::Aggregator
     
     # Finalizes the aggregator by closing the connection to the database
     def finalize
-      @request_count = database.request_class.count
+      @request_count = RequestLogAnalyzer::Database::Request.count
       database.disconnect
       database.remove_orm_classes!
     end
     
     # Records w warining in the warnings table.
     def warning(type, message, lineno)
-      database.warning_class.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
+      RequestLogAnalyzer::Database::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
     
     # Records source changes in the sources table
@@ -60,8 +60,7 @@ module RequestLogAnalyzer::Aggregator
       if File.exist?(filename)
         case change
         when :started
-          p database.source_class
-          @sources[filename] = database.source_class.create!(:filename => filename)
+          @sources[filename] = RequestLogAnalyzer::Database::Source.create!(:filename => filename)
         when :finished
           @sources[filename].update_attributes!(:filesize => File.size(filename), :mtime => File.mtime(filename))
         end

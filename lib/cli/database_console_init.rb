@@ -3,6 +3,7 @@ $:.unshift(File.dirname(__FILE__) + '/..')
 
 $database = RequestLogAnalyzer::Database.new(ENV['RLA_DBCONSOLE_DATABASE'])
 $database.load_database_schema!
+$database.register_default_orm_classes!
 
 require 'cli/tools'
 
@@ -39,4 +40,4 @@ end
 puts "request-log-analyzer database console"
 puts "-------------------------------------"
 puts "The following ActiveRecord classes are available:"
-puts $database.orm_classes.join(", ")
+puts $database.orm_classes.map { |k| k.name.split('::').last }.join(", ")

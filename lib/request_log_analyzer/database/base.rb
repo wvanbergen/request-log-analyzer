@@ -32,8 +32,8 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
       klass.send(:serialize, capture[:name], Hash)
     end
 
-    database.request_class.has_many  "#{definition.name}_lines".to_sym
-    database.source_class.has_many   "#{definition.name}_lines".to_sym
+    RequestLogAnalyzer::Database::Request.has_many  "#{definition.name}_lines".to_sym
+    RequestLogAnalyzer::Database::Source.has_many   "#{definition.name}_lines".to_sym
 
     return klass
   end
@@ -46,12 +46,12 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
 
     if klass.column_names.include?('request_id')
       klass.belongs_to :request
-      database.request_class.has_many table.to_sym
+      RequestLogAnalyzer::Database::Request.has_many table.to_sym
     end
     
     if klass.column_names.include?('source_id')
       klass.belongs_to :source
-      database.source_class.has_many table.to_sym
+      RequestLogAnalyzer::Database::Source.has_many table.to_sym
     end
     
     return klass

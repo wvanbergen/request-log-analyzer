@@ -15,16 +15,13 @@ describe RequestLogAnalyzer::Database::Base do
       @orm_class.stub!(:belongs_to)
       @orm_class.stub!(:serialize)
       @orm_class.stub!(:line_definition=)
+      
       Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@orm_class)
       
-      @request_class = mock('Request ActiveRecord::Base class')
-      @request_class.stub!(:has_many)
-      @source_class = mock('Source ActiveRecord::Base class')
-      @source_class.stub!(:has_many)      
+      RequestLogAnalyzer::Database::Request.stub!(:has_many)
+      RequestLogAnalyzer::Database::Source.stub!(:has_many)
       
       @database = mock_database
-      @database.stub!(:request_class).and_return(@request_class)
-      @database.stub!(:source_class).and_return(@source_class)
       RequestLogAnalyzer::Database::Base.stub!(:database).and_return(@database)
     end
 
@@ -49,12 +46,12 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should set a :has_many relationship in the request class" do
-      @request_class.should_receive(:has_many).with(:test_lines)
+      RequestLogAnalyzer::Database::Request.should_receive(:has_many).with(:test_lines)
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
     end
 
     it "should set a :has_many relationship in the source class" do
-      @source_class.should_receive(:has_many).with(:test_lines)
+      RequestLogAnalyzer::Database::Source.should_receive(:has_many).with(:test_lines)
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
     end
 
@@ -73,14 +70,10 @@ describe RequestLogAnalyzer::Database::Base do
   describe '.subclass_from_table' do
     before(:each) do
       
-      @request_class = mock('Request ActiveRecord::Base class')
-      @request_class.stub!(:has_many)
-      @source_class = mock('Source ActiveRecord::Base class')
-      @source_class.stub!(:has_many)      
+      RequestLogAnalyzer::Database::Request.stub!(:has_many)
+      RequestLogAnalyzer::Database::Source.stub!(:has_many)      
       
       @database = mock_database
-      @database.stub!(:request_class).and_return(@request_class)
-      @database.stub!(:source_class).and_return(@source_class)
       @database.connection.stub!(:table_exists?).and_return(true)
       RequestLogAnalyzer::Database::Base.stub!(:database).and_return(@database)
       
@@ -107,7 +100,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
     
     it "should create the :has_many relation in the request class" do
-      @request_class.should_receive(:has_many).with(:completed_lines)
+      RequestLogAnalyzer::Database::Request.should_receive(:has_many).with(:completed_lines)
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 
@@ -117,7 +110,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
     
     it "should create the :has_many relation in the request class" do
-      @source_class.should_receive(:has_many).with(:completed_lines)
+      RequestLogAnalyzer::Database::Source.should_receive(:has_many).with(:completed_lines)
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 

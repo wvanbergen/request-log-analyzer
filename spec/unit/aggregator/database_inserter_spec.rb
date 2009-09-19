@@ -66,7 +66,7 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
       it "should insert a record in the request table" do
         lambda { 
           @database_inserter.aggregate(@incomplete_request)
-        }.should change(@database_inserter.database.request_class, :count).from(0).to(1)
+        }.should change(RequestLogAnalyzer::Database::Request, :count).from(0).to(1)
       end
       
       it "should insert a record in the first_lines table" do
@@ -77,7 +77,7 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
 
       it "should insert records in all relevant line tables" do
         @database_inserter.aggregate(@completed_request)
-        request = @database_inserter.database.request_class.first
+        request = RequestLogAnalyzer::Database::Request.first
         request.should have(2).test_lines
         request.should have(1).first_lines
         request.should have(1).eval_lines
@@ -85,7 +85,7 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
       end
 
       it "should log a warning in the warnings table" do
-        @database_inserter.database.warning_class.should_receive(:create!).with(hash_including(:warning_type => 'test_warning'))
+        RequestLogAnalyzer::Database::Warning.should_receive(:create!).with(hash_including(:warning_type => 'test_warning'))
         @database_inserter.warning(:test_warning, "Testing the warning system", 12)
       end
     end

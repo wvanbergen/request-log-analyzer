@@ -15,11 +15,11 @@ describe RequestLogAnalyzer::Database do
       # FileFormat-agnostic classes
       default_orm_class_names.each do |const|
         it "should create the default #{const} constant" do
-          Object.const_defined?(const).should be_true
+          RequestLogAnalyzer::Database.const_defined?(const).should be_true
         end
 
         it "should create the default #{const} class inheriting from ActiveRecord::Base and RequestLogAnalyzer::Database::Base" do
-          Object.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
+          RequestLogAnalyzer::Database.const_get(const).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
         end
       end
     
@@ -38,8 +38,8 @@ describe RequestLogAnalyzer::Database do
         end
         
         it "should create a :has_many relation from the Request and Source class to the #{const} class" do
-          @database.request_class.send(:reflections).should include(const.underscore.pluralize.to_sym)
-          @database.source_class.send(:reflections).should include(const.underscore.pluralize.to_sym)
+          RequestLogAnalyzer::Database::Request.send(:reflections).should include(const.underscore.pluralize.to_sym)
+          RequestLogAnalyzer::Database::Source.send(:reflections).should include(const.underscore.pluralize.to_sym)
         end
       end
     end
@@ -60,6 +60,7 @@ describe RequestLogAnalyzer::Database do
     after(:each) { @database.remove_orm_classes! }
 
     default_orm_class_names.each do |klass|
+      
       it "should create a table for the default #{klass} class" do
         @database.connection.should_receive(:create_table).with(klass.underscore.pluralize.to_sym)
         @database.send :create_database_schema!
@@ -67,7 +68,7 @@ describe RequestLogAnalyzer::Database do
 
       it "should create a #{klass} class inheriting from ActiveRecord and the base class of the ORM module" do
         @database.send :create_database_schema!
-        @database.send("#{klass.underscore}_class".to_sym).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
+        RequestLogAnalyzer::Database.const_get(klass).ancestors.should include(ActiveRecord::Base, RequestLogAnalyzer::Database::Base)
       end
     end
 
@@ -92,15 +93,9 @@ describe RequestLogAnalyzer::Database do
       @connection = mock_connection
       @database.stub!(:connection).and_return(@connection)
       
-      # Mock the request ORM class
-      @request_class = mock('Request ActiveRecord::Base class')
-      @request_class.stub!(:has_many)
-    
-      @source_class = mock('Source ActiveRecord::Base class')
-      @source_class.stub!(:has_many)
-    
-      @database.stub!(:request_class).and_return(@request_class)
-      @database.stub!(:source_class).and_return(@source_class)
+      # Mock the has_many method of the defaukt ORM classes
+      RequestLogAnalyzer::Database::Request.stub!(:has_many)
+      RequestLogAnalyzer::Database::Source.stub!(:has_many)
       
       @mock_class = Class.new(RequestLogAnalyzer::Database::Base)
       
