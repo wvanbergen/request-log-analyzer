@@ -5,11 +5,11 @@ module RequestLogAnalyzer::FileFormat
     # Processing EmployeeController#index (for 123.123.123.123 at 2008-07-13 06:00:00) [GET]
     line_definition :processing do |line|
       line.header = true # this line is the first log line for a request 
-      line.teaser = /Processing /
+      # line.teaser = /Processing /
       line.regexp = /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
       line.captures << { :name => :controller, :type  => :string } \
                     << { :name => :action,     :type  => :string } \
-                    << { :name => :format,     :type  => :format } \
+                    << { :name => :format,     :type  => :string, :default => 'html' } \
                     << { :name => :ip,         :type  => :string } \
                     << { :name => :timestamp,  :type  => :timestamp } \
                     << { :name => :method,     :type  => :string }
@@ -46,7 +46,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :completed do |line|
     
       line.footer = true
-      line.teaser = /Completed in /
+      # line.teaser = /Completed in /
       line.regexp = Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})")
     
       line.captures << { :name => :duration, :type => :duration, :unit => :sec } \
@@ -61,8 +61,6 @@ module RequestLogAnalyzer::FileFormat
                     << { :name => :status,   :type => :integer } \
                     << { :name => :url,      :type => :string }  # 2.2 variant 
     end
-
-
 
     REQUEST_CATEGORIZER = Proc.new do |request|
       "#{request[:controller]}##{request[:action]}.#{request[:format]} [#{request[:method]}]"
@@ -90,15 +88,10 @@ module RequestLogAnalyzer::FileFormat
     # Define a custom Request class for the Rails file format to speed up timestamp handling
     # and to ensure that a format is always set.
     class Request < RequestLogAnalyzer::Request
-
+    
       # Do not use DateTime.parse
       def convert_timestamp(value, definition)
         value.gsub(/[^0-9]/, '')[0...14].to_i unless value.nil?
-      end
-      
-      # Set 'html' as default format for a request
-      def convert_format(value, definition)
-        value || 'html'
       end
     end
 

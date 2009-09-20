@@ -19,7 +19,7 @@ module RequestLogAnalyzer
       # using the type indication in the line definition. It will use a custom connverter
       # method if one is available.
       def convert_value(value, capture_definition)
-        return nil if value.nil?
+        return capture_definition[:default] if value.nil?
         custom_converter_method = :"convert_#{capture_definition[:type]}"
         send(custom_converter_method, value, capture_definition)
       end
