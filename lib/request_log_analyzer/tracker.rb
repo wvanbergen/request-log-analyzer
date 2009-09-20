@@ -29,6 +29,17 @@ module RequestLogAnalyzer::Tracker
     # * <tt>:line_type</tt> Line type this tracker will accept.
     def initialize(options ={})
       @options = options
+      setup_should_update_checks!
+    end
+    
+    # Sets up the tracker's should_update? checks.
+    def setup_should_update_checks!
+      @should_update_checks = []
+      @should_update_checks.push( lambda { |request| request.has_line_type?(options[:line_type]) } ) if options[:line_type]
+      @should_update_checks.push(options[:if]) if options[:if].respond_to?(:call)
+      @should_update_checks.push( lambda { |request| request[options[:if]] }) if options[:if].kind_of?(Symbol)
+      @should_update_checks.push( lambda { |request| !options[:unless].call(request) }) if options[:unless].respond_to?(:call)
+      @should_update_checks.push( lambda { |request| !request[options[:unless]] }) if options[:unless].kind_of?(Symbol)
     end
     
     # Hook things that need to be done before running here.
@@ -55,25 +66,7 @@ module RequestLogAnalyzer::Tracker
     #
     # <tt>request</tt> The request object.
     def should_update?(request)
-      return false if options[:line_type] && !request.has_line_type?(options[:line_type])
-      
-      if options[:if]
-        if options[:if].kind_of?(Symbol)
-          return false unless request[options[:if]]
-        elsif options[:if].respond_to?(:call)
-          return false unless options[:if].call(request)
-        end
-      end
-      
-      if options[:unless]
-        if options[:unless].kind_of?(Symbol)
-          return false if request[options[:unless]]
-        elsif options[:unless].respond_to?(:call)
-          return false if options[:unless].call(request)
-        end
-      end
-      
-      return true
+      @should_update_checks.all? { |c| c.call(request) }
     end
     
     # Hook report generation here.
