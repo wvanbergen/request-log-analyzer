@@ -40,7 +40,9 @@ module RequestLogAnalyzer
         nil
       end
       
-      # Slow default method to parse timestamps
+      # Slow default method to parse timestamps. 
+      # Reimplement this function in a file format specific Request class
+      # to improve the timestamp parsing speed.
       def convert_timestamp(value, capture_definition)
         DateTime.parse(value).strftime('%Y%m%d%H%M%S').to_i
       end
@@ -48,26 +50,29 @@ module RequestLogAnalyzer
       # Converts traffic fields to (whole) bytes based on the given unit.
       def convert_traffic(value, capture_definition)
         case capture_definition[:unit]
+        when nil, :b, :B, :byte      then value.to_i
         when :GB, :G, :gigabyte      then (value.to_f * 1000_000_000).round
         when :GiB, :gibibyte         then (value.to_f * (2 ** 30)).round
         when :MB, :M, :megabyte      then (value.to_f * 1000_000).round
         when :MiB, :mebibyte         then (value.to_f * (2 ** 20)).round
         when :KB, :K, :kilobyte, :kB then (value.to_f * 1000).round
         when :KiB, :kibibyte         then (value.to_f * (2 ** 10)).round
-        else                              value.to_i
+        else raise "Unknown traffic unit"
         end
       end
       
       # Convert duration fields to float, and make sure the values are in seconds.
       def convert_duration(value, capture_definition)
         case capture_definition[:unit]
+        when nil, :sec, :s     then value.to_f
         when :microsec, :musec then value.to_f / 1000000.0
         when :msec, :millisec  then value.to_f / 1000.0
-        else                        value.to_f
+        else raise "Unknown duration unit"
         end
       end
     end
 
+    # Install the default converter methods
     include Converters
 
     attr_reader :lines, :attributes, :file_format
