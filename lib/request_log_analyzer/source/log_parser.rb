@@ -134,7 +134,7 @@ module RequestLogAnalyzer::Source
     def parse_io(io, options = {}, &block) # :yields: request
       @current_lineno = 1
       while line = io.gets
-        @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 127 == 0
+        @progress_handler.call(:progress, io.pos) if @progress_handler && (@current_lineno & 255 == 0)
         
         if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
           @parsed_lines += 1
