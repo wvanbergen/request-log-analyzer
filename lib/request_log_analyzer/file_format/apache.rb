@@ -92,18 +92,13 @@ module RequestLogAnalyzer::FileFormat
 
       analyze.frequency :category => :http_method, :amount => 20, :title => "HTTP methods"  if line_definition.captures?(:http_method)
       analyze.frequency :category => :http_status, :amount => 20, :title => "HTTP statuses" if line_definition.captures?(:http_status)
-      analyze.frequency :category => :path, :amount => 20, :title => "Most popular URIs"    if line_definition.captures?(:path)
+      analyze.frequency :category => lambda { |r| r.category }, :amount => 20, :title => "Most popular URIs"    if line_definition.captures?(:path)
 
       analyze.frequency :category => :user_agent, :amount => 20, :title => "User agents"    if line_definition.captures?(:user_agent)
       analyze.frequency :category => :referer,    :amount => 20, :title => "Referers"       if line_definition.captures?(:referer)
 
-      if line_definition.captures?(:path) && line_definition.captures?(:duration)
-        analyze.duration :duration => :duration, :category => :path , :title => 'Request duration'
-      end
-
-      if line_definition.captures?(:path) && line_definition.captures?(:bytes_sent)
-        analyze.traffic :traffic => :bytes_sent, :category => :path , :title => 'Traffic'
-      end
+      analyze.duration :duration => :duration,  :category => lambda { |r| r.category }, :title => 'Request duration' if line_definition.captures?(:duration)
+      analyze.traffic  :traffic => :bytes_sent, :category => lambda { |r| r.category }, :title => 'Traffic'          if line_definition.captures?(:bytes_sent)
 
       return analyze.trackers
     end
