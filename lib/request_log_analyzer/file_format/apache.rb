@@ -111,14 +111,17 @@ module RequestLogAnalyzer::FileFormat
     # Define a custom Request class for the Apache file format to speed up timestamp handling.
     class Request < RequestLogAnalyzer::Request
       
+      def category
+        first(:path)
+      end
+      
       MONTHS = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
                 'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12' }
       
       # Do not use DateTime.parse, but parse the timestamp ourselves to return a integer
       # to speed up parsing.
       def convert_timestamp(value, definition)
-        d = /^(\d{2})\/([A-Za-z]{3})\/(\d{4}).(\d{2}):(\d{2}):(\d{2})/.match(value).captures
-        "#{d[2]}#{MONTHS[d[1]]}#{d[0]}#{d[3]}#{d[4]}#{d[5]}".to_i
+        "#{value[7,4]}#{MONTHS[value[3,3]]}#{value[0,2]}#{value[12,2]}#{value[15,2]}#{value[18,2]}".to_i
       end
       
       # This function can be overridden to rewrite the path for better categorization in the

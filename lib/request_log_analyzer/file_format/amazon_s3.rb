@@ -48,8 +48,7 @@ module RequestLogAnalyzer::FileFormat
       # Do not use DateTime.parse, but parse the timestamp ourselves to return a integer
       # to speed up parsing.
       def convert_timestamp(value, definition)
-        d = /^(\d{2})\/([A-Za-z]{3})\/(\d{4}).(\d{2}):(\d{2}):(\d{2})/.match(value).captures
-        "#{d[2]}#{MONTHS[d[1]]}#{d[0]}#{d[3]}#{d[4]}#{d[5]}".to_i
+        "#{value[7,4]}#{MONTHS[value[3,3]]}#{value[0,2]}#{value[12,2]}#{value[15,2]}#{value[18,2]}".to_i
       end
       
       # Make sure that the string '-' is parsed as a nil value.
