@@ -48,7 +48,7 @@ describe RequestLogAnalyzer::Tracker::Base do
       @tracker_class = Class.new(RequestLogAnalyzer::Tracker::Base)
     end
     
-    it "should return true by default" do
+    it "should return true by default, when no checks are installed" do
       tracker = @tracker_class.new
       tracker.should_update?(testing_format.request).should be_true
     end
@@ -63,22 +63,22 @@ describe RequestLogAnalyzer::Tracker::Base do
       tracker.should_update?(request(:line_type => :there)).should be_true
     end
     
-    it "should return true if a a field name is given to :if and it is in the request" do
+    it "should return true if a field name is given to :if and it is in the request" do
       tracker = @tracker_class.new(:if => :field)
       tracker.should_update?(request(:field => 'anything')).should be_true
     end
 
-    it "should return false if a a field name is given to :if and it is not the request" do
+    it "should return false if a field name is given to :if and it is not the request" do
       tracker = @tracker_class.new(:if => :field)
       tracker.should_update?(request(:other_field => 'anything')).should be_false
     end
 
-    it "should return false if a a field name is given to :unless and it is in the request" do
+    it "should return false if a field name is given to :unless and it is in the request" do
       tracker = @tracker_class.new(:unless => :field)
       tracker.should_update?(request(:field => 'anything')).should be_false
     end
 
-    it "should return true if a a field name is given to :unless and it is not the request" do
+    it "should return true if a field name is given to :unless and it is not the request" do
       tracker = @tracker_class.new(:unless => :field)
       tracker.should_update?(request(:other_field => 'anything')).should be_true
     end
