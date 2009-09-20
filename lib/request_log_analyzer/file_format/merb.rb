@@ -1,11 +1,14 @@
 module RequestLogAnalyzer::FileFormat
   
+  # The Merb file format parses the request header with the timestamp, the params line
+  # with the most important request information and the durations line which contains
+  # the different request durations that can be used for analysis.
   class Merb < Base
 
     # ~ Started request handling: Fri Aug 29 11:10:23 +0200 2008
     line_definition :started do |line|
       line.header = true
-      line.teaser = /Started/
+      # line.teaser = /Started/
       line.regexp = /Started request handling\:\ (.+)/
       line.captures << { :name => :timestamp, :type => :timestamp }
     end    
@@ -13,7 +16,7 @@ module RequestLogAnalyzer::FileFormat
     # ~ Params: {"action"=>"create", "controller"=>"session"}
     # ~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"d}
     line_definition :params do |line|
-      line.teaser = /Params/
+      # line.teaser = /Params/
       line.regexp = /Params\:\ (\{.+\})/
       line.captures << { :name => :params, :type => :eval, :provides => { 
             :namespace => :string, :controller => :string, :action => :string, :format => :string, :method => :string } }
@@ -36,15 +39,28 @@ module RequestLogAnalyzer::FileFormat
     end
     
     report do |analyze|
-      analyze.timespan :line_type => :started
+      
+      analyze.timespan
+      analyze.hourly_spread
+
       analyze.frequency :category => REQUEST_CATEGORIZER, :amount => 20, :title => "Top 20 by hits"
-      analyze.hourly_spread :line_type => :started
       analyze.duration :dispatch_time, :category => REQUEST_CATEGORIZER, :title => 'Request dispatch duration'
+      
       # analyze.duration :action_time, :category => REQUEST_CATEGORIZER, :title => 'Request action duration'
       # analyze.duration :after_filters_time, :category => REQUEST_CATEGORIZER, :title => 'Request after_filter duration'
       # analyze.duration :before_filters_time, :category => REQUEST_CATEGORIZER, :title => 'Request before_filter duration'
     end
-        
+
+    class Request < RequestLogAnalyzer::Request
+      
+      MONTHS = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
+                'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12' }
+      
+      # Speed up timestamp conversion
+      def convert_timestamp(value, definition)
+        "#{value[26,4]}#{MONTHS[value[4,3]]}#{value[8,2]}#{value[11,2]}#{value[14,2]}#{value[17,2]}".to_i
+      end
+    end
   end
 
 end
