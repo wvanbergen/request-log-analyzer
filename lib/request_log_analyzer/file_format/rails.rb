@@ -69,8 +69,10 @@ module RequestLogAnalyzer::FileFormat
     end
 
     report do |analyze|
-      analyze.timespan :line_type => :processing
-      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20, :line_type => :processing
+      analyze.timespan
+      analyze.hourly_spread
+            
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20
       analyze.frequency :method, :title => 'HTTP methods'
       analyze.frequency :status, :title => 'HTTP statuses returned'
       analyze.frequency :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits'
@@ -82,7 +84,6 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)', 
               :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20
             
-      analyze.hourly_spread :line_type => :processing
       analyze.frequency :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
     end
 
