@@ -23,36 +23,34 @@ module RequestLogAnalyzer
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     # <rr>report_with</tt> Width of the report. Defaults to 80.
     def self.build_from_arguments(arguments)
-      options = { }
-
-      # Database command line options
-      options[:database]       = arguments[:database] if arguments[:database]
+      
+      options = {}
+      
+      # Copy fields
+      options[:database]       = arguments[:database]
       options[:reset_database] = arguments[:reset_database]
       options[:debug]          = arguments[:debug]
       options[:dump]           = arguments[:dump]
       options[:parse_strategy] = arguments[:parse_strategy]
       options[:no_progress]    = arguments[:no_progress]
-
-      output_class = RequestLogAnalyzer::Output::const_get(arguments[:output])
-      if arguments[:file]
-        output_file = File.new(arguments[:file], "w+")
-        options[:output] = output_class.new(output_file, :width => 80, :color => false, :characters => :ascii)
-      elsif arguments[:mail]
-        output_mail = RequestLogAnalyzer::Mailer.new(arguments[:mail])
-        options[:output] = output_class.new(output_mail, :width => 80, :color => false, :characters => :ascii)
-      else
-        options[:output] = output_class.new(STDOUT, :width => arguments[:report_width].to_i,
-            :color => !arguments[:boring], :characters => (arguments[:boring] ? :ascii : :utf))
+      options[:format]         = arguments[:format]
+      options[:output]         = arguments[:output]
+      options[:file]           = arguments[:file]
+      options[:format]         = arguments[:format]
+      options[:after]          = arguments[:after]
+      options[:before]         = arguments[:before]
+      options[:reject]         = arguments[:reject]
+      options[:select]         = arguments[:select]
+      options[:boring]         = arguments[:boring]
+      options[:aggregator]     = arguments[:aggregator]
+      options[:report_width]   = arguments[:report_width]
+      
+      # Apache format workaround
+      if arguments[:apache_format]
+        options[:format] = {:apache => arguments[:apache_format]}
       end
-
-      # Create the controller with the correct file format
-      file_format = if arguments[:apache_format]
-          RequestLogAnalyzer::FileFormat.load(:apache, arguments[:apache_format])
-        else
-          RequestLogAnalyzer::FileFormat.load(arguments[:format])
-        end
-
-      # register sources
+      
+      # Register sources
       if arguments.parameters.length == 1
         file = arguments.parameters[0]
         if file == '-' || file == 'STDIN'
@@ -66,39 +64,8 @@ module RequestLogAnalyzer
       else
         options.store(:source_files, arguments.parameters)
       end
-
-      controller = Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format, options), options)
-      #controller = Controller.new(RequestLogAnalyzer::Source::DatabaseLoader.new(file_format, options), options)
-
-      # register filters
-      if arguments[:after] || arguments[:before]
-        filter_options = {}
-        filter_options[:after]  = DateTime.parse(arguments[:after])
-        filter_options[:before] = DateTime.parse(arguments[:before]) if arguments[:before]
-        controller.add_filter(:timespan, filter_options)
-      end
-
-      arguments[:reject].each do |(field, value)|
-        controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
-      end
-
-      arguments[:select].each do |(field, value)|
-        controller.add_filter(:field, :mode => :select, :field => field, :value => value)
-      end
-
-      # register aggregators
-      arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
-
-      # register the database
-      controller.add_aggregator(:summarizer)          if arguments[:aggregator].empty?
-      controller.add_aggregator(:database_inserter)   if arguments[:database] && !arguments[:aggregator].include?('database')
-
-      # register the echo aggregator in debug mode
-      controller.add_aggregator(:echo) if arguments[:debug]
-
-      file_format.setup_environment(controller)
-
-      return controller
+      
+      build(options)
     end
 
     # Build a new controller using parameters (Base for new API)
@@ -106,7 +73,7 @@ module RequestLogAnalyzer
     # Options are passd on to the LogParser.
     #
     # Options
-    # * <tt>:database</tt> 
+    # * <tt>:database</tt> Database file
     # * <tt>:reset_database</tt> 
     # * <tt>:debug</tt> Enables echo aggregator.
     # * <tt>:dump</tt> 
@@ -120,17 +87,26 @@ module RequestLogAnalyzer
     # * <tt>:before</tt> Drop all requests before this date
     # * <tt>:reject</tt> Reject specific {:field => :value} combination. Expects single hash.
     # * <tt>:select</tt> Select specific {:field => :value} combination. Expects single hash.
-    # * <tt>:aggregators</tt> Array of aggregators (ATM: STRINGS OR SYMBOLS ONLY!). Defaults to summarizer
+    # * <tt>:aggregator</tt> Array of aggregators (ATM: STRINGS OR SYMBOLS ONLY!). Defaults to [:summarizer
+    # * <tt>:boring</tt> Do not show color on STDOUT. Defaults to False.
+    # * <tt>::report_width</tt> Width or reports in characters. Defaults to 80.
+    #
+    # TODO:
+    #   Check if defaults work (Aggregator defaults seem wrong).
+    #   Refactor :database => options[:database], :dump => options[:dump] away from contoller intialization.
     def self.build(options)
       # Defaults
-      options[:output]      ||= :fixed_width
-      options[:format]      ||= :rails
-      options[:aggregator]  ||= :summarizer
+      options[:output]        ||= :fixed_width
+      options[:format]        ||= :rails
+      options[:aggregator]    ||= [:summarizer]
+      options[:report_width]  ||= 80
+      options[:boring]        ||= false
       
       # Set the output class
       output_args = {}
       output_object = nil
-
+      output_class = RequestLogAnalyzer::Output::const_get(options[:output])
+      
       if options[:file]
         output_object = (options[:file].class == File) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii }
@@ -139,36 +115,25 @@ module RequestLogAnalyzer
         output_args   = {:width => 80, :color => false, :characters => :ascii }
       else
         output_object = STDOUT
-        output_args   = {:width => arguments[:report_width].to_i, :color => !options[:boring],
-                        :characters => (arguments[:boring] ? :ascii : :utf)}
+        output_args   = {:width => options[:report_width].to_i, :color => !options[:boring],
+                        :characters => (options[:boring] ? :ascii : :utf)}
       end
-      output_class = RequestLogAnalyzer::Output.load(output_object, output_args)
+      
+      output_instance = output_class.new(output_object, output_args)
       
       # Create the controller with the correct file format
       if options[:format].kind_of?(Hash)
         file_format = RequestLogAnalyzer::FileFormat.load(options[:format].keys[0], options[:format].values[0])
       else
-        file_format = RequestLogAnalyzer::FileFormat.load(options[:format], format_arguments)
-      end
-      
-      # Handle source files
-      source_files = nil
-      if options[:source_files]
-        if options[:source_files] == '-' || options[:source_files] == 'STDIN'
-          source_files = $stdin
-        elsif File.exist?(options[:source_files])
-          source_file = options[:source_files]
-        else
-          puts "File not found: #{options[:source_files]}"
-          exit(0)
-        end
-      else
-        source_files = options[:source_files] # Just pray?
+        file_format = RequestLogAnalyzer::FileFormat.load(options[:format])
       end
       
       # Kickstart the controller
-      controller = Controller.new(  RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => source_files),
-                                    :output => output_class)
+      controller = Controller.new(  RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => options[:source_files], :output => output_instance),
+                                    { :output => output_instance,
+                                      :database => options[:database],                # FUGLY!
+                                      :dump => options[:dump], 
+                                      :reset_database => options[:reset_database]})
 
       # register filters
       if options[:after] || options[:before]
@@ -188,7 +153,8 @@ module RequestLogAnalyzer
 
       # register aggregators
       options[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
-      controller.add_aggregator(:echo) if options[:debug]
+      controller.add_aggregator(:summarizer)          if options[:aggregator].empty?
+      controller.add_aggregator(:echo)                if options[:debug]
       controller.add_aggregator(:database_inserter)   if options[:database] && !options[:aggregator].include?('database')
 
       file_format.setup_environment(controller)
@@ -200,6 +166,7 @@ module RequestLogAnalyzer
     # Options are passd on to the LogParser.
     # * <tt>:aggregator</tt> Aggregator array.
     # * <tt>:database</tt> Database the controller should use.
+    # * <tt>:dump</tt> Yaml Dump the contrller should use.
     # * <tt>:echo</tt> Output debug information.
     # * <tt>:silent</tt> Do not output any warnings.
     # * <tt>:colorize</tt> Colorize output
@@ -211,7 +178,7 @@ module RequestLogAnalyzer
       @aggregators = []
       @filters     = []
       @output      = options[:output]
-
+      
       # Register the request format for this session after checking its validity
       raise "Invalid file format!" unless @source.file_format.valid?
 
@@ -290,6 +257,8 @@ module RequestLogAnalyzer
     # 5. Call report on every aggregator
     # 6. Finalize Source
     def run!
+
+      @aggregators.each{|agg| p agg}
 
       @aggregators.each { |agg| agg.prepare }
       install_signal_handlers
