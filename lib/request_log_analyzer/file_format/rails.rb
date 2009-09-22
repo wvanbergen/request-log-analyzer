@@ -15,10 +15,9 @@ module RequestLogAnalyzer::FileFormat
                     << { :name => :method,     :type  => :string }
     end
 
-    # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.    
+    # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.
     line_definition :cache_hit do |line|
-      line.teaser = /Filter chain halted /
-      line.regexp = /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter:.+>\] rendered_or_redirected/
+      line.regexp = /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter/
     end
   
     # RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy' 

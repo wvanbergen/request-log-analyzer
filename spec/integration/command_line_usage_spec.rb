@@ -17,7 +17,7 @@ describe RequestLogAnalyzer, 'running from command line' do
 
   it "should find 2 requests when parsing a compressed file" do
     output = run("#{log_fixture(:decompression, :tgz)}")
-    output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
+    output.any? { |line| /^Parsed requests\:\s*2\s/ =~ line }.should be_true
   end
 
 
