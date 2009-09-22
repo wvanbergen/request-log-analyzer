@@ -34,33 +34,33 @@ module RequestLogAnalyzer::Tracker
       @categories = {}
     end
 
+    # Update sthe running calculation numbers with the newly found duration.
+    # <tt>category</tt>:: The category for which to update the running calculations
+    # <tt>duration</tt>:: The duration to update the calculations with.
+    def update_numbers(category, duration)
+      @categories[category] ||= {:hits => 0, :sum => 0.0, :mean => 0.0, :sum_of_squares => 0.0, :min => duration, :max => duration }
+      delta = duration - @categories[category][:mean]
+      
+      @categories[category][:hits]           += 1
+      @categories[category][:mean]           += (delta / @categories[category][:hits])
+      @categories[category][:sum_of_squares] += delta * (duration - @categories[category][:mean])
+      @categories[category][:sum]            += duration
+      @categories[category][:min]             = duration if duration < @categories[category][:min]
+      @categories[category][:max]             = duration if duration > @categories[category][:max]
+    end
+
     # Get the duration information fron the request and store it in the different categories.
     # <tt>request</tt> The request.
     def update(request)
       if options[:multiple]
         categories = request.every(options[:category])
         durations  = request.every(options[:duration])
-        
-        if categories.length == durations.length
-          categories.each_with_index do |category, index|
-            @categories[category] ||= {:hits => 0, :cumulative => 0.0}
-            @categories[category][:hits] += 1
-            @categories[category][:cumulative] += durations[index]
-          end
-        else
-          raise "Capture mismatch for multiple values in a request"
-        end
+        raise "Capture mismatch for multiple values in a request" unless categories.length == durations.length
+        categories.each_with_index { |category, index| update_numbers(category, durations[index]) }
       else
         category = @categorizer.call(request)
         duration = @durationizer.call(request)
-  
-        if duration.kind_of?(Numeric) && !category.nil?
-          @categories[category] ||= {:hits => 0, :cumulative => 0.0, :min => duration, :max => duration }
-          @categories[category][:hits] += 1
-          @categories[category][:cumulative] += duration
-          @categories[category][:min] = duration if duration < @categories[category][:min]
-          @categories[category][:max] = duration if duration > @categories[category][:max]
-        end
+        update_numbers(category, duration) if duration.kind_of?(Numeric) && !category.nil?
       end
     end
     
@@ -72,65 +72,62 @@ module RequestLogAnalyzer::Tracker
     
     # Get the total duration of a specific category.
     # <tt>cat</tt> The category
-    def cumulative_duration(cat)
-      categories[cat][:cumulative]
+    def sum(cat)
+      categories[cat][:sum]
     end
 
     # Get the minimal duration of a specific category.
     # <tt>cat</tt> The category
-    def min_duration(cat)
+    def min(cat)
       categories[cat][:min]
     end
 
     # Get the maximum duration of a specific category.
     # <tt>cat</tt> The category
-    def max_duration(cat)
+    def max(cat)
       categories[cat][:max]
     end
 
     # Get the average duration of a specific category.
     # <tt>cat</tt> The category
-    def average_duration(cat)
-      categories[cat][:cumulative] / categories[cat][:hits]  
+    def mean(cat)
+      categories[cat][:mean]
+    end
+    
+    # Get the standard deviation of the duration of a specific category.
+    # <tt>cat</tt> The category
+    def stddev(cat)
+      Math.sqrt(variance(cat)) rescue nil
+    end
+    
+    # Get the variance of the duration of a specific category.
+    # <tt>cat</tt> The category
+    def variance(cat)
+      categories[cat][:sum_of_squares] / (categories[cat][:hits] - 1) rescue nil
     end
     
     # Get the average duration of a all categories.
-    def overall_average_duration
-      overall_cumulative_duration / overall_hits
+    def mean_overall
+      sum_overall / hits_overall
     end
     
     # Get the cumlative duration of a all categories.
-    def overall_cumulative_duration
-      categories.inject(0.0) { |sum, (name, cat)| sum + cat[:cumulative] }  
+    def sum_overall
+      categories.inject(0.0) { |sum, (name, cat)| sum + cat[:sum] }
     end
     
     # Get the total hits of a all categories.
-    def overall_hits
+    def hits_overall
       categories.inject(0) { |sum, (name, cat)| sum + cat[:hits] }
     end
 
-    # Return categories sorted by hits.
-    def sorted_by_hits
-      sorted_by(:hits)
-    end
-
-    # Return categories sorted by cumulative duration.
-    def sorted_by_cumulative
-      sorted_by(:cumulative)
-    end
-
-    # Return categories sorted by cumulative duration.
-    def sorted_by_average
-      sorted_by { |cat| cat[:cumulative] / cat[:hits] }
-    end
-          
     # Return categories sorted by a given key.
     # <tt>by</tt> The key.
     def sorted_by(by = nil) 
       if block_given?
-        categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) } 
+        categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }
       else
-        categories.sort { |a, b| b[1][by] <=> a[1][by] } 
+        categories.sort { |a, b| send(by, b[0]) <=> send(by, a[0]) }
       end
     end
     
@@ -140,23 +137,29 @@ module RequestLogAnalyzer::Tracker
     # === Options
     #  * </tt>:title</tt> The title of the table
     #  * </tt>:sort</tt> The key to sort on (:hits, :cumulative, :average, :min or :max)
-    def report_table(output, amount = 10, options = {}, &block)
+    def report_table(output, sort, amount = 10, options = {}, &block)
     
       output.title(options[:title])
     
-      top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
+      top_categories = sorted_by(sort).slice(0...amount)
       output.table({:title => 'Category', :width => :rest}, 
-            {:title => 'Hits',       :align => :right, :highlight => (options[:sort] == :hits), :min_width => 4}, 
-            {:title => 'Cumulative', :align => :right, :highlight => (options[:sort] == :cumulative), :min_width => 10}, 
-            {:title => 'Average',    :align => :right, :highlight => (options[:sort] == :average), :min_width => 8},
-            {:title => 'Min',        :align => :right, :highlight => (options[:sort] == :min)}, 
-            {:title => 'Max',        :align => :right, :highlight => (options[:sort] == :max)}) do |rows|
+            {:title => 'Hits',   :align => :right, :highlight => (sort == :hits),   :min_width => 4 },
+            {:title => 'Sum',    :align => :right, :highlight => (sort == :sum),    :min_width => 6 },
+            {:title => 'Mean',   :align => :right, :highlight => (sort == :mean),   :min_width => 6 },
+            {:title => 'StdDev', :align => :right, :highlight => (sort == :stddev), :min_width => 6 },
+            {:title => 'Min',    :align => :right, :highlight => (sort == :min),    :min_width => 6 },
+            {:title => 'Max',    :align => :right, :highlight => (sort == :max),    :min_width => 6 }) do |rows|
       
         top_categories.each do |(cat, info)|
-          rows << [cat, info[:hits], "%0.02fs" % info[:cumulative], "%0.02fs" % (info[:cumulative] / info[:hits]),
-                    "%0.02fs" % info[:min], "%0.02fs" % info[:max]]
-        end        
+          rows << [cat, hits(cat), display_time(sum(cat)), display_time(mean(cat)), display_time(stddev(cat)),
+                    display_time(min(cat)), display_time(max(cat))]
+        end
       end
+    end
+    
+    # Display a duration
+    def display_time(time)
+      time.nil? ? '-' : "%0.02fs" % time
     end
 
     # Generate a request duration report to the given output object
@@ -166,17 +169,19 @@ module RequestLogAnalyzer::Tracker
     def report(output)
 
       options[:title]  ||= 'Request duration'
-      options[:report] ||= [:cumulative, :average]
+      options[:report] ||= [:sum, :mean]
       options[:top]    ||= 20
   
       options[:report].each do |report|
         case report
-        when :average
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by average time", :sort => :average) { |cat| cat[:cumulative] / cat[:hits] }  
-        when :cumulative
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by cumulative time", :sort => :cumulative) { |cat| cat[:cumulative] }
+        when :mean
+          report_table(output, :mean,   options[:top], :title => "#{options[:title]} - top #{options[:top]} by mean time")
+        when :sum
+          report_table(output, :sum,    options[:top], :title => "#{options[:title]} - top #{options[:top]} by total time")
+        when :stddev
+          report_table(output, :stddev, options[:top], :title => "#{options[:title]} - top #{options[:top]} by time variation")
         when :hits
-          report_table(output, options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits", :sort => :hits) { |cat| cat[:hits] }
+          report_table(output, :hits,   options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits")
         else
           raise "Unknown duration report specified: #{report}!"
         end
@@ -190,7 +195,7 @@ module RequestLogAnalyzer::Tracker
     
     # Returns all the categories and the tracked duration as a hash than can be exported to YAML
     def to_yaml_object
-      return nil if @categories.empty?      
+      return nil if @categories.empty?
       @categories
     end
   end

@@ -24,19 +24,28 @@ module RequestLogAnalyzer::Tracker
       @categories = {}
     end
 
+    # Update sthe running calculation numbers with the newly found duration.
+    # <tt>category</tt>:: The category for which to update the running calculations
+    # <tt>duration</tt>:: The duration to update the calculations with.
+    def update_numbers(category, traffic)
+      @categories[category] ||= {:hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => traffic, :max => traffic }
+      delta = traffic - @categories[category][:mean]
+      
+      @categories[category][:hits]           += 1
+      @categories[category][:mean]           += (delta / @categories[category][:hits])
+      @categories[category][:sum_of_squares] += delta * (traffic - @categories[category][:mean])
+      @categories[category][:sum]            += traffic
+      @categories[category][:min]             = traffic if traffic < @categories[category][:min]
+      @categories[category][:max]             = traffic if traffic > @categories[category][:max]
+    end
+
     # Get the duration information fron the request and store it in the different categories.
     # <tt>request</tt> The request.
     def update(request)
       category = @categorizer.call(request)
       traffic  = @trafficizer.call(request)
 
-      if traffic.kind_of?(Numeric) && !category.nil?
-        @categories[category] ||= {:hits => 0, :cumulative => 0, :min => traffic, :max => traffic }
-        @categories[category][:hits] += 1
-        @categories[category][:cumulative] += traffic
-        @categories[category][:min] = traffic if traffic < @categories[category][:min]
-        @categories[category][:max] = traffic if traffic > @categories[category][:max]
-      end
+      update_numbers(category, traffic) if traffic.kind_of?(Numeric) && !category.nil?
     end
     
     # Get the number of hits of a specific category.
@@ -47,65 +56,62 @@ module RequestLogAnalyzer::Tracker
     
     # Get the total duration of a specific category.
     # <tt>cat</tt> The category
-    def cumulative_traffic(cat)
-      categories[cat][:cumulative]
+    def sum(cat)
+      categories[cat][:sum]
     end
 
     # Get the minimal duration of a specific category.
     # <tt>cat</tt> The category
-    def min_traffic(cat)
+    def min(cat)
       categories[cat][:min]
     end
 
     # Get the maximum duration of a specific category.
     # <tt>cat</tt> The category
-    def max_traffic(cat)
+    def max(cat)
       categories[cat][:max]
     end
 
     # Get the average duration of a specific category.
     # <tt>cat</tt> The category
-    def average_traffic(cat)
-      categories[cat][:cumulative].to_f / categories[cat][:hits]  
+    def mean(cat)
+      categories[cat][:mean]
+    end
+    
+    # Get the standard deviation of the duration of a specific category.
+    # <tt>cat</tt> The category
+    def stddev(cat)
+      Math.sqrt(variance(cat)) rescue nil
+    end
+    
+    # Get the variance of the duration of a specific category.
+    # <tt>cat</tt> The category
+    def variance(cat)
+      categories[cat][:sum_of_squares] / (categories[cat][:hits] - 1) rescue nil
     end
     
     # Get the average duration of a all categories.
-    def overall_average_traffic
-      overall_cumulative_duration.to_f / overall_hits
+    def mean_overall
+      sum_overall / hits_overall
     end
     
     # Get the cumlative duration of a all categories.
-    def overall_cumulative_traffic
-      categories.inject(0) { |sum, (name, cat)| sum + cat[:cumulative] }  
+    def sum_overall
+      categories.inject(0.0) { |sum, (name, cat)| sum + cat[:sum] }
     end
     
     # Get the total hits of a all categories.
-    def overall_hits
+    def hits_overall
       categories.inject(0) { |sum, (name, cat)| sum + cat[:hits] }
     end
 
-    # Return categories sorted by hits.
-    def sorted_by_hits
-      sorted_by(:hits)
-    end
-
-    # Return categories sorted by cumulative duration.
-    def sorted_by_cumulative
-      sorted_by(:cumulative)
-    end
-
-    # Return categories sorted by cumulative duration.
-    def sorted_by_average
-      sorted_by { |cat| cat[:cumulative].to_f / cat[:hits] }
-    end
-          
     # Return categories sorted by a given key.
     # <tt>by</tt> The key.
     def sorted_by(by = nil) 
       if block_given?
-        categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) } 
+        categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }
       else
-        categories.sort { |a, b| b[1][by] <=> a[1][by] } 
+        categories.sort { |a, b| send(by, b[0]) <=> send(by, a[0]) }
       end
     end
     
@@ -115,27 +121,29 @@ module RequestLogAnalyzer::Tracker
     # === Options
     #  * </tt>:title</tt> The title of the table
     #  * </tt>:sort</tt> The key to sort on (:hits, :cumulative, :average, :min or :max)
-    def report_table(output, amount = 10, options = {}, &block)
+    def report_table(output, sort, amount = 10, options = {}, &block)
       
       output.title(options[:title])
       
-      top_categories = @categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }.slice(0...amount)
+      top_categories =       top_categories = sorted_by(sort).slice(0...amount)
       output.table({:title => 'Category', :width => :rest}, 
-            {:title => 'Hits',       :align => :right, :highlight => (options[:sort] == :hits), :min_width => 4}, 
-            {:title => 'Cumulative', :align => :right, :highlight => (options[:sort] == :cumulative), :min_width => 10}, 
-            {:title => 'Average',    :align => :right, :highlight => (options[:sort] == :average), :min_width => 8},
-            {:title => 'Min',        :align => :right, :highlight => (options[:sort] == :min)}, 
-            {:title => 'Max',        :align => :right, :highlight => (options[:sort] == :max)}) do |rows|
+            {:title => 'Hits',   :align => :right, :highlight => (sort == :hits),   :min_width => 4},
+            {:title => 'Sum',    :align => :right, :highlight => (sort == :sum),    :min_width => 6},
+            {:title => 'Mean',   :align => :right, :highlight => (sort == :mean),   :min_width => 6},
+            {:title => 'StdDev', :align => :right, :highlight => (sort == :stddev), :min_width => 6},
+            {:title => 'Min',    :align => :right, :highlight => (sort == :min),    :min_width => 6},
+            {:title => 'Max',    :align => :right, :highlight => (sort == :max),    :min_width => 6}) do |rows|
       
         top_categories.each do |(cat, info)|
-          rows << [cat, info[:hits], format_traffic(info[:cumulative]), format_traffic((info[:cumulative] / info[:hits]).round),
-                    format_traffic(info[:min]), format_traffic(info[:max])]
+          rows << [cat, hits(cat), display_traffic(sum(cat)), display_traffic(mean(cat)), display_traffic(stddev(cat)),
+                    display_traffic(min(cat)), display_traffic(max(cat))]
         end
       end
     end
     
     # Formats the traffic number using x B/kB/MB/GB etc notation
-    def format_traffic(bytes)
+    def display_traffic(bytes)
+      return "-"   if bytes.nil?
       return "0 B" if bytes.zero?
       case Math.log10(bytes).floor
       when  1...4  then '%d B'  % bytes
@@ -152,24 +160,26 @@ module RequestLogAnalyzer::Tracker
     # <tt>output</tt> The output object
     def report(output)
 
-      options[:report] ||= [:cumulative, :average]
+      options[:report] ||= [:sum, :mean]
       options[:top]    ||= 20
   
       options[:report].each do |report|
         case report
-        when :average
-          report_table(output, options[:top], :title => "#{title} - top #{options[:top]} by average", :sort => :average) { |cat| cat[:cumulative] / cat[:hits] }  
-        when :cumulative
-          report_table(output, options[:top], :title => "#{title} - top #{options[:top]} by sum", :sort => :cumulative) { |cat| cat[:cumulative] }
+        when :mean
+          report_table(output, :mean,   options[:top], :title => "#{title} - top #{options[:top]} by mean")
+        when :stddev
+          report_table(output, :stddev, options[:top], :title => "#{title} - top #{options[:top]} by standard deviation")
+        when :sum
+          report_table(output, :sum,    options[:top], :title => "#{title} - top #{options[:top]} by sum")
         when :hits
-          report_table(output, options[:top], :title => "#{title} - top #{options[:top]} by hits", :sort => :hits) { |cat| cat[:hits] }
+          report_table(output, :hits,   options[:top], :title => "#{title} - top #{options[:top]} by hits")
         else
           raise "Unknown duration report specified: #{report}!"
         end
       end
       
       output.puts
-      output.puts "#{output.colorize(title, :white, :bold)} - observed total: " + output.colorize(format_traffic(overall_cumulative_traffic), :brown, :bold)
+      output.puts "#{output.colorize(title, :white, :bold)} - observed total: " + output.colorize(display_traffic(sum_overall), :brown, :bold)
     end
     
     # Returns the title of this tracker for reports

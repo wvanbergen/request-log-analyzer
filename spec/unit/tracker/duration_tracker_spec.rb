@@ -1,93 +1,99 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe RequestLogAnalyzer::Tracker::Duration, 'static category' do
+describe RequestLogAnalyzer::Tracker::Duration do
   
-  before(:each) do
-    @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => :category)
-    @tracker.prepare
-  end
+  context 'using a static category' do
+    
+    before(:each) do
+      @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => :category)
+      @tracker.prepare
+    end
 
-  it "should register a request in the right category" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.categories.keys.should include('a')
-  end
- 
-  it "should register a hit in the right category" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.update(request(:category => 'b', :duration => 0.3))
-    @tracker.update(request(:category => 'b', :duration => 0.4))
+    it "should create a category for every request using the category field" do
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      @tracker.categories.keys.should include('a')
+    end
+
+    it "should register a request as hit in the right category" do
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      @tracker.update(request(:category => 'b', :duration => 0.3))
+      @tracker.update(request(:category => 'b', :duration => 0.4))
     
-    @tracker.hits('a').should == 1
-    @tracker.hits('b').should == 2
-  end
-  
-  it "should sum the durations of the same category as cumulative duration" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.update(request(:category => 'b', :duration => 0.3))
-    @tracker.update(request(:category => 'b', :duration => 0.4))      
-    
-    @tracker.cumulative_duration('a').should == 0.2
-    @tracker.cumulative_duration('b').should == 0.7
+      @tracker.hits('a').should == 1
+      @tracker.hits('b').should == 2
+    end
   end
   
-  it "should calculate the average duration correctly" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.update(request(:category => 'b', :duration => 0.3))
-    @tracker.update(request(:category => 'b', :duration => 0.4))      
-    
-    @tracker.average_duration('a').should == 0.2
-    @tracker.average_duration('b').should == 0.35
+  context 'using a dynamic category' do
+    before(:each) do
+      @categorizer = Proc.new { |request| request[:duration] > 0.2 ? 'slow' : 'fast' }
+      @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => @categorizer)
+      @tracker.prepare
+    end
+
+    it "should use the categorizer to determine the right category" do
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      @tracker.update(request(:category => 'b', :duration => 0.3))
+      @tracker.update(request(:category => 'b', :duration => 0.4)) 
+
+      @tracker.hits('fast').should == 1
+      @tracker.hits('slow').should == 2
+    end
   end
   
-  it "should set min and max duration correctly" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.update(request(:category => 'b', :duration => 0.3))
-    @tracker.update(request(:category => 'b', :duration => 0.4))      
+  describe '#update' do
     
-    @tracker.min_duration('b').should == 0.3
-    @tracker.max_duration('b').should == 0.4
+    before(:each) do
+      @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => :category)
+      @tracker.prepare
+      
+      @tracker.update(request(:category => 'a', :duration => 0.4))
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+    end
+    
+    it "should sum of the durations for a category correctly" do
+      @tracker.sum('a').should be_close(0.9, 0.000001)
+    end
+    
+    it "should keep track of the minimum and maximum duration" do
+      @tracker.min('a').should == 0.2
+      @tracker.max('a').should == 0.4
+    end
+
+    it "should calculate the mean duration correctly" do
+      @tracker.mean('a').should be_close(0.3, 0.000001)
+    end
+    
+    it "should calculate the duration variance correctly" do
+      @tracker.variance('a').should be_close(0.01, 0.000001)
+    end
+
+    it "should calculate the duration standard deviation correctly" do
+      @tracker.stddev('a').should be_close(0.1,  0.000001)
+    end
+  end
+  
+  describe '#report' do
+
+    before(:each) do
+      @tracker = RequestLogAnalyzer::Tracker::Duration.new(:category => :category, :duration => :duration)
+      @tracker.prepare
+    end
+
+    it "should generate a report without errors when one category is present" do
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      lambda { @tracker.report(mock_output) }.should_not raise_error
+    end
+
+    it "should generate a report without errors when no category is present" do
+      lambda { @tracker.report(mock_output) }.should_not raise_error
+    end
+
+    it "should generate a report without errors when multiple categories are present" do
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      @tracker.update(request(:category => 'b', :duration => 0.2))
+      lambda { @tracker.report(mock_output) }.should_not raise_error
+    end
   end  
-  
-end
-
-describe RequestLogAnalyzer::Tracker::Duration, 'dynamic category' do
-  
-  before(:each) do
-    @categorizer = Proc.new { |request| request[:duration] > 0.2 ? 'slow' : 'fast' }
-    @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => @categorizer)
-    @tracker.prepare
-  end
-  
-  it "should use the categorizer to determine the right category" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.update(request(:category => 'b', :duration => 0.3))
-    @tracker.update(request(:category => 'b', :duration => 0.4)) 
-    
-    @tracker.cumulative_duration('fast').should == 0.2
-    @tracker.cumulative_duration('slow').should == 0.7     
-  end
-  
-end
-
-describe RequestLogAnalyzer::Tracker::Duration, 'reporting' do
- 
-  before(:each) do
-    @tracker = RequestLogAnalyzer::Tracker::Duration.new(:category => :category, :duration => :duration)
-    @tracker.prepare
-  end
-  
-  it "should generate a report without errors when one category is present" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    lambda { @tracker.report(mock_output) }.should_not raise_error
-  end
-
-  it "should generate a report without errors when no category is present" do
-    lambda { @tracker.report(mock_output) }.should_not raise_error
-  end
-
-  it "should generate a report without errors when multiple categories are present" do
-    @tracker.update(request(:category => 'a', :duration => 0.2))
-    @tracker.update(request(:category => 'b', :duration => 0.2))    
-    lambda { @tracker.report(mock_output) }.should_not raise_error
-  end
 end
