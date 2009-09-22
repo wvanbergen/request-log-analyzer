@@ -5,7 +5,7 @@ module RequestLogAnalyzer::FileFormat
     # Processing EmployeeController#index (for 123.123.123.123 at 2008-07-13 06:00:00) [GET]
     line_definition :processing do |line|
       line.header = true # this line is the first log line for a request 
-      # line.teaser = /Processing /
+      line.teaser = /Processing /
       line.regexp = /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
       line.captures << { :name => :controller, :type  => :string } \
                     << { :name => :action,     :type  => :string } \
@@ -17,6 +17,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.    
     line_definition :cache_hit do |line|
+      line.teaser = /Filter chain halted /
       line.regexp = /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter:.+>\] rendered_or_redirected/
     end
   
@@ -46,7 +47,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :completed do |line|
     
       line.footer = true
-      # line.teaser = /Completed in /
+      line.teaser = /Completed in /
       line.regexp = Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})")
     
       line.captures << { :name => :duration, :type => :duration, :unit => :sec } \
@@ -91,7 +92,7 @@ module RequestLogAnalyzer::FileFormat
     
       # Do not use DateTime.parse
       def convert_timestamp(value, definition)
-        value.gsub(/[^0-9]/, '')[0...14].to_i unless value.nil?
+        value.gsub(/[^0-9]/, '')[0...14].to_i
       end
     end
 
