@@ -9,10 +9,6 @@ module RequestLogAnalyzer
   # Request#every(field_name) returns all values corresponding to the given field name as array.
   class Request
   
-    def self.inherited(klass)
-      # klass.send(:include, Converters)
-    end
-  
     module Converters
 
       # Default converter function, which converts the parsed strings to a native Ruby type
