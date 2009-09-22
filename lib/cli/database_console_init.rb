@@ -23,7 +23,7 @@ class Request
   def inspect
     request_inspect = "Request[id: #{id}]"
     request_inspect << " <#{lines.first.source.filename}>" if lines.first.source
-    
+
     inspected_lines = lines.map do |line|
       inspect_line = "   - #{line.line_type} (line #{line.lineno})"
       if (inspect_attributes = line.attributes.reject { |(k, v)| [:id, :source_id, :request_id, :lineno].include?(k.to_sym) }).any?
@@ -32,7 +32,7 @@ class Request
       end
       inspect_line
     end
-    
+
     request_inspect << "\n" << inspected_lines.join("\n") << "\n\n"
   end
 end

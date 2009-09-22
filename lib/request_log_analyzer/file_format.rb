@@ -1,9 +1,9 @@
 module RequestLogAnalyzer::FileFormat
-  
+
   def self.const_missing(const)
     RequestLogAnalyzer::load_default_class_file(self, const)
-  end  
-  
+  end
+
   # Loads a FileFormat::Base subclass instance.
   # You can provide:
   # * A FileFormat instance (which will return itself)
@@ -34,46 +34,46 @@ module RequestLogAnalyzer::FileFormat
 
     else
       # load a provided file format
-      klass = RequestLogAnalyzer::FileFormat.const_get(RequestLogAnalyzer::to_camelcase(file_format))      
+      klass = RequestLogAnalyzer::FileFormat.const_get(RequestLogAnalyzer::to_camelcase(file_format))
     end
-    
+
     # check the returned klass to see if it can be used
     raise "Could not load a file format from #{file_format.inspect}" if klass.nil?
     raise "Invalid FileFormat class" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
-    
+
     @current_file_format = klass.create(*args) # return an instance of the class
   end
 
-  # Base class for all log file format definitions. This class provides functions for subclasses to 
+  # Base class for all log file format definitions. This class provides functions for subclasses to
   # define their LineDefinitions and to define a summary report.
   #
   # A subclass of this class is instantiated when request-log-analyzer is started and this instance
   # is shared with all components of the application so they can act on the specifics of the format
   class Base
-    
+
     attr_reader :line_definitions, :report_trackers
-    
+
     ####################################################################################
     # CLASS METHODS for format definition
     ####################################################################################
-    
+
     # Registers the line definer instance for a subclass.
     def self.inherited(subclass)
       if subclass.superclass == RequestLogAnalyzer::FileFormat::Base
 
         # Create aline and report definer for this class
-        subclass.class_eval do 
+        subclass.class_eval do
           instance_variable_set(:@line_definer, RequestLogAnalyzer::LineDefinition::Definer.new)
           instance_variable_set(:@report_definer, RequestLogAnalyzer::Aggregator::Summarizer::Definer.new)
           class << self; attr_accessor :line_definer, :report_definer; end
-        end        
+        end
 
         # Create a custom Request class for this file format
         subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request)) unless subclass.const_defined?('Request')
       else
 
         # Copy the line and report definer from the parent class.
-        subclass.class_eval do 
+        subclass.class_eval do
           instance_variable_set(:@line_definer, superclass.line_definer.clone)
           instance_variable_set(:@report_definer, superclass.report_definer.clone)
           class << self; attr_accessor :line_definer, :report_definer; end
@@ -153,7 +153,7 @@ module RequestLogAnalyzer::FileFormat
         match = definition.matches(line, &warning_handler)
         return match if match
       end
-      
+
       return nil
     end
   end

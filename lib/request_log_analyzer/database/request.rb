@@ -1,5 +1,5 @@
 class RequestLogAnalyzer::Database::Request < RequestLogAnalyzer::Database::Base
-  
+
   # Returns an array of all the Line objects of this request in the correct order.
   def lines
     @lines ||= begin
@@ -8,7 +8,7 @@ class RequestLogAnalyzer::Database::Request < RequestLogAnalyzer::Database::Base
       lines.sort
     end
   end
-  
+
   # Creates the table to store requests in.
   def self.create_table!
     unless database.connection.table_exists?(:requests)

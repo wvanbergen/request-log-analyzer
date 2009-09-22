@@ -1,6 +1,6 @@
 module RequestLogAnalyzer::FileFormat
-  
-  # The Apache file format is able to log Apache access.log files. 
+
+  # The Apache file format is able to log Apache access.log files.
   #
   # The access.log can be configured in Apache to have many different formats. In theory, this
   # FileFormat can handle any format, but it must be aware of the log formatting that is used
@@ -22,7 +22,7 @@ module RequestLogAnalyzer::FileFormat
       :referer  => '%{Referer}i -> %U',
       :agent    => '%{User-agent}i'
     }
-    
+
     # A hash that defines how the log format directives should be parsed.
     LOG_DIRECTIVES = {
       '%' => { :regexp => '%', :captures => [] },
@@ -62,7 +62,7 @@ module RequestLogAnalyzer::FileFormat
       format_string.scan(/([^%]*)(?:%(?:\{([^\}]+)\})?>?([A-Za-z%]))?/) do |literal, arg, variable|
 
         line_regexp << Regexp.quote(literal) # Make sure to parse the literal before the directive
-        
+
         if variable
           # Check if we recognize the log directive
           directive = LOG_DIRECTIVES[variable]
@@ -77,7 +77,7 @@ module RequestLogAnalyzer::FileFormat
           end
         end
       end
-      
+
       # Return a new line definition object
       return RequestLogAnalyzer::LineDefinition.new(:access, :regexp => Regexp.new(line_regexp),
                                         :captures => captures, :header => true, :footer => true)
@@ -105,32 +105,32 @@ module RequestLogAnalyzer::FileFormat
 
     # Define a custom Request class for the Apache file format to speed up timestamp handling.
     class Request < RequestLogAnalyzer::Request
-      
+
       def category
         first(:path)
       end
-      
+
       MONTHS = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
                 'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12' }
-      
+
       # Do not use DateTime.parse, but parse the timestamp ourselves to return a integer
       # to speed up parsing.
       def convert_timestamp(value, definition)
         "#{value[7,4]}#{MONTHS[value[3,3]]}#{value[0,2]}#{value[12,2]}#{value[15,2]}#{value[18,2]}".to_i
       end
-      
+
       # This function can be overridden to rewrite the path for better categorization in the
       # reports.
       def convert_path(value, definition)
         value
       end
-      
-      # This function can be overridden to simplify the user agent string for better 
+
+      # This function can be overridden to simplify the user agent string for better
       # categorization in the reports
       def convert_user_agent(value, definition)
         value # TODO
       end
-      
+
       # Make sure that the string '-' is parsed as a nil value.
       def convert_nillable_string(value, definition)
         value == '-' ? nil : value

@@ -2,7 +2,7 @@ require 'rubygems'
 require 'activerecord'
 
 module RequestLogAnalyzer::Source
-  
+
   # Active Resource hook
   class Request < ActiveRecord::Base
     has_many :completed_lines
@@ -40,7 +40,7 @@ module RequestLogAnalyzer::Source
       @parsed_requests  = 0
       @requests         = []
     end
-    
+
     # Reads the input, which can either be a file, sequence of files or STDIN to parse
     # lines specified in the FileFormat. This lines will be combined into Request instances,
     # that will be yielded. The actual parsing occurs in the parse_io method.
@@ -52,10 +52,10 @@ module RequestLogAnalyzer::Source
         RequestLogAnalyzer::Source::Request.find(:all).each do |request|
           @parsed_requests += 1
           @progress_handler.call(:progress, @parsed_requests) if @progress_handler
-          
+
           yield request.convert(self.file_format)
         end
-      
+
       @progress_handler.call(:finished, @source_files) if @progress_handler
     end
 
@@ -66,15 +66,15 @@ module RequestLogAnalyzer::Source
     end
 
     # Add a block to this method to install a warning handler while parsing,
-    # <tt>proc</tt>:: The proc that will be called to handle parse warning messages    
+    # <tt>proc</tt>:: The proc that will be called to handle parse warning messages
     def warning=(proc)
       @warning_handler = proc
     end
 
     # This method is called by the parser if it encounteres any parsing problems.
-    # It will call the installed warning handler if any. 
+    # It will call the installed warning handler if any.
     #
-    # By default, RequestLogAnalyzer::Controller will install a warning handler 
+    # By default, RequestLogAnalyzer::Controller will install a warning handler
     # that will pass the warnings to each aggregator so they can do something useful
     # with it.
     #

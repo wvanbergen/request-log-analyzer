@@ -26,13 +26,13 @@ module RequestLogAnalyzer::Database::Connection
       raise "Cannot connect with this connection_identifier: #{connection_identifier.inspect}"
     end
   end
-  
+
   def disconnect
     RequestLogAnalyzer::Database::Base.remove_connection
   end
-  
+
   def connection
     RequestLogAnalyzer::Database::Base.connection
   end
-  
+
 end

@@ -1,24 +1,24 @@
 module RequestLogAnalyzer::Spec::Mocks
-  
+
   def mock_source
     source = mock('RequestLogAnalyzer::Source::Base')
     source.stub!(:file_format).and_return(testing_format)
     source.stub!(:parsed_requests).and_return(2)
-    source.stub!(:skipped_requests).and_return(1)    
+    source.stub!(:skipped_requests).and_return(1)
     source.stub!(:parse_lines).and_return(10)
-    
+
     source.stub!(:warning=)
     source.stub!(:progress=)
     source.stub!(:source_changes=)
 
     source.stub!(:prepare)
     source.stub!(:finalize)
-        
+
     source.stub!(:each_request).and_return do |block|
       block.call(testing_format.request(:field => 'value1'))
       block.call(testing_format.request(:field => 'value2'))
     end
-    
+
     return source
   end
 
@@ -29,24 +29,24 @@ module RequestLogAnalyzer::Spec::Mocks
     mio.stub!(:write)
     return mio
   end
-  
+
   def mock_output
     output = mock('RequestLogAnalyzer::Output::Base')
     output.stub!(:header)
-    output.stub!(:footer)   
+    output.stub!(:footer)
     output.stub!(:puts)
     output.stub!(:<<)
     output.stub!(:colorize).and_return("Fancy text")
     output.stub!(:link)
     output.stub!(:title)
     output.stub!(:line)
-    output.stub!(:with_style)    
+    output.stub!(:with_style)
     output.stub!(:table).and_yield([])
     output.stub!(:io).and_return(mock_io)
-    
+
     return output
   end
-  
+
   def mock_database(*stubs)
     database = mock('RequestLogAnalyzer::Database')
     database.stub!(:connect)
@@ -55,11 +55,11 @@ module RequestLogAnalyzer::Spec::Mocks
     stubs.each { |s| database.stub!(s)}
     return database
   end
-  
+
   def mock_connection
     table_creator = mock('ActiveRecord table creator')
     table_creator.stub!(:column)
-    
+
     connection = mock('ActiveRecord::Base.connection')
     connection.stub!(:add_index)
     connection.stub!(:remove_index)
@@ -68,6 +68,6 @@ module RequestLogAnalyzer::Spec::Mocks
     connection.stub!(:table_creator).and_return(table_creator)
     return connection
   end
-  
-  
+
+
 end

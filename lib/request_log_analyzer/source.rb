@@ -1,7 +1,7 @@
 # The RequestLogAnalyzer::Source module contains all functionality that loads requests from a given source
 # and feed them to the pipeline for further processing. The requests (see RequestLogAnalyzer::Request) that
-# will be parsed from a source, will be piped throug filters (see RequestLogAnalyzer::Filter) and are then 
-# fed to an aggregator (see RequestLogAnalyzer::Aggregator). The source instance is thus the beginning of 
+# will be parsed from a source, will be piped throug filters (see RequestLogAnalyzer::Filter) and are then
+# fed to an aggregator (see RequestLogAnalyzer::Aggregator). The source instance is thus the beginning of
 # the RequestLogAnalyzer chain.
 #
 # - The base class for all sources is RequestLogAnalyzer::Source::Base. All source classes should inherit from this class.
@@ -14,13 +14,13 @@ module RequestLogAnalyzer::Source
   def self.const_missing(const)
     RequestLogAnalyzer::load_default_class_file(self, const)
   end
-  
+
   # The base Source class. All other sources should inherit from this class.
   #
   # A source implememtation should at least implement the each_request method, which should yield
   # RequestLogAnalyzer::Request instances that will be fed through the pipleine.
   class Base
-    
+
     # A hash of options
     attr_reader :options
 
@@ -49,14 +49,14 @@ module RequestLogAnalyzer::Source
       @options     = options
       @file_format = format
     end
-    
+
     # The prepare method is called before the RequestLogAnalyzer::Source::Base#each_request method is called.
     # Use this method to implement any initialization that should occur before this source can produce Request
     # instances.
     def prepare
     end
-    
-    # This function is called to actually produce the requests that will be send into the pipeline. 
+
+    # This function is called to actually produce the requests that will be send into the pipeline.
     # The implementation should yield instances of RequestLogAnalyzer::Request.
     # <tt>options</tt>:: A Hash of options that can be used in the implementation.
     def each_request(options = {}, &block) # :yields: request

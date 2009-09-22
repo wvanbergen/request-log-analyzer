@@ -8,7 +8,7 @@ Encoding.default_external = 'binary' if defined? Encoding and Encoding.respond_t
 # - This module itselfs contains some functions to help with class and source file loading.
 # - The actual application resides in the RequestLogAnalyzer::Controller class.
 module RequestLogAnalyzer
-  
+
   # The current version of request-log-analyzer.
   # This will be diplayed in output reports etc.
   VERSION = "1.3.7"
@@ -35,7 +35,7 @@ module RequestLogAnalyzer
     str.to_s.gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase
   end
 
-  # Convert a string/symbol in underscores (<tt>request_log_analyzer/controller</tt>) to camelcase 
+  # Convert a string/symbol in underscores (<tt>request_log_analyzer/controller</tt>) to camelcase
   # (<tt>RequestLogAnalyzer::Controller</tt>). This can be used to find the class that is defined in a given filename.
   # <tt>str</tt>:: The string to convert in the following format: <tt>module_name/class_name</tt>
   def self.to_camelcase(str)

@@ -4,7 +4,7 @@ module RequestLogAnalyzer::Aggregator
   # The database aggregator will create an SQLite3 database with all parsed request information.
   #
   # The prepare method will create a database schema according to the file format definitions.
-  # It will also create ActiveRecord::Base subclasses to interact with the created tables. 
+  # It will also create ActiveRecord::Base subclasses to interact with the created tables.
   # Then, the aggregate method will be called for every parsed request. The information of
   # these requests is inserted into the tables using the ActiveRecord classes.
   #
@@ -22,11 +22,11 @@ module RequestLogAnalyzer::Aggregator
       @sources = {}
       @database = RequestLogAnalyzer::Database.new(options[:database])
       @database.file_format = source.file_format
-      
+
       database.drop_database_schema! if options[:reset_database]
       database.create_database_schema!
     end
-    
+
     # Aggregates a request into the database
     # This will create a record in the requests table and create a record for every line that has been parsed,
     # in which the captured values will be stored.
@@ -42,19 +42,19 @@ module RequestLogAnalyzer::Aggregator
     rescue SQLite3::SQLException => e
       raise Interrupt, e.message
     end
-    
+
     # Finalizes the aggregator by closing the connection to the database
     def finalize
       @request_count = RequestLogAnalyzer::Database::Request.count
       database.disconnect
       database.remove_orm_classes!
     end
-    
+
     # Records w warining in the warnings table.
     def warning(type, message, lineno)
       RequestLogAnalyzer::Database::Warning.create!(:warning_type => type.to_s, :message => message, :lineno => lineno)
     end
-    
+
     # Records source changes in the sources table
     def source_change(change, filename)
       if File.exist?(filename)
@@ -66,11 +66,11 @@ module RequestLogAnalyzer::Aggregator
         end
       end
     end
-    
+
     # Prints a short report of what has been inserted into the database
     def report(output)
       output.title('Request database created')
-      
+
       output <<  "A database file has been created with all parsed request information.\n"
       output <<  "#{@request_count} requests have been added to the database.\n"
       output << "\n"
@@ -78,6 +78,6 @@ module RequestLogAnalyzer::Aggregator
       output <<  output.colorize("  $ request-log-analyzer console -d #{options[:database]}\n", :bold)
       output << "\n"
     end
-    
+
   end
 end

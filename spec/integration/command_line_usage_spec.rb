@@ -76,7 +76,7 @@ describe RequestLogAnalyzer, 'running from command line' do
     File.exist?(temp_output_file(:dump)).should be_true
     YAML::load(File.read(temp_output_file(:dump))).should have_at_least(1).item
   end
-  
+
   it "should parse 4 requests from the standard input" do
     output = run("- < #{log_fixture(:rails_1x)}")
     output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true

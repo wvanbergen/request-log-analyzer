@@ -16,13 +16,13 @@ module RequestLogAnalyzer::Tracker
   #
   # For example :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
   class Base
-    
+
     attr_reader :options
-    
+
     # Initialize the class
     # Note that the options are only applicable if should_update? is not overwritten
     # by the inheriting class.
-    # 
+    #
     # === Options
     # * <tt>:if</tt> Handle request if this proc is true for the handled request.
     # * <tt>:unless</tt> Handle request if this proc is false for the handled request.
@@ -31,7 +31,7 @@ module RequestLogAnalyzer::Tracker
       @options = options
       setup_should_update_checks!
     end
-    
+
     # Sets up the tracker's should_update? checks.
     def setup_should_update_checks!
       @should_update_checks = []
@@ -41,25 +41,25 @@ module RequestLogAnalyzer::Tracker
       @should_update_checks.push( lambda { |request| !options[:unless].call(request) }) if options[:unless].respond_to?(:call)
       @should_update_checks.push( lambda { |request| !request[options[:unless]] }) if options[:unless].kind_of?(Symbol)
     end
-    
+
     # Hook things that need to be done before running here.
     def prepare
     end
-    
+
     # Will be called with each request.
     # <tt>request</tt> The request to track data in.
     def update(request)
     end
-    
+
     # Hook things that need to be done after running here.
     def finalize
     end
-    
+
     # Determine if we should run the update function at all.
     # Usually the update function will be heavy, so a light check is done here
     # determining if we need to call update at all.
     #
-    # Default this checks if defined: 
+    # Default this checks if defined:
     #  * :line_type is also in the request hash.
     #  * :if is true for this request.
     #  * :unless if false for this request
@@ -68,25 +68,25 @@ module RequestLogAnalyzer::Tracker
     def should_update?(request)
       @should_update_checks.all? { |c| c.call(request) }
     end
-    
+
     # Hook report generation here.
     # Defaults to self.inspect
     # <tt>output</tt> The output object the report will be passed to.
     def report(output)
       output << self.inspect
-      output << "\n"  
+      output << "\n"
     end
-    
+
     # The title of this tracker. Used for reporting.
     def title
       self.class.to_s
     end
-    
+
     # This method is called by RequestLogAnalyzer::Aggregator:Summarizer to retrieve an
     # object with all the results of this tracker, that can be dumped to YAML format.
     def to_yaml_object
       nil
     end
-         
-  end 
+
+  end
 end

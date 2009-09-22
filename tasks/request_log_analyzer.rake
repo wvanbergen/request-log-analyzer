@@ -6,7 +6,7 @@ namespace :rla do
     puts "  Logfile: #{Rails.configuration.log_path}"
     puts ""
     IO.popen("request-log-analyzer #{Rails.configuration.log_path}") { |io| $stdout << io.read }
-    
+
   end
 
   namespace :report do
@@ -22,5 +22,5 @@ namespace :rla do
       IO.popen("request-log-analyzer #{Rails.configuration.log_path} --output HTML --file #{output_file}") { |io| $stdout << io.read }
     end
   end
-    
+
 end

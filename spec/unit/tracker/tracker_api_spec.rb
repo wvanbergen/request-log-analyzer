@@ -3,14 +3,14 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 describe RequestLogAnalyzer::Tracker::Base do
 
   describe 'API' do
-    
+
     before(:each) do
       @tracker    = Class.new(RequestLogAnalyzer::Tracker::Base).new
 
       @summarizer = RequestLogAnalyzer::Aggregator::Summarizer.new(mock_source)
       @summarizer.trackers << @tracker
     end
-        
+
     it "should receive :prepare when the summarizer is preparing" do
       @tracker.should_receive(:prepare).once
       @summarizer.prepare
@@ -33,8 +33,8 @@ describe RequestLogAnalyzer::Tracker::Base do
     end
 
     it "should receive :report when the summary report is being built" do
-      @tracker.should_receive(:report).with(anything).once   
-      @summarizer.report(mock_output) 
+      @tracker.should_receive(:report).with(anything).once
+      @summarizer.report(mock_output)
     end
 
     it "should receieve :finalize when the summarizer is finalizing" do
@@ -42,27 +42,27 @@ describe RequestLogAnalyzer::Tracker::Base do
       @summarizer.finalize
     end
   end
-  
+
   describe '#should_update?' do
     before(:each) do
       @tracker_class = Class.new(RequestLogAnalyzer::Tracker::Base)
     end
-    
+
     it "should return true by default, when no checks are installed" do
       tracker = @tracker_class.new
       tracker.should_update?(testing_format.request).should be_true
     end
-    
+
     it "should return false if the line type is not in the request" do
       tracker = @tracker_class.new(:line_type => :not_there)
       tracker.should_update?(request(:line_type => :different)).should be_false
     end
-    
+
     it "should return true if the line type is in the request" do
       tracker = @tracker_class.new(:line_type => :there)
       tracker.should_update?(request(:line_type => :there)).should be_true
     end
-    
+
     it "should return true if a field name is given to :if and it is in the request" do
       tracker = @tracker_class.new(:if => :field)
       tracker.should_update?(request(:field => 'anything')).should be_true
@@ -103,18 +103,18 @@ describe RequestLogAnalyzer::Tracker::Base do
       tracker.should_update?(request(:line_type => :present, :field => 'anything')).should be_true
     end
 
-  
+
   end
-  
+
   describe '#to_yaml_object' do
-    
+
     before(:each) do
       @tracker    = Class.new(RequestLogAnalyzer::Tracker::Base).new
 
       @summarizer = RequestLogAnalyzer::Aggregator::Summarizer.new(mock_source)
       @summarizer.trackers << @tracker
     end
-        
+
     it "should receive :to_yaml object when finalizing" do
       @summarizer.options[:dump] = temp_output_file(:dump)
       @tracker.should_receive(:to_yaml_object).once

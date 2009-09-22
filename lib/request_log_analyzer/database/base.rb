@@ -1,5 +1,5 @@
 class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
-  
+
   self.abstract_class = true
 
   def <=>(other)
@@ -13,20 +13,20 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
   def line_type
     self.class.name.underscore.gsub(/_line$/, '').to_sym
   end
-  
+
   class_inheritable_accessor :line_definition
   cattr_accessor :database
 
   def self.subclass_from_line_definition(definition)
     klass = Class.new(RequestLogAnalyzer::Database::Base)
     klass.set_table_name("#{definition.name}_lines")
-    
+
     klass.line_definition = definition
-    
+
     # Set relations with requests and sources table
     klass.belongs_to :request
     klass.belongs_to :source
-    
+
     # Serialize complex fields into the database
     definition.captures.select { |c| c.has_key?(:provides) }.each do |capture|
       klass.send(:serialize, capture[:name], Hash)
@@ -48,32 +48,32 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
       klass.belongs_to :request
       RequestLogAnalyzer::Database::Request.has_many table.to_sym
     end
-    
+
     if klass.column_names.include?('source_id')
       klass.belongs_to :source
       RequestLogAnalyzer::Database::Source.has_many table.to_sym
     end
-    
+
     return klass
   end
-  
+
   def self.drop_table!
     database.connection.remove_index(self.table_name, [:source_id])  rescue nil
     database.connection.remove_index(self.table_name, [:request_id]) rescue nil
     database.connection.drop_table(self.table_name) if database.connection.table_exists?(self.table_name)
   end
-  
+
   def self.create_table!
     raise "No line_definition available to base table schema on!" unless self.line_definition
-    
+
     unless table_exists?
       database.connection.create_table(table_name.to_sym) do |t|
-      
+
         # Default fields
         t.column :request_id, :integer
         t.column :source_id,  :integer
         t.column :lineno,     :integer
-      
+
         line_definition.captures.each do |capture|
           # Add a field for every capture
           t.column(capture[:name], column_type(capture[:type]))
@@ -83,13 +83,13 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
         end
       end
     end
-    
+
     # Add indices to table for more speedy querying
     database.connection.add_index(self.table_name.to_sym, [:request_id]) # rescue
     database.connection.add_index(self.table_name.to_sym, [:source_id])  # rescue
   end
-  
-  
+
+
   # Function to determine the column type for a field
   # TODO: make more robust / include in file-format definition
   def self.column_type(type_indicator)
@@ -110,6 +110,6 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     when :date;      :date
     else             :string
     end
-  end  
-  
+  end
+
 end

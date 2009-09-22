@@ -1,5 +1,5 @@
 module RequestLogAnalyzer
-  
+
   # The RequestLogAnalyzer::Controller class creates a LogParser instance for the
   # requested file format, and connect it with sources and aggregators.
   #
@@ -32,23 +32,23 @@ module RequestLogAnalyzer
       options[:dump]           = arguments[:dump]
       options[:parse_strategy] = arguments[:parse_strategy]
       options[:no_progress]    = arguments[:no_progress]
-      
+
       output_class = RequestLogAnalyzer::Output::const_get(arguments[:output])
       if arguments[:file]
         output_file = File.new(arguments[:file], "w+")
         options[:output] = output_class.new(output_file, :width => 80, :color => false, :characters => :ascii)
       elsif arguments[:mail]
         output_mail = RequestLogAnalyzer::Mailer.new(arguments[:mail])
-        options[:output] = output_class.new(output_mail, :width => 80, :color => false, :characters => :ascii)        
+        options[:output] = output_class.new(output_mail, :width => 80, :color => false, :characters => :ascii)
       else
-        options[:output] = output_class.new(STDOUT, :width => arguments[:report_width].to_i, 
+        options[:output] = output_class.new(STDOUT, :width => arguments[:report_width].to_i,
             :color => !arguments[:boring], :characters => (arguments[:boring] ? :ascii : :utf))
       end
-                
+
       # Create the controller with the correct file format
       file_format = if arguments[:apache_format]
           RequestLogAnalyzer::FileFormat.load(:apache, arguments[:apache_format])
-        else 
+        else
           RequestLogAnalyzer::FileFormat.load(arguments[:format])
         end
 
@@ -66,22 +66,22 @@ module RequestLogAnalyzer
       else
         options.store(:source_files, arguments.parameters)
       end
-      
+
       controller = Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format, options), options)
       #controller = Controller.new(RequestLogAnalyzer::Source::DatabaseLoader.new(file_format, options), options)
-      
+
       # register filters
       if arguments[:after] || arguments[:before]
         filter_options = {}
-        filter_options[:after]  = DateTime.parse(arguments[:after])  
+        filter_options[:after]  = DateTime.parse(arguments[:after])
         filter_options[:before] = DateTime.parse(arguments[:before]) if arguments[:before]
         controller.add_filter(:timespan, filter_options)
       end
-      
+
       arguments[:reject].each do |(field, value)|
         controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
       end
-      
+
       arguments[:select].each do |(field, value)|
         controller.add_filter(:field, :mode => :select, :field => field, :value => value)
       end
@@ -89,15 +89,15 @@ module RequestLogAnalyzer
       # register aggregators
       arguments[:aggregator].each { |agg| controller.add_aggregator(agg.to_sym) }
 
-      # register the database 
+      # register the database
       controller.add_aggregator(:summarizer)          if arguments[:aggregator].empty?
       controller.add_aggregator(:database_inserter)   if arguments[:database] && !arguments[:aggregator].include?('database')
 
       # register the echo aggregator in debug mode
       controller.add_aggregator(:echo) if arguments[:debug]
-      
+
       file_format.setup_environment(controller)
-          
+
       return controller
     end
 
@@ -117,16 +117,16 @@ module RequestLogAnalyzer
       @aggregators = []
       @filters     = []
       @output      = options[:output]
-      
+
       # Register the request format for this session after checking its validity
       raise "Invalid file format!" unless @source.file_format.valid?
-      
+
       # Install event handlers for wrnings, progress updates and source changes
       @source.warning        = lambda { |type, message, lineno|  @aggregators.each { |agg| agg.warning(type, message, lineno) } }
       @source.progress       = lambda { |message, value| handle_progress(message, value) } unless options[:no_progress]
       @source.source_changes = lambda { |change, filename| handle_source_change(change, filename) }
     end
-    
+
     # Progress function.
     # Expects :started with file, :progress with current line and :finished or :interrupted when done.
     # <tt>message</tt> Current state (:started, :finished, :interupted or :progress).
@@ -147,46 +147,46 @@ module RequestLogAnalyzer
         @progress_bar.set(value)
       end
     end
-    
+
     # Source change handler
     def handle_source_change(change, filename)
       @aggregators.each { |agg| agg.source_change(change, File.expand_path(filename, Dir.pwd)) }
     end
-    
-    # Adds an aggregator to the controller. The aggregator will be called for every request 
+
+    # Adds an aggregator to the controller. The aggregator will be called for every request
     # that is parsed from the provided sources (see add_source)
-    def add_aggregator(agg)      
+    def add_aggregator(agg)
       agg = RequestLogAnalyzer::Aggregator.const_get(RequestLogAnalyzer::to_camelcase(agg)) if agg.kind_of?(Symbol)
       @aggregators << agg.new(@source, @options)
     end
-    
+
     alias :>> :add_aggregator
-    
+
     # Adds a request filter to the controller.
     def add_filter(filter, filter_options = {})
       filter = RequestLogAnalyzer::Filter.const_get(RequestLogAnalyzer::to_camelcase(filter)) if filter.kind_of?(Symbol)
       @filters << filter.new(source.file_format, @options.merge(filter_options))
     end
-    
+
     # Push a request through the entire filterchain (@filters).
     # <tt>request</tt> The request to filter.
     # Returns the filtered request or nil.
     def filter_request(request)
-      @filters.each do |filter| 
+      @filters.each do |filter|
         request = filter.filter(request)
         return nil if request.nil?
       end
       return request
     end
-    
+
     # Push a request to all the aggregators (@aggregators).
-    # <tt>request</tt> The request to push to the aggregators.    
+    # <tt>request</tt> The request to push to the aggregators.
     def aggregate_request(request)
       return false unless request
       @aggregators.each { |agg| agg.aggregate(request) }
       return true
     end
-    
+
     # Runs RequestLogAnalyzer
     # 1. Call prepare on every aggregator
     # 2. Generate requests from source object
@@ -196,10 +196,10 @@ module RequestLogAnalyzer
     # 5. Call report on every aggregator
     # 6. Finalize Source
     def run!
-      
+
       @aggregators.each { |agg| agg.prepare }
       install_signal_handlers
-      
+
       @source.each_request do |request|
         break if @interrupted
         aggregate_request(filter_request(request))
@@ -210,9 +210,9 @@ module RequestLogAnalyzer
       @output.header
       @aggregators.each { |agg| agg.report(@output) }
       @output.footer
-            
+
       @source.finalize
-      
+
       if @output.io.kind_of?(File)
         puts
         puts "Report written to: " + File.expand_path(@output.io.path)
@@ -224,7 +224,7 @@ module RequestLogAnalyzer
         @output.io.mail
       end
     end
-    
+
     def install_signal_handlers
       Signal.trap("INT") do
         handle_progress(:interrupted)
@@ -232,6 +232,6 @@ module RequestLogAnalyzer
         @interrupted = true
       end
     end
-    
+
   end
 end

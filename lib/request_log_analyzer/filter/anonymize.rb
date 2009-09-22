@@ -1,12 +1,12 @@
 module RequestLogAnalyzer::Filter
-  
+
   # Filter to anonymize parsed values
   # Options
   # * <tt>:mode</tt> :reject or :accept.
   # * <tt>:field</tt> Specific field to accept or reject.
   # * <tt>:value</tt> Value that the field should match to be accepted or rejected.
   class Anonymize < Base
-   
+
     def generate_random_ip
       "#{rand(256)}.#{rand(256)}.#{rand(256)}.#{rand(256)}"
     end
@@ -14,7 +14,7 @@ module RequestLogAnalyzer::Filter
     def anonymize_url(value)
       return value.sub(/^https?\:\/\/[A-Za-z0-9\.-]+\//, "http://example.com/")
     end
-    
+
     def fuzz(value)
       value * ((75 + rand(50)) / 100.0)
     end
@@ -31,9 +31,9 @@ module RequestLogAnalyzer::Filter
           request.attributes[key] = fuzz(value)
         end
       end
-      
+
       return request
-    end 
+    end
   end
-  
+
 end

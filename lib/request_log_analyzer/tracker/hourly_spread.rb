@@ -1,5 +1,5 @@
 module RequestLogAnalyzer::Tracker
-  
+
   # Determines the average hourly spread of the parsed requests.
   # This spread is shown in a graph form.
   #
@@ -52,17 +52,17 @@ module RequestLogAnalyzer::Tracker
     def total_requests
       @request_time_graph.inject(0) { |sum, value| sum + value }
     end
-    
+
     # First timestamp encountered
     def first_timestamp
       DateTime.parse(@first.to_s, '%Y%m%d%H%M%S') rescue nil
     end
-    
+
     # Last timestamp encountered
     def last_timestamp
       DateTime.parse(@last.to_s, '%Y%m%d%H%M%S') rescue nil
     end
-    
+
     # Difference between last and first timestamp.
     def timespan
       last_timestamp - first_timestamp
@@ -73,7 +73,7 @@ module RequestLogAnalyzer::Tracker
     # <tt>output</tt> The output object
     def report(output)
       output.title(title)
-    
+
       if total_requests == 0
         output << "None found.\n"
         return
@@ -88,12 +88,12 @@ module RequestLogAnalyzer::Tracker
         end
       end
     end
-    
+
     # Returns the title of this tracker for reports
     def title
       options[:title] || "Request distribution per hour"
     end
-    
+
     # Returns the found frequencies per hour as a hash for YAML exporting
     def to_yaml_object
       yaml_object = {}

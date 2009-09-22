@@ -1,7 +1,7 @@
 module RequestLogAnalyzer::Tracker
-  
+
   # Catagorize requests by frequency.
-  # Count and analyze requests for a specific attribute 
+  # Count and analyze requests for a specific attribute
   #
   # === Options
   # * <tt>:amount</tt> The amount of lines in the report
@@ -33,7 +33,7 @@ module RequestLogAnalyzer::Tracker
         options[:all_categories].each { |cat| @frequencies[cat] = 0 }
       end
     end
-            
+
     # Check HTTP method of a request and store that in the frequencies hash.
     # <tt>request</tt> The request.
     def update(request)
@@ -49,12 +49,12 @@ module RequestLogAnalyzer::Tracker
     def frequency(cat)
       frequencies[cat] || 0
     end
-    
+
     # Return the overall frequency
     def overall_frequency
       frequencies.inject(0) { |carry, item| carry + item[1] }
     end
-    
+
     # Return the methods sorted by frequency
     def sorted_by_frequency
       @frequencies.sort { |a, b| b[1] <=> a[1] }
@@ -65,15 +65,15 @@ module RequestLogAnalyzer::Tracker
     # <tt>output</tt> The output object
     def report(output)
       output.title(options[:title]) if options[:title]
-    
+
       if @frequencies.empty?
-        output << "None found.\n" 
+        output << "None found.\n"
       else
         sorted_frequencies = @frequencies.sort { |a, b| b[1] <=> a[1] }
         total_hits         = sorted_frequencies.inject(0) { |carry, item| carry + item[1] }
         sorted_frequencies = sorted_frequencies.slice(0...options[:amount]) if options[:amount]
 
-        output.table({:align => :left}, {:align => :right }, {:align => :right}, {:type => :ratio, :width => :rest}) do |rows|        
+        output.table({:align => :left}, {:align => :right }, {:align => :right}, {:type => :ratio, :width => :rest}) do |rows|
           sorted_frequencies.each do |(cat, count)|
             rows << [cat, "#{count} hits", '%0.1f%%' % ((count.to_f / total_hits.to_f) * 100.0), (count.to_f / total_hits.to_f)]
           end
@@ -81,13 +81,13 @@ module RequestLogAnalyzer::Tracker
 
       end
     end
-    
+
     # Returns a hash with the frequencies of every category that can be exported to YAML
     def to_yaml_object
       return nil if @frequencies.empty?
       @frequencies
     end
-    
+
     # Returns the title of this tracker for reports
     def title
       options[:title] || 'Request frequency'

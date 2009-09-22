@@ -21,7 +21,7 @@ Alternatively, use the gem from the GitHub gem server:
 
   $ sudo gem install wvanbergen-request-log-analyzer --source http://gems.github.com
 
-To get the best results out of request-log-analyzer, make sure to 
+To get the best results out of request-log-analyzer, make sure to
 set up logging correctly: http://wiki.github.com/wvanbergen/request-log-analyzer/configure-logging
 for your application.
 

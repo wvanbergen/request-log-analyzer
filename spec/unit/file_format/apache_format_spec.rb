@@ -23,7 +23,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     it "should make it a footer line" do
       @line_definition.should be_footer
     end
-    
+
     it "should capture :duration" do
       @line_definition.captures?(:duration).should be_true
     end
@@ -43,7 +43,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     it "should be a valid file format" do
       @format.should be_valid
     end
-    
+
     it "should setup report trackers" do
       @format.report_trackers.should_not be_empty
     end
@@ -60,7 +60,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     it "should have a valid language definitions" do
       @file_format.should be_valid
     end
-    
+
     it "should parse a valid access log line" do
       @file_format.line_definitions[:access].matches(@sample_1).should be_kind_of(Hash)
     end
@@ -68,7 +68,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     it "should not parse a valid access log line" do
       @file_format.line_definitions[:access].matches('addasdsasadadssadasd').should be_false
     end
-    
+
     it "should read the correct values from a valid HTTP/1.0 access log line" do
       @log_parser.parse_io(StringIO.new(@sample_1)) do |request|
         request[:remote_host].should  == '1.129.119.13'
@@ -80,7 +80,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
         request[:user].should         == nil
       end
     end
-    
+
     it "should read the correct values from a valid 200 access log line" do
       @log_parser.parse_io(StringIO.new(@sample_2)) do |request|
         request[:remote_host].should  == '1.82.235.29'
@@ -91,7 +91,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
         request[:bytes_sent].should   == 23414
         request[:user].should         == nil
       end
-    end    
+    end
 
     it "should parse 10 request from fixture access log" do
       counter = mock('counter')
@@ -99,18 +99,18 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       @log_parser.parse_file(log_fixture(:apache_common)) { counter.hit! }
     end
   end
-  
+
   context '"Rack" access log parser' do
     before(:each) do
       @file_format = RequestLogAnalyzer::FileFormat.load(:rack)
       @log_parser  = RequestLogAnalyzer::Source::LogParser.new(@file_format)
       @sample_1 = '127.0.0.1 - - [16/Sep/2009 06:40:08] "GET /favicon.ico HTTP/1.1" 500 63183 0.0453'
     end
-    
+
     it "should create a kind of an Apache file format" do
       @file_format.should be_kind_of(RequestLogAnalyzer::FileFormat::Apache)
     end
-    
+
     it "should have a valid language definitions" do
       @file_format.should be_valid
     end
@@ -136,7 +136,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       end
     end
   end
- 
+
   context '"Combined" access log parsing' do
 
     before(:all) do
@@ -171,7 +171,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
         request[:user_agent].should   == 'Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)'
       end
     end
-    
+
     it "should read the correct values from a valid 200 access log line" do
       @log_parser.parse_io(StringIO.new(@sample_2)) do |request|
         request[:remote_host].should  == '10.0.1.1'
@@ -184,8 +184,8 @@ describe RequestLogAnalyzer::FileFormat::Apache do
         request[:user].should         == nil
         request[:user_agent].should   == 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; en-us) AppleWebKit/531.9 (KHTML, like Gecko) Version/4.0.3 Safari/531.9'
       end
-    end    
-  
+    end
+
     it "should parse 5 request from fixture access log" do
       counter = mock('counter')
       counter.should_receive(:hit!).exactly(5).times

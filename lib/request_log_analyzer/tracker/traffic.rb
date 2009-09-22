@@ -8,10 +8,10 @@ module RequestLogAnalyzer::Tracker
   # * <tt>:traffic</tt> The field containing the duration in the request hash.
   # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
   # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
-  # * <tt>:title</tt> Title do be displayed above the report  
+  # * <tt>:title</tt> Title do be displayed above the report
   # * <tt>:unless</tt> Handle request if this proc is false for the handled request.
   class Traffic < Base
-    
+
     attr_reader :categories
 
     # Check if duration and catagory option have been received,
@@ -30,7 +30,7 @@ module RequestLogAnalyzer::Tracker
     def update_numbers(category, traffic)
       @categories[category] ||= {:hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => traffic, :max => traffic }
       delta = traffic - @categories[category][:mean]
-      
+
       @categories[category][:hits]           += 1
       @categories[category][:mean]           += (delta / @categories[category][:hits])
       @categories[category][:sum_of_squares] += delta * (traffic - @categories[category][:mean])
@@ -47,13 +47,13 @@ module RequestLogAnalyzer::Tracker
 
       update_numbers(category, traffic) if traffic.kind_of?(Numeric) && !category.nil?
     end
-    
+
     # Get the number of hits of a specific category.
     # <tt>cat</tt> The category
     def hits(cat)
       categories[cat][:hits]
     end
-    
+
     # Get the total duration of a specific category.
     # <tt>cat</tt> The category
     def sum(cat)
@@ -77,29 +77,29 @@ module RequestLogAnalyzer::Tracker
     def mean(cat)
       categories[cat][:mean]
     end
-    
+
     # Get the standard deviation of the duration of a specific category.
     # <tt>cat</tt> The category
     def stddev(cat)
       Math.sqrt(variance(cat)) rescue nil
     end
-    
+
     # Get the variance of the duration of a specific category.
     # <tt>cat</tt> The category
     def variance(cat)
       categories[cat][:sum_of_squares] / (categories[cat][:hits] - 1) rescue nil
     end
-    
+
     # Get the average duration of a all categories.
     def mean_overall
       sum_overall / hits_overall
     end
-    
+
     # Get the cumlative duration of a all categories.
     def sum_overall
       categories.inject(0.0) { |sum, (name, cat)| sum + cat[:sum] }
     end
-    
+
     # Get the total hits of a all categories.
     def hits_overall
       categories.inject(0) { |sum, (name, cat)| sum + cat[:hits] }
@@ -107,14 +107,14 @@ module RequestLogAnalyzer::Tracker
 
     # Return categories sorted by a given key.
     # <tt>by</tt> The key.
-    def sorted_by(by = nil) 
+    def sorted_by(by = nil)
       if block_given?
         categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }
       else
         categories.sort { |a, b| send(by, b[0]) <=> send(by, a[0]) }
       end
     end
-    
+
     # Block function to build a result table using a provided sorting function.
     # <tt>output</tt> The output object.
     # <tt>amount</tt> The number of rows in the report table (default 10).
@@ -122,25 +122,25 @@ module RequestLogAnalyzer::Tracker
     #  * </tt>:title</tt> The title of the table
     #  * </tt>:sort</tt> The key to sort on (:hits, :cumulative, :average, :min or :max)
     def report_table(output, sort, amount = 10, options = {}, &block)
-      
+
       output.title(options[:title])
-      
+
       top_categories =       top_categories = sorted_by(sort).slice(0...amount)
-      output.table({:title => 'Category', :width => :rest}, 
+      output.table({:title => 'Category', :width => :rest},
             {:title => 'Hits',   :align => :right, :highlight => (sort == :hits),   :min_width => 4},
             {:title => 'Sum',    :align => :right, :highlight => (sort == :sum),    :min_width => 6},
             {:title => 'Mean',   :align => :right, :highlight => (sort == :mean),   :min_width => 6},
             {:title => 'StdDev', :align => :right, :highlight => (sort == :stddev), :min_width => 6},
             {:title => 'Min',    :align => :right, :highlight => (sort == :min),    :min_width => 6},
             {:title => 'Max',    :align => :right, :highlight => (sort == :max),    :min_width => 6}) do |rows|
-      
+
         top_categories.each do |(cat, info)|
           rows << [cat, hits(cat), display_traffic(sum(cat)), display_traffic(mean(cat)), display_traffic(stddev(cat)),
                     display_traffic(min(cat)), display_traffic(max(cat))]
         end
       end
     end
-    
+
     # Formats the traffic number using x B/kB/MB/GB etc notation
     def display_traffic(bytes)
       return "-"   if bytes.nil?
@@ -162,7 +162,7 @@ module RequestLogAnalyzer::Tracker
 
       options[:report] ||= [:sum, :mean]
       options[:top]    ||= 20
-  
+
       options[:report].each do |report|
         case report
         when :mean
@@ -177,16 +177,16 @@ module RequestLogAnalyzer::Tracker
           raise "Unknown duration report specified: #{report}!"
         end
       end
-      
+
       output.puts
       output.puts "#{output.colorize(title, :white, :bold)} - observed total: " + output.colorize(display_traffic(sum_overall), :brown, :bold)
     end
-    
+
     # Returns the title of this tracker for reports
     def title
       options[:title]  || 'Request traffic'
     end
-    
+
     # Returns all the categories and the tracked duration as a hash than can be exported to YAML
     def to_yaml_object
       return nil if @categories.empty?

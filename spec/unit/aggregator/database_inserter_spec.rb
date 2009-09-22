@@ -5,27 +5,27 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
   before(:all) do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(testing_format)
   end
-  
+
   # The prepare method is called before the parsing starts. It should establish a connection
   # to a database that is suitable for inserting requests later on.
   describe '#prepare' do
-  
+
     before(:each) do
       @database = mock_database(:create_database_schema!, :drop_database_schema!, :file_format=)
       @database_inserter = RequestLogAnalyzer::Aggregator::DatabaseInserter.new(@log_parser)
       RequestLogAnalyzer::Database.stub!(:new).and_return(@database)
     end
-  
+
     it 'should establish the database connection' do
       RequestLogAnalyzer::Database.should_receive(:new).and_return(@database)
       @database_inserter.prepare
     end
-    
+
     it "should set the file_format" do
       @database.should_receive(:file_format=).with(testing_format)
       @database_inserter.prepare
     end
-  
+
     it 'should create the database schema during preparation' do
       @database.should_receive(:create_database_schema!)
       @database_inserter.prepare
@@ -52,28 +52,28 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
         @database_inserter.prepare
 
         @incomplete_request = testing_format.request( {:line_type => :first, :request_no => 564})
-        @completed_request  = testing_format.request( {:line_type => :first, :request_no => 564}, 
+        @completed_request  = testing_format.request( {:line_type => :first, :request_no => 564},
                               {:line_type => :test, :test_capture => "awesome"},
-                              {:line_type => :test, :test_capture => "indeed"}, 
-                              {:line_type => :eval, :evaluated => { :greating => 'howdy'}, :greating => 'howdy' }, 
+                              {:line_type => :test, :test_capture => "indeed"},
+                              {:line_type => :eval, :evaluated => { :greating => 'howdy'}, :greating => 'howdy' },
                               {:line_type => :last, :request_no   => 564})
       end
-      
+
       after(:each) do
         @database_inserter.database.send :remove_orm_classes!
       end
 
       it "should insert a record in the request table" do
-        lambda { 
+        lambda {
           @database_inserter.aggregate(@incomplete_request)
         }.should change(RequestLogAnalyzer::Database::Request, :count).from(0).to(1)
       end
-      
+
       it "should insert a record in the first_lines table" do
-        lambda { 
+        lambda {
           @database_inserter.aggregate(@incomplete_request)
         }.should change(@database_inserter.database.get_class(:first), :count).from(0).to(1)
-      end      
+      end
 
       it "should insert records in all relevant line tables" do
         @database_inserter.aggregate(@completed_request)

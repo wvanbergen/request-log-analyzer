@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::Filter::Anonymize, 'anonymize request' do
   before(:each) do
     @filter = RequestLogAnalyzer::Filter::Anonymize.new(testing_format)
   end
-  
+
   it "should anonimize ip" do
     @filter.filter(request(:ip => '123.123.123.123'))[:ip].should_not eql('123.123.123.123')
   end
@@ -17,5 +17,5 @@ describe RequestLogAnalyzer::Filter::Anonymize, 'anonymize request' do
   it "should fuzz durations" do
     @filter.filter(request(:duration => 100))[:duration].should_not eql(100)
   end
-  
+
 end

@@ -7,7 +7,7 @@ describe RequestLogAnalyzer::LogProcessor, 'stripping log files' do
   before(:each) do
     @log_stripper = RequestLogAnalyzer::LogProcessor.new(testing_format, :strip, {})
   end
-  
+
   it "should remove a junk line" do
     @log_stripper.strip_line("junk line\n").should be_empty
   end

@@ -1,5 +1,5 @@
 module RequestLogAnalyzer::Tracker
-  
+
   # Determines the datetime of the first request and the last request
   # Also determines the amount of days inbetween these.
   #
@@ -25,7 +25,7 @@ module RequestLogAnalyzer::Tracker
     def prepare
       options[:field] ||= :timestamp
     end
-            
+
     # Check if the timestamp in the request and store it.
     # <tt>request</tt> The request.
     def update(request)
@@ -39,12 +39,12 @@ module RequestLogAnalyzer::Tracker
     def first_timestamp
       DateTime.parse(@first.to_s, '%Y%m%d%H%M%S') rescue nil
     end
-    
+
     # Last timestamp encountered
     def last_timestamp
-      DateTime.parse(@last.to_s, '%Y%m%d%H%M%S') rescue nil      
+      DateTime.parse(@last.to_s, '%Y%m%d%H%M%S') rescue nil
     end
-    
+
     # Difference between last and first timestamp.
     def timespan
       last_timestamp - first_timestamp
@@ -55,27 +55,27 @@ module RequestLogAnalyzer::Tracker
     # <tt>output</tt> The output object
     def report(output)
       output.title(options[:title]) if options[:title]
-    
+
       if @last && @first
-        output.with_style(:cell_separator => false) do         
+        output.with_style(:cell_separator => false) do
           output.table({:width => 20}, {}) do |rows|
             rows << ['First request:', first_timestamp.strftime('%Y-%m-%d %H:%M:%I')]
             rows << ['Last request:', last_timestamp.strftime('%Y-%m-%d %H:%M:%I')]
-            rows << ['Total time analyzed:', "#{timespan.ceil} days"]                    
+            rows << ['Total time analyzed:', "#{timespan.ceil} days"]
           end
         end
       end
     end
-    
+
     # Returns the title of this tracker for reports
     def title
       options[:title] || 'Request timespan'
     end
-    
+
     # A hash that can be exported to YAML with the first and last timestamp encountered.
     def to_yaml_object
       { :first => first_timestamp, :last  =>last_timestamp }
     end
-    
+
   end
 end

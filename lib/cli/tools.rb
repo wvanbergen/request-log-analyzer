@@ -4,15 +4,15 @@
 def terminal_width(default_width = 81)
   tiocgwinsz = 0x5413
   data = [0, 0, 0, 0].pack("SSSS")
-  if @out.ioctl(tiocgwinsz, data) >= 0 
+  if @out.ioctl(tiocgwinsz, data) >= 0
     rows, cols, xpixels, ypixels = data.unpack("SSSS")
     raise unless cols > 0
     cols
   else
     raise
   end
-rescue   
-  begin 
+rescue
+  begin
     IO.popen('stty -a 2>&1') do |pipe|
       column_line = pipe.detect { |line| /(\d+) columns/ =~ line }
       raise unless column_line

@@ -24,7 +24,7 @@ begin
       strip.option(:format, :alias => :f, :default => 'rails')
       strip.option(:output, :alias => :o)
       strip.switch(:discard_teaser_lines, :t)
-      strip.switch(:keep_junk_lines, :j) 
+      strip.switch(:keep_junk_lines, :j)
     end
 
     command_line.option(:format, :alias => :f, :default => 'rails')
@@ -57,7 +57,7 @@ begin
   end
 
 rescue CommandLine::Error => e
-  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"  
+  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
   puts "Website: http://railsdoctors.com"
   puts
   puts "ARGUMENT ERROR: " + e.message if e.message
@@ -67,9 +67,9 @@ rescue CommandLine::Error => e
   puts "Input options:"
   puts "  --format <format>, -f:     Uses the specified log file format. Defaults to rails."
   puts "  --after <date>             Only consider requests from <date> or later."
-  puts "  --before <date>            Only consider requests before <date>."  
-  puts "  --select <field> <value>   Only consider requests where <field> matches <value>."        
-  puts "  --reject <field> <value>   Only consider requests where <field> does not match <value>."    
+  puts "  --before <date>            Only consider requests before <date>."
+  puts "  --select <field> <value>   Only consider requests where <field> matches <value>."
+  puts "  --reject <field> <value>   Only consider requests where <field> does not match <value>."
   puts
   puts "Output options:"
   puts "  --boring, -b               Output reports without ASCII colors."
@@ -77,9 +77,9 @@ rescue CommandLine::Error => e
   puts "  --debug                    Print debug information while parsing."
   puts "  --file <filename>          Output to file."
   puts "  --mail <emailaddress>      Send report to an email address."
-  puts "  --output <format>          Output format. Supports 'HTML' and 'FixedWidth' (default)"  
+  puts "  --output <format>          Output format. Supports 'HTML' and 'FixedWidth' (default)"
   puts "  --dump <filename>          Dump the YAML formatted results in the given file"
-  puts 
+  puts
   puts "Examples:"
   puts "  request-log-analyzer development.log"
   puts "  request-log-analyzer -b mongrel.0.log mongrel.1.log mongrel.2.log "
@@ -89,7 +89,7 @@ rescue CommandLine::Error => e
   puts "run the following command in your application's root directory:"
   puts
   puts "  request-log-analyzer install rails"
-  exit(0) 
+  exit(0)
 end
 
 case arguments.command
@@ -101,7 +101,7 @@ when :console
 when :strip
   require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
-else 
+else
   puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
   puts "Website: http://railsdoctors.com"
   puts

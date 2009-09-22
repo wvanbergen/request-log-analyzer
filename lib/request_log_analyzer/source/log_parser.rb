@@ -1,13 +1,13 @@
 module RequestLogAnalyzer::Source
-  
+
   # The LogParser class reads log data from a given source and uses a file format definition
-  # to parse all relevent information about requests from the file. A FileFormat module should 
+  # to parse all relevent information about requests from the file. A FileFormat module should
   # be provided that contains the definitions of the lines that occur in the log data.
   #
-  # De order in which lines occur is used to combine lines to a single request. If these lines 
-  # are mixed, requests cannot be combined properly. This can be the case if data is written to 
-  # the log file simultaneously by different mongrel processes. This problem is detected by the 
-  # parser. It will emit warnings when this occurs. LogParser supports multiple parse strategies 
+  # De order in which lines occur is used to combine lines to a single request. If these lines
+  # are mixed, requests cannot be combined properly. This can be the case if data is written to
+  # the log file simultaneously by different mongrel processes. This problem is detected by the
+  # parser. It will emit warnings when this occurs. LogParser supports multiple parse strategies
   # that deal differently with this problem.
   class LogParser < Base
 
@@ -15,7 +15,7 @@ module RequestLogAnalyzer::Source
 
     # The default parse strategy that will be used to parse the input.
     DEFAULT_PARSE_STRATEGY = 'assume-correct'
-    
+
     # All available parse strategies.
     PARSE_STRATEGIES = ['cautious', 'assume-correct']
 
@@ -36,30 +36,30 @@ module RequestLogAnalyzer::Source
       @current_file     = nil
       @current_lineno   = nil
       @source_files     = options[:source_files]
-      
+
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
       raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
     end
-    
+
     # Reads the input, which can either be a file, sequence of files or STDIN to parse
     # lines specified in the FileFormat. This lines will be combined into Request instances,
     # that will be yielded. The actual parsing occurs in the parse_io method.
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def each_request(options = {}, &block) # :yields: :request, request
-      
+
       case @source_files
       when IO
         puts "Parsing from the standard input. Press CTRL+C to finish." # FIXME: not here
-        parse_stream(@source_files, options, &block) 
+        parse_stream(@source_files, options, &block)
       when String
-        parse_file(@source_files, options, &block) 
+        parse_file(@source_files, options, &block)
       when Array
-        parse_files(@source_files, options, &block) 
+        parse_files(@source_files, options, &block)
       else
         raise "Unknown source provided"
       end
     end
-    
+
     # Make sure the Enumerable methods work as expected
     alias_method :each, :each_request
 
@@ -70,12 +70,12 @@ module RequestLogAnalyzer::Source
     def parse_files(files, options = {}, &block) # :yields: request
       files.each { |file| parse_file(file, options, &block) }
     end
-    
+
     # Check if a file has a compressed extention in the filename.
     # If recognized, return the command string used to decompress the file
     def decompress_file?(filename)
       nice_command = "nice -n 5"
-      
+
       return "#{nice_command} gunzip -c -d #{filename}" if filename.match(/\.tar.gz$/) || filename.match(/\.tgz$/) || filename.match(/\.gz$/)
       return "#{nice_command} bunzip2 -c -d #{filename}" if filename.match(/\.bz2$/)
       return "#{nice_command} unzip -p #{filename}" if filename.match(/\.zip$/)
@@ -96,22 +96,22 @@ module RequestLogAnalyzer::Source
 
       @current_source = File.expand_path(file)
       @source_changes_handler.call(:started, @current_source) if @source_changes_handler
-      
+
       if decompress_file?(file).empty?
 
         @progress_handler = @dormant_progress_handler
         @progress_handler.call(:started, file) if @progress_handler
-        
+
         File.open(file, 'r') { |f| parse_io(f, options, &block) }
-        
+
         @progress_handler.call(:finished, file) if @progress_handler
         @progress_handler = nil
       else
         IO.popen(decompress_file?(file), 'r') { |f| parse_io(f, options, &block) }
       end
-      
+
       @source_changes_handler.call(:finished, @current_source) if @source_changes_handler
-      
+
       @current_source = nil
 
     end
@@ -119,7 +119,7 @@ module RequestLogAnalyzer::Source
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
     # because the length of a stream is not known.
     # <tt>stream</tt>:: The IO stream that should be parsed.
-    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.    
+    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_stream(stream, options = {}, &block)
       parse_io(stream, options, &block)
     end
@@ -140,15 +140,15 @@ module RequestLogAnalyzer::Source
       @current_lineno = 1
       while line = io.gets
         @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 255 == 0
-        
+
         if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
           @parsed_lines += 1
           update_current_request(request_data.merge(:source => @current_source, :lineno => @current_lineno), &block)
         end
-        
+
         @current_lineno += 1
       end
-      
+
       warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
       @current_lineno = nil
     end
@@ -164,7 +164,7 @@ module RequestLogAnalyzer::Source
     def warning=(proc)
       @warning_handler = proc
     end
-    
+
     # Add a block to this method to install a source change handler while parsing,
     # <tt>proc</tt>:: The proc that will be called to handle source changes
     def source_changes=(proc)
@@ -172,9 +172,9 @@ module RequestLogAnalyzer::Source
     end
 
     # This method is called by the parser if it encounteres any parsing problems.
-    # It will call the installed warning handler if any. 
+    # It will call the installed warning handler if any.
     #
-    # By default, RequestLogAnalyzer::Controller will install a warning handler 
+    # By default, RequestLogAnalyzer::Controller will install a warning handler
     # that will pass the warnings to each aggregator so they can do something useful
     # with it.
     #
@@ -186,24 +186,24 @@ module RequestLogAnalyzer::Source
 
     protected
 
-    # Combines the different lines of a request into a single Request object. It will start a 
-    # new request when a header line is encountered en will emit the request when a footer line 
+    # Combines the different lines of a request into a single Request object. It will start a
+    # new request when a header line is encountered en will emit the request when a footer line
     # is encountered.
     #
     # Combining the lines is done using heuristics. Problems can occur in this process. The
     # current parse strategy defines how these cases are handled.
     #
     # When using the 'assume-correct' parse strategy (default):
-    # - Every line that is parsed before a header line is ignored as it cannot be included in 
+    # - Every line that is parsed before a header line is ignored as it cannot be included in
     #   any request. It will emit a :no_current_request warning.
-    # - If a header line is found before the previous requests was closed, the previous request 
+    # - If a header line is found before the previous requests was closed, the previous request
     #   will be yielded and a new request will be started.
     #
     # When using the 'cautious' parse strategy:
-    # - Every line that is parsed before a header line is ignored as it cannot be included in 
+    # - Every line that is parsed before a header line is ignored as it cannot be included in
     #   any request. It will emit a :no_current_request warning.
     # - A header line that is parsed before a request is closed by a footer line, is a sign of
-    #   an unproperly ordered file. All data that is gathered for the request until then is 
+    #   an unproperly ordered file. All data that is gathered for the request until then is
     #   discarded and the next request is ignored as well. An :unclosed_request warning is
     #   emitted.
     #
@@ -230,7 +230,7 @@ module RequestLogAnalyzer::Source
           @current_request << request_data
           if footer_line?(request_data)
             handle_request(@current_request, &block) # yield @current_request
-            @current_request = nil 
+            @current_request = nil
           end
         else
           @skipped_lines += 1
@@ -238,8 +238,8 @@ module RequestLogAnalyzer::Source
         end
       end
     end
-    
-    # Handles the parsed request by sending it into the pipeline. 
+
+    # Handles the parsed request by sending it into the pipeline.
     #
     # - It will call RequestLogAnalyzer::Request#validate on the request instance
     # - It will send the request into the pipeline, checking whether it was accepted by all the filters.
@@ -251,19 +251,19 @@ module RequestLogAnalyzer::Source
       request.validate
       accepted = block_given? ? yield(request) : true
       @skipped_requests += 1 unless accepted
-    end    
+    end
 
     # Checks whether a given line hash is a header line according to the current file format.
-    # <tt>hash</tt>:: A hash of data that was parsed from the line.    
+    # <tt>hash</tt>:: A hash of data that was parsed from the line.
     def header_line?(hash)
       hash[:line_definition].header
     end
 
-    # Checks whether a given line hash is a footer line  according to the current file format.    
-    # <tt>hash</tt>:: A hash of data that was parsed from the line.    
+    # Checks whether a given line hash is a footer line  according to the current file format.
+    # <tt>hash</tt>:: A hash of data that was parsed from the line.
     def footer_line?(hash)
       hash[:line_definition].footer
-    end 
+    end
   end
 
 end

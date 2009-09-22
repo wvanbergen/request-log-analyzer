@@ -9,16 +9,16 @@ module RequestLogAnalyzer::Spec
 end
 
 # Include all files in the spec_helper directory
-Dir[File.dirname(__FILE__) + "/lib/**/*.rb"].each do |file| 
-  require file 
+Dir[File.dirname(__FILE__) + "/lib/**/*.rb"].each do |file|
+  require file
 end
 
 Dir.mkdir("#{File.dirname(__FILE__)}/../tmp") unless File.exist?("#{File.dirname(__FILE__)}/../tmp")
 
 Spec::Runner.configure do |config|
-  config.include RequestLogAnalyzer::Spec::Matchers  
+  config.include RequestLogAnalyzer::Spec::Matchers
   config.include RequestLogAnalyzer::Spec::Mocks
-  config.include RequestLogAnalyzer::Spec::Helpers  
-  
-  config.extend RequestLogAnalyzer::Spec::Macros  
+  config.include RequestLogAnalyzer::Spec::Helpers
+
+  config.extend RequestLogAnalyzer::Spec::Macros
 end

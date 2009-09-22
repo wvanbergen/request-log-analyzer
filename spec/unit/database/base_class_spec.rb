@@ -1,26 +1,26 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe RequestLogAnalyzer::Database::Base do
-  
+
   describe '.subclass_from_line_definition' do
     before(:all) do
       @line_definition = RequestLogAnalyzer::LineDefinition.new(:test, { :regexp   => /Testing (\w+), tries\: (\d+)/,
                           :captures => [{ :name => :what, :type => :string }, { :name => :tries, :type => :integer },
                             { :name => :evaluated, :type => :hash, :provides => {:evaluated_field => :duration} }]})
     end
-    
+
     before(:each) do
       @orm_class = mock('Line ActiveRecord::Base class')
       @orm_class.stub!(:set_table_name)
       @orm_class.stub!(:belongs_to)
       @orm_class.stub!(:serialize)
       @orm_class.stub!(:line_definition=)
-      
+
       Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@orm_class)
-      
+
       RequestLogAnalyzer::Database::Request.stub!(:has_many)
       RequestLogAnalyzer::Database::Source.stub!(:has_many)
-      
+
       @database = mock_database
       RequestLogAnalyzer::Database::Base.stub!(:database).and_return(@database)
     end
@@ -29,7 +29,7 @@ describe RequestLogAnalyzer::Database::Base do
       Class.should_receive(:new).with(RequestLogAnalyzer::Database::Base).and_return(@orm_class)
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
     end
-    
+
     it "should store the LineDefinition" do
       @orm_class.should_receive(:line_definition=).with(@line_definition)
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
@@ -69,26 +69,26 @@ describe RequestLogAnalyzer::Database::Base do
 
   describe '.subclass_from_table' do
     before(:each) do
-      
+
       RequestLogAnalyzer::Database::Request.stub!(:has_many)
-      RequestLogAnalyzer::Database::Source.stub!(:has_many)      
-      
+      RequestLogAnalyzer::Database::Source.stub!(:has_many)
+
       @database = mock_database
       @database.connection.stub!(:table_exists?).and_return(true)
       RequestLogAnalyzer::Database::Base.stub!(:database).and_return(@database)
-      
+
       @klass = mock('ActiveRecord ORM class')
-      @klass.stub!(:column_names).and_return(['id', 'request_id', 'source_id', 'lineno', 'duration']) 
+      @klass.stub!(:column_names).and_return(['id', 'request_id', 'source_id', 'lineno', 'duration'])
       @klass.stub!(:set_table_name)
       @klass.stub!(:belongs_to)
       Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@klass)
     end
-    
+
     it "should create a new subclass using the Base class as parent" do
       Class.should_receive(:new).with(RequestLogAnalyzer::Database::Base).and_return(@klass)
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
-    end    
-    
+    end
+
     it "should set the table name" do
       @klass.should_receive(:set_table_name).with('completed_lines')
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
@@ -98,7 +98,7 @@ describe RequestLogAnalyzer::Database::Base do
       @klass.should_receive(:belongs_to).with(:request)
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
-    
+
     it "should create the :has_many relation in the request class" do
       RequestLogAnalyzer::Database::Request.should_receive(:has_many).with(:completed_lines)
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
@@ -108,7 +108,7 @@ describe RequestLogAnalyzer::Database::Base do
       @klass.should_receive(:belongs_to).with(:source)
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
-    
+
     it "should create the :has_many relation in the request class" do
       RequestLogAnalyzer::Database::Source.should_receive(:has_many).with(:completed_lines)
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
@@ -131,7 +131,7 @@ describe RequestLogAnalyzer::Database::Base do
       @klass.stub!(:table_exists?).and_return(false)
     end
 
-    after(:each) do 
+    after(:each) do
       @klass.drop_table!
       @database.remove_orm_classes!
     end
@@ -170,12 +170,12 @@ describe RequestLogAnalyzer::Database::Base do
     it "should create a field of the correct type for every defined capture field" do
       @database.connection.table_creator.should_receive(:column).with(:what, :string)
       @database.connection.table_creator.should_receive(:column).with(:tries, :integer)
-      @database.connection.table_creator.should_receive(:column).with(:evaluated, :text) 
+      @database.connection.table_creator.should_receive(:column).with(:evaluated, :text)
       @klass.create_table!
     end
 
     it "should create a field of the correct type for every provided field" do
-      @database.connection.table_creator.should_receive(:column).with(:evaluated_field, :double) 
+      @database.connection.table_creator.should_receive(:column).with(:evaluated_field, :double)
       @klass.create_table!
     end
   end
