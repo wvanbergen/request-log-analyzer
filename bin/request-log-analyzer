@@ -107,5 +107,5 @@ else
   puts
 
   # Run the request_log_analyzer!
-  RequestLogAnalyzer::Controller.build(arguments).run!
+  RequestLogAnalyzer::Controller.build_from_arguments(arguments).run!
 end

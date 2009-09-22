@@ -6,6 +6,42 @@ module RequestLogAnalyzer::Output
     RequestLogAnalyzer::load_default_class_file(self, const)
   end
 
+  # Loads a Output::Base subclass instance.
+  def self.load(file_format, *args)
+    
+    klass = nil
+    if file_format.kind_of?(RequestLogAnalyzer::Output::Base)
+      # this already is a file format! return itself
+      return file_format
+
+    elsif file_format.kind_of?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::Output::Base)
+      # a usable class is provided. Use this format class.
+      klass = file_format
+
+    elsif file_format.kind_of?(String) && File.exist?(file_format)
+      # load a format from a ruby file
+      require file_format
+      const = RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb'))
+      if RequestLogAnalyzer::FileFormat.const_defined?(const)
+        klass = RequestLogAnalyzer::Output.const_get(const)
+      elsif Object.const_defined?(const)
+        klass = Object.const_get(const)
+      else
+        raise "Cannot load class #{const} from #{file_format}!"
+      end
+
+    else
+      # load a provided file format
+      klass = RequestLogAnalyzer::Output.const_get(RequestLogAnalyzer::to_camelcase(file_format))
+    end
+
+    # check the returned klass to see if it can be used
+    raise "Could not load a file format from #{file_format.inspect}" if klass.nil?
+    raise "Invalid FileFormat class" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::Output::Base)
+
+    klass.create(*args) # return an instance of the class
+  end
+  
   # Base Class used for generating output for reports.
   # All output should inherit fromt this class.
   class Base
