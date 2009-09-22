@@ -89,7 +89,7 @@ module RequestLogAnalyzer
     # * <tt>:select</tt> Select specific {:field => :value} combination. Expects single hash.
     # * <tt>:aggregator</tt> Array of aggregators (ATM: STRINGS OR SYMBOLS ONLY!). Defaults to [:summarizer
     # * <tt>:boring</tt> Do not show color on STDOUT. Defaults to False.
-    # * <tt>::report_width</tt> Width or reports in characters. Defaults to 80.
+    # * <tt>:report_width</tt> Width or reports in characters. Defaults to 80.
     #
     # TODO:
     #   Check if defaults work (Aggregator defaults seem wrong).
@@ -129,7 +129,7 @@ module RequestLogAnalyzer
       end
       
       # Kickstart the controller
-      controller = Controller.new(  RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => options[:source_files], :output => output_instance),
+      controller = Controller.new(  RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => options[:source_files]),
                                     { :output => output_instance,
                                       :database => options[:database],                # FUGLY!
                                       :dump => options[:dump], 
@@ -164,13 +164,10 @@ module RequestLogAnalyzer
     # Builds a new Controller for the given log file format.
     # <tt>format</tt> Logfile format. Defaults to :rails
     # Options are passd on to the LogParser.
-    # * <tt>:aggregator</tt> Aggregator array.
     # * <tt>:database</tt> Database the controller should use.
     # * <tt>:dump</tt> Yaml Dump the contrller should use.
-    # * <tt>:echo</tt> Output debug information.
-    # * <tt>:silent</tt> Do not output any warnings.
-    # * <tt>:colorize</tt> Colorize output
     # * <tt>:output</tt> All report outputs get << through this output.
+    # * <tt>:no_progress</tt> No progress bar
     def initialize(source, options = {})
 
       @source      = source
