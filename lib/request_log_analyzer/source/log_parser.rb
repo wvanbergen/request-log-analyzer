@@ -94,21 +94,26 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_file(file, options = {}, &block)
 
-      @progress_handler = @dormant_progress_handler
       @current_source = File.expand_path(file)
-      @progress_handler.call(:started, file)                  if @progress_handler
       @source_changes_handler.call(:started, @current_source) if @source_changes_handler
       
       if decompress_file?(file).empty?
+
+        @progress_handler = @dormant_progress_handler
+        @progress_handler.call(:started, file) if @progress_handler
+        
         File.open(file, 'r') { |f| parse_io(f, options, &block) }
+        
+        @progress_handler.call(:finished, file) if @progress_handler
+        @progress_handler = nil
       else
         IO.popen(decompress_file?(file), 'r') { |f| parse_io(f, options, &block) }
       end
       
       @source_changes_handler.call(:finished, @current_source) if @source_changes_handler
-      @progress_handler.call(:finished, file)                  if @progress_handler
+      
       @current_source = nil
-      @progress_handler = nil
+
     end
 
     # Parses an IO stream. It will simply call parse_io. This function does not support progress updates
@@ -134,7 +139,7 @@ module RequestLogAnalyzer::Source
     def parse_io(io, options = {}, &block) # :yields: request
       @current_lineno = 1
       while line = io.gets
-        @progress_handler.call(:progress, io.pos) if @progress_handler && (@current_lineno & 255 == 0)
+        @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 255 == 0
         
         if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
           @parsed_lines += 1

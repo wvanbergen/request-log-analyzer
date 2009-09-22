@@ -15,6 +15,12 @@ describe RequestLogAnalyzer, 'running from command line' do
     output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
   end
 
+  it "should find 2 requests when parsing a compressed file" do
+    output = run("#{log_fixture(:decompression, :tgz)}")
+    output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
+  end
+
+
   it "should skip 1 requests with a --select option" do
     output = run("#{log_fixture(:rails_1x)} --select controller PeopleController")
     output.any? { |line| /^Skipped requests\:\s*1\s/ =~ line }.should be_true
