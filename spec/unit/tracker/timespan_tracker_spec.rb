@@ -47,6 +47,10 @@ describe RequestLogAnalyzer::Tracker::Timespan, 'reporting' do
     @tracker = RequestLogAnalyzer::Tracker::Timespan.new
     @tracker.prepare
   end
+  
+  it "should have a title" do
+    @tracker.title.should_not eql("")
+  end
 
   it "should generate a report without errors when no request was tracked" do
     lambda { @tracker.report(mock_output) }.should_not raise_error
@@ -58,4 +62,12 @@ describe RequestLogAnalyzer::Tracker::Timespan, 'reporting' do
     @tracker.update(request(:category => 'a', :timestamp => 20090103000000))
     lambda { @tracker.report(mock_output) }.should_not raise_error
   end
+  
+  it "should generate a YAML output" do
+    @tracker.update(request(:category => 'a', :timestamp => 20090102000000))
+    @tracker.update(request(:category => 'a', :timestamp => 20090101000000))
+    @tracker.update(request(:category => 'a', :timestamp => 20090103000000))
+    @tracker.to_yaml_object.should eql({ :first => DateTime.parse('20090101000000'), :last => DateTime.parse('20090103000000')})
+  end
+  
 end

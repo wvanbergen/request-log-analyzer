@@ -23,6 +23,13 @@ describe RequestLogAnalyzer::LineDefinition do
     it "should parse a line and capture the expected values" do
       @line_definition.should parse("Testing LineDefinition, tries: 123").capturing('LineDefinition', '123')
     end
+
+    it "should know which names it can capture" do
+      @line_definition.captures?(:what).should be_true
+      @line_definition.captures?(:tries).should be_true
+      @line_definition.captures?(:bogus).should be_false
+    end
+    
   end
 
   describe '#convert_captured_values' do

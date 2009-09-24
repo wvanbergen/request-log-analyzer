@@ -64,6 +64,6 @@ describe RequestLogAnalyzer::FileFormat do
       @file_format = RequestLogAnalyzer::FileFormat.load(format_filename)
       @file_format.should be_kind_of(TestingFormat)
     end
-
+    
   end
 end

@@ -74,4 +74,10 @@ describe RequestLogAnalyzer::Tracker::Frequency, 'reporting' do
     @tracker.update(request(:category => 'b', :blah => 0.2))
     lambda { @tracker.report(mock_output) }.should_not raise_error
   end
+
+  it "should generate a YAML output" do
+    @tracker.update(request(:category => 'a', :blah => 0.2))
+    @tracker.update(request(:category => 'b', :blah => 0.2))
+    @tracker.to_yaml_object.should eql({"a"=>1, "b"=>1})
+  end
 end

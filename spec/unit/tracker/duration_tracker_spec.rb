@@ -56,6 +56,10 @@ describe RequestLogAnalyzer::Tracker::Duration do
       @tracker.sum('a').should be_close(0.9, 0.000001)
     end
 
+    it "should overall sum of the durations correctly" do
+      @tracker.sum_overall.should be_close(0.9, 0.000001)
+    end
+
     it "should keep track of the minimum and maximum duration" do
       @tracker.min('a').should == 0.2
       @tracker.max('a').should == 0.4
@@ -63,6 +67,10 @@ describe RequestLogAnalyzer::Tracker::Duration do
 
     it "should calculate the mean duration correctly" do
       @tracker.mean('a').should be_close(0.3, 0.000001)
+    end
+
+    it "should calculate the overall mean duration correctly" do
+      @tracker.mean_overall.should be_close(0.3, 0.000001)
     end
 
     it "should calculate the duration variance correctly" do
@@ -94,6 +102,12 @@ describe RequestLogAnalyzer::Tracker::Duration do
       @tracker.update(request(:category => 'a', :duration => 0.2))
       @tracker.update(request(:category => 'b', :duration => 0.2))
       lambda { @tracker.report(mock_output) }.should_not raise_error
+    end
+
+    it "should generate a YAML output" do
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      @tracker.update(request(:category => 'b', :duration => 0.2))
+      @tracker.to_yaml_object.should eql({"a"=>{:hits=>1, :min=>0.2, :mean=>0.2, :max=>0.2, :sum_of_squares=>0.0, :sum=>0.2}, "b"=>{:hits=>1, :min=>0.2, :mean=>0.2, :max=>0.2, :sum_of_squares=>0.0, :sum=>0.2}})
     end
   end
 end
