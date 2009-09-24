@@ -47,7 +47,9 @@ begin
 
     command_line.switch(:boring, :b)
     command_line.option(:output, :alias => :o, :default => 'FixedWidth')
-    command_line.option(:report_width, :default => terminal_width - 1)
+    command_line.option(:report_width,  :default => terminal_width - 1)
+    command_line.option(:report_amount, :default => 20)
+    command_line.option(:report_sort,   :default => 'sum,mean')
 
     command_line.switch(:debug)
     command_line.switch(:no_progress)

@@ -4,7 +4,6 @@ module RequestLogAnalyzer::Tracker
   # Count and analyze requests for a specific attribute
   #
   # === Options
-  # * <tt>:amount</tt> The amount of lines in the report
   # * <tt>:category</tt> Proc that handles the request categorization.
   # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
   # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
@@ -71,7 +70,7 @@ module RequestLogAnalyzer::Tracker
       else
         sorted_frequencies = @frequencies.sort { |a, b| b[1] <=> a[1] }
         total_hits         = sorted_frequencies.inject(0) { |carry, item| carry + item[1] }
-        sorted_frequencies = sorted_frequencies.slice(0...options[:amount]) if options[:amount]
+        sorted_frequencies = sorted_frequencies.slice(0, output.options[:amount]) if output.options[:amount] && output.options[:amount] != :all
 
         output.table({:align => :left}, {:align => :right }, {:align => :right}, {:type => :ratio, :width => :rest}) do |rows|
           sorted_frequencies.each do |(cat, count)|

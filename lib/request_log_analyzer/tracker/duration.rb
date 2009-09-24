@@ -3,7 +3,6 @@ module RequestLogAnalyzer::Tracker
   # Analyze the duration of a specific attribute
   #
   # === Options
-  # * <tt>:amount</tt> The amount of lines in the report
   # * <tt>:category</tt> Proc that handles request categorization for given fileformat (REQUEST_CATEGORIZER)
   # * <tt>:duration</tt> The field containing the duration in the request hash.
   # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
@@ -97,13 +96,13 @@ module RequestLogAnalyzer::Tracker
     # Get the standard deviation of the duration of a specific category.
     # <tt>cat</tt> The category
     def stddev(cat)
-      Math.sqrt(variance(cat)) rescue nil
+      Math.sqrt(variance(cat)) rescue 0.0
     end
 
     # Get the variance of the duration of a specific category.
     # <tt>cat</tt> The category
     def variance(cat)
-      categories[cat][:sum_of_squares] / (categories[cat][:hits] - 1) rescue nil
+      categories[cat][:sum_of_squares] / (categories[cat][:hits] - 1) rescue 0.0
     end
 
     # Get the average duration of a all categories.
@@ -137,11 +136,12 @@ module RequestLogAnalyzer::Tracker
     # === Options
     #  * </tt>:title</tt> The title of the table
     #  * </tt>:sort</tt> The key to sort on (:hits, :cumulative, :average, :min or :max)
-    def report_table(output, sort, amount = 10, options = {}, &block)
-
+    def report_table(output, sort, options = {}, &block)
+      amount = output.options[:amount] || 20
       output.title(options[:title])
 
-      top_categories = sorted_by(sort).slice(0...amount)
+      top_categories = sorted_by(sort)
+      top_categories = top_categories.slice(0, amount) unless amount == :all
       output.table({:title => 'Category', :width => :rest},
             {:title => 'Hits',   :align => :right, :highlight => (sort == :hits),   :min_width => 4 },
             {:title => 'Sum',    :align => :right, :highlight => (sort == :sum),    :min_width => 6 },
@@ -168,20 +168,18 @@ module RequestLogAnalyzer::Tracker
     # <tt>output</tt> The output object
     def report(output)
 
-      options[:title]  ||= 'Request duration'
-      options[:report] ||= [:sum, :mean]
-      options[:top]    ||= 20
+      sortings = output.options[:sort] || [:sum, :mean]
 
-      options[:report].each do |report|
-        case report
+      sortings.each do |sorting|
+        case sorting
         when :mean
-          report_table(output, :mean,   options[:top], :title => "#{options[:title]} - top #{options[:top]} by mean time")
+          report_table(output, :mean,   :title => "#{title} - sorted by mean time")
         when :sum
-          report_table(output, :sum,    options[:top], :title => "#{options[:title]} - top #{options[:top]} by total time")
+          report_table(output, :sum,    :title => "#{title} - sorted by total time")
         when :stddev
-          report_table(output, :stddev, options[:top], :title => "#{options[:title]} - top #{options[:top]} by time variation")
+          report_table(output, :stddev, :title => "#{title} - sorted by time variation")
         when :hits
-          report_table(output, :hits,   options[:top], :title => "#{options[:title]} - top #{options[:top]} by hits")
+          report_table(output, :hits,   :title => "#{title} - sorted by hits")
         else
           raise "Unknown duration report specified: #{report}!"
         end

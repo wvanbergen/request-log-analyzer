@@ -43,7 +43,7 @@ module RequestLogAnalyzer::FileFormat
       analyze.timespan
       analyze.hourly_spread
       
-      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Most requested'
       analyze.frequency :method, :title => 'HTTP methods'
       analyze.frequency :status, :title => 'HTTP statuses returned'
       
@@ -57,20 +57,18 @@ module RequestLogAnalyzer::FileFormat
       analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
       
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
-        :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20
+        :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
       
       if line_definitions.has_key?(:failure)
-        analyze.frequency :error, :title => 'Failed requests', :line_type => :failure, :amount => 20
+        analyze.frequency :error, :title => 'Failed requests', :line_type => :failure
       end
 
       if line_definitions.has_key?(:rendered)
-        analyze.duration :render_duration, :category => :render_file, :multiple_per_request => true,
-                :amount => 20, :title => 'Partial rendering duration'
+        analyze.duration :render_duration, :category => :render_file, :multiple_per_request => true, :title => 'Partial rendering duration'
       end
 
       if line_definitions.has_key?(:query_executed)
-        analyze.duration :query_duration, :category => :query_sql, :multiple_per_request => true,
-              :amount => 20, :title => 'Query duration'
+        analyze.duration :query_duration, :category => :query_sql, :multiple_per_request => true, :title => 'Query duration'
       end
       
       return analyze.trackers + report_definer.trackers

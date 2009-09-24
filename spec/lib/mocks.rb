@@ -43,7 +43,7 @@ module RequestLogAnalyzer::Spec::Mocks
     output.stub!(:with_style)
     output.stub!(:table).and_yield([])
     output.stub!(:io).and_return(mock_io)
-
+    output.stub!(:options).and_return({})
     return output
   end
 

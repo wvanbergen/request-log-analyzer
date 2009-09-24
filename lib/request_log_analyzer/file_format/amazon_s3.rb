@@ -33,9 +33,9 @@ module RequestLogAnalyzer::FileFormat
       analyze.timespan
       analyze.hourly_spread
 
-      analyze.frequency :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Most popular items"
-      analyze.duration :duration => :total_time, :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Request duration"
-      analyze.traffic  :traffic => :bytes_sent,  :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :amount => 20, :title => "Traffic"
+      analyze.frequency :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :title => "Most popular items"
+      analyze.duration :duration => :total_time, :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :title => "Request duration"
+      analyze.traffic  :traffic => :bytes_sent,  :category => lambda { |r| "#{r[:bucket]}/#{r[:key]}"}, :title => "Traffic"
       analyze.frequency :category => :http_status, :title => 'HTTP status codes'
       analyze.frequency :category => :error_code, :title => 'Error codes'
     end

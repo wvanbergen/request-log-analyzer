@@ -44,6 +44,8 @@ module RequestLogAnalyzer
       options[:boring]         = arguments[:boring]
       options[:aggregator]     = arguments[:aggregator]
       options[:report_width]   = arguments[:report_width]
+      options[:report_sort]    = arguments[:report_sort]
+      options[:report_amount]  = arguments[:report_amount]
       
       # Apache format workaround
       if arguments[:rails_format]
@@ -102,23 +104,28 @@ module RequestLogAnalyzer
       options[:format]        ||= :rails
       options[:aggregator]    ||= [:summarizer]
       options[:report_width]  ||= 80
+      options[:report_amount] ||= 20
+      options[:report_sort]   ||= 'sum,mean'
       options[:boring]        ||= false
       
       # Set the output class
-      output_args = {}
+      output_args   = {}
       output_object = nil
-      output_class = RequestLogAnalyzer::Output::const_get(options[:output])
+      output_class  = RequestLogAnalyzer::Output::const_get(options[:output])
+      
+      output_sort   = options[:report_sort].split(',').map { |s| s.to_sym }
+      output_amount = options[:report_amount] == 'all' ? :all : options[:report_amount].to_i
       
       if options[:file]
         output_object = (options[:file].class == File) ? options[:file] : File.new(options[:file], "w+")
-        output_args   = {:width => 80, :color => false, :characters => :ascii }
+        output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
       elsif options[:mail]
         output_object = RequestLogAnalyzer::Mailer.new(arguments[:mail])
-        output_args   = {:width => 80, :color => false, :characters => :ascii }
+        output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount  }
       else
         output_object = STDOUT
         output_args   = {:width => options[:report_width].to_i, :color => !options[:boring],
-                        :characters => (options[:boring] ? :ascii : :utf)}
+                        :characters => (options[:boring] ? :ascii : :utf), :sort => output_sort, :amount => output_amount }
       end
       
       output_instance = output_class.new(output_object, output_args)

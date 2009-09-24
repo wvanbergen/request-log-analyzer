@@ -44,7 +44,7 @@ module RequestLogAnalyzer::FileFormat
       analyze.timespan
       analyze.hourly_spread
 
-      analyze.frequency :category => REQUEST_CATEGORIZER, :amount => 20, :title => "Top 20 by hits"
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => "Top 20 by hits"
       analyze.duration :dispatch_time, :category => REQUEST_CATEGORIZER, :title => 'Request dispatch duration'
 
       # analyze.duration :action_time, :category => REQUEST_CATEGORIZER, :title => 'Request action duration'
