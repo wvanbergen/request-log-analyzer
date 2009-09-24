@@ -8,6 +8,8 @@ module RequestLogAnalyzer
     # <tt>to</tt> to address
     # <tt>host</tt> the mailer host
     # <tt>options</tt> Specific style options
+    # Options
+    # <tt>:debug</tt> Do not actually mail
     def initialize(to, host = 'localhost', options = {})
       require 'net/smtp'
       @to      = to
@@ -28,10 +30,14 @@ Subject: #{subject}
 
 #{@data.to_s}
 END_OF_MESSAGE
-
-      Net::SMTP.start(@host) do |smtp|
-        smtp.send_message msg, from, to
+    
+      unless @options[:debug]
+        Net::SMTP.start(@host) do |smtp|
+          smtp.send_message msg, from, to
+        end
       end
+
+      return [msg, from, to] 
     end
 
     def << string
