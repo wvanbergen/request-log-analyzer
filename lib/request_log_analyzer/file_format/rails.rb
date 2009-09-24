@@ -1,36 +1,80 @@
 module RequestLogAnalyzer::FileFormat
 
+  # Default FileFormat class for Rails logs.
+  #
+  # Instances will be created dynamically based on the lines you want it to parse. You can
+  # specify what lines should be included in the parser by providing a list to the create
+  # method as first argument.
   class Rails < Base
 
-    # Processing EmployeeController#index (for 123.123.123.123 at 2008-07-13 06:00:00) [GET]
-    line_definition :processing do |line|
-      line.header = true # this line is the first log line for a request
-      line.teaser = /Processing /
-      line.regexp = /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/
-      line.captures << { :name => :controller, :type  => :string } \
-                    << { :name => :action,     :type  => :string } \
-                    << { :name => :format,     :type  => :string, :default => 'html' } \
-                    << { :name => :ip,         :type  => :string } \
-                    << { :name => :timestamp,  :type  => :timestamp } \
-                    << { :name => :method,     :type  => :string }
-    end
+    # Creates a Rails FileFormat instance.
+    #
+    # The lines that will be parsed can be defined by the argument to this function, 
+    # which should be an array of line names, or a list of line names as comma separated
+    # string. The resulting report depends on the lines that will be parsed. You can 
+    # also provide s string that describes a common set of lines, like "production",
+    # "development" or "production".
+    def self.create(lines = 'production')
+      line_definitions = line_definer.line_definitions
+      
+      lines = lines.to_s.split(',') if lines.kind_of?(String)
+      lines = [lines.to_s]          if lines.kind_of?(Symbol)
+      
+      lines.each do |line|
+        line = line.to_sym
+        if LINE_COLLECTIONS.has_key?(line)
+          LINE_COLLECTIONS[line].each { |l| line_definitions[l] = LINE_DEFINITIONS[l] }
+        elsif LINE_DEFINITIONS.has_key?(line)
+          line_definitions[line] = LINE_DEFINITIONS[line]
+        else
+          raise "Unrecognized Rails log line name: #{line.inspect}!"
+        end
+      end
 
-    # Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.
-    line_definition :cache_hit do |line|
-      line.regexp = /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter/
+      return self.new(line_definitions, report_trackers(line_definitions))
     end
+    
+    # Creates trackers based on the specified line definitions.
+    #
+    # The more lines that will be parsed, the more information will appear in the report.
+    def self.report_trackers(line_definitions)
+      analyze = RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
+      
+      analyze.timespan
+      analyze.hourly_spread
+      
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20
+      analyze.frequency :method, :title => 'HTTP methods'
+      analyze.frequency :status, :title => 'HTTP statuses returned'
+      
+      if line_definitions.has_key?(:cache_hit)
+        analyze.frequency(:category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, 
+              :title => 'Rails action cache hits')
+      end
+      
+      analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
+      analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
+      analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
+      
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
+        :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20
+      
+      if line_definitions.has_key?(:failure)
+        analyze.frequency :error, :title => 'Failed requests', :line_type => :failure, :amount => 20
+      end
 
-    # RuntimeError (Cannot destroy employee):  /app/models/employee.rb:198:in `before_destroy'
-    line_definition :failed do |line|
-      line.footer = true
-      line.regexp = /((?:[A-Z]\w+\:\:)*[A-Z]\w+) \((.*)\)(?: on line #(\d+) of .+)?\:(.*)/
-      line.captures << { :name => :error,       :type => :string } \
-                    << { :name => :message,     :type => :string } \
-                    << { :name => :line,        :type => :integer } \
-                    << { :name => :file,        :type => :string } \
-                    << { :name => :stack_trace, :type => :string }
+      if line_definitions.has_key?(:rendered)
+        analyze.duration :render_duration, :category => :render_file, :multiple_per_request => true,
+                :amount => 20, :title => 'Partial rendering duration'
+      end
+
+      if line_definitions.has_key?(:query_executed)
+        analyze.duration :query_duration, :category => :query_sql, :multiple_per_request => true,
+              :amount => 20, :title => 'Query duration'
+      end
+      
+      return analyze.trackers + report_definer.trackers
     end
-
 
     # Rails < 2.1 completed line example
     # Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]
@@ -40,49 +84,77 @@ module RequestLogAnalyzer::FileFormat
     # Completed in 614ms (View: 120, DB: 31) | 200 OK [http://floorplanner.local/demo]
     RAILS_22_COMPLETED = /Completed in (\d+)ms \((?:View: (\d+), )?DB: (\d+)\) \| (\d\d\d).+\[(http.+)\]/
 
-    # The completed line uses a kind of hack to ensure that both old style logs and new style logs
-    # are both parsed by the same regular expression. The format in Rails 2.2 was slightly changed,
-    # but the line contains exactly the same information.
-    line_definition :completed do |line|
+    # A hash of definitions for all common lines in Rails logs.
+    LINE_DEFINITIONS = {
+      :processing => RequestLogAnalyzer::LineDefinition.new(:processing, :header => true,
+            :teaser   => /Processing /,
+            :regexp   => /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/,
+            :captures => [{ :name => :controller, :type  => :string },
+                          { :name => :action,     :type  => :string },
+                          { :name => :format,     :type  => :string, :default => 'html' },
+                          { :name => :ip,         :type  => :string },
+                          { :name => :timestamp,  :type  => :timestamp },
+                          { :name => :method,     :type  => :string }]),
 
-      line.footer = true
-      line.teaser = /Completed in /
-      line.regexp = Regexp.new("(?:#{RAILS_21_COMPLETED}|#{RAILS_22_COMPLETED})")
+      :completed => RequestLogAnalyzer::LineDefinition.new(:completed, :footer => true,
+            :teaser   => /Completed in /,
+            :regexp   => Regexp.union(RAILS_21_COMPLETED, RAILS_22_COMPLETED),
+            :captures => [{ :name => :duration, :type => :duration, :unit => :sec },   # First old variant capture
+                          { :name => :view,     :type => :duration, :unit => :sec },
+                          { :name => :db,       :type => :duration, :unit => :sec },
+                          { :name => :status,   :type => :integer },
+                          { :name => :url,      :type => :string },                    # Last old variant capture
+                          { :name => :duration, :type => :duration, :unit => :msec },  # First new variant capture
+                          { :name => :view,     :type => :duration, :unit => :msec },
+                          { :name => :db,       :type => :duration, :unit => :msec },
+                          { :name => :status,   :type => :integer },
+                          { :name => :url,      :type => :string }]),                  # Last new variant capture
 
-      line.captures << { :name => :duration, :type => :duration, :unit => :sec } \
-                    << { :name => :view,     :type => :duration, :unit => :sec } \
-                    << { :name => :db,       :type => :duration, :unit => :sec } \
-                    << { :name => :status,   :type => :integer } \
-                    << { :name => :url,      :type => :string } # Old variant
+      :failure => RequestLogAnalyzer::LineDefinition.new(:failure, :footer => true,
+          :regexp   => /((?:[A-Z]\w+\:\:)*[A-Z]\w+) \((.*)\)(?: on line #(\d+) of (.+))?\:/,
+          :captures => [{ :name => :error,       :type => :string },
+                        { :name => :message,     :type => :string },
+                        { :name => :line,        :type => :integer },
+                        { :name => :file,        :type => :string }]),
 
-      line.captures << { :name => :duration, :type => :duration, :unit => :msec } \
-                    << { :name => :view,     :type => :duration, :unit => :msec } \
-                    << { :name => :db,       :type => :duration, :unit => :msec } \
-                    << { :name => :status,   :type => :integer } \
-                    << { :name => :url,      :type => :string }  # 2.2 variant
-    end
+      :cache_hit => RequestLogAnalyzer::LineDefinition.new(:cache_hit,
+          :regexp => /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter/),
 
+      :parameters => RequestLogAnalyzer::LineDefinition.new(:parameters,
+          :teaser   => /  Parameters:/,
+          :regexp   => /  Parameters:\s+(\{.*\})/,
+          :captures => [{ :name => :params, :type => :eval }]),
+          
+      :rendered => RequestLogAnalyzer::LineDefinition.new(:rendered,
+          :teaser   => /Rendered /,
+          :regexp   => /Rendered (\w+(?:\/\w+)+) \((\d+\.\d+)ms\)/,
+          :captures => [{ :name => :render_file,     :type  => :string },
+                        { :name => :render_duration, :type  => :duration, :unit => :msec }]),
+
+      :query_executed => RequestLogAnalyzer::LineDefinition.new(:query_executed,
+          :regexp   => /\s+(?:\e\[4;36;1m)?((?:\w+::)*\w+) Load \((\d+\.\d+)ms\)(?:\e\[0m)?\s+(?:\e\[0;1m)?([^\e]+) ?(?:\e\[0m)?/,
+          :captures => [{ :name => :query_class,    :type  => :string },
+                        { :name => :query_duration, :type  => :duration, :unit => :msec },
+                        { :name => :query_sql,      :type  => :sql }]),
+
+      :query_cached => RequestLogAnalyzer::LineDefinition.new(:query_cached,
+          :regexp   => /\s+(?:\e\[4;35;1m)?CACHE \((\d+\.\d+)ms\)(?:\e\[0m)?\s+(?:\e\[0m)?([^\e]+) ?(?:\e\[0m)?/,
+          :captures => [{ :name => :cached_duration, :type  => :duration, :unit => :msec },
+                        { :name => :cached_sql,      :type  => :sql }])
+    }
+
+    # Definitions of common combinations of lines that can be parsed
+    LINE_COLLECTIONS = {
+      :minimal     => [:processing, :completed],
+      :production  => [:processing, :completed, :failure, :cache_hit],
+      :development => [:processing, :completed, :failure, :rendered, :query_executed, :query_cached],
+      :all         => LINE_DEFINITIONS.keys
+    }
+
+
+    # Simple function to categorize Rails requests using controller/actions/format and method.
     REQUEST_CATEGORIZER = Proc.new do |request|
       "#{request[:controller]}##{request[:action]}.#{request[:format]} [#{request[:method]}]"
-    end
-
-    report do |analyze|
-      analyze.timespan
-      analyze.hourly_spread
-
-      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Top 20 hits', :amount => 20
-      analyze.frequency :method, :title => 'HTTP methods'
-      analyze.frequency :status, :title => 'HTTP statuses returned'
-      analyze.frequency :category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, :title => 'Rails action cache hits'
-
-      analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
-      analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
-      analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
-
-      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
-              :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }, :amount => 20
-
-      analyze.frequency :error, :title => 'Failed requests', :line_type => :failed, :amount => 20
     end
 
     # Define a custom Request class for the Rails file format to speed up timestamp handling
@@ -92,6 +164,11 @@ module RequestLogAnalyzer::FileFormat
       # Do not use DateTime.parse
       def convert_timestamp(value, definition)
         value.gsub(/[^0-9]/, '')[0...14].to_i
+      end
+
+      # Sanitizes SQL queries so that they can be grouped
+      def convert_sql(sql, definition)
+        sql.gsub(/\b\d+\b/, ':int').gsub(/`([^`]+)`/, '\1').gsub(/'[^']*'/, ':string').rstrip
       end
     end
 

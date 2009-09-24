@@ -9,4 +9,4 @@ Rendered shared/_analytics (0.2ms)
 Rendered layouts/_actions (0.6ms)
 Rendered layouts/_menu (2.2ms)
 Rendered layouts/_tabbar (0.5ms)
-Completed in 614ms (View: 120, DB: 31) | 200 OK [http://www.example.coml/demo]
+Completed in 614ms (View: 120, DB: 31) | 200 OK [http://www.example.com/demo]

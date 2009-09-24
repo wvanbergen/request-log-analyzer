@@ -46,7 +46,9 @@ module RequestLogAnalyzer
       options[:report_width]   = arguments[:report_width]
       
       # Apache format workaround
-      if arguments[:apache_format]
+      if arguments[:rails_format]
+        options[:format] = {:rails => arguments[:rails_format]}
+      elsif arguments[:apache_format]
         options[:format] = {:apache => arguments[:apache_format]}
       end
       
@@ -255,7 +257,7 @@ module RequestLogAnalyzer
     # 6. Finalize Source
     def run!
 
-      @aggregators.each{|agg| p agg}
+      # @aggregators.each{|agg| p agg}
 
       @aggregators.each { |agg| agg.prepare }
       install_signal_handlers

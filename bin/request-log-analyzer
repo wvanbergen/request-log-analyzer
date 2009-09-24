@@ -15,8 +15,6 @@ begin
 
     command_line.command(:console) do |cons|
       cons.option(:database, :alias => :d, :required => true)
-      cons.option(:format, :alias => :f, :default => 'rails')
-      cons.option(:apache_format)
     end
 
     command_line.command(:strip) do |strip|
@@ -29,6 +27,7 @@ begin
 
     command_line.option(:format, :alias => :f, :default => 'rails')
     command_line.option(:apache_format)
+    command_line.option(:rails_format)
 
     command_line.option(:file, :alias => :e)
     command_line.option(:mail, :alias => :m)
