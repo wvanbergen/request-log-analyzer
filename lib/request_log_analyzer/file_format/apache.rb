@@ -48,8 +48,9 @@ module RequestLogAnalyzer::FileFormat
     # It will set up the line definition and the report trackers according to the Apache access log format,
     # which should be passed as first argument. By default, is uses the 'combined' log format.
     def self.create(*args)
-      access_line =  access_line_definition(args.first)
-      self.new({ :access => access_line}, report_trackers(access_line))
+      access_line = access_line_definition(args.first)
+      trackers = report_trackers(access_line) + report_definer.trackers
+      self.new(line_definer.line_definitions.merge(:access => access_line), trackers)
     end
 
     # Creates the access log line definition based on the Apache log format string
