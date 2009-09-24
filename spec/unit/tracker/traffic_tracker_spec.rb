@@ -71,6 +71,10 @@ describe RequestLogAnalyzer::Tracker::Traffic do
       @tracker.mean('a').should == 2.0
     end
 
+    it "should calculate the overall mean traffic correctly" do
+      @tracker.mean_overall.should == 2.0
+    end
+
     it "should set min and max traffic correctly" do
       @tracker.min('a').should == 1
       @tracker.max('a').should == 3
