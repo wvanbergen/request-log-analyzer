@@ -12,7 +12,7 @@ describe RequestLogAnalyzer::Tracker::Traffic do
       @tracker.update(request(:category => 'b', :traffic => 3))
     end
 
-    it "should register a request in the right categoryusing the category field" do
+    it "should register a request in the right category using the category field" do
       @tracker.categories.should include('a', 'b')
     end
 
@@ -34,7 +34,7 @@ describe RequestLogAnalyzer::Tracker::Traffic do
       @tracker.update(request(:category => 'b', :traffic => 3))
     end
 
-    it "should use the categorizer to determine the  category" do
+    it "should use the categorizer to determine the category" do
       @tracker.categories.should include('few', 'lots')
     end
 
