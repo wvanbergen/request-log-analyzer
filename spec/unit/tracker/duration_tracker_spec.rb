@@ -107,7 +107,7 @@ describe RequestLogAnalyzer::Tracker::Duration do
     it "should generate a YAML output" do
       @tracker.update(request(:category => 'a', :duration => 0.2))
       @tracker.update(request(:category => 'b', :duration => 0.2))
-      @tracker.to_yaml_object.should eql({"a"=>{:hits=>1, :min=>0.2, :mean=>0.2, :max=>0.2, :sum_of_squares=>0.0, :sum=>0.2}, "b"=>{:hits=>1, :min=>0.2, :mean=>0.2, :max=>0.2, :sum_of_squares=>0.0, :sum=>0.2}})
+      @tracker.to_yaml_object.should == {"a"=>{:hits=>1, :min=>0.2, :mean=>0.2, :max=>0.2, :sum_of_squares=>0.0, :sum=>0.2}, "b"=>{:hits=>1, :min=>0.2, :mean=>0.2, :max=>0.2, :sum_of_squares=>0.0, :sum=>0.2}}
     end
   end
 end

@@ -67,7 +67,7 @@ describe RequestLogAnalyzer::Tracker::Timespan, 'reporting' do
     @tracker.update(request(:category => 'a', :timestamp => 20090102000000))
     @tracker.update(request(:category => 'a', :timestamp => 20090101000000))
     @tracker.update(request(:category => 'a', :timestamp => 20090103000000))
-    @tracker.to_yaml_object.should eql({ :first => DateTime.parse('20090101000000'), :last => DateTime.parse('20090103000000')})
+    @tracker.to_yaml_object.should == { :first => DateTime.parse('20090101000000'), :last => DateTime.parse('20090103000000')}
   end
   
 end
