@@ -184,6 +184,7 @@ module RequestLogAnalyzer::Tracker
       end
     end
     
+    # Returns the column header for a statistics table to report on the statistics result
     def statistics_header(options)
       [
         {:title => options[:title], :width => :rest},
@@ -196,6 +197,7 @@ module RequestLogAnalyzer::Tracker
       ]
     end
     
+    # Returns a row of statistics information for a report table, given a category
     def statistics_row(cat)
       [cat, hits(cat), display_value(sum(cat)), display_value(mean(cat)), display_value(stddev(cat)),
                 display_value(min(cat)), display_value(max(cat))]
