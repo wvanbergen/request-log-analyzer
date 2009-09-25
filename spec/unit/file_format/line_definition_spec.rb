@@ -13,15 +13,15 @@ describe RequestLogAnalyzer::LineDefinition do
   describe '#matches' do
 
     it "should return false on an unmatching line" do
-      @line_definition.should_not parse("nonmatching")
+      @line_definition.matches("nonmatching").should be_false
     end
 
     it "should return false when only the teaser matches" do
-      @line_definition.should_not parse("Testing LineDefinition")
+      @line_definition.matches("Testing LineDefinition").should be_false
     end
 
     it "should parse a line and capture the expected values" do
-      @line_definition.should parse("Testing LineDefinition, tries: 123").capturing('LineDefinition', '123')
+      @line_definition.matches("Testing LineDefinition, tries: 123").should == {:line_definition => @line_definition, :captures => ['LineDefinition', '123'] }
     end
 
     it "should know which names it can capture" do

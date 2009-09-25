@@ -22,32 +22,50 @@ module RequestLogAnalyzer::Spec::Matchers
     end
   end
 
-  class Parse
+  class ParseLine
+    
     def initialize(line)
-      @line     = line
-      @captures = nil
+      @line      = line
+      @captures  = {}
+      @line_type = nil
     end
 
     def failure_message
-      message = "expected to parse the provided line"
-      if @found_captures
-        message << "with captures #{@captures.inspect}, but captured #{@found_captures.inspect}"
-      end
-      return message
+      @failure_message
     end
 
-    def capturing(*captures)
+    def as(line_type)
+      @line_type = line_type
+      return self
+    end
+    
+    def and_capture(captures)
       @captures = captures
       return self
     end
 
-    def matches?(line_definition)
-      hash = line_definition.matches(@line)
-      if hash
-        @found_captures = hash[:captures].to_a
-        @captures.nil? ? true : @found_captures.eql?(@captures)
+    def fail(message)
+      @failure_message = message
+      return false
+    end
+
+    def matches?(file_format)
+      @line_hash = file_format.parse_line(@line)
+      @request   = file_format.request(@line_hash)
+      
+      if @line_hash
+        if @line_type.nil? || @line_hash[:line_definition].name == @line_type
+          @captures.each do |key, value|
+            if @request[key] != value
+              return fail("Expected line #{@line.inspect}\n    to capture #{key.inspect} as #{value.inspect} but was #{@request[key].inspect}.") 
+            end
+          end
+          return true
+        else
+          return fail("The line should match the #{@line_type.inspect} line definition, but matched #{@line_hash[:line_definition].name.inspect} instead.")
+        end
       else
-        return false
+        return fail("The line did not match any line definition.")
       end
     end
   end
@@ -56,8 +74,8 @@ module RequestLogAnalyzer::Spec::Matchers
     return HasLineDefinition.new(line_type)
   end
 
-  def parse(line)
-    Parse.new(line)
+  def parse_line(line)
+    ParseLine.new(line)
   end
 
 end
