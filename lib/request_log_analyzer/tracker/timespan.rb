@@ -19,20 +19,20 @@ module RequestLogAnalyzer::Tracker
   #  Total time analyzed:  7 days
   class Timespan < Base
 
-    attr_reader :first, :last, :request_time_graph
+    attr_reader :first, :last
 
     # Check if timestamp field is set in the options.
     def prepare
       options[:field] ||= :timestamp
+      @first, @last = 99999999999999, 0
     end
 
     # Check if the timestamp in the request and store it.
     # <tt>request</tt> The request.
     def update(request)
       timestamp = request[options[:field]]
-
-      @first = timestamp if @first.nil? || timestamp < @first
-      @last  = timestamp if @last.nil?  || timestamp > @last
+      @first = timestamp if timestamp < @first
+      @last  = timestamp if timestamp > @last
     end
 
     # First timestamp encountered
@@ -56,11 +56,11 @@ module RequestLogAnalyzer::Tracker
     def report(output)
       output.title(options[:title]) if options[:title]
 
-      if @last && @first
+      if @last > 0 && @first < 99999999999999
         output.with_style(:cell_separator => false) do
           output.table({:width => 20}, {}) do |rows|
             rows << ['First request:', first_timestamp.strftime('%Y-%m-%d %H:%M:%I')]
-            rows << ['Last request:', last_timestamp.strftime('%Y-%m-%d %H:%M:%I')]
+            rows << ['Last request:',  last_timestamp.strftime('%Y-%m-%d %H:%M:%I')]
             rows << ['Total time analyzed:', "#{timespan.ceil} days"]
           end
         end

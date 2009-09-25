@@ -12,7 +12,7 @@ describe RequestLogAnalyzer::Tracker::HourlySpread do
     @tracker.update(request(:timestamp => 20090101000000))
     @tracker.update(request(:timestamp => 20090103000000))
 
-    @tracker.request_time_graph[0].should eql(3)
+    @tracker.hour_frequencies[0].should eql(3)
   end
 
   it "should count the number of timestamps correctly" do

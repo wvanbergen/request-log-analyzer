@@ -16,11 +16,11 @@ module RequestLogAnalyzer::Tracker
     # Check if duration and catagory option have been received,
     def prepare
       raise "No traffic field set up for category tracker #{self.inspect}" unless options[:traffic]
-      raise "No categorizer set up for duration tracker #{self.inspect}" unless options[:category]
+      raise "No categorizer set up for duration tracker #{self.inspect}"   unless options[:category]
 
-      @categorizer = options[:category].respond_to?(:call) ? options[:category] : lambda { |request| request[options[:category]] }
-      @trafficizer = options[:traffic].respond_to?(:call)  ? options[:traffic]  : lambda { |request| request[options[:traffic]]  }
-      @categories = {}
+      @categorizer = create_lambda(options[:category])
+      @trafficizer = create_lambda(options[:traffic])
+      @categories  = {}
     end
 
     # Update sthe running calculation numbers with the newly found duration.

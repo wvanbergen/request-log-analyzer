@@ -41,6 +41,16 @@ module RequestLogAnalyzer::Tracker
       @should_update_checks.push( lambda { |request| !options[:unless].call(request) }) if options[:unless].respond_to?(:call)
       @should_update_checks.push( lambda { |request| !request[options[:unless]] }) if options[:unless].kind_of?(Symbol)
     end
+    
+    # Creates a lambda expression to return a static field from a request. If the 
+    # argument already is a lambda exprssion, it will simply return the argument.
+    def create_lambda(arg)
+      case arg
+      when Proc   then arg
+      when Symbol then lambda { |request| request[arg] }
+      else raise "Canot create a lambda expression from this argument: #{arg.inspect}!"
+      end
+    end
 
     # Hook things that need to be done before running here.
     def prepare

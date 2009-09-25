@@ -30,28 +30,29 @@ module RequestLogAnalyzer::Tracker
   #   ................
   class HourlySpread < Base
 
-    attr_reader :first, :last, :request_time_graph
+    attr_reader :hour_frequencies, :first, :last
 
     # Check if timestamp field is set in the options and prepare the result time graph.
     def prepare
       options[:field] ||= :timestamp
-      @request_time_graph = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+      @hour_frequencies = (0...24).map { 0 }
+      @first, @last = 99999999999999, 0
     end
 
     # Check if the timestamp in the request and store it.
     # <tt>request</tt> The request.
     def update(request)
       timestamp = request.first(options[:field])
-
-      @request_time_graph[timestamp.to_s[8..9].to_i] +=1
-      @first = timestamp if @first.nil? || timestamp < @first
-      @last  = timestamp if @last.nil?  || timestamp > @last
+      @hour_frequencies[timestamp.to_s[8..9].to_i] +=1
+      @first = timestamp if timestamp < @first
+      @last  = timestamp if timestamp > @last
     end
 
     # Total amount of requests tracked
     def total_requests
-      @request_time_graph.inject(0) { |sum, value| sum + value }
+      @hour_frequencies.inject(0) { |sum, value| sum + value }
     end
+
 
     # First timestamp encountered
     def first_timestamp
@@ -67,7 +68,7 @@ module RequestLogAnalyzer::Tracker
     def timespan
       last_timestamp - first_timestamp
     end
-
+    
     # Generate an hourly spread report to the given output object.
     # Any options for the report should have been set during initialize.
     # <tt>output</tt> The output object
@@ -81,10 +82,10 @@ module RequestLogAnalyzer::Tracker
 
       days = [1, timespan].max
       output.table({}, {:align => :right}, {:type => :ratio, :width => :rest, :treshold => 0.15}) do |rows|
-        @request_time_graph.each_with_index do |requests, index|
-          ratio = requests.to_f / total_requests.to_f
+        @hour_frequencies.each_with_index do |requests, index|
+          ratio            = requests.to_f / total_requests.to_f
           requests_per_day = (requests / days).ceil
-          rows << ["#{index.to_s.rjust(3)}:00", "%d hits" % requests_per_day, ratio]
+          rows << ["#{index.to_s.rjust(3)}:00", "%d hits/day" % requests_per_day, ratio]
         end
       end
     end
@@ -97,7 +98,7 @@ module RequestLogAnalyzer::Tracker
     # Returns the found frequencies per hour as a hash for YAML exporting
     def to_yaml_object
       yaml_object = {}
-      @request_time_graph.each_with_index do |freq, hour|
+      @hour_frequencies.each_with_index do |freq, hour|
         yaml_object["#{hour}:00 - #{hour+1}:00"] = freq
       end
       yaml_object
