@@ -13,6 +13,8 @@ module RequestLogAnalyzer::Tracker
 
     attr_reader :categories
 
+    include RequestLogAnalyzer::Tracker::StatisticsTracking
+
     # Check if duration and catagory option have been received,
     def prepare
       raise "No traffic field set up for category tracker #{self.inspect}" unless options[:traffic]
@@ -23,95 +25,13 @@ module RequestLogAnalyzer::Tracker
       @categories  = {}
     end
 
-    # Update sthe running calculation numbers with the newly found duration.
-    # <tt>category</tt>:: The category for which to update the running calculations
-    # <tt>duration</tt>:: The duration to update the calculations with.
-    def update_numbers(category, traffic)
-      @categories[category] ||= {:hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => traffic, :max => traffic }
-      delta = traffic - @categories[category][:mean]
 
-      @categories[category][:hits]           += 1
-      @categories[category][:mean]           += (delta / @categories[category][:hits])
-      @categories[category][:sum_of_squares] += delta * (traffic - @categories[category][:mean])
-      @categories[category][:sum]            += traffic
-      @categories[category][:min]             = traffic if traffic < @categories[category][:min]
-      @categories[category][:max]             = traffic if traffic > @categories[category][:max]
-    end
-
-    # Get the duration information fron the request and store it in the different categories.
+    # Get the duration information from the request and store it in the different categories.
     # <tt>request</tt> The request.
     def update(request)
       category = @categorizer.call(request)
       traffic  = @trafficizer.call(request)
-
-      update_numbers(category, traffic) if traffic.kind_of?(Numeric) && !category.nil?
-    end
-
-    # Get the number of hits of a specific category.
-    # <tt>cat</tt> The category
-    def hits(cat)
-      categories[cat][:hits]
-    end
-
-    # Get the total duration of a specific category.
-    # <tt>cat</tt> The category
-    def sum(cat)
-      categories[cat][:sum]
-    end
-
-    # Get the minimal duration of a specific category.
-    # <tt>cat</tt> The category
-    def min(cat)
-      categories[cat][:min]
-    end
-
-    # Get the maximum duration of a specific category.
-    # <tt>cat</tt> The category
-    def max(cat)
-      categories[cat][:max]
-    end
-
-    # Get the average duration of a specific category.
-    # <tt>cat</tt> The category
-    def mean(cat)
-      categories[cat][:mean]
-    end
-
-    # Get the standard deviation of the duration of a specific category.
-    # <tt>cat</tt> The category
-    def stddev(cat)
-      Math.sqrt(variance(cat)) rescue 0.0
-    end
-
-    # Get the variance of the duration of a specific category.
-    # <tt>cat</tt> The category
-    def variance(cat)
-      categories[cat][:sum_of_squares] / (categories[cat][:hits] - 1) rescue 0.0
-    end
-
-    # Get the average duration of a all categories.
-    def mean_overall
-      sum_overall / hits_overall
-    end
-
-    # Get the cumlative duration of a all categories.
-    def sum_overall
-      categories.inject(0.0) { |sum, (name, cat)| sum + cat[:sum] }
-    end
-
-    # Get the total hits of a all categories.
-    def hits_overall
-      categories.inject(0) { |sum, (name, cat)| sum + cat[:hits] }
-    end
-
-    # Return categories sorted by a given key.
-    # <tt>by</tt> The key.
-    def sorted_by(by = nil)
-      if block_given?
-        categories.sort { |a, b| yield(b[1]) <=> yield(a[1]) }
-      else
-        categories.sort { |a, b| send(by, b[0]) <=> send(by, a[0]) }
-      end
+      update_statistics(category, traffic) if traffic.kind_of?(Numeric) && !category.nil?
     end
 
     # Block function to build a result table using a provided sorting function.
@@ -121,29 +41,19 @@ module RequestLogAnalyzer::Tracker
     #  * </tt>:title</tt> The title of the table
     #  * </tt>:sort</tt> The key to sort on (:hits, :cumulative, :average, :min or :max)
     def report_table(output, sort, options = {}, &block)
-      amount = output.options[:amount] || 20
-      output.title(options[:title])
+      output.puts
 
-      top_categories = sorted_by(sort)
-      top_categories = top_categories.slice(0, amount) unless amount == :all
-      
-      output.table({:title => 'Category', :width => :rest},
-            {:title => 'Hits',   :align => :right, :highlight => (sort == :hits),   :min_width => 4},
-            {:title => 'Sum',    :align => :right, :highlight => (sort == :sum),    :min_width => 6},
-            {:title => 'Mean',   :align => :right, :highlight => (sort == :mean),   :min_width => 6},
-            {:title => 'StdDev', :align => :right, :highlight => (sort == :stddev), :min_width => 6},
-            {:title => 'Min',    :align => :right, :highlight => (sort == :min),    :min_width => 6},
-            {:title => 'Max',    :align => :right, :highlight => (sort == :max),    :min_width => 6}) do |rows|
-
-        top_categories.each do |(cat, info)|
-          rows << [cat, hits(cat), display_traffic(sum(cat)), display_traffic(mean(cat)), display_traffic(stddev(cat)),
-                    display_traffic(min(cat)), display_traffic(max(cat))]
+      top_categories = output.slice_results(sorted_by(sort))
+      output.with_style(:top_line => true) do      
+        output.table(*statistics_header(:title => options[:title],:highlight => sort)) do |rows|
+          top_categories.each { |(cat, info)| rows.push(statistics_row(cat)) }
         end
       end
+      output.puts
     end
 
     # Formats the traffic number using x B/kB/MB/GB etc notation
-    def display_traffic(bytes)
+    def display_value(bytes)
       return "-"   if bytes.nil?
       return "0 B" if bytes.zero?
       case Math.log10(bytes).floor
@@ -179,7 +89,7 @@ module RequestLogAnalyzer::Tracker
       end
 
       output.puts
-      output.puts "#{output.colorize(title, :white, :bold)} - observed total: " + output.colorize(display_traffic(sum_overall), :brown, :bold)
+      output.puts "#{output.colorize(title, :white, :bold)} - observed total: " + output.colorize(display_value(sum_overall), :brown, :bold)
     end
 
     # Returns the title of this tracker for reports

@@ -44,6 +44,7 @@ module RequestLogAnalyzer::Spec::Mocks
     output.stub!(:table).and_yield([])
     output.stub!(:io).and_return(mock_io)
     output.stub!(:options).and_return({})
+    output.stub!(:slice_results).and_return { |a| a } 
     return output
   end
 

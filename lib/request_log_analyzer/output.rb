@@ -73,6 +73,11 @@ module RequestLogAnalyzer::Output
     def footer
     end
 
+    def slice_results(array)
+      return array if options[:amount] == :all
+      return array.slice(0, options[:amount]) # otherwise
+    end
+
     # Generate a report table and push it into the output object.
     # Yeilds a rows array into which the rows can be pushed
     # <tt>*colums<tt> Array of Column hashes (see Column options).

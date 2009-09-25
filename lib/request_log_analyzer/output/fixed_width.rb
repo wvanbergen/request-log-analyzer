@@ -172,6 +172,8 @@ module RequestLogAnalyzer::Output
         end
       end
 
+      line(:green) if @style[:top_line]
+
       # Print table header
       if table_has_header?(columns)
         column_titles = []

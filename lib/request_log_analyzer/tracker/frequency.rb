@@ -69,9 +69,8 @@ module RequestLogAnalyzer::Tracker
       if @categories.empty?
         output << "None found.\n"
       else
-        sorted_categories = @categories.sort { |a, b| b[1] <=> a[1] }
-        total_hits        = sorted_categories.inject(0) { |carry, item| carry + item[1] }
-        sorted_categories = sorted_categories.slice(0, output.options[:amount]) if output.options[:amount] && output.options[:amount] != :all
+        sorted_categories = output.slice_results(sorted_by_frequency)
+        total_hits        = overall_frequency
 
         output.table({:align => :left}, {:align => :right }, {:align => :right}, {:type => :ratio, :width => :rest}) do |rows|
           sorted_categories.each do |(cat, count)|
