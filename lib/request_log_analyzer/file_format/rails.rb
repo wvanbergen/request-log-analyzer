@@ -15,7 +15,7 @@ module RequestLogAnalyzer::FileFormat
     # also provide s string that describes a common set of lines, like "production",
     # "development" or "production".
     def self.create(lines = 'production')
-      line_definitions = line_definer.line_definitions
+      definitions_hash = line_definer.line_definitions.clone
       
       lines = lines.to_s.split(',') if lines.kind_of?(String)
       lines = [lines.to_s]          if lines.kind_of?(Symbol)
@@ -23,21 +23,21 @@ module RequestLogAnalyzer::FileFormat
       lines.each do |line|
         line = line.to_sym
         if LINE_COLLECTIONS.has_key?(line)
-          LINE_COLLECTIONS[line].each { |l| line_definitions[l] = LINE_DEFINITIONS[l] }
+          LINE_COLLECTIONS[line].each { |l| definitions_hash[l] = LINE_DEFINITIONS[l] }
         elsif LINE_DEFINITIONS.has_key?(line)
-          line_definitions[line] = LINE_DEFINITIONS[line]
+          definitions_hash[line] = LINE_DEFINITIONS[line]
         else
           raise "Unrecognized Rails log line name: #{line.inspect}!"
         end
       end
 
-      return self.new(line_definitions, report_trackers(line_definitions))
+      return self.new(definitions_hash, report_trackers(definitions_hash))
     end
     
     # Creates trackers based on the specified line definitions.
     #
     # The more lines that will be parsed, the more information will appear in the report.
-    def self.report_trackers(line_definitions)
+    def self.report_trackers(lines)
       analyze = RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
       
       analyze.timespan
@@ -47,7 +47,7 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :method, :title => 'HTTP methods'
       analyze.frequency :status, :title => 'HTTP statuses returned'
       
-      if line_definitions.has_key?(:cache_hit)
+      if lines.has_key?(:cache_hit)
         analyze.frequency(:category => lambda { |request| request =~ :cache_hit ? 'Cache hit' : 'No hit' }, 
               :title => 'Rails action cache hits')
       end
@@ -59,15 +59,15 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
         :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
       
-      if line_definitions.has_key?(:failure)
+      if lines.has_key?(:failure)
         analyze.frequency :error, :title => 'Failed requests', :line_type => :failure
       end
 
-      if line_definitions.has_key?(:rendered)
+      if lines.has_key?(:rendered)
         analyze.duration :render_duration, :category => :render_file, :multiple_per_request => true, :title => 'Partial rendering duration'
       end
 
-      if line_definitions.has_key?(:query_executed)
+      if lines.has_key?(:query_executed)
         analyze.duration :query_duration, :category => :query_sql, :multiple_per_request => true, :title => 'Query duration'
       end
       

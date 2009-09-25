@@ -50,15 +50,11 @@ module RequestLogAnalyzer::Spec::Matchers
     end
 
     def matches?(file_format)
-      @line_hash = file_format.parse_line(@line)
-      @request   = file_format.request(@line_hash)
-      
-      if @line_hash
+      if @line_hash = file_format.parse_line(@line)
         if @line_type.nil? || @line_hash[:line_definition].name == @line_type
+          @request   = file_format.request(@line_hash)
           @captures.each do |key, value|
-            if @request[key] != value
-              return fail("Expected line #{@line.inspect}\n    to capture #{key.inspect} as #{value.inspect} but was #{@request[key].inspect}.") 
-            end
+            return fail("Expected line #{@line.inspect}\n    to capture #{key.inspect} as #{value.inspect} but was #{@request[key].inspect}.") if @request[key] != value
           end
           return true
         else

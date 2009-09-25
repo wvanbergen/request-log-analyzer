@@ -26,12 +26,12 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       
       it "should at least parse :processing and :completed lines" do
         @rails.line_definitions.should include(:processing, :completed, :failure)
-      end      
+      end
     end
 
     RequestLogAnalyzer::FileFormat::Rails::LINE_COLLECTIONS.keys.each do |constant|
-      context "using the '#{constant}' line collection constant" do
 
+      context "using the '#{constant}' line collection constant" do
         before(:each) { @rails = RequestLogAnalyzer::FileFormat.load(:rails, constant) }
 
         it "should return a valid language" do
@@ -46,131 +46,122 @@ describe RequestLogAnalyzer::FileFormat::Rails do
   end
 
   describe '#parse_line' do
-    before(:each) do
-      @rails   = RequestLogAnalyzer::FileFormat.load(:rails, :all)
-    end
-    
-    sample_lines = [
-      [:processing, nil, 
-          'Processing PeopleController#index (for 1.1.1.1 at 2008-08-14 21:16:30) [GET]',
-          { :controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET'}],
-      [:completed, 'Rails 2.1 style',
-          'Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]',
-          {:duration => 0.21665, :db => 0.0, :view => 0.00926, :status => 200, :url => 'http://demo.nu/employees'}],
-      [:completed, 'Rails 2.2 style', 
-        'Completed in 614ms (View: 120, DB: 31) | 200 OK [http://floorplanner.local/demo]',
-          {:duration => 0.614, :db => 0.031, :view => 0.120, :status => 200, :url => 'http://floorplanner.local/demo'}],
-      [:failure, nil,
-          "NoMethodError (undefined method `update_domain_account' for nil:NilClass):",
-          {:error => 'NoMethodError', :message => "undefined method `update_domain_account' for nil:NilClass"} ],
-      [:cache_hit, nil, 
-          'Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.'],
-      [:parameters, nil,
-          '  Parameters: {"action"=>"cached", "controller"=>"cached"}', 
-          {:params => {:action => 'cached', :controller => 'cached'}}],
-      [:rendered, nil, 
-          'Rendered layouts/_footer (2.9ms)', 
-          {:render_file => 'layouts/_footer', :render_duration => 0.0029} ],
-      [:query_executed, 'with coloring', 
-          ' [4;36;1mUser Load (0.4ms)[0m   [0;1mSELECT * FROM `users` WHERE (`users`.`id` = 18205844) [0m',
-          {:query_class => 'User', :query_duration => 0.0004, :query_sql => 'SELECT * FROM users WHERE (users.id = :int)' }],
-      [:query_executed, 'without coloring', 
-          ' User Load (0.4ms)   SELECT * FROM `users` WHERE (`users`.`id` = 18205844) ',
-          {:query_class => 'User', :query_duration => 0.0004, :query_sql => 'SELECT * FROM users WHERE (users.id = :int)' }],
-      [:query_cached, 'with coloring',   
-          ' [4;35;1mCACHE (0.0ms)[0m   [0mSELECT * FROM `users` WHERE (`users`.`id` = 0) [0m',
-          {:cached_duration => 0.0, :cached_sql => 'SELECT * FROM users WHERE (users.id = :int)' }],
-      [:query_cached, 'without coloring',
-          ' CACHE (0.0ms)   SELECT * FROM `users` WHERE (`users`.`id` = 0) ',
-          {:cached_duration => 0.0, :cached_sql => 'SELECT * FROM users WHERE (users.id = :int)' }],
-    ]
-    
-    sample_lines.each do |(line_type, comment, sample, values)|
-      values   ||= {}
-      definition = RequestLogAnalyzer::FileFormat::Rails::LINE_DEFINITIONS[line_type]
-      
-      context "with a #{line_type.inspect} line #{comment}" do
-        before(:each) { @parse_result = @rails.parse_line(sample) }
-        
-        it "should recognize the line" do
-          @parse_result.should be_kind_of(Hash)
+    before(:each) { @rails = RequestLogAnalyzer::FileFormat.load(:rails, :all) }
+
+    {'with prefix' => 'LINE PREFIX: ', 'without prefix' => '' }.each do |context, prefix|
+      context context do
+        it "should parse a :processing line correctly" do
+          line = prefix + 'Processing PeopleController#index (for 1.1.1.1 at 2008-08-14 21:16:30) [GET]'
+          @rails.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET')
         end
-        
-        it "should recognize the line type correctly" do
-          @parse_result[:line_definition].should == definition
+
+        it "should parse a Rails 2.1 style :completed line correctly" do
+          line = prefix + 'Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]'
+          @rails.should parse_line(line).as(:completed).and_capture(:duration => 0.21665, :db => 0.0, :view => 0.00926, :status => 200, :url => 'http://demo.nu/employees')
         end
-        
-        it "should capture #{definition.captures.length} values" do
-          @parse_result[:captures].should have(definition.captures.length).items
+
+        it "should parse a Rails 2.2 style :completed line correctly" do
+          line = prefix + 'Completed in 614ms (View: 120, DB: 31) | 200 OK [http://floorplanner.local/demo]'
+          @rails.should parse_line(line).as(:completed).and_capture(:duration => 0.614, :db => 0.031, :view => 0.120, :status => 200, :url => 'http://floorplanner.local/demo')
         end
-        
-        values.each do |key, value|
-          it "should capture the #{key.inspect} value correctly as #{value.inspect}" do
-            @rails.request(@parse_result)[key].should == value
-          end
+
+        it "should parse a :failure line with exception correctly" do
+          line = prefix + "NoMethodError (undefined method `update_domain_account' for nil:NilClass):"
+          @rails.should parse_line(line).as(:failure).and_capture(:error => 'NoMethodError', :message => "undefined method `update_domain_account' for nil:NilClass")
+        end
+
+        it "should parse a :cache_hit line correctly" do
+          line = prefix + 'Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.'
+          @rails.should parse_line(line).as(:cache_hit)
+        end
+
+        it "should parse a :parameters line correctly" do
+          line = prefix + '  Parameters: {"action"=>"cached", "controller"=>"cached"}'
+          @rails.should parse_line(line).as(:parameters).and_capture(:params => {:action => 'cached', :controller => 'cached'})
+        end
+
+        it "should parse a :rendered line correctly" do
+          line = prefix + 'Rendered layouts/_footer (2.9ms)'
+          @rails.should parse_line(line).as(:rendered).and_capture(:render_file => 'layouts/_footer', :render_duration => 0.0029)
+        end
+
+        it "should parse a :query_executed line with colors" do
+          line = prefix + ' [4;36;1mUser Load (0.4ms)[0m   [0;1mSELECT * FROM `users` WHERE (`users`.`id` = 18205844) [0m'
+          @rails.should parse_line(line).as(:query_executed).and_capture(:query_class => 'User', :query_duration => 0.0004, :query_sql => 'SELECT * FROM users WHERE (users.id = :int)')
+        end
+
+        it "should parse a :query_executed line without colors" do
+          line = prefix + ' User Load (0.4ms)   SELECT * FROM `users` WHERE (`users`.`id` = 18205844) '
+          @rails.should parse_line(line).as(:query_executed).and_capture(:query_class => 'User', :query_duration => 0.0004, :query_sql => 'SELECT * FROM users WHERE (users.id = :int)')
+        end
+
+        it "should parse a :query_cached line with colors" do
+          line = prefix + ' [4;35;1mCACHE (0.0ms)[0m   [0mSELECT * FROM `users` WHERE (`users`.`id` = 0) [0m'
+          @rails.should parse_line(line).as(:query_cached).and_capture(:cached_duration => 0.0, :cached_sql => 'SELECT * FROM users WHERE (users.id = :int)')
+        end
+
+        it "should parse a :query_cached line without colors" do
+          line = prefix + ' CACHE (0.0ms)   SELECT * FROM `users` WHERE (`users`.`id` = 0) '
+          @rails.should parse_line(line).as(:query_cached).and_capture(:cached_duration => 0.0, :cached_sql => 'SELECT * FROM users WHERE (users.id = :int)')
+        end
+
+        it "should not parse an unsupported line" do
+          line = prefix + 'nonsense line that should not be parsed as anything'
+          @rails.should_not parse_line(line)
         end
       end
     end
+  end
 
-    it "should return nil with an unsupported line" do
-      @rails.parse_line('nonsense').should be_nil
+  describe '#parse_io' do
+    before(:each) do
+      @log_parser = RequestLogAnalyzer::Source::LogParser.new(
+            RequestLogAnalyzer::FileFormat.load(:rails), :parse_strategy => 'cautious')
     end
-  end
 
-  before(:each) do
-    @log_parser = RequestLogAnalyzer::Source::LogParser.new(
-          RequestLogAnalyzer::FileFormat.load(:rails), :parse_strategy => 'cautious')
-  end
-
-  it "should have a valid language definitions" do
-    @log_parser.file_format.should be_valid
-  end
-
-  it "should parse a stream and find valid requests" do
-    io = File.new(log_fixture(:rails_1x), 'r')
-    @log_parser.parse_io(io) do |request|
-      request.should be_kind_of(RequestLogAnalyzer::Request)
+    it "should parse a Rails 2.1 style log and find valid Rails requests without warnings" do
+      @log_parser.should_not_receive(:warn)
+      @log_parser.parse_file(log_fixture(:rails_1x)) do |request|
+        request.should be_kind_of(RequestLogAnalyzer::FileFormat::Rails::Request)
+        request.should be_completed
+      end
     end
-    io.close
-  end
 
-  it "should find 4 completed requests" do
-    @log_parser.should_not_receive(:warn)
-    @log_parser.should_receive(:handle_request).exactly(4).times
-    @log_parser.parse_file(log_fixture(:rails_1x))
-  end
-
-  it "should parse a Rails 2.2 request properly" do
-    @log_parser.should_not_receive(:warn)
-    @log_parser.parse_file(log_fixture(:rails_22)) do |request|
-      request.should =~ :processing
-      request.should =~ :completed
+    it "should parse a Rails 2.2 style log and find valid Rails requests without warnings" do
+      @log_parser.should_not_receive(:warn)
+      @log_parser.parse_file(log_fixture(:rails_22)) do |request|
+        request.should be_kind_of(RequestLogAnalyzer::FileFormat::Rails::Request)
+        request.should be_completed
+      end
     end
-  end
 
-  it "should parse a syslog file with prefix correctly" do
-    @log_parser.should_not_receive(:warn)
-    @log_parser.parse_file(log_fixture(:syslog_1x)) do |request|
-      request.should be_completed
+    it "should parse a Rails SyslogLogger file with prefix and find valid requests without warnings" do
+      @log_parser.should_not_receive(:warn)
+      @log_parser.parse_file(log_fixture(:syslog_1x)) do |request|
+        request.should be_kind_of(RequestLogAnalyzer::FileFormat::Rails::Request)
+        request.should be_completed
+      end
     end
-  end
 
-  it "should parse cached requests" do
-    @log_parser.should_not_receive(:warn)
-    @log_parser.parse_file(log_fixture(:rails_22_cached)) do |request|
-      request.should be_completed
-      request =~ :cache_hit
+    it "should find 4 completed requests" do
+      @log_parser.should_not_receive(:warn)
+      @log_parser.should_receive(:handle_request).exactly(4).times
+      @log_parser.parse_file(log_fixture(:rails_1x))
     end
-  end
 
-  it "should detect unordered requests in the logs" do
-    # No valid request should be found in cautious mode
-    @log_parser.should_not_receive(:handle_request)
-    # the first Processing-line will not give a warning, but the next one will
-    @log_parser.should_receive(:warn).with(:unclosed_request, anything).once
-    # Both Completed lines will give a warning
-    @log_parser.should_receive(:warn).with(:no_current_request, anything).twice
+    it "should parse cached requests" do
+      @log_parser.should_not_receive(:warn)
+      @log_parser.parse_file(log_fixture(:rails_22_cached)) do |request|
+        request.should be_completed
+        request =~ :cache_hit
+      end
+    end
 
-    @log_parser.parse_file(log_fixture(:rails_unordered))
+    it "should detect unordered requests in the logs" do
+      @log_parser.should_not_receive(:handle_request)
+      @log_parser.should_receive(:warn).with(:unclosed_request, anything).once
+      @log_parser.should_receive(:warn).with(:no_current_request, anything).twice
+      @log_parser.parse_file(log_fixture(:rails_unordered))
+    end
   end
 end
