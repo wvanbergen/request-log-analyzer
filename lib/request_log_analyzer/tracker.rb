@@ -187,12 +187,12 @@ module RequestLogAnalyzer::Tracker
     def statistics_header(options)
       [
         {:title => options[:title], :width => :rest},
-        {:title => 'Hits',   :align => :right, :highlight => (options[:sort] == :hits),   :min_width => 4},
-        {:title => 'Sum',    :align => :right, :highlight => (options[:sort] == :sum),    :min_width => 6},
-        {:title => 'Mean',   :align => :right, :highlight => (options[:sort] == :mean),   :min_width => 6},
-        {:title => 'StdDev', :align => :right, :highlight => (options[:sort] == :stddev), :min_width => 6},
-        {:title => 'Min',    :align => :right, :highlight => (options[:sort] == :min),    :min_width => 6},
-        {:title => 'Max',    :align => :right, :highlight => (options[:sort] == :max),    :min_width => 6}
+        {:title => 'Hits',   :align => :right, :highlight => (options[:highlight] == :hits),   :min_width => 4},
+        {:title => 'Sum',    :align => :right, :highlight => (options[:highlight] == :sum),    :min_width => 6},
+        {:title => 'Mean',   :align => :right, :highlight => (options[:highlight] == :mean),   :min_width => 6},
+        {:title => 'StdDev', :align => :right, :highlight => (options[:highlight] == :stddev), :min_width => 6},
+        {:title => 'Min',    :align => :right, :highlight => (options[:highlight] == :min),    :min_width => 6},
+        {:title => 'Max',    :align => :right, :highlight => (options[:highlight] == :max),    :min_width => 6}
       ]
     end
     
