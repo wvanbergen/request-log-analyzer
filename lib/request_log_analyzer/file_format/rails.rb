@@ -109,7 +109,8 @@ module RequestLogAnalyzer::FileFormat
                           { :name => :url,      :type => :string }]),                  # Last new variant capture
 
       :failure => RequestLogAnalyzer::LineDefinition.new(:failure, :footer => true,
-          :regexp   => /((?:[A-Z]\w+\:\:)*[A-Z]\w+) \((.*)\)(?: on line #(\d+) of (.+))?\:/,
+          :teaser   => /((?:[A-Z]\w*[a-z]\w+\:\:)*[A-Z]\w*[a-z]\w+) \((.*)\)(?: on line #(\d+) of (.+))?\:/,
+          :regexp   => /((?:[A-Z]\w*[a-z]\w+\:\:)*[A-Z]\w*[a-z]\w+) \((.*)\)(?: on line #(\d+) of (.+))?\:\s*$/,
           :captures => [{ :name => :error,       :type => :string },
                         { :name => :message,     :type => :string },
                         { :name => :line,        :type => :integer },
