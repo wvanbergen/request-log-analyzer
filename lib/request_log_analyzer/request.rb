@@ -21,7 +21,6 @@ module RequestLogAnalyzer
       end
 
       def convert_string(value, capture_definition);  value; end
-      def convert_decimal(value, capture_definition); value.to_f; end
       def convert_float(value, capture_definition);   value.to_f; end
       def convert_decimal(value, capture_definition); value.to_f; end
       def convert_int(value, capture_definition);     value.to_i; end
