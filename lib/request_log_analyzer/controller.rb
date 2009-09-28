@@ -192,6 +192,7 @@ module RequestLogAnalyzer
       @aggregators = []
       @filters     = []
       @output      = options[:output]
+      @interrupted = false
       
       # Register the request format for this session after checking its validity
       raise "Invalid file format!" unless @source.file_format.valid?

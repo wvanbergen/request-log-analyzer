@@ -9,6 +9,8 @@ module RequestLogAnalyzer::Filter
     attr_reader :before, :after
 
     def initialize(file_format, options = {})
+      @after  = nil
+      @before = nil
       super(file_format, options)
       setup_filter
     end

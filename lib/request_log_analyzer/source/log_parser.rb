@@ -33,9 +33,12 @@ module RequestLogAnalyzer::Source
       @parsed_requests  = 0
       @skipped_lines    = 0
       @skipped_requests = 0
+      @current_request  = nil
+      @current_source   = nil
       @current_file     = nil
       @current_lineno   = nil
       @source_files     = options[:source_files]
+      @progress_handler = nil
 
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
       raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
