@@ -156,12 +156,16 @@ module RequestLogAnalyzer
         controller.add_filter(:timespan, filter_options)
       end
 
-      options[:reject].each do |(field, value)|
-        controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
+      if options[:reject]
+        options[:reject].each do |(field, value)|
+          controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
+        end
       end
 
-      options[:select].each do |(field, value)|
-        controller.add_filter(:field, :mode => :select, :field => field, :value => value)
+      if options[:reject]
+        options[:select].each do |(field, value)|
+          controller.add_filter(:field, :mode => :select, :field => field, :value => value)
+        end
       end
 
       # register aggregators
