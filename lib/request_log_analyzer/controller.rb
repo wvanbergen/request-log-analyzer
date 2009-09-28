@@ -87,8 +87,8 @@ module RequestLogAnalyzer
     # * <tt>:file</tt> Filestring or File or StringIO
     # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. Defaults to :rails.
     # * <tt>:source_files</tt> File or STDIN
-    # * <tt>:after</tt> Drop all requests after this date
-    # * <tt>:before</tt> Drop all requests before this date
+    # * <tt>:after</tt> Drop all requests after this date (Date, DateTime, Time, or a String in "YYYY-MM-DD hh:mm:ss" format)
+    # * <tt>:before</tt> Drop all requests before this date (Date, DateTime, Time, or a String in "YYYY-MM-DD hh:mm:ss" format)
     # * <tt>:reject</tt> Reject specific {:field => :value} combination. Expects single hash.
     # * <tt>:select</tt> Select specific {:field => :value} combination. Expects single hash.
     # * <tt>:aggregator</tt> Array of aggregators (ATM: STRINGS OR SYMBOLS ONLY!). Defaults to [:summarizer
@@ -151,8 +151,14 @@ module RequestLogAnalyzer
       # register filters
       if options[:after] || options[:before]
         filter_options = {}
-        filter_options[:after]  = DateTime.parse(options[:after]) if options[:after]
-        filter_options[:before] = DateTime.parse(options[:before]) if options[:before]
+        [:after, :before].each do |filter|
+          case options[filter]
+          when Date, DateTime, Time
+            filter_options[filter] = options[filter]
+          when String
+            filter_options[filter] = DateTime.parse(options[filter])
+          end
+        end
         controller.add_filter(:timespan, filter_options)
       end
 
