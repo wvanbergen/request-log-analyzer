@@ -84,7 +84,7 @@ module RequestLogAnalyzer
     # * <tt>:parse_strategy</tt> 
     # * <tt>:no_progress</tt> 
     # * <tt>:output</tt> :fixed_width, :html or Output class. Defaults to fixed width.
-    # * <tt>:file</tt> Filestring or File
+    # * <tt>:file</tt> Filestring or File or StringIO
     # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. Defaults to :rails.
     # * <tt>:source_files</tt> File or STDIN
     # * <tt>:after</tt> Drop all requests after this date
@@ -121,7 +121,7 @@ module RequestLogAnalyzer
       output_amount = options[:report_amount] == 'all' ? :all : options[:report_amount].to_i
       
       if options[:file]
-        output_object = (options[:file].class == File) ? options[:file] : File.new(options[:file], "w+")
+        output_object = %w[File StringIO].include?(options[:file].class.name) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
       elsif options[:mail]
         output_object = RequestLogAnalyzer::Mailer.new(arguments[:mail])
