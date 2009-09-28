@@ -52,7 +52,9 @@ module RequestLogAnalyzer::Source
 
       case @source_files
       when IO
-        puts "Parsing from the standard input. Press CTRL+C to finish." # FIXME: not here
+        if @source_files == $stdin
+          puts "Parsing from the standard input. Press CTRL+C to finish." # FIXME: not here
+        end
         parse_stream(@source_files, options, &block)
       when String
         parse_file(@source_files, options, &block)
