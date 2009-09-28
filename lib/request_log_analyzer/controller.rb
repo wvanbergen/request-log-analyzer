@@ -111,7 +111,11 @@ module RequestLogAnalyzer
       # Set the output class
       output_args   = {}
       output_object = nil
-      output_class  = RequestLogAnalyzer::Output::const_get(options[:output])
+      if options[:output].is_a? Class
+        output_class = options[:output]
+      else
+        output_class = RequestLogAnalyzer::Output::const_get(options[:output])
+      end
       
       output_sort   = options[:report_sort].split(',').map { |s| s.to_sym }
       output_amount = options[:report_amount] == 'all' ? :all : options[:report_amount].to_i
