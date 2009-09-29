@@ -179,7 +179,7 @@ module GithubGem
 
     # Checks whether the current branch is not diverged from the remote branch
     def check_not_diverged_task
-      raise "The current branch is diverged from the remote branch!" if git.log.between('HEAD', git.branches["#{remote}/#{remote_branch}"].gcommit).any?
+      raise "The current branch is diverged from the remote branch!" if git.log.between('HEAD', git.remote(remote).branch(remote_branch).gcommit).any?
     end
 
     # Checks whether the repository status ic clean
