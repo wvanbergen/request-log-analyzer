@@ -38,6 +38,7 @@ module RequestLogAnalyzer
     def initialize(name, definition = {})
       @name     = name
       @captures = []
+      @teaser   = nil
       definition.each { |key, value| self.send("#{key.to_s}=".to_sym, value) }
     end
 

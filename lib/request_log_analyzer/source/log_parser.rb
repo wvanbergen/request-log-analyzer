@@ -33,9 +33,12 @@ module RequestLogAnalyzer::Source
       @parsed_requests  = 0
       @skipped_lines    = 0
       @skipped_requests = 0
+      @current_request  = nil
+      @current_source   = nil
       @current_file     = nil
       @current_lineno   = nil
       @source_files     = options[:source_files]
+      @progress_handler = nil
 
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
       raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
@@ -49,7 +52,9 @@ module RequestLogAnalyzer::Source
 
       case @source_files
       when IO
-        puts "Parsing from the standard input. Press CTRL+C to finish." # FIXME: not here
+        if @source_files == $stdin
+          puts "Parsing from the standard input. Press CTRL+C to finish." # FIXME: not here
+        end
         parse_stream(@source_files, options, &block)
       when String
         parse_file(@source_files, options, &block)

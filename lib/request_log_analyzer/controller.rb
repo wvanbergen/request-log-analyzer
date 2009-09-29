@@ -84,11 +84,11 @@ module RequestLogAnalyzer
     # * <tt>:parse_strategy</tt> 
     # * <tt>:no_progress</tt> 
     # * <tt>:output</tt> :fixed_width, :html or Output class. Defaults to fixed width.
-    # * <tt>:file</tt> Filestring or File
+    # * <tt>:file</tt> Filestring or File or StringIO
     # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. Defaults to :rails.
     # * <tt>:source_files</tt> File or STDIN
-    # * <tt>:after</tt> Drop all requests after this date
-    # * <tt>:before</tt> Drop all requests before this date
+    # * <tt>:after</tt> Drop all requests after this date (Date, DateTime, Time, or a String in "YYYY-MM-DD hh:mm:ss" format)
+    # * <tt>:before</tt> Drop all requests before this date (Date, DateTime, Time, or a String in "YYYY-MM-DD hh:mm:ss" format)
     # * <tt>:reject</tt> Reject specific {:field => :value} combination. Expects single hash.
     # * <tt>:select</tt> Select specific {:field => :value} combination. Expects single hash.
     # * <tt>:aggregator</tt> Array of aggregators (ATM: STRINGS OR SYMBOLS ONLY!). Defaults to [:summarizer
@@ -111,13 +111,17 @@ module RequestLogAnalyzer
       # Set the output class
       output_args   = {}
       output_object = nil
-      output_class  = RequestLogAnalyzer::Output::const_get(options[:output])
+      if options[:output].is_a? Class
+        output_class = options[:output]
+      else
+        output_class = RequestLogAnalyzer::Output::const_get(options[:output])
+      end
       
       output_sort   = options[:report_sort].split(',').map { |s| s.to_sym }
       output_amount = options[:report_amount] == 'all' ? :all : options[:report_amount].to_i
       
       if options[:file]
-        output_object = (options[:file].class == File) ? options[:file] : File.new(options[:file], "w+")
+        output_object = %w[File StringIO].include?(options[:file].class.name) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
       elsif options[:mail]
         output_object = RequestLogAnalyzer::Mailer.new(arguments[:mail])
@@ -147,17 +151,27 @@ module RequestLogAnalyzer
       # register filters
       if options[:after] || options[:before]
         filter_options = {}
-        filter_options[:after]  = DateTime.parse(options[:after]) if options[:after]
-        filter_options[:before] = DateTime.parse(options[:before]) if options[:before]
+        [:after, :before].each do |filter|
+          case options[filter]
+          when Date, DateTime, Time
+            filter_options[filter] = options[filter]
+          when String
+            filter_options[filter] = DateTime.parse(options[filter])
+          end
+        end
         controller.add_filter(:timespan, filter_options)
       end
 
-      options[:reject].each do |(field, value)|
-        controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
+      if options[:reject]
+        options[:reject].each do |(field, value)|
+          controller.add_filter(:field, :mode => :reject, :field => field, :value => value)
+        end
       end
 
-      options[:select].each do |(field, value)|
-        controller.add_filter(:field, :mode => :select, :field => field, :value => value)
+      if options[:reject]
+        options[:select].each do |(field, value)|
+          controller.add_filter(:field, :mode => :select, :field => field, :value => value)
+        end
       end
 
       # register aggregators
@@ -184,6 +198,7 @@ module RequestLogAnalyzer
       @aggregators = []
       @filters     = []
       @output      = options[:output]
+      @interrupted = false
       
       # Register the request format for this session after checking its validity
       raise "Invalid file format!" unless @source.file_format.valid?
