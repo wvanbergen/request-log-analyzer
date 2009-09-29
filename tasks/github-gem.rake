@@ -308,7 +308,15 @@ module GithubGem
         response = http.get(path)
         open(__FILE__, "w") { |file| file.write(response.body) }
       end
-      puts "Updated gem release tasks file with latest version."
+
+      relative_file = File.expand_path(__FILE__).sub(%r[^#{git.dir.path}/], '')
+      if git.status[relative_file] && git.status[relative_file].type == 'M'
+        git.add(relative_file)
+        git.commit("Updated to latest gem release management tasks.")
+        puts "Updated to latest version of gem release management tasks."
+      else
+        puts "Release managament tasks already are at the latest version."
+      end
     end
 
   end
