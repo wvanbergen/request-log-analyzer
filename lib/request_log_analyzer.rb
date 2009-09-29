@@ -10,7 +10,7 @@ Encoding.default_external = 'binary' if defined? Encoding and Encoding.respond_t
 module RequestLogAnalyzer
 
   # The current version of request-log-analyzer.
-  # This will be diplayed in output reports etc.
+  # Do not change the value by hand; it will be updated automatically by the gem release script.
   VERSION = "1.3.7"
 
   # Loads constants in the RequestLogAnalyzer namespace using self.load_default_class_file(base, const)
