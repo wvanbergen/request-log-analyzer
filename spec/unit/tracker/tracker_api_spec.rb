@@ -116,7 +116,7 @@ describe RequestLogAnalyzer::Tracker::Base do
     end
 
     it "should receive :to_yaml object when finalizing" do
-      @summarizer.options[:dump] = temp_output_file(:dump)
+      @summarizer.options[:yaml] = temp_output_file(:yaml)
       @tracker.should_receive(:to_yaml_object).once
       @summarizer.to_yaml
     end
