@@ -20,7 +20,7 @@ To analyze a Rails log file and produce a performance report, run request-log-an
 
   $ request-log-analyzer log/production.log
 
-For more details, other file formats, and available command line options, see the project's wiki: http://wiki.github.com/wvanbergen/request-log-analyzer/basic-usage
+For more details, other file formats, and available command line options, see the project's wiki at http://wiki.github.com/wvanbergen/request-log-analyzer
 
 == Additional information
 
