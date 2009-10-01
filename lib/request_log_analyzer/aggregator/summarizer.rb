@@ -90,7 +90,7 @@ module RequestLogAnalyzer::Aggregator
     # Call finalize on all trackers. Saves a YAML dump if this is set in  the options.
     def finalize
       @trackers.each { |tracker| tracker.finalize }
-      save_results_dump(options[:dump]) if options[:dump]
+      save_results_dump(options[:yaml]) if options[:yaml]
     end
 
     # Saves the results of all the trackers in YAML format to a file.

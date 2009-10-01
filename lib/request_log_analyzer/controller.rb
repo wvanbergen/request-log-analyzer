@@ -30,7 +30,7 @@ module RequestLogAnalyzer
       options[:database]       = arguments[:database]
       options[:reset_database] = arguments[:reset_database]
       options[:debug]          = arguments[:debug]
-      options[:dump]           = arguments[:dump]
+      options[:yaml]           = arguments[:dump]
       options[:parse_strategy] = arguments[:parse_strategy]
       options[:no_progress]    = arguments[:no_progress]
       options[:format]         = arguments[:format]
@@ -80,9 +80,9 @@ module RequestLogAnalyzer
     # * <tt>:database</tt> Database file
     # * <tt>:reset_database</tt> 
     # * <tt>:debug</tt> Enables echo aggregator.
-    # * <tt>:dump</tt> 
+    # * <tt>:yaml</tt> Output to YAML 
     # * <tt>:parse_strategy</tt> 
-    # * <tt>:no_progress</tt> 
+    # * <tt>:no_progress</tt> Do not display the progress bar
     # * <tt>:output</tt> :fixed_width, :html or Output class. Defaults to fixed width.
     # * <tt>:file</tt> Filestring or File or StringIO
     # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. Defaults to :rails.
@@ -100,13 +100,19 @@ module RequestLogAnalyzer
     #   Refactor :database => options[:database], :dump => options[:dump] away from contoller intialization.
     def self.build(options)
       # Defaults
-      options[:output]        ||= :fixed_width
+      options[:output]        ||= 'fixed_width'
       options[:format]        ||= :rails
       options[:aggregator]    ||= [:summarizer]
       options[:report_width]  ||= 80
       options[:report_amount] ||= 20
       options[:report_sort]   ||= 'sum,mean'
       options[:boring]        ||= false
+      
+      # Backwards compatibility
+      if options[:dump] && options[:yaml].blank?
+        warn "[DEPRECATION] `:dump` is deprecated.  Please use `:yaml` instead."
+        options[:yaml]          = options[:dump]
+      end
       
       # Set the output class
       output_args   = {}
@@ -145,8 +151,9 @@ module RequestLogAnalyzer
       controller = Controller.new(  RequestLogAnalyzer::Source::LogParser.new(file_format, :source_files => options[:source_files]),
                                     { :output => output_instance,
                                       :database => options[:database],                # FUGLY!
-                                      :dump => options[:dump], 
-                                      :reset_database => options[:reset_database]})
+                                      :yaml => options[:yaml], 
+                                      :reset_database => options[:reset_database],
+                                      :no_progress => options[:no_progress]})
 
       # register filters
       if options[:after] || options[:before]
@@ -188,7 +195,7 @@ module RequestLogAnalyzer
     # <tt>format</tt> Logfile format. Defaults to :rails
     # Options are passd on to the LogParser.
     # * <tt>:database</tt> Database the controller should use.
-    # * <tt>:dump</tt> Yaml Dump the contrller should use.
+    # * <tt>:yaml</tt> Yaml Dump the contrller should use.
     # * <tt>:output</tt> All report outputs get << through this output.
     # * <tt>:no_progress</tt> No progress bar
     def initialize(source, options = {})
