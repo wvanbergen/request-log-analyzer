@@ -70,5 +70,7 @@ module RequestLogAnalyzer::Spec::Mocks
     return connection
   end
 
-
+  def request_counter
+    @request_counter ||= mock('aggregator to count request')
+  end
 end

@@ -120,33 +120,30 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     end
 
     it "should parse a Rails 2.1 style log and find valid Rails requests without warnings" do
+      request_counter.should_receive(:hit!).exactly(4).times
       @log_parser.should_not_receive(:warn)
+      
       @log_parser.parse_file(log_fixture(:rails_1x)) do |request|
-        request.should be_kind_of(RequestLogAnalyzer::FileFormat::Rails::Request)
-        request.should be_completed
+        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails::Request) && request.completed?
       end
     end
 
     it "should parse a Rails 2.2 style log and find valid Rails requests without warnings" do
+      request_counter.should_receive(:hit!).once
       @log_parser.should_not_receive(:warn)
+      
       @log_parser.parse_file(log_fixture(:rails_22)) do |request|
-        request.should be_kind_of(RequestLogAnalyzer::FileFormat::Rails::Request)
-        request.should be_completed
+        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails::Request) && request.completed?
       end
     end
 
     it "should parse a Rails SyslogLogger file with prefix and find valid requests without warnings" do
+      request_counter.should_receive(:hit!).once
       @log_parser.should_not_receive(:warn)
+      
       @log_parser.parse_file(log_fixture(:syslog_1x)) do |request|
-        request.should be_kind_of(RequestLogAnalyzer::FileFormat::Rails::Request)
-        request.should be_completed
+        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails::Request) && request.completed?
       end
-    end
-
-    it "should find 4 completed requests" do
-      @log_parser.should_not_receive(:warn)
-      @log_parser.should_receive(:handle_request).exactly(4).times
-      @log_parser.parse_file(log_fixture(:rails_1x))
     end
 
     it "should parse cached requests" do

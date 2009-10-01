@@ -10,6 +10,11 @@ module RequestLogAnalyzer::Spec::Helpers
     File.dirname(__FILE__) + "/../fixtures/#{name}.#{extention}"
   end
 
+  # Creates a log file given some lines
+  def log_stream(*lines)
+    StringIO.new(lines.join("\n") + "\n")
+  end
+
   # Request loopback
   def request(fields, format = testing_format)
     if fields.kind_of?(Array)
