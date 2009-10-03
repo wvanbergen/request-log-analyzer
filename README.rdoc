@@ -12,11 +12,13 @@ See the project wiki at http://wiki.github.com/wvanbergen/request-log-analyzer f
 
 == Installation & basic usage
 
-Install request-log-analyzer as a Ruby gem:
+Install request-log-analyzer as a Ruby gem (you might need to run this command
+as root by prepending +sudo+ to it):
 
-  $ sudo gem install request-log-analyzer
+  $ gem install request-log-analyzer
 
-To analyze a Rails log file and produce a performance report, run request-log-analyzer like this:
+To analyze a Rails log file and produce a performance report, run
+request-log-analyzer like this:
 
   $ request-log-analyzer log/production.log
 
@@ -24,10 +26,12 @@ For more details, other file formats, and available command line options, see th
 
 == Additional information
 
-Request-log-analyzer was designed and built by Willem van Bergen and Bart ten Brinke.
+Request-log-analyzer was designed and built by Willem van Bergen and Bart ten
+Brinke.
 
-Do you have a rails application that is not performing as it should?
-If you need an expert to analyze your application, feel free to contact either Willem van Bergen (willem@railsdoctors.com) or Bart ten Brinke (bart@railsdoctors.com).
+Do you have a rails application that is not performing as it should? If you need
+an expert to analyze your application, feel free to contact either Willem van
+Bergen (willem@railsdoctors.com) or Bart ten Brinke (bart@railsdoctors.com).
 
 * Project wiki at GitHub: http://wiki.github.com/wvanbergen/request-log-analyzer
 * railsdoctors homepage: http://railsdoctors.com
