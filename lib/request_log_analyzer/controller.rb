@@ -31,6 +31,7 @@ module RequestLogAnalyzer
       options[:reset_database] = arguments[:reset_database]
       options[:debug]          = arguments[:debug]
       options[:yaml]           = arguments[:dump]
+      options[:mail]           = arguments[:mail]
       options[:parse_strategy] = arguments[:parse_strategy]
       options[:no_progress]    = arguments[:no_progress]
       options[:format]         = arguments[:format]
