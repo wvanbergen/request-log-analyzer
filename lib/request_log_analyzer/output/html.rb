@@ -67,8 +67,15 @@ module RequestLogAnalyzer::Output
 
     end
 
+    # Generate HTML content type
+    def content_type
+      'text/html; charset="ISO-8859-1";'
+    end
+    
     # Genrate HTML header and associated stylesheet
     def header
+      @io.content_type = content_type if @io.respond_to?(:content_type)
+
       @io << "<html>"
       @io << tag(:head) do |headers|
         headers << tag(:title, 'Request-log-analyzer report')

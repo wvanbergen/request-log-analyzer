@@ -3,7 +3,7 @@ module RequestLogAnalyzer
   # Mail report to a specified emailaddress
   class Mailer
 
-    attr_accessor :data, :to, :host
+    attr_accessor :data, :to, :host, :content_type
 
     # Initialize a mailer
     # <tt>to</tt> to email address to mail to
@@ -21,6 +21,7 @@ module RequestLogAnalyzer
       @host    = host
       @options = options
       @data    = []
+      @content_type = nil
     end
 
     # Send all data in @data to the email address used during initialization.
@@ -30,14 +31,16 @@ module RequestLogAnalyzer
       from_alias  = @options[:from_alias]  || 'Request-log-analyzer reporter'
       to_alias    = @options[:to_alias]    || to
       subject     = @options[:subject]     || "Request log analyzer report - generated on #{Time.now.to_s}"
+      content_type= "Content-Type: #{@content_type}" if @content_type
     msg = <<END_OF_MESSAGE
 From: #{from_alias} <#{from}>
 To: #{to_alias} <#{@to}>
 Subject: #{subject}
+#{content_type}
 
 #{@data.to_s}
 END_OF_MESSAGE
-    
+
       unless @options[:debug]
         Net::SMTP.start(@host) do |smtp|
           smtp.send_message msg, from, to
