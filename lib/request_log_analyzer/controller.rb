@@ -31,6 +31,7 @@ module RequestLogAnalyzer
       options[:reset_database] = arguments[:reset_database]
       options[:debug]          = arguments[:debug]
       options[:yaml]           = arguments[:dump]
+      options[:mail]           = arguments[:mail]
       options[:parse_strategy] = arguments[:parse_strategy]
       options[:no_progress]    = arguments[:no_progress]
       options[:format]         = arguments[:format]
@@ -130,7 +131,7 @@ module RequestLogAnalyzer
         output_object = %w[File StringIO].include?(options[:file].class.name) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
       elsif options[:mail]
-        output_object = RequestLogAnalyzer::Mailer.new(arguments[:mail])
+        output_object = RequestLogAnalyzer::Mailer.new(options[:mail])
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount  }
       else
         output_object = STDOUT
