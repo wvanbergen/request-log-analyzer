@@ -1,14 +1,12 @@
 module RequestLogAnalyzer
 
   # The RequestLogAnalyzer::Controller class creates a LogParser instance for the
-  # requested file format, and connect it with sources and aggregators.
+  # requested file format and connect it with sources and aggregators.
   #
   # Sources are streams or files from which the requests will be parsed.
   # Aggregators will handle every passed request to yield a meaningfull results.
   #
-  # - Use the build-function to build a controller instance using command line arguments.
-  # - Use add_aggregator to register a new aggregator
-  # - Use add_source to register a new aggregator
+  # - Use the build -function to build a new controller instance.
   # - Use the run! method to start the parser and send the requests to the aggregators.
   #
   # Note that the order of sources can be imported if you have log files than succeed
@@ -21,7 +19,6 @@ module RequestLogAnalyzer
 
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
-    # <rr>report_with</tt> Width of the report. Defaults to 80.
     def self.build_from_arguments(arguments)
       
       options = {}
@@ -32,7 +29,6 @@ module RequestLogAnalyzer
       options[:debug]          = arguments[:debug]
       options[:yaml]           = arguments[:dump]
       options[:mail]           = arguments[:mail]
-      options[:parse_strategy] = arguments[:parse_strategy]
       options[:no_progress]    = arguments[:no_progress]
       options[:format]         = arguments[:format]
       options[:output]         = arguments[:output]
@@ -73,32 +69,39 @@ module RequestLogAnalyzer
       build(options)
     end
 
-    # Build a new controller using parameters (Base for new API)
-    # <tt>source</tt> The source file
-    # Options are passd on to the LogParser.
+    # Build a new controller.
+    # Returns a new RequestLogAnalyzer::Controller object.
     #
     # Options
-    # * <tt>:database</tt> Database file
-    # * <tt>:reset_database</tt> 
-    # * <tt>:debug</tt> Enables echo aggregator.
-    # * <tt>:yaml</tt> Output to YAML 
-    # * <tt>:parse_strategy</tt> 
-    # * <tt>:no_progress</tt> Do not display the progress bar
-    # * <tt>:output</tt> :fixed_width, :html or Output class. Defaults to fixed width.
-    # * <tt>:file</tt> Filestring or File or StringIO
-    # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. Defaults to :rails.
-    # * <tt>:source_files</tt> File or STDIN
     # * <tt>:after</tt> Drop all requests after this date (Date, DateTime, Time, or a String in "YYYY-MM-DD hh:mm:ss" format)
-    # * <tt>:before</tt> Drop all requests before this date (Date, DateTime, Time, or a String in "YYYY-MM-DD hh:mm:ss" format)
-    # * <tt>:reject</tt> Reject specific {:field => :value} combination. Expects single hash.
-    # * <tt>:select</tt> Select specific {:field => :value} combination. Expects single hash.
-    # * <tt>:aggregator</tt> Array of aggregators (ATM: STRINGS OR SYMBOLS ONLY!). Defaults to [:summarizer
-    # * <tt>:boring</tt> Do not show color on STDOUT. Defaults to False.
-    # * <tt>:report_width</tt> Width or reports in characters. Defaults to 80.
+    # * <tt>:aggregator</tt> Array of aggregators (ATM: STRINGS OR SYMBOLS ONLY! - Defaults to [:summarizer]).
+    # * <tt>:boring</tt> Do not show color on STDOUT (Defaults to false).
+    # * <tt>:before</tt> Drop all requests before this date (Date, DateTime, Time or a String in "YYYY-MM-DD hh:mm:ss" format)
+    # * <tt>:database</tt> Database file to insert encountered requests to.
+    # * <tt>:debug</tt> Enables echo aggregator which will echo each request analyzed.
+    # * <tt>:file</tt> Filestring, File or StringIO.
+    # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. (Defaults to :rails).
+    # * <tt>:mail</tt> Email the results to this email address.
+    # * <tt>:no_progress</tt> Do not display the progress bar (increases speed).
+    # * <tt>:output</tt> :fixed_width, :html or Output class. Defaults to fixed width.
+    # * <tt>:reject</tt> Reject specific {:field => :value} combination (expects a single hash).
+    # * <tt>:report_width</tt> Width or reports in characters. (Defaults to 80)
+    # * <tt>:reset_database</tt> Reset the database before starting.
+    # * <tt>:select</tt> Select specific {:field => :value} combination (expects a single hash).
+    # * <tt>:source_files</tt> Source files to analyze. Provide either File, array of files or STDIN.
+    # * <tt>:yaml</tt> Output to YAML file.
     #
-    # TODO:
-    #   Check if defaults work (Aggregator defaults seem wrong).
-    #   Refactor :database => options[:database], :dump => options[:dump] away from contoller intialization.
+    # === Example
+    # RequestLogAnalyzer::Controller.build(
+    #   :output       => :HTML,
+    #   :mail         => 'root@localhost',
+    #   :after        => Time.now - 24*60*60, 
+    #   :source_files => '/var/log/passenger.log'
+    # ).run!
+    #
+    # === Todo
+    # * Check if defaults work (Aggregator defaults seem wrong).
+    # * Refactor :database => options[:database], :dump => options[:dump] away from contoller intialization.
     def self.build(options)
       # Defaults
       options[:output]        ||= 'fixed_width'
@@ -109,7 +112,7 @@ module RequestLogAnalyzer
       options[:report_sort]   ||= 'sum,mean'
       options[:boring]        ||= false
       
-      # Backwards compatibility
+      # Deprecation warnings
       if options[:dump] && options[:yaml].blank?
         warn "[DEPRECATION] `:dump` is deprecated.  Please use `:yaml` instead."
         options[:yaml]          = options[:dump]
