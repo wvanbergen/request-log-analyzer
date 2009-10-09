@@ -11,7 +11,7 @@ module RequestLogAnalyzer
 
   # The current version of request-log-analyzer.
   # Do not change the value by hand; it will be updated automatically by the gem release script.
-  VERSION = "1.4.1"
+  VERSION = "1.4.2"
 
   # Loads constants in the RequestLogAnalyzer namespace using self.load_default_class_file(base, const)
   # <tt>const</tt>:: The constant that is not yet loaded in the RequestLogAnalyzer namespace. This should be passed as a string or symbol.
