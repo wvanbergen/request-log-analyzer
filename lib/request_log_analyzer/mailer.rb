@@ -3,7 +3,7 @@ module RequestLogAnalyzer
   # Mail report to a specified emailaddress
   class Mailer
 
-    attr_accessor :data, :to, :host, :content_type
+    attr_accessor :data, :to, :host
 
     # Initialize a mailer
     # <tt>to</tt> to email address to mail to
@@ -21,17 +21,17 @@ module RequestLogAnalyzer
       @host    = host
       @options = options
       @data    = []
-      @content_type = nil
     end
 
     # Send all data in @data to the email address used during initialization.
     # Returns array containg [message_data, from_email_address, to_email_address] of sent email.
     def mail
-      from        = @options[:from]        || 'contact@railsdoctors.com'
-      from_alias  = @options[:from_alias]  || 'Request-log-analyzer reporter'
-      to_alias    = @options[:to_alias]    || to
-      subject     = @options[:subject]     || "Request log analyzer report - generated on #{Time.now.to_s}"
-      content_type= "Content-Type: #{@content_type}" if @content_type
+      from          = @options[:from]        || 'contact@railsdoctors.com'
+      from_alias    = @options[:from_alias]  || 'Request-log-analyzer reporter'
+      to_alias      = @options[:to_alias]    || to
+      subject       = @options[:subject]     || "Request log analyzer report - generated on #{Time.now.to_s}"
+      content_type  = ""
+      content_type  = 'Content-Type: text/html; charset="ISO-8859-1";' if @data.map{|l| l.include?('html')}.include?(true)
     msg = <<END_OF_MESSAGE
 From: #{from_alias} <#{from}>
 To: #{to_alias} <#{@to}>
