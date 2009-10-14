@@ -55,7 +55,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Creates the access log line definition based on the Apache log format string
     def self.access_line_definition(format_string)
-      format_string ||= :combined
+      format_string ||= :common
       format_string   = LOG_FORMAT_DEFAULTS[format_string.to_sym] || format_string
 
       line_regexp = ''
