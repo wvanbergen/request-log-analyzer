@@ -39,7 +39,7 @@ module RequestLogAnalyzer::FileFormat
 
     # check the returned klass to see if it can be used
     raise "Could not load a file format from #{file_format.inspect}" if klass.nil?
-    raise "Invalid FileFormat class" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
+    raise "Invalid FileFormat class from #{file_format.inspect}" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
 
     @current_file_format = klass.create(*args) # return an instance of the class
   end
