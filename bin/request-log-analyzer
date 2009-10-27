@@ -33,6 +33,7 @@ begin
 
     command_line.option(:file, :alias => :e)
     command_line.option(:mail, :alias => :m)
+    command_line.option(:mailhost, :default => 'localhost')
     command_line.option(:parse_strategy, :default => 'assume-correct')
     command_line.option(:dump)
 

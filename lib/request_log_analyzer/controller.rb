@@ -43,6 +43,7 @@ module RequestLogAnalyzer
       options[:report_width]   = arguments[:report_width]
       options[:report_sort]    = arguments[:report_sort]
       options[:report_amount]  = arguments[:report_amount]
+      options[:mailhost]       = arguments[:mailhost] 
       
       # Apache format workaround
       if arguments[:rails_format]
@@ -134,7 +135,7 @@ module RequestLogAnalyzer
         output_object = %w[File StringIO].include?(options[:file].class.name) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
       elsif options[:mail]
-        output_object = RequestLogAnalyzer::Mailer.new(options[:mail])
+        output_object = RequestLogAnalyzer::Mailer.new(options[:mail], options[:mailhost])
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount  }
       else
         output_object = STDOUT
