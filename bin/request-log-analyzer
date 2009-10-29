@@ -81,6 +81,7 @@ rescue CommandLine::Error => e
   puts "  --debug                    Print debug information while parsing."
   puts "  --file <filename>          Output to file."
   puts "  --mail <emailaddress>      Send report to an email address."
+  puts "  --mailhost <server>        Use the given server as the SMTP server for sending email."
   puts "  --output <format>          Output format. Supports 'HTML' and 'FixedWidth' (default)"
   puts "  --dump <filename>          Dump the YAML formatted results in the given file"
   puts
