@@ -38,7 +38,7 @@ To: #{to_alias} <#{@to}>
 Subject: #{subject}
 #{content_type}
 
-#{@data.to_s}
+#{@data.join("\n")}
 END_OF_MESSAGE
 
       unless @options[:debug]

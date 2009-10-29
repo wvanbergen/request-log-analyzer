@@ -83,6 +83,7 @@ module RequestLogAnalyzer
     # * <tt>:file</tt> Filestring, File or StringIO.
     # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. (Defaults to :rails).
     # * <tt>:mail</tt> Email the results to this email address.
+    # * <tt>:mailhost</tt> Email the results to this mail server.
     # * <tt>:no_progress</tt> Do not display the progress bar (increases speed).
     # * <tt>:output</tt> :fixed_width, :html or Output class. Defaults to fixed width.
     # * <tt>:reject</tt> Reject specific {:field => :value} combination (expects a single hash).
