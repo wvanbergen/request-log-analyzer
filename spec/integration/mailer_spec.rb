@@ -1,7 +1,8 @@
+require File.dirname(__FILE__) + '/../spec_helper.rb'
+
 # Degrate gracefully if mailtrap is missing
 begin
   require 'mailtrap'
-  require File.dirname(__FILE__) + '/../spec_helper.rb'
 
   describe RequestLogAnalyzer, 'running as a mailer' do
 
