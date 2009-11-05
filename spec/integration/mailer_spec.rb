@@ -1,6 +1,8 @@
 require File.dirname(__FILE__) + '/../spec_helper.rb'
-require 'mailtrap'
 
+
+begin
+  require 'mailtrap'
 describe RequestLogAnalyzer, 'running as a mailer' do
 
   before(:each) do
@@ -50,3 +52,8 @@ describe RequestLogAnalyzer, 'running as a mailer' do
     find_string_in_file('<td class="alt">0.29s</td></tr><tr><td>DashboardController#index.html [GET]</td>', @log_file).should_not be_nil
   end
 end
+
+rescue LoadError => e
+  $stderr.puts "\nSkipping mailer_spec tests. `gem install mailtrap` and try again.\n\n"
+end
+
