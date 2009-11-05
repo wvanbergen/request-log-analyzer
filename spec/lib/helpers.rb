@@ -47,6 +47,26 @@ module RequestLogAnalyzer::Spec::Helpers
 
   # Return a filename that can be used as temporary file in specs
   def temp_output_file(file_type)
-    "#{File.dirname(__FILE__)}/../../tmp/spec.#{file_type}.tmp"
+    File.expand_path("#{File.dirname(__FILE__)}/../../tmp/spec.#{file_type}.tmp")
+  end
+  
+  # Check if a given string can be found in the given file
+  # Returns the line number if found, nil otherwise
+  def find_string_in_file(string, file, options = {})
+    return nil unless File::exists?(file)
+    
+    line_counter = 0
+
+    File.open( file ) do |io|
+      io.each {|line|
+        line_counter += 1
+        line.chomp!
+
+        p line if options[:debug]
+        return line_counter if line.include? string
+      }
+    end
+    
+    return nil
   end
 end

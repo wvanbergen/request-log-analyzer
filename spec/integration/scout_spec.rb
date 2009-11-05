@@ -29,7 +29,8 @@ describe RequestLogAnalyzer, 'when using the rla API like the scout plugin' do
           :output       => EmbeddedHTML,
           :file         => sio,
           :after        => Time.local(2008, 8, 14, 21, 16, 31),  # after 3rd req
-          :source_files => log
+          :source_files => log,
+          :format        => RequestLogAnalyzer::FileFormat::Rails
         ).run!
       end
     end

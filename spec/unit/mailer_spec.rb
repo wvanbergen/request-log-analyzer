@@ -2,6 +2,18 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe RequestLogAnalyzer::Mailer, 'mailer' do
 
+  it "should initialize correctly" do
+    @mailer = RequestLogAnalyzer::Mailer.new('alfa@beta.com', 'localhost', :debug => true) 
+    @mailer.host.should eql("localhost")
+    @mailer.port.should eql(25)
+  end
+  
+  it "should allow alternate port settings" do
+    @mailer = RequestLogAnalyzer::Mailer.new('alfa@beta.com', 'localhost:2525', :debug => true) 
+    @mailer.host.should eql("localhost")
+    @mailer.port.should eql("2525")
+  end
+
   it "should store printed data" do
     @mailer = RequestLogAnalyzer::Mailer.new('alfa@beta.com', 'localhost', :debug => true)
 

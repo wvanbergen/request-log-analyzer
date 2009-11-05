@@ -106,7 +106,7 @@ module RequestLogAnalyzer
     # * Refactor :database => options[:database], :dump => options[:dump] away from contoller intialization.
     def self.build(options)
       # Defaults
-      options[:output]        ||= 'fixed_width'
+      options[:output]        ||= 'FixedWidth'
       options[:format]        ||= :rails
       options[:aggregator]    ||= [:summarizer]
       options[:report_width]  ||= 80

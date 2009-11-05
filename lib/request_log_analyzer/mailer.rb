@@ -3,7 +3,7 @@ module RequestLogAnalyzer
   # Mail report to a specified emailaddress
   class Mailer
 
-    attr_accessor :data, :to, :host
+    attr_accessor :data, :to, :host, :port
 
     # Initialize a mailer
     # <tt>to</tt> to email address to mail to
@@ -19,8 +19,11 @@ module RequestLogAnalyzer
       require 'net/smtp'
       @to      = to
       @host    = host
+
+      @port    = 25
       @options = options
-      @data    = []
+      @host, @port = host.split(':') if @host.include?(':')
+      @data    = []      
     end
 
     # Send all data in @data to the email address used during initialization.
@@ -42,7 +45,7 @@ Subject: #{subject}
 END_OF_MESSAGE
 
       unless @options[:debug]
-        Net::SMTP.start(@host) do |smtp|
+        Net::SMTP.start(@host, @port) do |smtp|
           smtp.send_message msg, from, to
         end
       end
