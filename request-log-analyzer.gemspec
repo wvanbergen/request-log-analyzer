@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('rspec',    '>= 1.2.4')
   s.add_development_dependency('git',      '>= 1.1.0')
-  s.add_development_dependency('mailtrap', '>= 0.2.1')
 
   s.authors  = ['Willem van Bergen', 'Bart ten Brinke']
   s.email    = ['willem@railsdoctors.com', 'bart@railsdoctors.com']
