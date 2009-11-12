@@ -31,11 +31,11 @@ module RequestLogAnalyzer::FileFormat
     RU = Proc.new { |request| "#{request[:user]}" }
 
     report do |analyze|
-      analyze.frequency :user, :title => "Top 20 of users with most queries", :amount => 20
-      analyze.duration :query_time, :category => RU, :title => 'Total query duration per user'
-      analyze.duration :query_time, :category => RQ, :title => 'Top 50 queries by duration', :amount => 50
-      analyze.count :query, :category => RQ, :title => "Top queries by total rows examined", :amount => 20
-      analyze.count :rows_sent, :category => RQ, :title => "Top queries by rows sent", :amount => 20
+      analyze.frequency :user, :title => "Users with most queries", :amount => 20
+      analyze.duration :query_time, :category => RU, :title => 'Query time per user'
+      analyze.duration :query_time, :category => RQ, :title => 'Query time', :amount => 50
+      analyze.count :category => RQ, :title => "Rows examined", :amount => 20, :field => :rows_examined
+      analyze.count :category => RQ, :title => "Rows sent", :amount => 20, :field => :rows_sent
     end
   
     class Request < RequestLogAnalyzer::Request
