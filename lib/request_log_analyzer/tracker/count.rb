@@ -9,8 +9,14 @@ module RequestLogAnalyzer::Tracker
       raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
       @categorizer = create_lambda(options[:category])
       @categories   = {}
+      
     end
 
+    # Return the methods sorted by count
+    def sorted_by_count
+      @categories.sort { |a, b| b[1] <=> a[1] }
+    end
+    
     # Get the duration information fron the request and store it in the different categories.
     # <tt>request</tt> The request.
     def update(request)
@@ -29,12 +35,14 @@ module RequestLogAnalyzer::Tracker
       if @categories.empty?
         output << "None found.\n"
       else
-       output.table({:title => "Top queries by total rows sent"}, {:align => :right, :title => "Rows"}) do |rows|
-         @categories.sort.reverse.each do |vars|
-           rows << [vars[0], vars[1].to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")]
-         end
-       end
-     end
+        sorted_categories = output.slice_results(sorted_by_count)
+        
+        output.table({:title => "Category", :align => :right}, {:align => :right, :title => "Rows"}) do |rows|
+          sorted_categories.each do |(cat, count)|
+            rows << [cat, count]
+          end
+        end
+      end
     end
 
     # Returns the title of this tracker for reports
