@@ -1,0 +1,51 @@
+module RequestLogAnalyzer::Tracker
+
+  # Get highest count of a specific attribute
+  class Count < Base
+
+    attr_reader :categories, :categorizer
+
+    def prepare
+      raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
+      @categorizer = create_lambda(options[:category])
+      @categories   = {}
+    end
+
+    # Get the duration information fron the request and store it in the different categories.
+    # <tt>request</tt> The request.
+    def update(request)
+      return if request[options[:category]] == 0 || request[options[:category]].nil?
+
+      cat = @categorizer.call(request)
+      if cat
+        @categories[cat] ||= 0
+        @categories[cat] += request[options[:category]].to_i
+      end
+    end
+
+    def report(output)
+      output.title(options[:title]) if options[:title]
+
+      if @categories.empty?
+        output << "None found.\n"
+      else
+       output.table({:title => "Top queries by total rows sent"}, {:align => :right, :title => "Rows"}) do |rows|
+         @categories.sort.reverse.each do |vars|
+           rows << [vars[0], vars[1].to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")]
+         end
+       end
+     end
+    end
+
+    # Returns the title of this tracker for reports
+    def title
+      options[:title]  || 'Count'
+    end
+
+    # Returns all the categories and the tracked duration as a hash than can be exported to YAML
+    def to_yaml_object
+      return nil if @categories.empty?
+      @categories
+    end
+  end
+end
