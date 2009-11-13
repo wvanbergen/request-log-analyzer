@@ -65,6 +65,11 @@ module RequestLogAnalyzer
         else raise "Unknown duration unit"
         end
       end
+      
+      # Convert an epoch to an integer
+      def convert_epoch(value, capture_definition)
+        Time.at(value.to_i).to_i
+      end
     end
 
     # Install the default converter methods
