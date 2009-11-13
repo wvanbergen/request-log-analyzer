@@ -64,11 +64,10 @@ module RequestLogAnalyzer::Aggregator
       # <tt>tracker_class</tt> The class to include
       # <tt>optiont</tt> The options to pass to the trackers.
       def track(tracker_klass, options = {})
-        tracker_klass = RequestLogAnalyzer::Tracker.const_get(RequestLogAnalyzer::to_camelcase(tracker_klass)) if tracker_klass.kind_of?(Symbol)        
+        tracker_klass = RequestLogAnalyzer::Tracker.const_get(RequestLogAnalyzer::to_camelcase(tracker_klass)) if tracker_klass.kind_of?(Symbol)
         @trackers << tracker_klass.new(options)
       end
-
-   end
+    end
 
     attr_reader :trackers
     attr_reader :warnings_encountered
