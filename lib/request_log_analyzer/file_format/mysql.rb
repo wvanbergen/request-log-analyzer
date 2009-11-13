@@ -31,8 +31,13 @@ module RequestLogAnalyzer::FileFormat
       line.captures << { :name => :database, :type => :string }
     end
 
+    line_definition :set_timestamp do |line|
+      line.regexp   = /^set timestamp=(\d+);$/i
+      line.captures << { :name => :set_timestamp, :type => :epoch}
+    end
+
     line_definition :query_part do |line|
-      line.regexp   = /^(?!(?:use |\# ))(.*[^;\s])\s*$/
+      line.regexp   = /^(?!(?:use |\# | ?:set timestamp))(.*[^;\s])\s*$/i
       line.captures << { :name => :query_fragment, :type => :string }
     end
 

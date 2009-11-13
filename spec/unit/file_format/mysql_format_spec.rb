@@ -58,6 +58,11 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       line = 'use db;'
       @file_format.should parse_line(line).as(:use_database).and_capture(:database => 'db')
     end
+    
+    it "should parse a :set_timestamp line" do
+      line = 'SET timestamp=1250651725;'
+      @file_format.should parse_line(line).as(:set_timestamp).and_capture(:set_timestamp => 1250651725)
+    end
 
   end
 
