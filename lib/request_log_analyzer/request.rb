@@ -68,7 +68,7 @@ module RequestLogAnalyzer
       
       # Convert an epoch to an integer
       def convert_epoch(value, capture_definition)
-        Time.at(value.to_i).to_i
+        Time.at(value.to_i).strftime('%Y%m%d%H%M%S').to_i
       end
     end
 

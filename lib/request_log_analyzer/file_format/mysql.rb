@@ -33,7 +33,7 @@ module RequestLogAnalyzer::FileFormat
 
     line_definition :set_timestamp do |line|
       line.regexp   = /^set timestamp=(\d+);$/i
-      line.captures << { :name => :set_timestamp, :type => :epoch}
+      line.captures << { :name => :unix_timestamp, :type => :epoch }
     end
 
     line_definition :query_part do |line|
