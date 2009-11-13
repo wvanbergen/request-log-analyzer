@@ -67,8 +67,8 @@ module RequestLogAnalyzer::Tracker
     # end
     
     def display_value(count)
-      return "-  " if count.nil?
-      return "0  " if count.zero?
+      return "- " if count.nil?
+      return "0 " if count.zero?
       case Math.log10(count).floor
       when  1...4  then '%d ' % count
       when  4...7  then '%dk' % (count / 1000)
