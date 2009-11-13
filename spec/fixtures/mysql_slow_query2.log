@@ -1,4 +1,3 @@
-SELECT /*!40001 SQL_NO_CACHE */ * FROM `clients`; 
 # Time: 091112 18:13:56
 # User@Host: admin[admin] @ db1 [10.0.0.1]
 # Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
