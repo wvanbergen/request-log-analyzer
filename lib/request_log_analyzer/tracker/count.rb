@@ -3,56 +3,84 @@ module RequestLogAnalyzer::Tracker
   # Get highest count of a specific attribute
   class Count < Base
 
-    attr_reader :categories, :categorizer
+    include RequestLogAnalyzer::Tracker::StatisticsTracking
+
+    attr_reader :categories
 
     def prepare
       raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
       raise "No field to count has been set up #{self.inspect}" unless options[:field]
-      @categorizer = create_lambda(options[:category])
-      @categories   = {}
-    end
 
-    # Return the methods sorted by count
-    def sorted_by_count
-      @categories.sort { |a, b| b[1] <=> a[1] }
+      @categorizer = create_lambda(options[:category])
+      @counter     = create_lambda(options[:field])
+      @categories  = {}
     end
     
     # Get the duration information fron the request and store it in the different categories.
     # <tt>request</tt> The request.
     def update(request)
-      return if request[options[:field]] == 0 || request[options[:field]].nil?
-
-      cat = @categorizer.call(request)
-      if cat
-        @categories[cat] ||= 0
-        @categories[cat] += request[options[:field]].to_i
-      end
+      category = @categorizer.call(request)
+      count    = @counter.call(request)
+      update_statistics(category, count) if count.kind_of?(Numeric) && !category.nil?
     end
 
     def report(output)
-      if @categories.empty?
-        output << "None found.\n"
-      else
-        output.title('')
-        sorted_categories = output.slice_results(sorted_by_count)
-        
-        output.table( {:title => title, :align => :left,  :width => :rest },
-                      {:title => "Count",         :align => :right, :width => 15    }) do |rows|
-          sorted_categories.each do |(cat, count)|
-            rows << [cat, format_number(count)]
-          end
+      sortings = output.options[:sort] || [:sum, :mean]
+
+      sortings.each do |report|
+        case report
+        when :mean
+          report_table(output, :mean,   :title => "#{title} - sorted by mean")
+        when :stddev
+          report_table(output, :stddev, :title => "#{title} - sorted by standard deviation")
+        when :sum
+          report_table(output, :sum,    :title => "#{title} - sorted by sum")
+        when :hits
+          report_table(output, :hits,   :title => "#{title} - sorted by hits")
+        else
+          raise "Unknown duration report specified: #{report}!"
         end
       end
     end
     
-    # Format an int to a nice string with decimal seperation.
-    def format_number(number)
-      number.to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
+    # Block function to build a result table using a provided sorting function.
+    # <tt>output</tt> The output object.
+    # <tt>amount</tt> The number of rows in the report table (default 10).
+    # === Options
+    #  * </tt>:title</tt> The title of the table
+    #  * </tt>:sort</tt> The key to sort on (:hits, :cumulative, :average, :min or :max)
+    def report_table(output, sort, options = {}, &block)
+      output.puts
+
+      top_categories = output.slice_results(sorted_by(sort))
+      output.with_style(:top_line => true) do      
+        output.table(*statistics_header(:title => options[:title],:highlight => sort)) do |rows|
+          top_categories.each { |(cat, info)| rows.push(statistics_row(cat)) }
+        end
+      end
+      output.puts
+    end
+        
+    # # Format an int to a nice string with decimal seperation.
+    # def display_value(number)
+    #   number.round.to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
+    # end
+    
+    def display_value(count)
+      return "-  " if count.nil?
+      return "0  " if count.zero?
+      case Math.log10(count).floor
+      when  1...4  then '%d  ' % count
+      when  4...7  then '%d k' % (count / 1000)
+      when  7...10 then '%d M' % (count / 1000_000)
+      when 10...13 then '%d G' % (count / 1000_000_000)
+      else              '%d T' % (count / 1000_000_000_000)
+      end
     end
 
     # Returns the title of this tracker for reports
     def title
-      options[:title]  || 'Category'
+      options[:title]  || 'Total'
     end
 
     # Returns all the categories and the tracked duration as a hash than can be exported to YAML
