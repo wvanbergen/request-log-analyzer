@@ -156,7 +156,7 @@ module RequestLogAnalyzer::Aggregator
       if has_log_ordering_warnings?
         output.title("Parse warnings")
 
-        output.puts "Parseable lines were ancountered without a header line before it. It"
+        output.puts "Parseable lines were encountered without a header line before it. It"
         output.puts "could be that logging is not setup correctly for your application."
         output.puts "Visit this website for logging configuration tips:"
         output.puts output.link("http://github.com/wvanbergen/request-log-analyzer/wikis/configure-logging")
