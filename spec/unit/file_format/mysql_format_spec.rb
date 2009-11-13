@@ -55,6 +55,11 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       @file_format.should parse_line(line).as(:query).and_capture(:query =>
         'SELECT /*!:int SQL_NO_CACHE */ * FROM events')
     end
+    
+    it "should parse a :use_database line" do
+      line = 'use db;'
+      @file_format.should parse_line(line).as(:use_database).and_capture(:database => 'db')
+    end
 
   end
 
