@@ -70,11 +70,11 @@ module RequestLogAnalyzer::Tracker
       return "-  " if count.nil?
       return "0  " if count.zero?
       case Math.log10(count).floor
-      when  1...4  then '%d  ' % count
-      when  4...7  then '%d k' % (count / 1000)
-      when  7...10 then '%d M' % (count / 1000_000)
-      when 10...13 then '%d G' % (count / 1000_000_000)
-      else              '%d T' % (count / 1000_000_000_000)
+      when  1...4  then '%d ' % count
+      when  4...7  then '%dk' % (count / 1000)
+      when  7...10 then '%dM' % (count / 1000_000)
+      when 10...13 then '%dG' % (count / 1000_000_000)
+      else              '%dT' % (count / 1000_000_000_000)
       end
     end
 
