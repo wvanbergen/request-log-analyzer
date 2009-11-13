@@ -23,6 +23,11 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       @file_format.should parse_line(line).as(:user_host).and_capture(:user => "admin", :host => 'db1', :ip => '10.0.0.1')
     end
 
+    it "should parse a :user_host line correctly without a host" do
+      line = '# User@Host: admin[admin] @  [10.0.0.1]'
+      @file_format.should parse_line(line).as(:user_without_host).and_capture(:user => "admin", :host => nil, :ip => '10.0.0.1')
+    end
+
     it "should parse a :user_host line correctly with IP absent" do
       line = '# User@Host: root[root] @ localhost []'
       @file_format.should parse_line(line).as(:user_host).and_capture(:user => "root", :host => 'localhost', :ip => "")

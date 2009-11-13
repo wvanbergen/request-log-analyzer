@@ -17,6 +17,13 @@ module RequestLogAnalyzer::FileFormat
                        { :name => :ip,   :type => :string }
     end
 
+    line_definition :user_without_host do |line|
+      line.teaser = /\# User\@Host\: /
+      line.regexp = /\# User\@Host\: (\w+)\[\w+\] \@  \[([\d\.]*)\]/
+      line.captures << { :name => :user, :type => :string } << 
+                       { :name => :ip,   :type => :string }
+    end
+
     line_definition :query_statistics do |line|
       line.teaser = /\# Query_time: /
       line.regexp = /\# Query_time: (\d+(?:\.\d+)?)\s+Lock_time: (\d+(?:\.\d+)?)\s+Rows_sent: (\d+)\s+Rows_examined: (\d+)/
