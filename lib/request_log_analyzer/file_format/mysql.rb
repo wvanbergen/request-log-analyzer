@@ -11,16 +11,9 @@ module RequestLogAnalyzer::FileFormat
 
     line_definition :user_host do |line|
       line.teaser = /\# User\@Host\: /
-      line.regexp = /\# User\@Host\: (\w+)\[\w+\] \@ ([\w\.-]+) \[([\d\.]*)\]/
+      line.regexp = /\# User\@Host\: (\w+)\[\w+\] \@ ([\w\.-]*) \[([\d\.]*)\]/
       line.captures << { :name => :user, :type => :string } << 
                        { :name => :host, :type => :string } <<
-                       { :name => :ip,   :type => :string }
-    end
-
-    line_definition :user_without_host do |line|
-      line.teaser = /\# User\@Host\: /
-      line.regexp = /\# User\@Host\: (\w+)\[\w+\] \@  \[([\d\.]*)\]/
-      line.captures << { :name => :user, :type => :string } << 
                        { :name => :ip,   :type => :string }
     end
 
@@ -51,7 +44,7 @@ module RequestLogAnalyzer::FileFormat
 
     PER_USER       = :user
     PER_QUERY      = :query
-    PER_USER_QUERY = Proc.new { |request| "#{request[:user]}@#{request[:host]}: #{request[:query]}" }
+    PER_USER_QUERY = Proc.new { |request| "#{request[:user]}@#{request.host}: #{request[:query]}" }
 
     report do |analyze|
       analyze.timespan
@@ -82,6 +75,10 @@ module RequestLogAnalyzer::FileFormat
         sql.gsub!(/(:string,)+:string/, ':strings')                       # replace multiple strings by a list
 
         return sql.rstrip
+      end
+
+      def host
+        self[:host] == '' || self[:host].nil? ? self[:ip] : self[:host]
       end
 
       # Convert the timestamp to an integer

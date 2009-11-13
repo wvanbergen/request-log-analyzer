@@ -10,9 +10,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
     before(:each) do
       @file_format = RequestLogAnalyzer::FileFormat.load(:mysql)
     end
-    
-    # SELECT /*!40001 SQL_NO_CACHE */ * FROM `events`; 
-    
+
     it "should parse a :time line correctly" do
       line = '# Time: 091112 8:13:56'
       @file_format.should parse_line(line).as(:time).and_capture(:timestamp => 20091112081356)
@@ -25,7 +23,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
 
     it "should parse a :user_host line correctly without a host" do
       line = '# User@Host: admin[admin] @  [10.0.0.1]'
-      @file_format.should parse_line(line).as(:user_without_host).and_capture(:user => "admin", :host => nil, :ip => '10.0.0.1')
+      @file_format.should parse_line(line).as(:user_host).and_capture(:user => "admin", :host => '', :ip => '10.0.0.1')
     end
 
     it "should parse a :user_host line correctly with IP absent" do
