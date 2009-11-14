@@ -13,6 +13,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
 
     it "should parse a :time line correctly" do
       line = '# Time: 091112 8:13:56'
+      line = '# Time: 091112 8:13:56'      
       @file_format.should parse_line(line).as(:time).and_capture(:timestamp => 20091112081356)
     end
 
@@ -59,10 +60,21 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       @file_format.should parse_line(line).as(:use_database).and_capture(:database => 'db')
     end
     
-    it "should parse a :set_timestamp line" do
+    it "should not parse a SET timestamp line" do
       line = 'SET timestamp=1250651725;'
-      @file_format.should parse_line(line).as(:set_timestamp).and_capture(:unix_timestamp => 20090819051525)
+      @file_format.should_not parse_line(line)
     end
+
+    it "should not parse a SET insert_id line" do
+      line = 'SET insert_id=1250651725;'
+      @file_format.should_not parse_line(line)
+    end
+
+    it "should not parse a SET timestamp, insert_id line" do
+      line = 'SET timestamp=1250651725, insert_id=45674;'
+      @file_format.should_not parse_line(line)
+    end
+
 
   end
 

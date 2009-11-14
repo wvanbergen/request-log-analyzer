@@ -1,17 +1,17 @@
 module RequestLogAnalyzer::FileFormat
 
   class Mysql < Base
-    
+
     line_definition :time do |line|
       line.teaser = /\# Time: /
-      line.regexp = /\# Time: (\d\d\d\d\d\d \d{1,2}:\d\d:\d\d)/
+      line.regexp = /\# Time: (\d{6}\s+\d{1,2}:\d{2}:\d{2})/
       line.captures << { :name => :timestamp, :type => :timestamp }
       line.header = true
     end
 
     line_definition :user_host do |line|
       line.teaser = /\# User\@Host\: /
-      line.regexp = /\# User\@Host\: (\w+)\[\w+\] \@ ([\w\.-]*) \[([\d\.]*)\]/
+      line.regexp = /\# User\@Host\: ([\w-]+)\[[\w-]+\] \@ ([\w\.-]*) \[([\d\.]*)\]/
       line.captures << { :name => :user, :type => :string } << 
                        { :name => :host, :type => :string } <<
                        { :name => :ip,   :type => :string }
@@ -31,18 +31,13 @@ module RequestLogAnalyzer::FileFormat
       line.captures << { :name => :database, :type => :string }
     end
 
-    line_definition :set_timestamp do |line|
-      line.regexp   = /^set timestamp=(\d+);$/i
-      line.captures << { :name => :unix_timestamp, :type => :epoch }
-    end
-
     line_definition :query_part do |line|
-      line.regexp   = /^(?!(?:use |\# | ?:set timestamp))(.*[^;\s])\s*$/i
+      line.regexp   = /^(?!(?:use |\# |SET ))(.*[^;\s])\s*$/
       line.captures << { :name => :query_fragment, :type => :string }
     end
 
     line_definition :query do |line|
-      line.regexp = /^(?!(?:use |\# ))(.*);\s*$/
+      line.regexp = /^(?!(?:use |\# |SET ))(.*);\s*$/
       line.captures << { :name => :query, :type => :sql }
       line.footer = true
     end
@@ -88,7 +83,7 @@ module RequestLogAnalyzer::FileFormat
 
       # Convert the timestamp to an integer
       def convert_timestamp(value, definition)
-        all,y,m,d,h,i,s = value.split(/(\d\d)(\d\d)(\d\d) (\d?\d):(\d\d):(\d\d)/)
+        all,y,m,d,h,i,s = value.split(/(\d\d)(\d\d)(\d\d)\s+(\d?\d):(\d\d):(\d\d)/)
         ('20%s%s%s%s%s%s' % [y,m,d,h.rjust(2, '0'),i,s]).to_i
       end
     end
