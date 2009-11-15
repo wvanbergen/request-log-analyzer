@@ -214,7 +214,13 @@ module RequestLogAnalyzer::Source
     #
     # <tt>request_data</tt>:: A hash of data that was parsed from the last line.
     def update_current_request(request_data, &block) # :yields: request
-      if header_line?(request_data)
+      if alternative_header_line?(request_data)
+        if @current_request
+          @current_request << request_data
+        else
+          @current_request = @file_format.request(request_data)
+        end
+      elsif header_line?(request_data)
         if @current_request
           case options[:parse_strategy]
           when 'assume-correct'
@@ -258,10 +264,18 @@ module RequestLogAnalyzer::Source
       @skipped_requests += 1 unless accepted
     end
 
+
+    # Checks whether a given line hash is an alternative header line according to the current file format.
+    # <tt>hash</tt>:: A hash of data that was parsed from the line.
+    def alternative_header_line?(hash)
+      hash[:line_definition].header == :alternative
+    end
+
+
     # Checks whether a given line hash is a header line according to the current file format.
     # <tt>hash</tt>:: A hash of data that was parsed from the line.
     def header_line?(hash)
-      hash[:line_definition].header
+      hash[:line_definition].header == true
     end
 
     # Checks whether a given line hash is a footer line  according to the current file format.
