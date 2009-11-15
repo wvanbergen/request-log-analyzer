@@ -3,13 +3,14 @@ module RequestLogAnalyzer::FileFormat
   class Mysql < Base
 
     line_definition :time do |line|
+      line.header = :alternative
       line.teaser = /\# Time: /
       line.regexp = /\# Time: (\d{6}\s+\d{1,2}:\d{2}:\d{2})/
       line.captures << { :name => :timestamp, :type => :timestamp }
-      line.header = true
     end
 
     line_definition :user_host do |line|
+      line.header = :alternative
       line.teaser = /\# User\@Host\: /
       line.regexp = /\# User\@Host\: ([\w-]+)\[[\w-]+\] \@ ([\w\.-]*) \[([\d\.]*)\]/
       line.captures << { :name => :user, :type => :string } << 
@@ -18,6 +19,7 @@ module RequestLogAnalyzer::FileFormat
     end
 
     line_definition :query_statistics do |line|
+      line.header = :alternative
       line.teaser = /\# Query_time: /
       line.regexp = /\# Query_time: (\d+(?:\.\d+)?)\s+Lock_time: (\d+(?:\.\d+)?)\s+Rows_sent: (\d+)\s+Rows_examined: (\d+)/
       line.captures << { :name => :query_time, :type => :duration, :unit => :sec } <<
@@ -47,7 +49,7 @@ module RequestLogAnalyzer::FileFormat
     PER_USER_QUERY = Proc.new { |request| "#{request[:user]}@#{request.host}: #{request[:query]}" }
 
     report do |analyze|
-      analyze.timespan
+      analyze.timespan :line_type => :time
       analyze.frequency :user, :title => "Users with most queries"
       analyze.duration :query_time, :category => PER_USER, :title => 'Query time per user'
       analyze.duration :query_time, :category => PER_USER_QUERY, :title => 'Query time'

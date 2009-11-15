@@ -112,6 +112,41 @@ EOS
       end
     end
 
+    it "should parse a request without timestamp correctly" do
+        fixture = <<EOS
+# User@Host: admin[admin] @ db1 [10.0.0.1]
+# Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
+SELECT /*!40001 SQL_NO_CACHE */ * FROM `events`;
+EOS
+      request_counter.should_receive(:hit!).once
+      @log_parser.should_not_receive(:warn)
+
+      @log_parser.parse_io(StringIO.new(fixture)) do |request|
+        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Mysql::Request) && request.completed?
+      end
+    end
+
+    it "should parse a query with context information correctly" do
+      fixture = <<EOS
+# Time: 091112 18:13:56
+# User@Host: admin[admin] @ db1 [10.0.0.1]
+# Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
+use database_name;
+SET timestamp=4324342342423, insert_id = 224253443;
+SELECT /*!40001 SQL_NO_CACHE */ * FROM `events`;
+EOS
+
+      request_counter.should_receive(:hit!).once
+      @log_parser.should_not_receive(:warn)
+
+      @log_parser.parse_io(StringIO.new(fixture)) do |request|
+        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Mysql::Request) && request.completed?
+        request[:query].should == 'SELECT /*!:int SQL_NO_CACHE */ * FROM events'
+      end
+
+    end
+
+
     it "should find 26 completed sloq query entries" do
       @log_parser.should_receive(:handle_request).exactly(26).times
       @log_parser.parse_file(log_fixture(:mysql_slow_query))
