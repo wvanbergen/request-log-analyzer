@@ -108,7 +108,7 @@ module RequestLogAnalyzer::Output
     # <tt>url</tt> The url to link to.
     def link(text, url = nil)
       if url.nil?
-        colorize(text, :blue, :bold)
+        colorize(text, :red, :bold)
       else
         "#{text} (#{colorize(url, :blue, :bold)})"
       end
