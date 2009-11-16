@@ -61,21 +61,22 @@ module RequestLogAnalyzer::Tracker
       output.puts
     end
         
-    # # Format an int to a nice string with decimal seperation.
-    # def display_value(number)
-    #   number.round.to_s.gsub(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1,")
-    # end
-    
+    # Format an int to a nice string with decimal seperation.
+    # Also see http://en.wikipedia.org/wiki/Terabyte
+    # <tt>count</tt> the value to reduce
     def display_value(count)
       return "- " if count.nil?
       return "0 " if count.zero?
+
       case Math.log10(count).floor
-      when  1...4  then '%d ' % count
-      when  4...7  then '%dk' % (count / 1000)
-      when  7...10 then '%dM' % (count / 1000_000)
-      when 10...13 then '%dG' % (count / 1000_000_000)
-      else              '%dT' % (count / 1000_000_000_000)
+        when  1...4  then '%d ' % count
+        when  4...7  then '%dk' % (count / 1000)
+        when  7...10 then '%dM' % (count / 1000_000)
+        when 10...13 then '%dG' % (count / 1000_000_000)
+        when 13...16 then '%dT' % (count / 1000_000_000_000)
+        else              '%dP' % (count / 1000_000_000_000_000)
       end
+
     end
 
     # Returns the title of this tracker for reports
