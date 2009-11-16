@@ -27,13 +27,13 @@ module RequestLogAnalyzer
       options[:database]       = arguments[:database]
       options[:reset_database] = arguments[:reset_database]
       options[:debug]          = arguments[:debug]
-      options[:yaml]           = arguments[:dump]
+      options[:yaml]           = arguments[:yaml] || arguments[:dump]
       options[:mail]           = arguments[:mail]
       options[:no_progress]    = arguments[:no_progress]
-      options[:format]         = arguments[:format]
-      options[:output]         = arguments[:output]
+      options[:format]         = arguments[:format].downcase
+      options[:output]         = arguments[:output].downcase
       options[:file]           = arguments[:file]
-      options[:format]         = arguments[:format]
+      options[:format]         = arguments[:format].downcase
       options[:after]          = arguments[:after]
       options[:before]         = arguments[:before]
       options[:reject]         = arguments[:reject]
@@ -50,6 +50,12 @@ module RequestLogAnalyzer
         options[:format] = {:rails => arguments[:rails_format]}
       elsif arguments[:apache_format]
         options[:format] = {:apache => arguments[:apache_format]}
+      end
+      
+      # Handle output format casing
+      if options[:output].class == String
+        options[:output] = 'HTML' if options[:output] == 'html'
+        options[:output] = 'FixedWidth' if options[:output] == 'fixedwidth' || options[:output] == 'fixed_width'
       end
       
       # Register sources
@@ -81,13 +87,13 @@ module RequestLogAnalyzer
     # * <tt>:database</tt> Database file to insert encountered requests to.
     # * <tt>:debug</tt> Enables echo aggregator which will echo each request analyzed.
     # * <tt>:file</tt> Filestring, File or StringIO.
-    # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, etcetera or Format Class. (Defaults to :rails).
+    # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, :amazon_s3, :mysql or RequestLogAnalyzer::FileFormat class. (Defaults to :rails).
     # * <tt>:mail</tt> Email the results to this email address.
     # * <tt>:mailhost</tt> Email the results to this mail server.
-    # * <tt>:no_progress</tt> Do not display the progress bar (increases speed).
-    # * <tt>:output</tt> :fixed_width, :html or Output class. Defaults to fixed width.
+    # * <tt>:no_progress</tt> Do not display the progress bar (increases parsing speed).
+    # * <tt>:output</tt> 'FixedWidth', 'HTML' or RequestLogAnalyzer::Output class. Defaults to 'FixedWidth'.
     # * <tt>:reject</tt> Reject specific {:field => :value} combination (expects a single hash).
-    # * <tt>:report_width</tt> Width or reports in characters. (Defaults to 80)
+    # * <tt>:report_width</tt> Width of reports in characters for FixedWidth reports. (Defaults to 80)
     # * <tt>:reset_database</tt> Reset the database before starting.
     # * <tt>:select</tt> Select specific {:field => :value} combination (expects a single hash).
     # * <tt>:source_files</tt> Source files to analyze. Provide either File, array of files or STDIN.
@@ -115,7 +121,7 @@ module RequestLogAnalyzer
       options[:boring]        ||= false
       
       # Deprecation warnings
-      if options[:dump] && options[:yaml].blank?
+      if options[:dump]
         warn "[DEPRECATION] `:dump` is deprecated.  Please use `:yaml` instead."
         options[:yaml]          = options[:dump]
       end
