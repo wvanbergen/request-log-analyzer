@@ -30,10 +30,9 @@ module RequestLogAnalyzer
       options[:yaml]           = arguments[:yaml] || arguments[:dump]
       options[:mail]           = arguments[:mail]
       options[:no_progress]    = arguments[:no_progress]
-      options[:format]         = arguments[:format].downcase
+      options[:format]         = arguments[:format]
       options[:output]         = arguments[:output].downcase
       options[:file]           = arguments[:file]
-      options[:format]         = arguments[:format].downcase
       options[:after]          = arguments[:after]
       options[:before]         = arguments[:before]
       options[:reject]         = arguments[:reject]
@@ -71,6 +70,19 @@ module RequestLogAnalyzer
         end
       else
         options.store(:source_files, arguments.parameters)
+      end
+      
+      # Guess file format
+      unless options[:format]
+        options[:format] = :rails
+
+        if options[:source_files] && options[:source_files] != $stdin
+          if options[:source_files].class == Array && options[:source_files].first != $stdin
+            options[:format] = RequestLogAnalyzer::FileFormat.autodetect(options[:source_files].first)
+          elsif options[:source_files].class == String && options[:source_files] != $stdin
+            options[:format] = RequestLogAnalyzer::FileFormat.autodetect(options[:source_files])
+          end
+        end
       end
       
       build(options)

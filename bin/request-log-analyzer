@@ -27,7 +27,7 @@ begin
       strip.switch(:keep_junk_lines, :j)
     end
 
-    command_line.option(:format, :alias => :f, :default => 'rails')
+    command_line.option(:format, :alias => :f)
     command_line.option(:apache_format)
     command_line.option(:rails_format)
 
