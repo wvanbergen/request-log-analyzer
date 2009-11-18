@@ -20,6 +20,7 @@ module RequestLogAnalyzer::Source
     PARSE_STRATEGIES = ['cautious', 'assume-correct']
 
     attr_reader :source_files, :current_file, :current_lineno
+    attr_reader :warnings, :parsed_lines, :parsed_requests, :skipped_lines, :skipped_requests
 
     # Initializes the log file parser instance.
     # It will apply the language specific FileFormat module to this instance. It will use the line
@@ -29,6 +30,7 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A hash of options that are used by the parser
     def initialize(format, options = {})
       super(format, options)
+      @warnings         = 0
       @parsed_lines     = 0
       @parsed_requests  = 0
       @skipped_lines    = 0
@@ -142,20 +144,26 @@ module RequestLogAnalyzer::Source
     # <tt>io</tt>:: The IO instance to use as source
     # <tt>options</tt>:: A hash of options that can be used by the parser.
     def parse_io(io, options = {}, &block) # :yields: request
-      @current_lineno = 1
+      @current_lineno = 0
       while line = io.gets
-        @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 255 == 0
-
-        if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
-          @parsed_lines += 1
-          update_current_request(request_data.merge(:source => @current_source, :lineno => @current_lineno), &block)
-        end
-
         @current_lineno += 1
+        @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 255 == 0
+        parse_line(line, &block)
       end
 
       warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
       @current_lineno = nil
+    end
+    
+    # Parses a single line using the current file format. If successful, use the parsed
+    # information to build a request
+    # <tt>line</tt>:: The line to parse
+    # <tt>block</tt>:: The block to send fully parsed requests to.
+    def parse_line(line, &block) # :yields: request
+      if request_data = file_format.parse_line(line) { |wt, message| warn(wt, message) }
+        @parsed_lines += 1
+        update_current_request(request_data.merge(:source => @current_source, :lineno => @current_lineno), &block)
+      end
     end
 
     # Add a block to this method to install a progress handler while parsing.
@@ -186,6 +194,7 @@ module RequestLogAnalyzer::Source
     # <tt>type</tt>:: The warning type (a Symbol)
     # <tt>message</tt>:: A message explaining the warning
     def warn(type, message)
+      @warnings += 1
       @warning_handler.call(type, message, @current_lineno) if @warning_handler
     end
 

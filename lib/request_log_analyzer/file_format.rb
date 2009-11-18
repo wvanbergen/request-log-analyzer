@@ -1,6 +1,6 @@
 module RequestLogAnalyzer::FileFormat
 
-  def self.const_missing(const)
+  def self.const_missing(const) # :nodoc:
     RequestLogAnalyzer::load_default_class_file(self, const)
   end
 
@@ -42,6 +42,48 @@ module RequestLogAnalyzer::FileFormat
     raise "Invalid FileFormat class from #{file_format.inspect}" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
 
     @current_file_format = klass.create(*args) # return an instance of the class
+  end
+  
+  # Returns an array of all FileFormat instances that are shipped with request-log-analyzer by default.
+  def self.all_formats
+    @all_formats ||= Dir[File.dirname(__FILE__) + '/file_format/*.rb'].map { |file| self.load(file) }
+  end
+  
+  # Autodetects the filetype of a given file.
+  #
+  # Returns a FileFormat instance, by parsing the first couple of lines of the provided file
+  # with avery known file format and return the most promosing file format based on the parser
+  # statistics. The <tt>autodetect_score</tt> method is used to score the fitness of a format.
+  #
+  # <tt>file</tt>:: The file to detect the file format for.
+  # <tt>line_count</tt>:: The number of lines to take into consideration
+  def self.autodetect(file, line_count = 50)
+    
+    parsers = all_formats.map { |f| RequestLogAnalyzer::Source::LogParser.new(f, :parse_strategy => 'cautious') }
+    
+    File.open(file, 'r') do |io|
+      while io.lineno < line_count && (line = io.gets)
+        parsers.each { |parser| parser.parse_line(line) } 
+      end
+    end
+    
+    parsers.select { |p| autodetect_score(p) > 0 }.max { |a, b| autodetect_score(a) <=> autodetect_score(b) }.file_format rescue nil
+  end
+  
+  # Calculates a file format auto detection score based on the parser statistics.
+  #
+  # This method returns a score as an integer. Usually, the score will increase as more
+  # lines are parsed. Usually, a file_format with a score of zero or lower should not be
+  # considered.
+  #
+  # <tt>parser</tt>:: The parsed that was use to parse the initial lines of the log file.
+  def self.autodetect_score(parser)
+    score  = 0
+    score -= parser.file_format.line_definitions.length
+    score -= parser.warnings * 3
+    score += parser.parsed_lines * 1
+    score += parser.parsed_requests * 10
+    score
   end
 
   # Base class for all log file format definitions. This class provides functions for subclasses to
