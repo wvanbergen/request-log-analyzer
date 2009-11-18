@@ -73,14 +73,15 @@ module RequestLogAnalyzer
       end
       
       # Guess file format
-      unless options[:format]
-        options[:format] = :rails
+      if !options[:format] && options[:source_files]
+        options[:format] = :rails # Default
 
-        if options[:source_files] && options[:source_files] != $stdin
-          if options[:source_files].class == Array && options[:source_files].first != $stdin
-            options[:format] = RequestLogAnalyzer::FileFormat.autodetect(options[:source_files].first)
-          elsif options[:source_files].class == String && options[:source_files] != $stdin
+        if options[:source_files] != $stdin
+          if options[:source_files].class == String
             options[:format] = RequestLogAnalyzer::FileFormat.autodetect(options[:source_files])
+
+          elsif options[:source_files].class == Array && options[:source_files].first != $stdin
+            options[:format] = RequestLogAnalyzer::FileFormat.autodetect(options[:source_files].first)
           end
         end
       end
