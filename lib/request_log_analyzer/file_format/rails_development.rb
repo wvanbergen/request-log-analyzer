@@ -5,7 +5,7 @@ module RequestLogAnalyzer::FileFormat
   # as well.
   class RailsDevelopment < Rails
     def self.create
-      puts 'DEPRECATED: use --rails-format development instead!'
+      # puts 'DEPRECATED: use --rails-format development instead!'
       super('development')
     end
   end
