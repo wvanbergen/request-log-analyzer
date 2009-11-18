@@ -70,7 +70,7 @@ rescue CommandLine::Error => e
   puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
   puts
   puts "Input options:"
-  puts "  --format <format>, -f:     Log file format. amazon_s3, apache, merb, mysql, rack or rails (default)."
+  puts "  --format <format>, -f:     Log file format. amazon_s3, apache, merb, mysql, rack or rails."
   puts "  --after <date>             Only consider requests from <date> or later."
   puts "  --before <date>            Only consider requests before <date>."
   puts "  --select <field> <value>   Only consider requests where <field> matches <value>."
@@ -89,7 +89,7 @@ rescue CommandLine::Error => e
   puts "Examples:"
   puts "  request-log-analyzer development.log"
   puts "  request-log-analyzer -b mongrel.0.log mongrel.1.log mongrel.2.log "
-  puts "  request-log-analyzer --format merb -d requests.db production.log"
+  puts "  request-log-analyzer -d requests.db production.log"
   puts
   puts "To install rake tasks in your Rails application, "
   puts "run the following command in your application's root directory:"
