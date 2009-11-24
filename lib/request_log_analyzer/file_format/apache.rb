@@ -19,6 +19,7 @@ module RequestLogAnalyzer::FileFormat
       :common   => '%h %l %u %t "%r" %>s %b',
       :combined => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"',
       :rack     => '%h %l %u %t "%r" %>s %b %T',
+      :sinatra  => '%a - - %t "%r" %>s %b %T',
       :referer  => '%{Referer}i -> %U',
       :agent    => '%{User-agent}i'
     }
@@ -57,11 +58,11 @@ module RequestLogAnalyzer::FileFormat
     def self.access_line_definition(format_string)
       format_string ||= :common
       format_string   = LOG_FORMAT_DEFAULTS[format_string.to_sym] || format_string
-
+      
       line_regexp = ''
       captures    = []
       format_string.scan(/([^%]*)(?:%(?:\{([^\}]+)\})?>?([A-Za-z%]))?/) do |literal, arg, variable|
-
+        
         line_regexp << Regexp.quote(literal) # Make sure to parse the literal before the directive
 
         if variable
@@ -78,7 +79,7 @@ module RequestLogAnalyzer::FileFormat
           end
         end
       end
-
+      
       # Return a new line definition object
       return RequestLogAnalyzer::LineDefinition.new(:access, :regexp => Regexp.new(line_regexp),
                                         :captures => captures, :header => true, :footer => true)

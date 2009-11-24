@@ -27,7 +27,7 @@ describe RequestLogAnalyzer::FileFormat do
       file_format = RequestLogAnalyzer::FileFormat.autodetect(log_fixture(:apache_common))
       file_format.should be_kind_of(RequestLogAnalyzer::FileFormat::Apache)
     end
-    
+
     it "should not find any file format with a bogus file" do
       RequestLogAnalyzer::FileFormat.autodetect(log_fixture(:test_order)).should be_nil
     end

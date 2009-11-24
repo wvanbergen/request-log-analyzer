@@ -85,6 +85,7 @@ module RequestLogAnalyzer::FileFormat
     score -= parser.warnings * 3
     score += parser.parsed_lines * 1
     score += parser.parsed_requests * 10
+    
     score
   end
 
