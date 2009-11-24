@@ -85,6 +85,9 @@ module RequestLogAnalyzer::FileFormat
     score -= parser.warnings * 3
     score += parser.parsed_lines * 1
     score += parser.parsed_requests * 10
+
+    # As Apache matches several simular formats, subtracting 1 will make a specific matcher have a higher score
+    score -= 1 if parser.file_format.class == RequestLogAnalyzer::FileFormat::Apache
     
     score
   end

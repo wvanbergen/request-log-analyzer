@@ -28,6 +28,11 @@ describe RequestLogAnalyzer::FileFormat do
       file_format.should be_kind_of(RequestLogAnalyzer::FileFormat::Apache)
     end
 
+    it "should autodetect a Rack access log" do
+      file_format = RequestLogAnalyzer::FileFormat.autodetect(log_fixture(:sinatra))
+      file_format.should be_kind_of(RequestLogAnalyzer::FileFormat::Rack)
+    end
+
     it "should not find any file format with a bogus file" do
       RequestLogAnalyzer::FileFormat.autodetect(log_fixture(:test_order)).should be_nil
     end
