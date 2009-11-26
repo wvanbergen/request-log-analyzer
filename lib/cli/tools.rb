@@ -6,7 +6,7 @@ def terminal_width(default_width = 81)
   begin
     tiocgwinsz = 0x5413
     data = [0, 0, 0, 0].pack("SSSS")
-    if RUBY_PLATFORM !=~ /\bjava\b/ && @out.ioctl(tiocgwinsz, data) >= 0 # JRuby crashes on ioctl
+    if RUBY_PLATFORM !=~ /java/ && @out.ioctl(tiocgwinsz, data) >= 0 # JRuby crashes on ioctl
       rows, cols, xpixels, ypixels = data.unpack("SSSS")
       raise unless cols > 0
       cols
