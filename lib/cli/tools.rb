@@ -2,12 +2,11 @@
 # If it is not possible to to so, it returns the default_width.
 # <tt>default_width</tt> Defaults to 81
 def terminal_width(default_width = 81)
-  return default_width if RUBY_PLATFORM && RUBY_PLATFORM =~ /\bjava\b/ #JRUBY HACK
   
   begin
     tiocgwinsz = 0x5413
     data = [0, 0, 0, 0].pack("SSSS")
-    if @out.ioctl(tiocgwinsz, data) >= 0
+    if RUBY_PLATFORM !=~ /\bjava\b/ && @out.ioctl(tiocgwinsz, data) >= 0 # JRuby crashes on ioctl
       rows, cols, xpixels, ypixels = data.unpack("SSSS")
       raise unless cols > 0
       cols
