@@ -54,6 +54,11 @@ describe RequestLogAnalyzer::FileFormat::Rails do
           line = prefix + 'Processing PeopleController#index (for 1.1.1.1 at 2008-08-14 21:16:30) [GET]'
           @rails.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET')
         end
+        
+        it "should parse a :processing line correctly when it contains ipv6 address" do
+           line = prefix + 'Processing PeopleController#index (for ::1 at 2008-08-14 21:16:30) [GET]'
+           @rails.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET')
+        end
 
         it "should parse a Rails 2.1 style :completed line correctly" do
           line = prefix + 'Completed in 0.21665 (4 reqs/sec) | Rendering: 0.00926 (4%) | DB: 0.00000 (0%) | 200 OK [http://demo.nu/employees]'
