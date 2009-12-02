@@ -23,7 +23,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       it "should return a valid language" do
         @rails.should be_valid
       end
-      
+
       it "should at least parse :processing and :completed lines" do
         @rails.line_definitions.should include(:processing, :completed, :failure)
       end

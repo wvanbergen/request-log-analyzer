@@ -7,6 +7,8 @@ module RequestLogAnalyzer::FileFormat
   # method as first argument.
   class Rails < Base
 
+    extend CommonRegularExpressions
+
     # Creates a Rails FileFormat instance.
     #
     # The lines that will be parsed can be defined by the argument to this function, 
@@ -85,8 +87,8 @@ module RequestLogAnalyzer::FileFormat
     # A hash of definitions for all common lines in Rails logs.
     LINE_DEFINITIONS = {
       :processing => RequestLogAnalyzer::LineDefinition.new(:processing, :header => true,
-            :teaser   => /Processing /, # [0-9A-Fa-f]{1,4}
-            :regexp   => /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+|[\d\w\:]+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/,
+            :teaser   => /Processing /, 
+            :regexp   => /Processing ((?:\w+::)*\w+)#(\w+)(?: to (\w+))? \(for (#{ip_address}) at (#{timestamp('%Y-%m-%d %H:%M:%S')})\) \[([A-Z]+)\]/,
             :captures => [{ :name => :controller, :type  => :string },
                           { :name => :action,     :type  => :string },
                           { :name => :format,     :type  => :string, :default => 'html' },

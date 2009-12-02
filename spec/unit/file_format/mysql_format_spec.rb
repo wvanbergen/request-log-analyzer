@@ -12,8 +12,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
     end
 
     it "should parse a :time line correctly" do
-      line = '# Time: 091112 8:13:56'
-      line = '# Time: 091112 8:13:56'      
+      line = '# Time: 091112  8:13:56'
       @file_format.should parse_line(line).as(:time).and_capture(:timestamp => 20091112081356)
     end
 
