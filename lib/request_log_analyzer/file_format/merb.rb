@@ -14,7 +14,7 @@ module RequestLogAnalyzer::FileFormat
     end
 
     # ~ Params: {"action"=>"create", "controller"=>"session"}
-    # ~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"d}
+    # ~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"destroy"}
     line_definition :params do |line|
       line.teaser = /Params\:\ /
       line.regexp = /Params\:\ (\{.+\})/

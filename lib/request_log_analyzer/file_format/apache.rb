@@ -27,7 +27,7 @@ module RequestLogAnalyzer::FileFormat
     LOG_DIRECTIVES = {
       '%' => { :regexp => '%', :captures => [] },
       'h' => { :regexp => '([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)',  :captures => [{:name => :remote_host, :type => :string}] },
-      'a' => { :regexp => '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', :captures => [{:name => :remote_ip, :type => :string}] },
+      'a' => { :regexp => '([\d\.:]+)', :captures => [{:name => :remote_ip, :type => :string}] },
       'b' => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :traffic}] },
       'c' => { :regexp => '(\+|\-|\X)', :captures => [{:name => :connection_status, :type => :integer}] },
       'D' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :musec}] },
