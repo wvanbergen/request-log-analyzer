@@ -85,7 +85,7 @@ module RequestLogAnalyzer::FileFormat
     # A hash of definitions for all common lines in Rails logs.
     LINE_DEFINITIONS = {
       :processing => RequestLogAnalyzer::LineDefinition.new(:processing, :header => true,
-            :teaser   => /Processing /, # [0-9A-Fa-f]{1,4}
+            :teaser   => /Processing /,
             :regexp   => /Processing ((?:\w+::)?\w+)#(\w+)(?: to (\w+))? \(for (\d+\.\d+\.\d+\.\d+|[\d\w\:]+) at (\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d)\) \[([A-Z]+)\]/,
             :captures => [{ :name => :controller, :type  => :string },
                           { :name => :action,     :type  => :string },
