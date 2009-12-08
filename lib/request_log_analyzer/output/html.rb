@@ -7,6 +7,14 @@ module RequestLogAnalyzer::Output
     #   super(io, options)
     # end
 
+    def colorize(text, *style)
+      if style.include?(:bold)
+        tag(:strong, text)
+      else
+        text
+      end
+    end
+
     # Print a string to the io object.
     def print(str)
       @io << str

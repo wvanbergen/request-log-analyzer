@@ -2,17 +2,19 @@ module RequestLogAnalyzer::FileFormat
 
   class Mysql < Base
 
+    extend CommonRegularExpressions
+
     line_definition :time do |line|
       line.header = :alternative
       line.teaser = /\# Time: /
-      line.regexp = /\# Time: (\d{6}\s+\d{1,2}:\d{2}:\d{2})/
+      line.regexp = /\# Time: (#{timestamp('%y%m%d %k:%M:%S')})/
       line.captures << { :name => :timestamp, :type => :timestamp }
     end
 
     line_definition :user_host do |line|
       line.header = :alternative
       line.teaser = /\# User\@Host\: /
-      line.regexp = /\# User\@Host\: ([\w-]+)\[[\w-]+\] \@ ([\w\.-]*) \[([\d\.]*)\]/
+      line.regexp = /\# User\@Host\: ([\w-]+)\[[\w-]+\] \@ ([\w\.-]*) \[(#{ip_address(true)})\]/
       line.captures << { :name => :user, :type => :string } << 
                        { :name => :host, :type => :string } <<
                        { :name => :ip,   :type => :string }

@@ -5,16 +5,18 @@ module RequestLogAnalyzer::FileFormat
   # the different request durations that can be used for analysis.
   class Merb < Base
 
+    extend CommonRegularExpressions
+
     # ~ Started request handling: Fri Aug 29 11:10:23 +0200 2008
     line_definition :started do |line|
       line.header = true
       line.teaser = /Started request handling\:/
-      line.regexp = /Started request handling\:\ (.+)/
+      line.regexp = /Started request handling\:\ (#{timestamp('%a %b %d %H:%M:%S %z %Y')})/
       line.captures << { :name => :timestamp, :type => :timestamp }
     end
 
     # ~ Params: {"action"=>"create", "controller"=>"session"}
-    # ~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"d}
+    # ~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"destroy"}
     line_definition :params do |line|
       line.teaser = /Params\:\ /
       line.regexp = /Params\:\ (\{.+\})/

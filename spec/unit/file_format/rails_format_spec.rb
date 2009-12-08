@@ -23,7 +23,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       it "should return a valid language" do
         @rails.should be_valid
       end
-      
+
       it "should at least parse :processing and :completed lines" do
         @rails.line_definitions.should include(:processing, :completed, :failure)
       end
@@ -52,7 +52,17 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       context context do
         it "should parse a :processing line correctly" do
           line = prefix + 'Processing PeopleController#index (for 1.1.1.1 at 2008-08-14 21:16:30) [GET]'
-          @rails.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET')
+          @rails.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET', :ip => '1.1.1.1')
+        end
+        
+        it "should parse a :processing line correctly when it contains ipv6 localhost address" do
+           line = prefix + 'Processing PeopleController#index (for ::1 at 2008-08-14 21:16:30) [GET]'
+           @rails.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET', :ip => '::1')
+        end
+
+        it "should parse a :processing line correctly when it contains ipv6 address" do
+           line = prefix + 'Processing PeopleController#index (for 3ffe:1900:4545:3:200:f8ff:fe21:67cf at 2008-08-14 21:16:30) [GET]'
+           @rails.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET', :ip => '3ffe:1900:4545:3:200:f8ff:fe21:67cf')
         end
 
         it "should parse a Rails 2.1 style :completed line correctly" do

@@ -5,11 +5,13 @@ module RequestLogAnalyzer::FileFormat
   # Access logs are disabled by default on Amazon S3. To enable logging, see
   # http://docs.amazonwebservices.com/AmazonS3/latest/index.html?ServerLogs.html
   class AmazonS3 < Base
+    
+    extend CommonRegularExpressions
 
     line_definition :access do |line|
       line.header = true
       line.footer = true
-      line.regexp = /^([^\ ]+) ([^\ ]+) \[(\d{2}\/[A-Za-z]{3}\/\d{4}.\d{2}:\d{2}:\d{2})(?: .\d{4})?\] (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]+)" "([^"]+)"/
+      line.regexp = /^([^\ ]+) ([^\ ]+) \[(#{timestamp('%d/%b/%Y:%H:%M:%S %z')})?\] (#{ip_address}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]+)" "([^"]+)"/
       line.captures << { :name => :bucket_owner,    :type => :string } <<
                        { :name => :bucket,          :type => :string } <<
                        { :name => :timestamp,       :type => :timestamp } <<

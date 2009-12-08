@@ -5,7 +5,5 @@ module RequestLogAnalyzer::FileFormat
     def self.create(*args)
       super(:rack, *args)
     end
-
   end
-
 end

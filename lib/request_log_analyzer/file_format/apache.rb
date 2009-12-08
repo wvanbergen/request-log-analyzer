@@ -14,6 +14,8 @@ module RequestLogAnalyzer::FileFormat
   # command line option.
   class Apache < Base
 
+    extend CommonRegularExpressions
+
     # A hash of predefined Apache log formats
     LOG_FORMAT_DEFAULTS = {
       :common   => '%h %l %u %t "%r" %>s %b',
@@ -23,17 +25,20 @@ module RequestLogAnalyzer::FileFormat
       :agent    => '%{User-agent}i'
     }
 
+    # I have encountered two timestamp types, with timezone and without. Parse both.
+    APACHE_TIMESTAMP = Regexp.union(timestamp('%d/%b/%Y:%H:%M:%S %z'), timestamp('%d/%b/%Y %H:%M:%S'))
+
     # A hash that defines how the log format directives should be parsed.
     LOG_DIRECTIVES = {
       '%' => { :regexp => '%', :captures => [] },
       'h' => { :regexp => '([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)',  :captures => [{:name => :remote_host, :type => :string}] },
-      'a' => { :regexp => '(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', :captures => [{:name => :remote_ip, :type => :string}] },
+      'a' => { :regexp => "(#{ip_address})", :captures => [{:name => :remote_ip, :type => :string}] },
       'b' => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :traffic}] },
       'c' => { :regexp => '(\+|\-|\X)', :captures => [{:name => :connection_status, :type => :integer}] },
       'D' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :musec}] },
       'l' => { :regexp => '([\w-]+)', :captures => [{:name => :remote_logname, :type => :nillable_string}] },
       'T' => { :regexp => '((?:\d+(?:\.\d+))|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] },
-      't' => { :regexp => '\[(\d{2}\/[A-Za-z]{3}\/\d{4}.\d{2}:\d{2}:\d{2})(?: .\d{4})?\]', :captures => [{:name => :timestamp, :type => :timestamp}] },
+      't' => { :regexp => "\\[(#{APACHE_TIMESTAMP})?\\]", :captures => [{:name => :timestamp, :type => :timestamp}] },
       's' => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] },
       'u' => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] },
       'U' => { :regexp => '(\/\S*)', :captures => [{:name => :path, :type => :string}] },
@@ -57,11 +62,12 @@ module RequestLogAnalyzer::FileFormat
     def self.access_line_definition(format_string)
       format_string ||= :common
       format_string   = LOG_FORMAT_DEFAULTS[format_string.to_sym] || format_string
-
+      
+      
       line_regexp = ''
       captures    = []
       format_string.scan(/([^%]*)(?:%(?:\{([^\}]+)\})?>?([A-Za-z%]))?/) do |literal, arg, variable|
-
+        
         line_regexp << Regexp.quote(literal) # Make sure to parse the literal before the directive
 
         if variable
@@ -78,7 +84,7 @@ module RequestLogAnalyzer::FileFormat
           end
         end
       end
-
+      
       # Return a new line definition object
       return RequestLogAnalyzer::LineDefinition.new(:access, :regexp => Regexp.new(line_regexp),
                                         :captures => captures, :header => true, :footer => true)
