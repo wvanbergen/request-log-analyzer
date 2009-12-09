@@ -59,8 +59,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.duration :lock_time,  :category => PER_USER_QUERY, :title => 'Lock time',
                        :if => lambda { |request| request[:lock_time] > 0.0 }
       
-      analyze.count :category => PER_USER_QUERY, :title => "Rows examined", :field => :rows_examined
-      analyze.count :category => PER_USER_QUERY, :title => "Rows sent",     :field => :rows_sent
+      analyze.numeric_value :rows_examined, :category => PER_USER_QUERY, :title => "Rows examined"
+      analyze.numeric_value :rows_sent,     :category => PER_USER_QUERY, :title => "Rows sent"
     end
   
     class Request < RequestLogAnalyzer::Request

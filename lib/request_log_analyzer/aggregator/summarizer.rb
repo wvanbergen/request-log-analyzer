@@ -26,44 +26,12 @@ module RequestLogAnalyzer::Aggregator
       def method_missing(tracker_method, *args)
         track(tracker_method, *args)
       end
-
-      # Track the frequency of a specific category
-      # <tt>category_field</tt> Field to track
-      # <tt>options</tt> options are passed to new frequency tracker
-      def frequency(category_field, options = {})
-        if category_field.kind_of?(Symbol)
-          track(:frequency, options.merge(:category => category_field))
-        elsif category_field.kind_of?(Hash)
-          track(:frequency, category_field.merge(options))
-        end
-      end
-
-      # Track the duration of a specific category
-      # <tt>duration_field</tt> Field to track
-      # <tt>options</tt> options are passed to new frequency tracker
-      def duration(duration_field, options = {})
-        if duration_field.kind_of?(Symbol)
-          track(:duration, options.merge(:duration => duration_field))
-        elsif duration_field.kind_of?(Hash)
-          track(:duration, duration_field.merge(options))
-        end
-      end
-
-      # Track the frequency of a specific category
-      # <tt>category_field</tt> Field to track
-      # <tt>options</tt> options are passed to new frequency tracker
-      def count(category_field, options = {})
-        if category_field.kind_of?(Symbol)
-          track(:count, options.merge(:category => category_field))
-        elsif category_field.kind_of?(Hash)
-          track(:count, category_field.merge(options))
-        end
-      end
-
+      
       # Helper function to initialize a tracker and add it to the tracker array.
       # <tt>tracker_class</tt> The class to include
       # <tt>optiont</tt> The options to pass to the trackers.
-      def track(tracker_klass, options = {})
+      def track(tracker_klass, value_field = {}, other_options = {})
+        options = value_field.kind_of?(Symbol) ? other_options.merge(:value => value_field) : value_field.merge(other_options) 
         tracker_klass = RequestLogAnalyzer::Tracker.const_get(RequestLogAnalyzer::to_camelcase(tracker_klass)) if tracker_klass.kind_of?(Symbol)
         @trackers << tracker_klass.new(options)
       end

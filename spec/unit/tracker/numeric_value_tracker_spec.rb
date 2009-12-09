@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe RequestLogAnalyzer::Tracker::Count do
+describe RequestLogAnalyzer::Tracker::NumericValue do
 
   context 'static category' do
     before(:each) do
-      @tracker = RequestLogAnalyzer::Tracker::Count.new(:category => :category, :field => :blah)
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:category => :category, :value => :blah)
       @tracker.prepare
     end
 
@@ -27,7 +27,7 @@ describe RequestLogAnalyzer::Tracker::Count do
   context 'dynamic category' do
     before(:each) do
       @categorizer = Proc.new { |request| request[:duration] > 0.2 ? 'slow' : 'fast' }
-      @tracker = RequestLogAnalyzer::Tracker::Count.new(:category => @categorizer, :field => :blah)
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:category => @categorizer, :value => :blah)
       @tracker.prepare
     end
 
@@ -40,10 +40,51 @@ describe RequestLogAnalyzer::Tracker::Count do
       @tracker.categories['slow'][:sum].should == 4
     end
   end
+  
+  describe '#update' do
+
+    before(:each) do
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:value => :duration, :category => :category)
+      @tracker.prepare
+
+      @tracker.update(request(:category => 'a', :duration => 0.4))
+      @tracker.update(request(:category => 'a', :duration => 0.2))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+    end
+
+    it "should sum of the durations for a category correctly" do
+      @tracker.sum('a').should be_close(0.9, 0.000001)
+    end
+
+    it "should overall sum of the durations correctly" do
+      @tracker.sum_overall.should be_close(0.9, 0.000001)
+    end
+
+    it "should keep track of the minimum and maximum duration" do
+      @tracker.min('a').should == 0.2
+      @tracker.max('a').should == 0.4
+    end
+
+    it "should calculate the mean duration correctly" do
+      @tracker.mean('a').should be_close(0.3, 0.000001)
+    end
+
+    it "should calculate the overall mean duration correctly" do
+      @tracker.mean_overall.should be_close(0.3, 0.000001)
+    end
+
+    it "should calculate the duration variance correctly" do
+      @tracker.variance('a').should be_close(0.01, 0.000001)
+    end
+
+    it "should calculate the duration standard deviation correctly" do
+      @tracker.stddev('a').should be_close(0.1,  0.000001)
+    end
+  end  
 
   describe '#report' do
     before(:each) do
-      @tracker = RequestLogAnalyzer::Tracker::Count.new(:category => :category, :field => :blah)
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:category => :category, :value => :blah)
       @tracker.prepare
     end
 
@@ -65,20 +106,22 @@ describe RequestLogAnalyzer::Tracker::Count do
 
   describe '#to_yaml_object' do
     before(:each) do
-      @tracker = RequestLogAnalyzer::Tracker::Count.new(:category => :category, :field => :blah)
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:category => :category, :value => :blah)
       @tracker.prepare
     end
 
     it "should generate a YAML output" do
       @tracker.update(request(:category => 'a', :blah => 2))
       @tracker.update(request(:category => 'b', :blah => 3))
-      @tracker.to_yaml_object.should == {"a"=>{:min=>2, :hits=>1, :max=>2, :mean=>2.0, :sum=>2, :sum_of_squares=>0.0}, "b"=>{:min=>3, :hits=>1, :max=>3, :mean=>3.0, :sum=>3, :sum_of_squares=>0.0}}
+      @tracker.to_yaml_object.should == {
+            "a" => { :min => 2, :hits => 1, :max => 2, :mean => 2.0, :sum => 2, :sum_of_squares => 0.0 },
+            "b" => { :min => 3, :hits => 1, :max => 3, :mean => 3.0, :sum => 3, :sum_of_squares => 0.0 }}
     end
   end
 
   describe '#display_value' do
     before(:each) do
-      @tracker = RequestLogAnalyzer::Tracker::Count.new(:category => :category, :field => :blah)
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:category => :category, :value => :blah)
       @tracker.prepare
     end
 

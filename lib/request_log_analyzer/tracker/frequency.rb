@@ -26,6 +26,7 @@ module RequestLogAnalyzer::Tracker
 
     # Check if categories are set up
     def prepare
+      options[:category] = options[:value] if options[:value] && !options[:category]
       raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
       @categorizer = create_lambda(options[:category])
       
