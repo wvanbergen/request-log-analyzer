@@ -55,7 +55,10 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :user, :title => "Users with most queries"
       analyze.duration :query_time, :category => PER_USER, :title => 'Query time per user'
       analyze.duration :query_time, :category => PER_USER_QUERY, :title => 'Query time'
-      # => analyze.duration :lock_time,  :category => PER_USER_QUERY, :title => 'Lock time'
+      
+      analyze.duration :lock_time,  :category => PER_USER_QUERY, :title => 'Lock time',
+                       :if => lambda { |request| request[:lock_time] > 0.0 }
+      
       analyze.count :category => PER_USER_QUERY, :title => "Rows examined", :field => :rows_examined
       analyze.count :category => PER_USER_QUERY, :title => "Rows sent",     :field => :rows_sent
     end
