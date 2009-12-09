@@ -7,7 +7,6 @@ module RequestLogAnalyzer::Tracker
   # * <tt>:duration</tt> The field containing the duration in the request hash.
   # * <tt>:if</tt> Proc that has to return !nil for a request to be passed to the tracker.
   # * <tt>:line_type</tt> The line type that contains the duration field (determined by the category proc).
-  # * <tt>:minimal_value</tt> Do not store duration if it is less or equal to the value specified.
   # * <tt>:title</tt> Title do be displayed above the report
   # * <tt>:unless</tt> Handle request if this proc is false for the handled request.
   #
@@ -50,10 +49,7 @@ module RequestLogAnalyzer::Tracker
       else
         category = @categorizer.call(request)
         duration = @durationizer.call(request)
-        if duration.kind_of?(Numeric) && category && 
-          (options[:minimal_value].nil? || duration > options[:minimal_value])
-            update_statistics(category, duration)
-        end
+        update_statistics(category, duration) if duration.kind_of?(Numeric) && category
       end
     end
 

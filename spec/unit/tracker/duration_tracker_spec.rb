@@ -22,18 +22,6 @@ describe RequestLogAnalyzer::Tracker::Duration do
       @tracker.hits('a').should == 1
       @tracker.hits('b').should == 2
     end
-
-    it "should drop requests below the minumum duration" do
-      @tracker = RequestLogAnalyzer::Tracker::Duration.new(:duration => :duration, :category => :category, :minimal_value => 0.3)
-      @tracker.prepare
-
-      @tracker.update(request(:category => 'a', :duration => 0.4))
-      @tracker.update(request(:category => 'b', :duration => 0.3))
-      @tracker.update(request(:category => 'b', :duration => 0.4))
-
-      @tracker.hits('a').should == 1
-      @tracker.hits('b').should == 1
-    end
   end
 
   context 'using a dynamic category' do
