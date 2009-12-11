@@ -56,6 +56,10 @@ module RequestLogAnalyzer::Output
       @options = options
       @style   = options[:style] || { :cell_separator => true, :table_border => false }
     end
+    
+    def report_tracker(tracker)
+      tracker.report(self)
+    end
 
     # Apply a style block.. with style :)
     def with_style(temp_style = {})

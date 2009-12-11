@@ -93,7 +93,7 @@ module RequestLogAnalyzer::Aggregator
     def report(output)
       report_header(output)
       if source.parsed_requests > 0
-        @trackers.each { |tracker| tracker.report(output) }
+        @trackers.each { |tracker| output.report_tracker(tracker) }
       else
         output.puts
         output.puts('There were no requests analyzed.')

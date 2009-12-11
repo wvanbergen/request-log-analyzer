@@ -53,8 +53,9 @@ module RequestLogAnalyzer
       
       # Handle output format casing
       if options[:output].class == String
-        options[:output] = 'HTML' if options[:output] == 'html'
-        options[:output] = 'FixedWidth' if options[:output] == 'fixedwidth' || options[:output] == 'fixed_width'
+        options[:output] = 'FancyHTML'  if options[:output] =~ /^fancy_?html$/i
+        options[:output] = 'HTML'       if options[:output] =~ /^html$/i
+        options[:output] = 'FixedWidth' if options[:output] =~ /^fixed_?width$/i
       end
       
       # Register sources
@@ -142,7 +143,7 @@ module RequestLogAnalyzer
       # Set the output class
       output_args   = {}
       output_object = nil
-      if options[:output].is_a? Class
+      if options[:output].is_a?(Class)
         output_class = options[:output]
       else
         output_class = RequestLogAnalyzer::Output::const_get(options[:output])
