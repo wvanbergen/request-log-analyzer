@@ -11,7 +11,8 @@ module RequestLogAnalyzer::Aggregator
 
     # Display every parsed line immediately to the terminal
     def aggregate(request)
-      puts "\nRequest: " + request.lines.inspect
+      puts "\nRequest: \n" + request.lines.map { |l| 
+        "\t#{l[:lineno]}:#{l[:line_type]}: #{l.reject { |(k,v)| [:lineno, :line_type].include?(k) }.inspect}" }.join("\n")
     end
 
     # Capture all warnings during parsing
