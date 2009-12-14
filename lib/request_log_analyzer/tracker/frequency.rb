@@ -28,7 +28,8 @@ module RequestLogAnalyzer::Tracker
     def prepare
       options[:category] = options[:value] if options[:value] && !options[:category]
       raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
-      @categorizer = create_lambda(options[:category])
+      
+      @categorizer = create_lambda(options[:category]) unless options[:multiple]
       
       # Initialize the categories. Use the list of category names to 
       @categories = {}
@@ -38,10 +39,21 @@ module RequestLogAnalyzer::Tracker
     # Check HTTP method of a request and store that in the categories hash.
     # <tt>request</tt> The request.
     def update(request)
-      cat = @categorizer.call(request)
-      if cat || options[:nils]
-        @categories[cat] ||= 0
-        @categories[cat] += 1
+      if options[:multiple]
+        cats = request.every(options[:category])
+        cats.each do |cat|
+          if cat || options[:nils]
+            @categories[cat] ||= 0
+            @categories[cat] += 1
+          end          
+        end
+        
+      else
+        cat = @categorizer.call(request)
+        if cat || options[:nils]
+          @categories[cat] ||= 0
+          @categories[cat] += 1
+        end
       end
     end
 
