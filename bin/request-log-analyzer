@@ -70,11 +70,11 @@ rescue CommandLine::Error => e
   puts "Usage: request-log-analyzer [LOGFILES*] <OPTIONS>"
   puts
   puts "Input options:"
-  puts "  --format <format>, -f:     Log file format. amazon_s3, apache, merb, mysql, rack or rails."
   puts "  --after <date>             Only consider requests from <date> or later."
   puts "  --before <date>            Only consider requests before <date>."
-  puts "  --select <field> <value>   Only consider requests where <field> matches <value>."
+  puts "  --format <format>, -f:     Log file format. amazon_s3, apache, merb, mysql, rack or rails."
   puts "  --reject <field> <value>   Only consider requests where <field> does not match <value>."
+  puts "  --select <field> <value>   Only consider requests where <field> matches <value>."
   puts
   puts "Output options:"
   puts "  --boring, -b               Output reports without ASCII colors."
@@ -83,12 +83,15 @@ rescue CommandLine::Error => e
   puts "  --file <filename>          Redirect output to file."
   puts "  --mail <emailaddress>      Send report to an email address."
   puts "  --mailhost <server>        Use the given server as the SMTP server for sending email."
-  puts "  --output <format>          Output format. Supports 'html' and 'fixed_width' (default)."
+  puts "  --no-progress              Hide the progress bar."
+  puts "  --output <format>          Output format. Supports 'html' and 'fixed_width'."
+  puts "  --report-width <amount>    Width of ASCII report. Defaults to terminal width."
+  puts "  --report-amount <amount>   Maximum numer of results per report."
   puts "  --yaml <filename>          Dump the results in YAML format in the given file."
   puts
   puts "Examples:"
-  puts "  request-log-analyzer development.log"
-  puts "  request-log-analyzer mongrel.0.log mongrel.1.log mongrel.2.log --mail root@localhost"
+  puts "  request-log-analyzer production.log"
+  puts "  request-log-analyzer mongrel.0.log mongrel.1.log --output HTML --mail root@localhost"
   puts "  request-log-analyzer --format merb -d requests.db production.log"
   puts "  request-log-analyzer mysql_slow_query.log --reject query /SQL_NO_CACHE/"
   puts
