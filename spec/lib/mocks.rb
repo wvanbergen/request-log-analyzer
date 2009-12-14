@@ -32,6 +32,7 @@ module RequestLogAnalyzer::Spec::Mocks
 
   def mock_output
     output = mock('RequestLogAnalyzer::Output::Base')
+    output.stub!(:report_tracker)
     output.stub!(:header)
     output.stub!(:footer)
     output.stub!(:puts)
