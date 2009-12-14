@@ -33,8 +33,9 @@ describe RequestLogAnalyzer::Tracker::Base do
     end
 
     it "should receive :report when the summary report is being built" do
-      @tracker.should_receive(:report).with(anything).once
-      @summarizer.report(mock_output)
+      m = mock_output
+      m.should_receive(:report_tracker).with(@tracker)
+      @summarizer.report(m)
     end
 
     it "should receieve :finalize when the summarizer is finalizing" do
