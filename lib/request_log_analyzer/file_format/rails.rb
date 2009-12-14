@@ -66,11 +66,11 @@ module RequestLogAnalyzer::FileFormat
       end
 
       if lines.has_key?(:rendered)
-        analyze.duration :render_duration, :category => :render_file, :multiple_per_request => true, :title => 'Partial rendering duration'
+        analyze.duration :render_duration, :category => :render_file, :multiple => true, :title => 'Partial rendering duration'
       end
 
       if lines.has_key?(:query_executed)
-        analyze.duration :query_duration, :category => :query_sql, :multiple_per_request => true, :title => 'Query duration'
+        analyze.duration :query_duration, :category => :query_sql, :multiple => true, :title => 'Query duration'
       end
       
       return analyze.trackers + report_definer.trackers
