@@ -26,6 +26,12 @@ module RequestLogAnalyzer::FileFormat
       
     end
     
+    line_definition :job_lock_failed do |line|
+      line.footer = true
+      line.regexp = /\* \[JOB\] failed to acquire exclusive lock for (\S+)/
+      line.captures << { :name => :locked_job, :type => :string }
+    end
+    
     # line_definition :batch_completed do |line|
     #   line.header = true
     #   line.footer = true
