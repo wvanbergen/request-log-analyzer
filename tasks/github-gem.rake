@@ -124,7 +124,7 @@ module GithubGem
         desc "Perform all checks that would occur before a release"
         task(:release_checks => checks)
 
-        release_tasks = [:release_checks, :set_version, :build, :github_release]
+        release_tasks = [:release_checks, :set_version, :build, :github_release, :gemcutter_release]
         release_tasks << [:rubyforge_release] if gemspec.rubyforge_project
 
         desc "Release a new verison of the gem"
@@ -132,6 +132,7 @@ module GithubGem
 
         task(:check_rubyforge)   { check_rubyforge_task }
         task(:rubyforge_release) { rubyforge_release_task }
+        task(:gemcutter_release) { gemcutter_release_task }
         task(:github_release => [:commit_modified_files, :tag_version]) { github_release_task }
         task(:tag_version) { tag_version_task }
         task(:commit_modified_files) { commit_modified_files_task }
@@ -227,6 +228,10 @@ module GithubGem
     # Task to release the .gem file toRubyforge.
     def rubyforge_release_task
       sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version.to_s, "pkg/#{gemspec.name}-#{gemspec.version}.gem"
+    end
+    
+    def gemcutter_release_task
+      sh "gem push pkg/#{gemspec.name}-#{gemspec.version}.gem"
     end
 
     # Gem release task.
