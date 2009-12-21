@@ -38,7 +38,7 @@ module RequestLogAnalyzer::Output
             foreground_color = "3#{COLORS[option]}" if COLORS.include?(option)
             font_style       = "#{STYLES[option]};" if STYLES.include?(option)
           elsif option.kind_of?(Hash)
-            options.each do |key, value|
+            option.each do |key, value|
               case key
               when :color;      foreground_color = "3#{COLORS[value]}"  if COLORS.include?(value)
               when :background; background_color = "4#{COLORS[value]};" if COLORS.include?(value)
