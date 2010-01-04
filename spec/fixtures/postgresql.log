@@ -1,0 +1,2980 @@
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='98'
+	
+2004-05-07 11:58:22 LOG:  duration: 0.084312 sec
+2004-05-07 11:58:22 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='98' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:58:22 LOG:  duration: 0.002680 sec
+2004-05-07 11:58:36 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:58:36 LOG:  duration: 0.001064 sec
+2004-05-07 11:58:36 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:58:36 LOG:  duration: 0.002612 sec
+2004-05-07 11:58:36 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='monkeys'
+			AND status IN ('A','H')
+		
+2004-05-07 11:58:36 LOG:  duration: 0.003376 sec
+2004-05-07 11:58:36 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945516','/projects/monkeys/','0');
+2004-05-07 11:58:36 LOG:  duration: 0.003521 sec
+2004-05-07 11:58:36 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:58:36 LOG:  duration: 0.001185 sec
+2004-05-07 11:58:36 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:58:36 LOG:  duration: 0.000657 sec
+2004-05-07 11:58:36 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:58:36 LOG:  duration: 0.000391 sec
+2004-05-07 11:58:36 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='59'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:58:36 LOG:  duration: 0.004163 sec
+2004-05-07 11:58:36 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='59'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:58:36 LOG:  duration: 0.037863 sec
+2004-05-07 11:58:36 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='59'
+2004-05-07 11:58:36 LOG:  duration: 0.001086 sec
+2004-05-07 11:58:36 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='59' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:58:36 LOG:  duration: 0.001717 sec
+2004-05-07 11:58:36 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='59' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:58:36 LOG:  duration: 0.001380 sec
+2004-05-07 11:58:36 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='59' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:58:36 LOG:  duration: 0.002534 sec
+2004-05-07 11:58:36 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='59'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 11:58:36 LOG:  duration: 0.002714 sec
+2004-05-07 11:58:36 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=59
+2004-05-07 11:58:36 LOG:  duration: 0.001197 sec
+2004-05-07 11:58:36 LOG:  query: SELECT * FROM project_group_list WHERE group_id='59' AND is_public=1
+2004-05-07 11:58:36 LOG:  duration: 0.001217 sec
+2004-05-07 11:58:36 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='59'
+	
+2004-05-07 11:58:36 LOG:  duration: 0.083981 sec
+2004-05-07 11:58:36 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='59' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:58:36 LOG:  duration: 0.002657 sec
+2004-05-07 11:58:36 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:58:36 LOG:  duration: 0.001062 sec
+2004-05-07 11:58:36 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:58:36 LOG:  duration: 0.002613 sec
+2004-05-07 11:58:36 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='iptcext'
+			AND status IN ('A','H')
+		
+2004-05-07 11:58:36 LOG:  duration: 0.003348 sec
+2004-05-07 11:58:36 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945516','/projects/iptcext/','0');
+2004-05-07 11:58:36 LOG:  duration: 0.003764 sec
+2004-05-07 11:58:36 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:58:36 LOG:  duration: 0.001167 sec
+2004-05-07 11:58:36 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:58:36 LOG:  duration: 0.000662 sec
+2004-05-07 11:58:36 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:58:36 LOG:  duration: 0.000396 sec
+2004-05-07 11:58:36 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='49'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:58:36 LOG:  duration: 0.003669 sec
+2004-05-07 11:58:36 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='49'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:58:36 LOG:  duration: 0.003526 sec
+2004-05-07 11:58:36 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='49'
+2004-05-07 11:58:36 LOG:  duration: 0.001046 sec
+2004-05-07 11:58:36 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='49' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:58:36 LOG:  duration: 0.001710 sec
+2004-05-07 11:58:36 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='49' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:58:36 LOG:  duration: 0.001340 sec
+2004-05-07 11:58:36 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='49' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:58:36 LOG:  duration: 0.002427 sec
+2004-05-07 11:58:36 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='49'
+	
+2004-05-07 11:58:37 LOG:  duration: 0.084783 sec
+2004-05-07 11:58:44 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:58:44 LOG:  duration: 0.001055 sec
+2004-05-07 11:58:44 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:58:44 LOG:  duration: 0.002383 sec
+2004-05-07 11:58:44 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='libxosd-ruby'
+			AND status IN ('A','H')
+		
+2004-05-07 11:58:44 LOG:  duration: 0.003405 sec
+2004-05-07 11:58:44 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945524','/projects/libxosd-ruby/','0');
+2004-05-07 11:58:44 LOG:  duration: 0.003565 sec
+2004-05-07 11:58:44 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:58:44 LOG:  duration: 0.001166 sec
+2004-05-07 11:58:44 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:58:44 LOG:  duration: 0.000661 sec
+2004-05-07 11:58:44 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:58:44 LOG:  duration: 0.000397 sec
+2004-05-07 11:58:44 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='133'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:58:44 LOG:  duration: 0.003629 sec
+2004-05-07 11:58:44 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='133'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:58:44 LOG:  duration: 0.003373 sec
+2004-05-07 11:58:44 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='133'
+2004-05-07 11:58:44 LOG:  duration: 0.001093 sec
+2004-05-07 11:58:44 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='133' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:58:44 LOG:  duration: 0.001809 sec
+2004-05-07 11:58:44 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='133' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:58:44 LOG:  duration: 0.001284 sec
+2004-05-07 11:58:44 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='133' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:58:44 LOG:  duration: 0.002584 sec
+2004-05-07 11:58:44 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='133'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 11:58:44 LOG:  duration: 0.002773 sec
+2004-05-07 11:58:44 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=133
+2004-05-07 11:58:44 LOG:  duration: 0.001184 sec
+2004-05-07 11:58:44 LOG:  query: SELECT * FROM project_group_list WHERE group_id='133' AND is_public=1
+2004-05-07 11:58:44 LOG:  duration: 0.001182 sec
+2004-05-07 11:58:44 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='133'
+	
+2004-05-07 11:58:44 LOG:  duration: 0.083427 sec
+2004-05-07 11:58:44 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='133' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:58:44 LOG:  duration: 0.002846 sec
+2004-05-07 11:58:44 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='562'
+2004-05-07 11:58:44 LOG:  duration: 0.002903 sec
+2004-05-07 11:58:47 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:58:47 LOG:  duration: 0.001033 sec
+2004-05-07 11:58:47 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:58:47 LOG:  duration: 0.002604 sec
+2004-05-07 11:58:47 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='xmldigester'
+			AND status IN ('A','H')
+		
+2004-05-07 11:58:47 LOG:  duration: 0.003497 sec
+2004-05-07 11:58:47 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945527','/projects/xmldigester/','0');
+2004-05-07 11:58:47 LOG:  duration: 0.003247 sec
+2004-05-07 11:58:47 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:58:47 LOG:  duration: 0.001176 sec
+2004-05-07 11:58:47 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:58:47 LOG:  duration: 0.000659 sec
+2004-05-07 11:58:47 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:58:47 LOG:  duration: 0.000405 sec
+2004-05-07 11:58:47 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='118'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:58:47 LOG:  duration: 0.003486 sec
+2004-05-07 11:58:47 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='118'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:58:47 LOG:  duration: 0.003631 sec
+2004-05-07 11:58:47 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='118'
+2004-05-07 11:58:47 LOG:  duration: 0.001094 sec
+2004-05-07 11:58:47 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='118' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:58:47 LOG:  duration: 0.001791 sec
+2004-05-07 11:58:47 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='118' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:58:47 LOG:  duration: 0.001390 sec
+2004-05-07 11:58:47 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='118' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:58:47 LOG:  duration: 0.002552 sec
+2004-05-07 11:58:47 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='118'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 11:58:47 LOG:  duration: 0.002663 sec
+2004-05-07 11:58:47 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=118
+2004-05-07 11:58:47 LOG:  duration: 0.001179 sec
+2004-05-07 11:58:47 LOG:  query: SELECT * FROM project_group_list WHERE group_id='118' AND is_public=1
+2004-05-07 11:58:47 LOG:  duration: 0.001212 sec
+2004-05-07 11:58:47 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='118'
+	
+2004-05-07 11:58:47 LOG:  duration: 0.084725 sec
+2004-05-07 11:58:47 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='118' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:58:47 LOG:  duration: 0.002930 sec
+2004-05-07 11:58:47 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='485'
+2004-05-07 11:58:47 LOG:  duration: 0.003047 sec
+2004-05-07 11:58:58 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:58:58 LOG:  duration: 0.001010 sec
+2004-05-07 11:58:58 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:58:58 LOG:  duration: 0.002649 sec
+2004-05-07 11:58:58 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='instiki'
+			AND status IN ('A','H')
+		
+2004-05-07 11:58:58 LOG:  duration: 0.003440 sec
+2004-05-07 11:58:58 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945538','/projects/instiki/','0');
+2004-05-07 11:58:58 LOG:  duration: 0.003220 sec
+2004-05-07 11:58:58 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:58:58 LOG:  duration: 0.001155 sec
+2004-05-07 11:58:58 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:58:58 LOG:  duration: 0.000626 sec
+2004-05-07 11:58:58 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:58:58 LOG:  duration: 0.000385 sec
+2004-05-07 11:58:58 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='186'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:58:58 LOG:  duration: 0.003501 sec
+2004-05-07 11:58:58 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='186'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:58:58 LOG:  duration: 0.003587 sec
+2004-05-07 11:58:58 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='186'
+2004-05-07 11:58:58 LOG:  duration: 0.001167 sec
+2004-05-07 11:58:58 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='186' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:58:58 LOG:  duration: 0.001693 sec
+2004-05-07 11:58:58 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='186' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:58:58 LOG:  duration: 0.001332 sec
+2004-05-07 11:58:58 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='186' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:58:58 LOG:  duration: 0.002893 sec
+2004-05-07 11:58:58 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='186'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 11:58:58 LOG:  duration: 0.002686 sec
+2004-05-07 11:58:58 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=186
+2004-05-07 11:58:58 LOG:  duration: 0.001174 sec
+2004-05-07 11:58:58 LOG:  query: SELECT * FROM project_group_list WHERE group_id='186' AND is_public=1
+2004-05-07 11:58:58 LOG:  duration: 0.001216 sec
+2004-05-07 11:58:58 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='186'
+	
+2004-05-07 11:58:58 LOG:  duration: 0.118019 sec
+2004-05-07 11:58:58 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='186' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:58:58 LOG:  duration: 0.003146 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1001'
+2004-05-07 11:58:58 LOG:  duration: 0.003038 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='975'
+2004-05-07 11:58:58 LOG:  duration: 0.000799 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='965'
+2004-05-07 11:58:58 LOG:  duration: 0.000713 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='922'
+2004-05-07 11:58:58 LOG:  duration: 0.000727 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='752'
+2004-05-07 11:58:58 LOG:  duration: 0.000770 sec
+2004-05-07 11:58:58 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:58:58 LOG:  duration: 0.001036 sec
+2004-05-07 11:58:58 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:58:58 LOG:  duration: 0.002565 sec
+2004-05-07 11:58:58 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='aeditor'
+			AND status IN ('A','H')
+		
+2004-05-07 11:58:58 LOG:  duration: 0.004980 sec
+2004-05-07 11:58:58 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945538','/projects/aeditor/','0');
+2004-05-07 11:58:58 LOG:  duration: 0.003882 sec
+2004-05-07 11:58:58 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:58:58 LOG:  duration: 0.001130 sec
+2004-05-07 11:58:58 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:58:58 LOG:  duration: 0.000691 sec
+2004-05-07 11:58:58 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:58:58 LOG:  duration: 0.000415 sec
+2004-05-07 11:58:58 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='18'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:58:58 LOG:  duration: 0.003580 sec
+2004-05-07 11:58:58 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='18'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:58:58 LOG:  duration: 0.003556 sec
+2004-05-07 11:58:58 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='18'
+2004-05-07 11:58:58 LOG:  duration: 0.001122 sec
+2004-05-07 11:58:58 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='18' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:58:58 LOG:  duration: 0.001717 sec
+2004-05-07 11:58:58 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='18' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:58:58 LOG:  duration: 0.001393 sec
+2004-05-07 11:58:58 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='18' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:58:58 LOG:  duration: 0.003136 sec
+2004-05-07 11:58:58 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='18'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 11:58:58 LOG:  duration: 0.002708 sec
+2004-05-07 11:58:58 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=18
+2004-05-07 11:58:58 LOG:  duration: 0.001379 sec
+2004-05-07 11:58:58 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='18'
+	
+2004-05-07 11:58:58 LOG:  duration: 0.092358 sec
+2004-05-07 11:58:58 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='18' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:58:58 LOG:  duration: 0.003686 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1050'
+2004-05-07 11:58:58 LOG:  duration: 0.002965 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1010'
+2004-05-07 11:58:58 LOG:  duration: 0.000746 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='985'
+2004-05-07 11:58:58 LOG:  duration: 0.000735 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='892'
+2004-05-07 11:58:58 LOG:  duration: 0.000736 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='847'
+2004-05-07 11:58:58 LOG:  duration: 0.000727 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='843'
+2004-05-07 11:58:58 LOG:  duration: 0.000712 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='841'
+2004-05-07 11:58:58 LOG:  duration: 0.000726 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='743'
+2004-05-07 11:58:58 LOG:  duration: 0.000786 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='531'
+2004-05-07 11:58:58 LOG:  duration: 0.000799 sec
+2004-05-07 11:58:58 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='524'
+2004-05-07 11:58:58 LOG:  duration: 0.000735 sec
+2004-05-07 11:59:06 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:59:06 LOG:  duration: 0.001160 sec
+2004-05-07 11:59:06 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:59:06 LOG:  duration: 0.002702 sec
+2004-05-07 11:59:06 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='qworker'
+			AND status IN ('A','H')
+		
+2004-05-07 11:59:06 LOG:  duration: 0.003458 sec
+2004-05-07 11:59:06 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945546','/projects/qworker/','0');
+2004-05-07 11:59:06 LOG:  duration: 0.003258 sec
+2004-05-07 11:59:06 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:59:06 LOG:  duration: 0.001153 sec
+2004-05-07 11:59:06 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:59:06 LOG:  duration: 0.000677 sec
+2004-05-07 11:59:06 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:59:06 LOG:  duration: 0.000400 sec
+2004-05-07 11:59:06 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='195'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:59:06 LOG:  duration: 0.003621 sec
+2004-05-07 11:59:06 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='195'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:59:06 LOG:  duration: 0.003433 sec
+2004-05-07 11:59:06 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='195'
+2004-05-07 11:59:06 LOG:  duration: 0.001119 sec
+2004-05-07 11:59:06 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='195' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:59:06 LOG:  duration: 0.001752 sec
+2004-05-07 11:59:06 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='195' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:59:06 LOG:  duration: 0.001410 sec
+2004-05-07 11:59:06 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='195' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:59:06 LOG:  duration: 0.002523 sec
+2004-05-07 11:59:06 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='195'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 11:59:06 LOG:  duration: 0.002651 sec
+2004-05-07 11:59:06 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=195
+2004-05-07 11:59:06 LOG:  duration: 0.001163 sec
+2004-05-07 11:59:06 LOG:  query: SELECT * FROM project_group_list WHERE group_id='195' AND is_public=1
+2004-05-07 11:59:06 LOG:  duration: 0.001210 sec
+2004-05-07 11:59:06 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='195'
+	
+2004-05-07 11:59:06 LOG:  duration: 0.119850 sec
+2004-05-07 11:59:06 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='195' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:59:06 LOG:  duration: 0.002631 sec
+2004-05-07 11:59:06 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:59:06 LOG:  duration: 0.001031 sec
+2004-05-07 11:59:06 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:59:06 LOG:  duration: 0.002604 sec
+2004-05-07 11:59:06 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='captcha'
+			AND status IN ('A','H')
+		
+2004-05-07 11:59:06 LOG:  duration: 0.003332 sec
+2004-05-07 11:59:06 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945546','/projects/captcha/','0');
+2004-05-07 11:59:06 LOG:  duration: 0.004125 sec
+2004-05-07 11:59:06 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:59:06 LOG:  duration: 0.001159 sec
+2004-05-07 11:59:06 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:59:06 LOG:  duration: 0.000650 sec
+2004-05-07 11:59:06 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:59:06 LOG:  duration: 0.000395 sec
+2004-05-07 11:59:06 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='212'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 11:59:06 LOG:  duration: 0.003407 sec
+2004-05-07 11:59:06 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='212'
+		ORDER BY trove_cat.fullpath
+2004-05-07 11:59:06 LOG:  duration: 0.003553 sec
+2004-05-07 11:59:06 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='212'
+2004-05-07 11:59:06 LOG:  duration: 0.001030 sec
+2004-05-07 11:59:06 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='212' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 11:59:06 LOG:  duration: 0.001718 sec
+2004-05-07 11:59:06 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='212' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 11:59:06 LOG:  duration: 0.001384 sec
+2004-05-07 11:59:06 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='212' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 11:59:06 LOG:  duration: 0.002485 sec
+2004-05-07 11:59:06 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='212'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 11:59:06 LOG:  duration: 0.002722 sec
+2004-05-07 11:59:06 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=212
+2004-05-07 11:59:06 LOG:  duration: 0.001109 sec
+2004-05-07 11:59:06 LOG:  query: SELECT * FROM project_group_list WHERE group_id='212' AND is_public=1
+2004-05-07 11:59:06 LOG:  duration: 0.001173 sec
+2004-05-07 11:59:06 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='212'
+	
+2004-05-07 11:59:06 LOG:  duration: 0.083668 sec
+2004-05-07 11:59:06 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='212' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 11:59:06 LOG:  duration: 0.002620 sec
+2004-05-07 11:59:21 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:59:21 LOG:  duration: 0.001036 sec
+2004-05-07 11:59:21 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 11:59:21 LOG:  duration: 0.002670 sec
+2004-05-07 11:59:21 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'11','0','OTHER','0','Other','1083945561','/export/index.php','0');
+2004-05-07 11:59:21 LOG:  duration: 0.003211 sec
+2004-05-07 11:59:21 LOG:  query: select classname from supported_languages where language_code = 'zh-cn'
+2004-05-07 11:59:21 LOG:  duration: 0.001773 sec
+2004-05-07 11:59:21 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='SimplifiedChinese'
+2004-05-07 11:59:21 LOG:  duration: 0.000672 sec
+2004-05-07 11:59:21 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='23'
+2004-05-07 11:59:21 LOG:  duration: 0.000404 sec
+2004-05-07 11:59:51 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 11:59:51 LOG:  duration: 0.000791 sec
+2004-05-07 11:59:51 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='262'
+2004-05-07 11:59:51 LOG:  duration: 0.006108 sec
+2004-05-07 11:59:51 LOG:  query: SELECT * FROM groups WHERE group_id='30'
+2004-05-07 11:59:51 LOG:  duration: 0.001106 sec
+2004-05-07 12:00:00 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:00:00 LOG:  duration: 0.000791 sec
+2004-05-07 12:00:00 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:00:00 LOG:  duration: 0.000767 sec
+2004-05-07 12:00:00 LOG:  query: SELECT *
+	FROM massmail_queue
+	WHERE finished_date=0
+	ORDER BY queued_date
+2004-05-07 12:00:00 LOG:  duration: 0.003031 sec
+2004-05-07 12:00:01 LOG:  query: SELECT users.user_name,email,mail_group_list.is_public,mail_group_list.list_name,mail_group_list.password,mail_group_list.status
+	FROM mail_group_list,users
+	WHERE mail_group_list.list_admin=users.user_id
+2004-05-07 12:00:01 LOG:  duration: 0.009955 sec
+2004-05-07 12:00:01 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:00:01 LOG:  duration: 0.000801 sec
+2004-05-07 12:00:01 LOG:  query: update users set unix_status = 'A' where user_id in (select
+distinct u.user_id from users u, user_group ug WHERE
+u.user_id=ug.user_id and ug.cvs_flags='1' and u.status='A')
+2004-05-07 12:00:01 LOG:  query: SELECT 1 FROM ONLY "public"."supported_languages" x WHERE "language_id" = $1 FOR UPDATE OF x
+2004-05-07 12:00:01 LOG:  query: SELECT 1 FROM ONLY "public"."supported_languages" x WHERE "language_id" = $1 FOR UPDATE OF x
+2004-05-07 12:00:01 LOG:  query: SELECT 1 FROM ONLY "public"."themes" x WHERE "theme_id" = $1 FOR UPDATE OF x
+2004-05-07 12:00:01 LOG:  query: SELECT 1 FROM ONLY "public"."country_code" x WHERE "ccode" = $1 FOR UPDATE OF x
+2004-05-07 12:00:01 LOG:  duration: 0.370524 sec
+2004-05-07 12:00:01 LOG:  query: SELECT distinct users.user_name,users.unix_pw,users.user_id,users.email
+        FROM users,user_group
+        WHERE users.user_id=user_group.user_id
+        AND user_group.cvs_flags='1'
+        AND users.status='A'
+        ORDER BY user_id ASC
+2004-05-07 12:00:01 LOG:  duration: 0.010672 sec
+2004-05-07 12:00:05 LOG:  query: select u.user_name, g.unix_group_name
+  from users u, user_group ug, groups g
+  where u.user_id = ug.user_id and
+  ug.group_id = g.group_id and
+  ug.cvs_flags = '1' and
+  u.status='A' and
+  g.status = 'A'
+  order by u.user_name
+2004-05-07 12:00:05 LOG:  duration: 0.010272 sec
+2004-05-07 12:00:09 LOG:  query: SELECT user_name,user_id,authorized_keys
+        FROM users
+        WHERE authorized_keys != ''
+        AND status='A'
+2004-05-07 12:00:09 LOG:  duration: 0.078004 sec
+2004-05-07 12:00:28 LOG:  query: INSERT INTO frs_dlstats_file (ip_address,file_id,month,day,user_id) 
+		VALUES ('221.31.184.90','262','200405','07','100')
+2004-05-07 12:00:28 LOG:  duration: 0.004602 sec
+2004-05-07 12:00:34 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:00:34 LOG:  duration: 0.001137 sec
+2004-05-07 12:00:34 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:00:34 LOG:  duration: 0.003104 sec
+2004-05-07 12:00:34 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Other','1083945634','/index.php','0');
+2004-05-07 12:00:34 LOG:  duration: 0.003589 sec
+2004-05-07 12:00:34 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:00:34 LOG:  duration: 0.002114 sec
+2004-05-07 12:00:34 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:00:34 LOG:  duration: 0.000621 sec
+2004-05-07 12:00:34 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.is_approved=1 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:00:34 LOG:  duration: 0.013382 sec
+2004-05-07 12:00:34 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1050'
+2004-05-07 12:00:34 LOG:  duration: 0.002894 sec
+2004-05-07 12:00:34 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1044'
+2004-05-07 12:00:34 LOG:  duration: 0.000691 sec
+2004-05-07 12:00:34 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1037'
+2004-05-07 12:00:34 LOG:  duration: 0.000663 sec
+2004-05-07 12:00:34 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1030'
+2004-05-07 12:00:34 LOG:  duration: 0.000651 sec
+2004-05-07 12:00:34 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1027'
+2004-05-07 12:00:34 LOG:  duration: 0.000661 sec
+2004-05-07 12:00:34 LOG:  query: SELECT count(*) AS count FROM groups WHERE status='A' AND is_public=1
+2004-05-07 12:00:34 LOG:  duration: 0.002080 sec
+2004-05-07 12:00:34 LOG:  query: SELECT count(*) AS count FROM users WHERE status='A' and user_id != 100
+2004-05-07 12:00:34 LOG:  duration: 0.074694 sec
+2004-05-07 12:00:34 LOG:  query: 
+		SELECT groups.group_id,
+		groups.group_name,
+		groups.unix_group_name,
+		frs_dlstats_grouptotal_vw.downloads
+		FROM frs_dlstats_grouptotal_vw,groups
+		WHERE
+		frs_dlstats_grouptotal_vw.group_id=groups.group_id AND groups.is_public='1' and groups.status='A'
+		ORDER BY downloads DESC
+	 LIMIT 10 OFFSET 0
+2004-05-07 12:00:34 LOG:  duration: 0.017606 sec
+2004-05-07 12:00:34 LOG:  query: SELECT groups.group_name,groups.unix_group_name,groups.group_id,project_weekly_metric.ranking,project_weekly_metric.percentile FROM groups,project_weekly_metric WHERE groups.group_id=project_weekly_metric.group_id AND groups.is_public=1 AND groups.type_id=1  AND groups.status != 'D'  ORDER BY ranking ASC LIMIT 10 OFFSET 0
+2004-05-07 12:00:34 LOG:  duration: 0.004113 sec
+2004-05-07 12:00:34 LOG:  query: SELECT group_id,unix_group_name,group_name,register_time FROM groups WHERE is_public=1 AND status='A' AND type_id=1 AND register_time > 0 ORDER BY register_time DESC LIMIT 10 OFFSET 0
+2004-05-07 12:00:34 LOG:  duration: 0.002522 sec
+2004-05-07 12:00:44 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:00:44 LOG:  duration: 0.001278 sec
+2004-05-07 12:00:44 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='610'
+2004-05-07 12:00:44 LOG:  duration: 0.006632 sec
+2004-05-07 12:00:44 LOG:  query: SELECT * FROM groups WHERE group_id='167'
+2004-05-07 12:00:44 LOG:  duration: 0.001131 sec
+2004-05-07 12:01:06 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:01:06 LOG:  duration: 0.000817 sec
+2004-05-07 12:01:06 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:01:06 LOG:  duration: 0.002161 sec
+2004-05-07 12:01:06 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Other','1083945666','/export/rss_sfnewreleases.php','0');
+2004-05-07 12:01:06 LOG:  duration: 0.003217 sec
+2004-05-07 12:01:06 LOG:  query: SELECT 
+					groups.group_id,
+					groups.group_name,
+					groups.unix_group_name,
+					groups.type,
+					news_bytes.forum_id,
+					news_bytes.summary,
+					news_bytes.date,
+					news_bytes.details 
+				FROM 
+					news_bytes,
+					groups 
+				WHERE 
+					news_bytes.group_id=groups.group_id 
+				ORDER BY 
+					date 
+				DESC LIMIT 30 OFFSET 0
+2004-05-07 12:01:06 ERROR:  No such attribute groups.type
+2004-05-07 12:01:40 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:01:40 LOG:  duration: 0.000800 sec
+2004-05-07 12:01:40 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:01:40 LOG:  duration: 0.001900 sec
+2004-05-07 12:01:40 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','240','OTHER','0','Other','1083945700','/news/index.php','0');
+2004-05-07 12:01:40 LOG:  duration: 0.002763 sec
+2004-05-07 12:01:40 LOG:  query: SELECT * FROM groups WHERE group_id='240'
+2004-05-07 12:01:40 LOG:  duration: 0.002771 sec
+2004-05-07 12:01:40 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:01:40 LOG:  duration: 0.001252 sec
+2004-05-07 12:01:40 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:01:40 LOG:  duration: 0.000445 sec
+2004-05-07 12:01:40 LOG:  query: SELECT * FROM news_bytes WHERE group_id='240' AND is_approved <> '4' ORDER BY post_date DESC LIMIT 51 OFFSET 0
+2004-05-07 12:01:40 LOG:  duration: 0.002369 sec
+2004-05-07 12:02:01 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:02:01 LOG:  duration: 0.000789 sec
+2004-05-07 12:02:01 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:02:01 LOG:  duration: 0.001899 sec
+2004-05-07 12:02:01 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','148','OTHER','0','Other','1083945721','/export/rss_sfnews.php','0');
+2004-05-07 12:02:01 LOG:  duration: 0.003165 sec
+2004-05-07 12:02:01 LOG:  query: SELECT forum_id,summary,post_date,details,group_id FROM news_bytes  where group_id=148 order by post_date desc LIMIT 10 OFFSET 0
+2004-05-07 12:02:01 LOG:  duration: 0.002510 sec
+2004-05-07 12:02:06 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:02:06 LOG:  duration: 0.000804 sec
+2004-05-07 12:02:06 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:02:06 LOG:  duration: 0.001915 sec
+2004-05-07 12:02:06 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='lolita'
+			AND status IN ('A','H')
+		
+2004-05-07 12:02:06 LOG:  duration: 0.003181 sec
+2004-05-07 12:02:06 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083945726','/projects/lolita/','0');
+2004-05-07 12:02:06 LOG:  duration: 0.003881 sec
+2004-05-07 12:02:06 LOG:  query: select classname from supported_languages where language_code = 'fi'
+2004-05-07 12:02:06 LOG:  duration: 0.001043 sec
+2004-05-07 12:02:06 LOG:  query: select classname from supported_languages where language_id='1'
+2004-05-07 12:02:06 LOG:  duration: 0.000434 sec
+2004-05-07 12:02:06 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:02:06 LOG:  duration: 0.000621 sec
+2004-05-07 12:02:06 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:02:06 LOG:  duration: 0.000335 sec
+2004-05-07 12:02:06 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='187'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:02:06 LOG:  duration: 0.003843 sec
+2004-05-07 12:02:06 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='187'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:02:06 LOG:  duration: 0.003411 sec
+2004-05-07 12:02:06 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='187'
+2004-05-07 12:02:06 LOG:  duration: 0.000938 sec
+2004-05-07 12:02:06 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='187' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:02:06 LOG:  duration: 0.001714 sec
+2004-05-07 12:02:06 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='187' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:02:06 LOG:  duration: 0.001230 sec
+2004-05-07 12:02:06 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='187' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:02:06 LOG:  duration: 0.002345 sec
+2004-05-07 12:02:06 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='187'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:02:06 LOG:  duration: 0.002698 sec
+2004-05-07 12:02:06 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=187
+2004-05-07 12:02:06 LOG:  duration: 0.001180 sec
+2004-05-07 12:02:06 LOG:  query: SELECT * FROM project_group_list WHERE group_id='187' AND is_public=1
+2004-05-07 12:02:06 LOG:  duration: 0.001219 sec
+2004-05-07 12:02:06 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='187'
+	
+2004-05-07 12:02:06 LOG:  duration: 0.084050 sec
+2004-05-07 12:02:06 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='187' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:02:06 LOG:  duration: 0.002793 sec
+2004-05-07 12:02:26 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:02:26 LOG:  duration: 0.001089 sec
+2004-05-07 12:02:26 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:02:26 LOG:  duration: 0.002640 sec
+2004-05-07 12:02:26 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','187','IE','6.0','Win','1083945746','/forum/index.php','0');
+2004-05-07 12:02:26 LOG:  duration: 0.004196 sec
+2004-05-07 12:02:26 LOG:  query: select classname from supported_languages where language_code = 'fi'
+2004-05-07 12:02:26 LOG:  duration: 0.001789 sec
+2004-05-07 12:02:26 LOG:  query: select classname from supported_languages where language_id='1'
+2004-05-07 12:02:26 LOG:  duration: 0.000518 sec
+2004-05-07 12:02:26 LOG:  query: SELECT * FROM groups WHERE group_id='187'
+2004-05-07 12:02:26 LOG:  duration: 0.002461 sec
+2004-05-07 12:02:26 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:02:26 LOG:  duration: 0.000514 sec
+2004-05-07 12:02:26 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:02:26 LOG:  duration: 0.000395 sec
+2004-05-07 12:02:26 LOG:  query: SELECT *
+			FROM forum_group_list_vw
+			WHERE group_id='187' 
+			AND is_public =1 
+			ORDER BY group_forum_id;
+2004-05-07 12:02:26 LOG:  duration: 0.005504 sec
+2004-05-07 12:02:58 LOG:  query: INSERT INTO frs_dlstats_file (ip_address,file_id,month,day,user_id) 
+		VALUES ('80.145.51.97','610','200405','07','100')
+2004-05-07 12:02:58 LOG:  duration: 0.003491 sec
+2004-05-07 12:03:00 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:03:00 LOG:  duration: 0.000813 sec
+2004-05-07 12:03:00 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:03:00 LOG:  duration: 0.001889 sec
+2004-05-07 12:03:00 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Win','1083945780','/export/rss_sfnewreleases.php','0');
+2004-05-07 12:03:00 LOG:  duration: 0.003597 sec
+2004-05-07 12:03:00 LOG:  query: SELECT 
+					groups.group_id,
+					groups.group_name,
+					groups.unix_group_name,
+					groups.type,
+					news_bytes.forum_id,
+					news_bytes.summary,
+					news_bytes.date,
+					news_bytes.details 
+				FROM 
+					news_bytes,
+					groups 
+				WHERE 
+					news_bytes.group_id=groups.group_id 
+				ORDER BY 
+					date 
+				DESC LIMIT 30 OFFSET 0
+2004-05-07 12:03:00 ERROR:  No such attribute groups.type
+2004-05-07 12:04:02 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:04:02 LOG:  duration: 0.000811 sec
+2004-05-07 12:04:02 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:04:02 LOG:  duration: 0.001861 sec
+2004-05-07 12:04:02 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Win','1083945842','/export/rss_sfnews.php','0');
+2004-05-07 12:04:02 LOG:  duration: 0.002710 sec
+2004-05-07 12:04:02 LOG:  query: SELECT forum_id,summary,post_date,details,group_id FROM news_bytes  WHERE is_approved=1  order by post_date desc LIMIT 10 OFFSET 0
+2004-05-07 12:04:02 LOG:  duration: 0.003907 sec
+2004-05-07 12:05:58 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:05:58 LOG:  duration: 0.000783 sec
+2004-05-07 12:05:58 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:05:58 LOG:  duration: 0.001842 sec
+2004-05-07 12:05:58 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','5','IE','6.0','Win','1083945958','/tracker/index.php','0');
+2004-05-07 12:05:59 LOG:  duration: 0.195217 sec
+2004-05-07 12:05:59 LOG:  query: select classname from supported_languages where language_code = 'pt-br'
+2004-05-07 12:05:59 LOG:  duration: 0.001478 sec
+2004-05-07 12:05:59 LOG:  query: SELECT * FROM groups WHERE group_id='5'
+2004-05-07 12:05:59 LOG:  duration: 0.002342 sec
+2004-05-07 12:05:59 LOG:  query: SELECT * FROM artifact_group_list_vw
+			WHERE group_artifact_id='104' 
+			AND group_id='5'
+2004-05-07 12:05:59 LOG:  duration: 0.003557 sec
+2004-05-07 12:05:59 LOG:  query: SELECT * FROM artifact_vw 
+			WHERE artifact_id='101' AND group_artifact_id='104'
+2004-05-07 12:05:59 LOG:  duration: 0.031941 sec
+2004-05-07 12:05:59 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='PortugueseBrazilian'
+2004-05-07 12:05:59 LOG:  duration: 0.000575 sec
+2004-05-07 12:05:59 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='16'
+2004-05-07 12:05:59 LOG:  duration: 0.000388 sec
+2004-05-07 12:05:59 LOG:  query: SELECT * FROM artifact_group_list_vw
+			WHERE group_artifact_id='104' 
+			AND group_id='5'
+2004-05-07 12:05:59 LOG:  duration: 0.000859 sec
+2004-05-07 12:05:59 LOG:  query: select * FROM artifact_message_user_vw WHERE artifact_id='101' ORDER BY adddate DESC
+2004-05-07 12:05:59 LOG:  duration: 0.017499 sec
+2004-05-07 12:05:59 LOG:  query: select * FROM artifact_file_user_vw WHERE artifact_id='101'
+2004-05-07 12:05:59 LOG:  duration: 0.001834 sec
+2004-05-07 12:05:59 LOG:  query: SELECT * FROM artifact_history_user_vw WHERE artifact_id='101' ORDER BY entrydate DESC
+2004-05-07 12:05:59 LOG:  duration: 0.001184 sec
+2004-05-07 12:05:59 LOG:  query: select status_name from artifact_status WHERE id='1'
+2004-05-07 12:05:59 LOG:  duration: 0.000533 sec
+2004-05-07 12:05:59 LOG:  query: SELECT * FROM users WHERE user_id='100'
+2004-05-07 12:05:59 LOG:  duration: 0.001196 sec
+2004-05-07 12:06:00 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:06:00 LOG:  duration: 0.000806 sec
+2004-05-07 12:06:00 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:06:00 LOG:  duration: 0.001875 sec
+2004-05-07 12:06:00 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','5','OTHER','0','Other','1083945960','/docman/index.php','0');
+2004-05-07 12:06:00 LOG:  duration: 0.004098 sec
+2004-05-07 12:06:00 LOG:  query: SELECT * FROM groups WHERE group_id='5'
+2004-05-07 12:06:00 LOG:  duration: 0.002776 sec
+2004-05-07 12:06:00 LOG:  query: SELECT *
+			FROM docdata_vw
+			WHERE group_id='5' 
+			AND stateid=1 
+			
+			AND language_id='1'
+			ORDER BY doc_group
+2004-05-07 12:06:00 LOG:  duration: 0.006720 sec
+2004-05-07 12:06:00 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:06:00 LOG:  duration: 0.000656 sec
+2004-05-07 12:06:00 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:06:00 LOG:  duration: 0.000432 sec
+2004-05-07 12:06:00 LOG:  query: select dd.language_id, sl.name, count(*) as count
+		 from doc_groups as dg, doc_data as dd, supported_languages as sl
+		 where dg.doc_group = dd.doc_group
+		 and dg.group_id = '5'
+		 AND dd.stateid=1
+		 and sl.language_id = dd.language_id
+		 group by dd.language_id,sl.name
+2004-05-07 12:06:00 LOG:  duration: 0.002514 sec
+2004-05-07 12:06:15 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:06:15 LOG:  duration: 0.000781 sec
+2004-05-07 12:06:15 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:06:15 LOG:  duration: 0.001864 sec
+2004-05-07 12:06:15 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','5','OTHER','0','Other','1083945975','/scm/index.php','0');
+2004-05-07 12:06:15 LOG:  duration: 0.002618 sec
+2004-05-07 12:06:15 LOG:  query: SELECT * FROM groups WHERE group_id='5'
+2004-05-07 12:06:15 LOG:  duration: 0.002745 sec
+2004-05-07 12:06:15 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:06:15 LOG:  duration: 0.001033 sec
+2004-05-07 12:06:15 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:06:15 LOG:  duration: 0.000425 sec
+2004-05-07 12:06:15 LOG:  query: 
+	SELECT u.realname, sum(commits) as commits, sum(adds) as adds, sum(adds+commits) as combined
+	FROM stats_cvs_user s, users u
+	WHERE group_id='5' AND s.user_id=u.user_id AND (commits>0 OR adds >0)
+	GROUP BY group_id, realname
+	ORDER BY combined DESC, realname;
+
+2004-05-07 12:06:15 LOG:  duration: 0.003789 sec
+2004-05-07 12:06:30 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:06:30 LOG:  duration: 0.000811 sec
+2004-05-07 12:06:30 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:06:30 LOG:  duration: 0.001877 sec
+2004-05-07 12:06:30 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','5.0','Win','1083945990','/index.php','0');
+2004-05-07 12:06:30 LOG:  duration: 0.002975 sec
+2004-05-07 12:06:30 LOG:  query: select classname from supported_languages where language_code = 'ru'
+2004-05-07 12:06:30 LOG:  duration: 0.001529 sec
+2004-05-07 12:06:30 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='Russian'
+2004-05-07 12:06:30 LOG:  duration: 0.000621 sec
+2004-05-07 12:06:30 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='17'
+2004-05-07 12:06:30 LOG:  duration: 0.000427 sec
+2004-05-07 12:06:30 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.is_approved=1 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:06:30 LOG:  duration: 0.011743 sec
+2004-05-07 12:06:30 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1050'
+2004-05-07 12:06:30 LOG:  duration: 0.002415 sec
+2004-05-07 12:06:30 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1044'
+2004-05-07 12:06:30 LOG:  duration: 0.000693 sec
+2004-05-07 12:06:30 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1037'
+2004-05-07 12:06:30 LOG:  duration: 0.000642 sec
+2004-05-07 12:06:30 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1030'
+2004-05-07 12:06:30 LOG:  duration: 0.000649 sec
+2004-05-07 12:06:30 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1027'
+2004-05-07 12:06:30 LOG:  duration: 0.000675 sec
+2004-05-07 12:06:30 LOG:  query: SELECT count(*) AS count FROM groups WHERE status='A' AND is_public=1
+2004-05-07 12:06:30 LOG:  duration: 0.001715 sec
+2004-05-07 12:06:30 LOG:  query: SELECT count(*) AS count FROM users WHERE status='A' and user_id != 100
+2004-05-07 12:06:30 LOG:  duration: 0.075087 sec
+2004-05-07 12:06:30 LOG:  query: 
+		SELECT groups.group_id,
+		groups.group_name,
+		groups.unix_group_name,
+		frs_dlstats_grouptotal_vw.downloads
+		FROM frs_dlstats_grouptotal_vw,groups
+		WHERE
+		frs_dlstats_grouptotal_vw.group_id=groups.group_id AND groups.is_public='1' and groups.status='A'
+		ORDER BY downloads DESC
+	 LIMIT 10 OFFSET 0
+2004-05-07 12:06:30 LOG:  duration: 0.017685 sec
+2004-05-07 12:06:30 LOG:  query: SELECT groups.group_name,groups.unix_group_name,groups.group_id,project_weekly_metric.ranking,project_weekly_metric.percentile FROM groups,project_weekly_metric WHERE groups.group_id=project_weekly_metric.group_id AND groups.is_public=1 AND groups.type_id=1  AND groups.status != 'D'  ORDER BY ranking ASC LIMIT 10 OFFSET 0
+2004-05-07 12:06:30 LOG:  duration: 0.004203 sec
+2004-05-07 12:06:30 LOG:  query: SELECT group_id,unix_group_name,group_name,register_time FROM groups WHERE is_public=1 AND status='A' AND type_id=1 AND register_time > 0 ORDER BY register_time DESC LIMIT 10 OFFSET 0
+2004-05-07 12:06:30 LOG:  duration: 0.002582 sec
+2004-05-07 12:06:59 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:06:59 LOG:  duration: 0.001236 sec
+2004-05-07 12:06:59 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:06:59 LOG:  duration: 0.002584 sec
+2004-05-07 12:06:59 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','5.0','Mac','1083946019','/404.php','0');
+2004-05-07 12:06:59 LOG:  duration: 0.003658 sec
+2004-05-07 12:06:59 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:06:59 LOG:  duration: 0.001835 sec
+2004-05-07 12:06:59 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:06:59 LOG:  duration: 0.000363 sec
+2004-05-07 12:06:59 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:06:59 LOG:  duration: 0.000632 sec
+2004-05-07 12:06:59 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:06:59 LOG:  duration: 0.000411 sec
+2004-05-07 12:07:02 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:02 LOG:  duration: 0.000795 sec
+2004-05-07 12:07:02 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:02 LOG:  duration: 0.001891 sec
+2004-05-07 12:07:02 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083946022','/index.php','0');
+2004-05-07 12:07:02 LOG:  duration: 0.002765 sec
+2004-05-07 12:07:02 LOG:  query: select classname from supported_languages where language_code = 'pt-br'
+2004-05-07 12:07:02 LOG:  duration: 0.001469 sec
+2004-05-07 12:07:02 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='PortugueseBrazilian'
+2004-05-07 12:07:02 LOG:  duration: 0.000616 sec
+2004-05-07 12:07:02 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='16'
+2004-05-07 12:07:02 LOG:  duration: 0.000435 sec
+2004-05-07 12:07:02 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.is_approved=1 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:07:02 LOG:  duration: 0.012523 sec
+2004-05-07 12:07:02 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1050'
+2004-05-07 12:07:02 LOG:  duration: 0.002943 sec
+2004-05-07 12:07:02 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1044'
+2004-05-07 12:07:02 LOG:  duration: 0.000679 sec
+2004-05-07 12:07:02 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1037'
+2004-05-07 12:07:02 LOG:  duration: 0.000656 sec
+2004-05-07 12:07:02 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1030'
+2004-05-07 12:07:02 LOG:  duration: 0.000650 sec
+2004-05-07 12:07:02 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1027'
+2004-05-07 12:07:02 LOG:  duration: 0.000661 sec
+2004-05-07 12:07:02 LOG:  query: SELECT count(*) AS count FROM groups WHERE status='A' AND is_public=1
+2004-05-07 12:07:02 LOG:  duration: 0.001887 sec
+2004-05-07 12:07:02 LOG:  query: SELECT count(*) AS count FROM users WHERE status='A' and user_id != 100
+2004-05-07 12:07:02 LOG:  duration: 0.075363 sec
+2004-05-07 12:07:02 LOG:  query: 
+		SELECT groups.group_id,
+		groups.group_name,
+		groups.unix_group_name,
+		frs_dlstats_grouptotal_vw.downloads
+		FROM frs_dlstats_grouptotal_vw,groups
+		WHERE
+		frs_dlstats_grouptotal_vw.group_id=groups.group_id AND groups.is_public='1' and groups.status='A'
+		ORDER BY downloads DESC
+	 LIMIT 10 OFFSET 0
+2004-05-07 12:07:03 LOG:  duration: 0.017374 sec
+2004-05-07 12:07:03 LOG:  query: SELECT groups.group_name,groups.unix_group_name,groups.group_id,project_weekly_metric.ranking,project_weekly_metric.percentile FROM groups,project_weekly_metric WHERE groups.group_id=project_weekly_metric.group_id AND groups.is_public=1 AND groups.type_id=1  AND groups.status != 'D'  ORDER BY ranking ASC LIMIT 10 OFFSET 0
+2004-05-07 12:07:03 LOG:  duration: 0.004156 sec
+2004-05-07 12:07:03 LOG:  query: SELECT group_id,unix_group_name,group_name,register_time FROM groups WHERE is_public=1 AND status='A' AND type_id=1 AND register_time > 0 ORDER BY register_time DESC LIMIT 10 OFFSET 0
+2004-05-07 12:07:03 LOG:  duration: 0.002659 sec
+2004-05-07 12:07:04 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:04 LOG:  duration: 0.001224 sec
+2004-05-07 12:07:04 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:04 LOG:  duration: 0.002643 sec
+2004-05-07 12:07:04 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083946024','/index.php','0');
+2004-05-07 12:07:04 LOG:  duration: 0.006881 sec
+2004-05-07 12:07:04 LOG:  query: select classname from supported_languages where language_code = 'en-ca'
+2004-05-07 12:07:04 LOG:  duration: 0.001839 sec
+2004-05-07 12:07:04 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:07:04 LOG:  duration: 0.000365 sec
+2004-05-07 12:07:04 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:07:04 LOG:  duration: 0.000640 sec
+2004-05-07 12:07:04 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:07:04 LOG:  duration: 0.000426 sec
+2004-05-07 12:07:04 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.is_approved=1 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:07:04 LOG:  duration: 0.012372 sec
+2004-05-07 12:07:04 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1050'
+2004-05-07 12:07:04 LOG:  duration: 0.002892 sec
+2004-05-07 12:07:04 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1044'
+2004-05-07 12:07:04 LOG:  duration: 0.000689 sec
+2004-05-07 12:07:04 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1037'
+2004-05-07 12:07:04 LOG:  duration: 0.000656 sec
+2004-05-07 12:07:04 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1030'
+2004-05-07 12:07:04 LOG:  duration: 0.000673 sec
+2004-05-07 12:07:04 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1027'
+2004-05-07 12:07:04 LOG:  duration: 0.000651 sec
+2004-05-07 12:07:04 LOG:  query: SELECT count(*) AS count FROM groups WHERE status='A' AND is_public=1
+2004-05-07 12:07:04 LOG:  duration: 0.001788 sec
+2004-05-07 12:07:04 LOG:  query: SELECT count(*) AS count FROM users WHERE status='A' and user_id != 100
+2004-05-07 12:07:04 LOG:  duration: 0.074975 sec
+2004-05-07 12:07:04 LOG:  query: 
+		SELECT groups.group_id,
+		groups.group_name,
+		groups.unix_group_name,
+		frs_dlstats_grouptotal_vw.downloads
+		FROM frs_dlstats_grouptotal_vw,groups
+		WHERE
+		frs_dlstats_grouptotal_vw.group_id=groups.group_id AND groups.is_public='1' and groups.status='A'
+		ORDER BY downloads DESC
+	 LIMIT 10 OFFSET 0
+2004-05-07 12:07:04 LOG:  duration: 0.017538 sec
+2004-05-07 12:07:04 LOG:  query: SELECT groups.group_name,groups.unix_group_name,groups.group_id,project_weekly_metric.ranking,project_weekly_metric.percentile FROM groups,project_weekly_metric WHERE groups.group_id=project_weekly_metric.group_id AND groups.is_public=1 AND groups.type_id=1  AND groups.status != 'D'  ORDER BY ranking ASC LIMIT 10 OFFSET 0
+2004-05-07 12:07:04 LOG:  duration: 0.004117 sec
+2004-05-07 12:07:04 LOG:  query: SELECT group_id,unix_group_name,group_name,register_time FROM groups WHERE is_public=1 AND status='A' AND type_id=1 AND register_time > 0 ORDER BY register_time DESC LIMIT 10 OFFSET 0
+2004-05-07 12:07:04 LOG:  duration: 0.002514 sec
+2004-05-07 12:07:19 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:19 LOG:  duration: 0.001217 sec
+2004-05-07 12:07:19 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:19 LOG:  duration: 0.002619 sec
+2004-05-07 12:07:19 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','148','MOZILLA','5.0','Mac','1083946039','/scm/index.php','0');
+2004-05-07 12:07:19 LOG:  duration: 0.003555 sec
+2004-05-07 12:07:19 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:07:19 LOG:  duration: 0.001826 sec
+2004-05-07 12:07:19 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:07:19 LOG:  duration: 0.000363 sec
+2004-05-07 12:07:19 LOG:  query: SELECT * FROM groups WHERE group_id='148'
+2004-05-07 12:07:19 LOG:  duration: 0.002739 sec
+2004-05-07 12:07:19 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:07:19 LOG:  duration: 0.000520 sec
+2004-05-07 12:07:19 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:07:19 LOG:  duration: 0.000330 sec
+2004-05-07 12:07:19 LOG:  query: 
+	SELECT u.realname, sum(commits) as commits, sum(adds) as adds, sum(adds+commits) as combined
+	FROM stats_cvs_user s, users u
+	WHERE group_id='148' AND s.user_id=u.user_id AND (commits>0 OR adds >0)
+	GROUP BY group_id, realname
+	ORDER BY combined DESC, realname;
+
+2004-05-07 12:07:19 LOG:  duration: 0.004092 sec
+2004-05-07 12:07:20 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:20 LOG:  duration: 0.000809 sec
+2004-05-07 12:07:20 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:20 LOG:  duration: 0.001883 sec
+2004-05-07 12:07:20 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='lolita'
+			AND status IN ('A','H')
+		
+2004-05-07 12:07:20 LOG:  duration: 0.003091 sec
+2004-05-07 12:07:20 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083946040','/projects/lolita/','0');
+2004-05-07 12:07:20 LOG:  duration: 0.004082 sec
+2004-05-07 12:07:21 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:07:21 LOG:  duration: 0.001022 sec
+2004-05-07 12:07:21 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:07:21 LOG:  duration: 0.000343 sec
+2004-05-07 12:07:21 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:07:21 LOG:  duration: 0.000639 sec
+2004-05-07 12:07:21 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:07:21 LOG:  duration: 0.000396 sec
+2004-05-07 12:07:21 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='187'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:07:21 LOG:  duration: 0.003436 sec
+2004-05-07 12:07:21 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='187'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:07:21 LOG:  duration: 0.003441 sec
+2004-05-07 12:07:21 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='187'
+2004-05-07 12:07:21 LOG:  duration: 0.000942 sec
+2004-05-07 12:07:21 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='187' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:07:21 LOG:  duration: 0.001824 sec
+2004-05-07 12:07:21 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='187' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:07:21 LOG:  duration: 0.001267 sec
+2004-05-07 12:07:21 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='187' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:07:21 LOG:  duration: 0.002337 sec
+2004-05-07 12:07:21 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='187'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:07:21 LOG:  duration: 0.002730 sec
+2004-05-07 12:07:21 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=187
+2004-05-07 12:07:21 LOG:  duration: 0.001194 sec
+2004-05-07 12:07:21 LOG:  query: SELECT * FROM project_group_list WHERE group_id='187' AND is_public=1
+2004-05-07 12:07:21 LOG:  duration: 0.001181 sec
+2004-05-07 12:07:21 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='187'
+	
+2004-05-07 12:07:21 LOG:  duration: 0.084259 sec
+2004-05-07 12:07:21 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='187' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:07:21 LOG:  duration: 0.002738 sec
+2004-05-07 12:07:29 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:29 LOG:  duration: 0.001088 sec
+2004-05-07 12:07:29 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:29 LOG:  duration: 0.002610 sec
+2004-05-07 12:07:29 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='win32utils'
+			AND status IN ('A','H')
+		
+2004-05-07 12:07:29 LOG:  duration: 0.003421 sec
+2004-05-07 12:07:29 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083946049','/projects/win32utils/','0');
+2004-05-07 12:07:29 LOG:  duration: 0.003214 sec
+2004-05-07 12:07:29 LOG:  query: select classname from supported_languages where language_code = 'pt-br'
+2004-05-07 12:07:29 LOG:  duration: 0.001198 sec
+2004-05-07 12:07:29 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='PortugueseBrazilian'
+2004-05-07 12:07:29 LOG:  duration: 0.000642 sec
+2004-05-07 12:07:29 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='16'
+2004-05-07 12:07:29 LOG:  duration: 0.000397 sec
+2004-05-07 12:07:29 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='85'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:07:29 LOG:  duration: 0.003443 sec
+2004-05-07 12:07:29 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='85'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:07:29 LOG:  duration: 0.003824 sec
+2004-05-07 12:07:29 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='85'
+2004-05-07 12:07:29 LOG:  duration: 0.001135 sec
+2004-05-07 12:07:29 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='85' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:07:29 LOG:  duration: 0.001742 sec
+2004-05-07 12:07:29 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='85' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:07:29 LOG:  duration: 0.001530 sec
+2004-05-07 12:07:29 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='85' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:07:29 LOG:  duration: 0.003193 sec
+2004-05-07 12:07:29 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='85'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:07:29 LOG:  duration: 0.002802 sec
+2004-05-07 12:07:29 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=85
+2004-05-07 12:07:29 LOG:  duration: 0.001419 sec
+2004-05-07 12:07:29 LOG:  query: SELECT * FROM project_group_list WHERE group_id='85' AND is_public=1
+2004-05-07 12:07:29 LOG:  duration: 0.001234 sec
+2004-05-07 12:07:29 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='85'
+	
+2004-05-07 12:07:29 LOG:  duration: 0.083960 sec
+2004-05-07 12:07:29 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='85' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:07:29 LOG:  duration: 0.003712 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1044'
+2004-05-07 12:07:29 LOG:  duration: 0.003037 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1037'
+2004-05-07 12:07:29 LOG:  duration: 0.000737 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1030'
+2004-05-07 12:07:29 LOG:  duration: 0.000715 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1000'
+2004-05-07 12:07:29 LOG:  duration: 0.000714 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='787'
+2004-05-07 12:07:29 LOG:  duration: 0.000777 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='773'
+2004-05-07 12:07:29 LOG:  duration: 0.000760 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='736'
+2004-05-07 12:07:29 LOG:  duration: 0.000774 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='720'
+2004-05-07 12:07:29 LOG:  duration: 0.000712 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='719'
+2004-05-07 12:07:29 LOG:  duration: 0.000712 sec
+2004-05-07 12:07:29 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='707'
+2004-05-07 12:07:29 LOG:  duration: 0.000718 sec
+2004-05-07 12:07:31 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:31 LOG:  duration: 0.001124 sec
+2004-05-07 12:07:31 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:31 LOG:  duration: 0.002746 sec
+2004-05-07 12:07:31 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='ooo4r'
+			AND status IN ('A','H')
+		
+2004-05-07 12:07:31 LOG:  duration: 0.003470 sec
+2004-05-07 12:07:31 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','5.0','Linux','1083946051','/projects/ooo4r','0');
+2004-05-07 12:07:31 LOG:  duration: 0.005250 sec
+2004-05-07 12:07:31 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:07:31 LOG:  duration: 0.001153 sec
+2004-05-07 12:07:31 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:07:31 LOG:  duration: 0.000357 sec
+2004-05-07 12:07:31 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:07:31 LOG:  duration: 0.000643 sec
+2004-05-07 12:07:31 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:07:31 LOG:  duration: 0.000396 sec
+2004-05-07 12:07:31 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='136'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:07:31 LOG:  duration: 0.003595 sec
+2004-05-07 12:07:31 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='136'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:07:31 LOG:  duration: 0.003542 sec
+2004-05-07 12:07:31 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='136'
+2004-05-07 12:07:31 LOG:  duration: 0.001178 sec
+2004-05-07 12:07:31 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='136' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:07:31 LOG:  duration: 0.001708 sec
+2004-05-07 12:07:31 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='136' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:07:31 LOG:  duration: 0.001409 sec
+2004-05-07 12:07:31 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='136' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:07:31 LOG:  duration: 0.002581 sec
+2004-05-07 12:07:31 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='136'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:07:31 LOG:  duration: 0.002700 sec
+2004-05-07 12:07:31 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=136
+2004-05-07 12:07:31 LOG:  duration: 0.001232 sec
+2004-05-07 12:07:31 LOG:  query: SELECT * FROM project_group_list WHERE group_id='136' AND is_public=1
+2004-05-07 12:07:31 LOG:  duration: 0.001221 sec
+2004-05-07 12:07:31 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='136'
+	
+2004-05-07 12:07:31 LOG:  duration: 0.091399 sec
+2004-05-07 12:07:31 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='136' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:07:31 LOG:  duration: 0.003055 sec
+2004-05-07 12:07:31 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='609'
+2004-05-07 12:07:31 LOG:  duration: 0.003029 sec
+2004-05-07 12:07:31 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='604'
+2004-05-07 12:07:31 LOG:  duration: 0.000739 sec
+2004-05-07 12:07:31 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='601'
+2004-05-07 12:07:31 LOG:  duration: 0.000715 sec
+2004-05-07 12:07:31 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='567'
+2004-05-07 12:07:31 LOG:  duration: 0.000718 sec
+2004-05-07 12:07:31 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:31 LOG:  duration: 0.001016 sec
+2004-05-07 12:07:31 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:31 LOG:  duration: 0.002596 sec
+2004-05-07 12:07:31 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','5.0','Linux','1083946051','/404.php','0');
+2004-05-07 12:07:31 LOG:  duration: 0.005207 sec
+2004-05-07 12:07:31 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:07:31 LOG:  duration: 0.001738 sec
+2004-05-07 12:07:31 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:07:31 LOG:  duration: 0.000428 sec
+2004-05-07 12:07:31 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:07:31 LOG:  duration: 0.000650 sec
+2004-05-07 12:07:31 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:07:31 LOG:  duration: 0.000425 sec
+2004-05-07 12:07:38 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:38 LOG:  duration: 0.000794 sec
+2004-05-07 12:07:38 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:38 LOG:  duration: 0.001891 sec
+2004-05-07 12:07:38 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','5.0','Mac','1083946058','/snippet/index.php','0');
+2004-05-07 12:07:38 LOG:  duration: 0.003196 sec
+2004-05-07 12:07:38 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:07:38 LOG:  duration: 0.001511 sec
+2004-05-07 12:07:38 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:07:38 LOG:  duration: 0.000370 sec
+2004-05-07 12:07:38 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:07:38 LOG:  duration: 0.000603 sec
+2004-05-07 12:07:38 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:07:38 LOG:  duration: 0.000439 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=1
+2004-05-07 12:07:38 LOG:  duration: 0.001729 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=2
+2004-05-07 12:07:38 LOG:  duration: 0.000402 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=3
+2004-05-07 12:07:38 LOG:  duration: 0.000363 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=4
+2004-05-07 12:07:38 LOG:  duration: 0.000348 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=5
+2004-05-07 12:07:38 LOG:  duration: 0.000347 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=6
+2004-05-07 12:07:38 LOG:  duration: 0.000360 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=7
+2004-05-07 12:07:38 LOG:  duration: 0.000345 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=8
+2004-05-07 12:07:38 LOG:  duration: 0.000343 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=9
+2004-05-07 12:07:38 LOG:  duration: 0.000347 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=10
+2004-05-07 12:07:38 LOG:  duration: 0.000354 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=11
+2004-05-07 12:07:38 LOG:  duration: 0.000347 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=12
+2004-05-07 12:07:38 LOG:  duration: 0.000347 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=13
+2004-05-07 12:07:38 LOG:  duration: 0.000361 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=14
+2004-05-07 12:07:38 LOG:  duration: 0.000350 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=15
+2004-05-07 12:07:38 LOG:  duration: 0.000351 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=16
+2004-05-07 12:07:38 LOG:  duration: 0.000343 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE language=17
+2004-05-07 12:07:38 LOG:  duration: 0.000364 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=1
+2004-05-07 12:07:38 LOG:  duration: 0.000404 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=2
+2004-05-07 12:07:38 LOG:  duration: 0.000353 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=3
+2004-05-07 12:07:38 LOG:  duration: 0.000373 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=4
+2004-05-07 12:07:38 LOG:  duration: 0.000394 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=5
+2004-05-07 12:07:38 LOG:  duration: 0.000349 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=6
+2004-05-07 12:07:38 LOG:  duration: 0.000366 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=7
+2004-05-07 12:07:38 LOG:  duration: 0.000792 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=8
+2004-05-07 12:07:38 LOG:  duration: 0.000361 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=9
+2004-05-07 12:07:38 LOG:  duration: 0.000365 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=10
+2004-05-07 12:07:38 LOG:  duration: 0.000351 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=11
+2004-05-07 12:07:38 LOG:  duration: 0.000345 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=12
+2004-05-07 12:07:38 LOG:  duration: 0.000378 sec
+2004-05-07 12:07:38 LOG:  query: SELECT count(*) FROM snippet WHERE category=13
+2004-05-07 12:07:38 LOG:  duration: 0.000351 sec
+2004-05-07 12:07:45 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:45 LOG:  duration: 0.000792 sec
+2004-05-07 12:07:45 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:07:45 LOG:  duration: 0.001907 sec
+2004-05-07 12:07:45 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','136','MOZILLA','5.0','Linux','1083946065','/frs/index.php','0');
+2004-05-07 12:07:45 LOG:  duration: 0.002784 sec
+2004-05-07 12:07:45 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:07:45 LOG:  duration: 0.001516 sec
+2004-05-07 12:07:45 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:07:45 LOG:  duration: 0.000363 sec
+2004-05-07 12:07:45 LOG:  query: SELECT *
+	FROM frs_package 
+	WHERE group_id='136' AND status_id='1' 
+	ORDER BY name
+2004-05-07 12:07:45 LOG:  duration: 0.002192 sec
+2004-05-07 12:07:45 LOG:  query: SELECT * FROM groups WHERE group_id='136'
+2004-05-07 12:07:45 LOG:  duration: 0.002162 sec
+2004-05-07 12:07:45 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:07:45 LOG:  duration: 0.000531 sec
+2004-05-07 12:07:45 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:07:45 LOG:  duration: 0.000333 sec
+2004-05-07 12:07:45 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='145'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:07:45 LOG:  duration: 0.001748 sec
+2004-05-07 12:07:45 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='232' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:07:45 LOG:  duration: 0.004231 sec
+2004-05-07 12:07:45 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='227' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:07:45 LOG:  duration: 0.001920 sec
+2004-05-07 12:07:52 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:07:52 LOG:  duration: 0.000786 sec
+2004-05-07 12:07:52 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='274'
+2004-05-07 12:07:52 LOG:  duration: 0.005764 sec
+2004-05-07 12:07:52 LOG:  query: SELECT * FROM groups WHERE group_id='136'
+2004-05-07 12:07:52 LOG:  duration: 0.001095 sec
+2004-05-07 12:07:52 LOG:  query: INSERT INTO frs_dlstats_file (ip_address,file_id,month,day,user_id) 
+		VALUES ('148.235.155.225','274','200405','07','100')
+2004-05-07 12:07:52 LOG:  duration: 0.004247 sec
+2004-05-07 12:08:00 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:08:00 LOG:  duration: 0.000799 sec
+2004-05-07 12:08:00 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='274'
+2004-05-07 12:08:00 LOG:  duration: 0.005490 sec
+2004-05-07 12:08:00 LOG:  query: SELECT * FROM groups WHERE group_id='136'
+2004-05-07 12:08:00 LOG:  duration: 0.001098 sec
+2004-05-07 12:08:06 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:08:06 LOG:  duration: 0.000813 sec
+2004-05-07 12:08:06 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='274'
+2004-05-07 12:08:06 LOG:  duration: 0.005488 sec
+2004-05-07 12:08:06 LOG:  query: SELECT * FROM groups WHERE group_id='136'
+2004-05-07 12:08:06 LOG:  duration: 0.001080 sec
+2004-05-07 12:08:07 LOG:  query: INSERT INTO frs_dlstats_file (ip_address,file_id,month,day,user_id) 
+		VALUES ('148.235.155.225','274','200405','07','100')
+2004-05-07 12:08:07 LOG:  duration: 0.003720 sec
+2004-05-07 12:08:20 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:08:20 LOG:  duration: 0.000797 sec
+2004-05-07 12:08:20 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:08:20 LOG:  duration: 0.001887 sec
+2004-05-07 12:08:20 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='extensions'
+			AND status IN ('A','H')
+		
+2004-05-07 12:08:20 LOG:  duration: 0.003219 sec
+2004-05-07 12:08:20 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083946100','/projects/extensions/','0');
+2004-05-07 12:08:20 LOG:  duration: 0.002794 sec
+2004-05-07 12:08:20 LOG:  query: select classname from supported_languages where language_code = 'ru'
+2004-05-07 12:08:20 LOG:  duration: 0.001044 sec
+2004-05-07 12:08:20 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='Russian'
+2004-05-07 12:08:20 LOG:  duration: 0.000616 sec
+2004-05-07 12:08:20 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='17'
+2004-05-07 12:08:20 LOG:  duration: 0.000415 sec
+2004-05-07 12:08:20 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='89'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:08:20 LOG:  duration: 0.003650 sec
+2004-05-07 12:08:20 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='89'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:08:20 LOG:  duration: 0.003394 sec
+2004-05-07 12:08:20 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='89'
+2004-05-07 12:08:20 LOG:  duration: 0.001026 sec
+2004-05-07 12:08:20 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='89' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:08:20 LOG:  duration: 0.001639 sec
+2004-05-07 12:08:20 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='89' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:08:20 LOG:  duration: 0.001036 sec
+2004-05-07 12:08:20 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='89' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:08:20 LOG:  duration: 0.002356 sec
+2004-05-07 12:08:20 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='89'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:08:20 LOG:  duration: 0.002701 sec
+2004-05-07 12:08:20 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=89
+2004-05-07 12:08:20 LOG:  duration: 0.001178 sec
+2004-05-07 12:08:20 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='89'
+	
+2004-05-07 12:08:20 LOG:  duration: 0.091966 sec
+2004-05-07 12:08:20 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='89' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:08:20 LOG:  duration: 0.003105 sec
+2004-05-07 12:08:20 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='663'
+2004-05-07 12:08:20 LOG:  duration: 0.003000 sec
+2004-05-07 12:08:20 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='384'
+2004-05-07 12:08:20 LOG:  duration: 0.000843 sec
+2004-05-07 12:08:20 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='383'
+2004-05-07 12:08:20 LOG:  duration: 0.000718 sec
+2004-05-07 12:08:20 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='382'
+2004-05-07 12:08:20 LOG:  duration: 0.000692 sec
+2004-05-07 12:08:24 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:08:24 LOG:  duration: 0.001027 sec
+2004-05-07 12:08:24 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:08:24 LOG:  duration: 0.002599 sec
+2004-05-07 12:08:24 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='korundum'
+			AND status IN ('A','H')
+		
+2004-05-07 12:08:24 LOG:  duration: 0.003469 sec
+2004-05-07 12:08:24 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Linux','1083946104','/projects/korundum/','0');
+2004-05-07 12:08:24 LOG:  duration: 0.003821 sec
+2004-05-07 12:08:24 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:08:24 LOG:  duration: 0.001281 sec
+2004-05-07 12:08:24 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:08:24 LOG:  duration: 0.000461 sec
+2004-05-07 12:08:24 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='181'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:08:24 LOG:  duration: 0.003569 sec
+2004-05-07 12:08:24 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='181'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:08:24 LOG:  duration: 0.003523 sec
+2004-05-07 12:08:24 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='181'
+2004-05-07 12:08:24 LOG:  duration: 0.001125 sec
+2004-05-07 12:08:24 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='181' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:08:24 LOG:  duration: 0.001749 sec
+2004-05-07 12:08:24 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='181' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:08:24 LOG:  duration: 0.001393 sec
+2004-05-07 12:08:24 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='181' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:08:24 LOG:  duration: 0.002462 sec
+2004-05-07 12:08:24 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=181
+2004-05-07 12:08:24 LOG:  duration: 0.001173 sec
+2004-05-07 12:08:24 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='181' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:08:24 LOG:  duration: 0.002586 sec
+2004-05-07 12:08:26 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:08:26 LOG:  duration: 0.000790 sec
+2004-05-07 12:08:26 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:08:26 LOG:  duration: 0.001893 sec
+2004-05-07 12:08:26 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Linux','1083946106','/404.php','0');
+2004-05-07 12:08:26 LOG:  duration: 0.004623 sec
+2004-05-07 12:08:26 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:08:26 LOG:  duration: 0.001558 sec
+2004-05-07 12:08:26 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:08:26 LOG:  duration: 0.000530 sec
+2004-05-07 12:08:53 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:08:53 LOG:  duration: 0.000855 sec
+2004-05-07 12:08:53 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:08:53 LOG:  duration: 0.002403 sec
+2004-05-07 12:08:53 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='simplemail'
+			AND status IN ('A','H')
+		
+2004-05-07 12:08:53 LOG:  duration: 0.003185 sec
+2004-05-07 12:08:53 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083946133','/projects/simplemail/','0');
+2004-05-07 12:08:53 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:08:53 LOG:  duration: 0.000898 sec
+2004-05-07 12:08:53 LOG:  query: BEGIN; SELECT usesuper FROM pg_catalog.pg_user WHERE usename = 'gforge'; COMMIT
+2004-05-07 12:08:53 LOG:  duration: 0.028393 sec
+2004-05-07 12:08:53 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:08:53 LOG:  duration: 0.001103 sec
+2004-05-07 12:08:53 LOG:  duration: 0.039607 sec
+2004-05-07 12:08:53 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:08:53 LOG:  duration: 0.000592 sec
+2004-05-07 12:08:53 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='70'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:08:53 LOG:  duration: 0.003085 sec
+2004-05-07 12:08:53 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='70'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:08:53 LOG:  duration: 0.002993 sec
+2004-05-07 12:08:53 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='70'
+2004-05-07 12:08:53 LOG:  duration: 0.000927 sec
+2004-05-07 12:08:53 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='70' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:08:53 LOG:  duration: 0.001564 sec
+2004-05-07 12:08:53 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='70' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:08:53 LOG:  duration: 0.001051 sec
+2004-05-07 12:08:53 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='70' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:08:53 LOG:  duration: 0.002329 sec
+2004-05-07 12:08:53 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='70'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:08:53 LOG:  duration: 0.002809 sec
+2004-05-07 12:08:53 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=70
+2004-05-07 12:08:53 LOG:  duration: 0.001019 sec
+2004-05-07 12:08:53 LOG:  query: SELECT * FROM project_group_list WHERE group_id='70' AND is_public=1
+2004-05-07 12:08:53 LOG:  duration: 0.001224 sec
+2004-05-07 12:08:53 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='70'
+	
+2004-05-07 12:08:53 LOG:  duration: 0.084562 sec
+2004-05-07 12:08:53 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='70' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:08:53 LOG:  duration: 0.002980 sec
+2004-05-07 12:08:53 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='512'
+2004-05-07 12:08:53 LOG:  duration: 0.003011 sec
+2004-05-07 12:08:54 LOG:  query: SELECT relname FROM pg_catalog.pg_class WHERE (relkind='r' or relkind='v') and substr(relname,1,5)='grpou' and pg_catalog.pg_table_is_visible(oid)
+2004-05-07 12:08:54 LOG:  duration: 0.002892 sec
+2004-05-07 12:08:55 LOG:  query: SELECT relname FROM pg_catalog.pg_class WHERE (relkind='r' or relkind='v') and substr(relname,1,3)='grr' and pg_catalog.pg_table_is_visible(oid)
+2004-05-07 12:08:55 LOG:  duration: 0.001469 sec
+2004-05-07 12:08:56 LOG:  query: SELECT relname FROM pg_catalog.pg_class WHERE (relkind='r' or relkind='v') and substr(relname,1,2)='gr' and pg_catalog.pg_table_is_visible(oid)
+2004-05-07 12:08:56 LOG:  duration: 0.001775 sec
+2004-05-07 12:08:57 LOG:  query: SELECT c.oid,
+  n.nspname,
+  c.relname
+FROM pg_catalog.pg_class c
+     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+WHERE pg_catalog.pg_table_is_visible(c.oid)
+      AND c.relname ~ '^group$'
+ORDER BY 2, 3;
+2004-05-07 12:08:57 LOG:  duration: 0.053801 sec
+2004-05-07 12:08:59 LOG:  query: SELECT c.oid,
+  n.nspname,
+  c.relname
+FROM pg_catalog.pg_class c
+     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+WHERE pg_catalog.pg_table_is_visible(c.oid)
+      AND c.relname ~ '^groups$'
+ORDER BY 2, 3;
+2004-05-07 12:08:59 LOG:  duration: 0.004144 sec
+2004-05-07 12:08:59 LOG:  query: SELECT relhasindex, relkind, relchecks, reltriggers, relhasrules
+FROM pg_catalog.pg_class WHERE oid = '20275'
+2004-05-07 12:08:59 LOG:  duration: 0.000935 sec
+2004-05-07 12:08:59 LOG:  query: SELECT a.attname,
+  pg_catalog.format_type(a.atttypid, a.atttypmod),
+  a.attnotnull, a.atthasdef, a.attnum
+FROM pg_catalog.pg_attribute a
+WHERE a.attrelid = '20275' AND a.attnum > 0 AND NOT a.attisdropped
+ORDER BY a.attnum
+2004-05-07 12:08:59 LOG:  duration: 0.002435 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 1
+2004-05-07 12:08:59 LOG:  duration: 0.001720 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 4
+2004-05-07 12:08:59 LOG:  duration: 0.000794 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 5
+2004-05-07 12:08:59 LOG:  duration: 0.000784 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 6
+2004-05-07 12:08:59 LOG:  duration: 0.000760 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 7
+2004-05-07 12:08:59 LOG:  duration: 0.000706 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 10
+2004-05-07 12:08:59 LOG:  duration: 0.000748 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 14
+2004-05-07 12:08:59 LOG:  duration: 0.000751 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 17
+2004-05-07 12:08:59 LOG:  duration: 0.000770 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 18
+2004-05-07 12:08:59 LOG:  duration: 0.000755 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 20
+2004-05-07 12:08:59 LOG:  duration: 0.000766 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 21
+2004-05-07 12:08:59 LOG:  duration: 0.000744 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 22
+2004-05-07 12:08:59 LOG:  duration: 0.000748 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 23
+2004-05-07 12:08:59 LOG:  duration: 0.000749 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 28
+2004-05-07 12:08:59 LOG:  duration: 0.000744 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 29
+2004-05-07 12:08:59 LOG:  duration: 0.000768 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 33
+2004-05-07 12:08:59 LOG:  duration: 0.000743 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 34
+2004-05-07 12:08:59 LOG:  duration: 0.000806 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 36
+2004-05-07 12:08:59 LOG:  duration: 0.000749 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 40
+2004-05-07 12:08:59 LOG:  duration: 0.000772 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 41
+2004-05-07 12:08:59 LOG:  duration: 0.000721 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 42
+2004-05-07 12:08:59 LOG:  duration: 0.000724 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 43
+2004-05-07 12:08:59 LOG:  duration: 0.000739 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 44
+2004-05-07 12:08:59 LOG:  duration: 0.000775 sec
+2004-05-07 12:08:59 LOG:  query: SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+WHERE d.adrelid = '20275' AND d.adnum = 45
+2004-05-07 12:08:59 LOG:  duration: 0.000750 sec
+2004-05-07 12:08:59 LOG:  query: SELECT c2.relname, i.indisprimary, i.indisunique, pg_catalog.pg_get_indexdef(i.indexrelid)
+FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index i
+WHERE c.oid = '20275' AND c.oid = i.indrelid AND i.indexrelid = c2.oid
+ORDER BY i.indisprimary DESC, i.indisunique DESC, c2.relname
+2004-05-07 12:08:59 LOG:  duration: 0.002278 sec
+2004-05-07 12:08:59 LOG:  query: SELECT t.tgname
+FROM pg_catalog.pg_trigger t
+WHERE t.tgrelid = '20275' and (not tgisconstraint  OR NOT EXISTS  (SELECT 1 FROM pg_catalog.pg_depend d    JOIN pg_catalog.pg_constraint c ON (d.refclassid = c.tableoid AND d.refobjid = c.oid)    WHERE d.classid = t.tableoid AND d.objid = t.oid AND d.deptype = 'i' AND c.contype = 'f'))
+2004-05-07 12:08:59 LOG:  duration: 0.030052 sec
+2004-05-07 12:08:59 LOG:  query: SELECT conname,
+  pg_catalog.pg_get_constraintdef(oid) as condef
+FROM pg_catalog.pg_constraint r
+WHERE r.conrelid = '20275' AND r.contype = 'f'
+2004-05-07 12:08:59 LOG:  duration: 0.000956 sec
+2004-05-07 12:09:05 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:09:05 LOG:  duration: 0.000932 sec
+2004-05-07 12:09:05 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:09:05 LOG:  duration: 0.002286 sec
+2004-05-07 12:09:05 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','85','IE','6.0','Win','1083946145','/frs/index.php','0');
+2004-05-07 12:09:05 LOG:  duration: 0.003796 sec
+2004-05-07 12:09:05 LOG:  query: select classname from supported_languages where language_code = 'pt-br'
+2004-05-07 12:09:05 LOG:  duration: 0.001711 sec
+2004-05-07 12:09:05 LOG:  query: SELECT *
+	FROM frs_package 
+	WHERE group_id='85' AND status_id='1' 
+	ORDER BY name
+2004-05-07 12:09:05 LOG:  duration: 0.002091 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM groups WHERE group_id='85'
+2004-05-07 12:09:05 LOG:  duration: 0.002133 sec
+2004-05-07 12:09:05 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='PortugueseBrazilian'
+2004-05-07 12:09:05 LOG:  duration: 0.000520 sec
+2004-05-07 12:09:05 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='16'
+2004-05-07 12:09:05 LOG:  duration: 0.000357 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='134'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.001658 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='177' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.004038 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='117'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000778 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='335' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002271 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='172'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000712 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='457' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002623 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='269' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002060 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='113'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000747 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='319' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002116 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='279' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002021 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='122'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000703 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='157' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.001741 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='266'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000652 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='456' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002535 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='211'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000719 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='344' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002187 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='337' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002152 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='85'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000679 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='464' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002568 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='138'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000650 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='294' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002036 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='195'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000652 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='327' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002140 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='109'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000716 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='343' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002186 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='289' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002057 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='190'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000637 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='295' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002044 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='259'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000708 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='429' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002456 sec
+2004-05-07 12:09:05 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='268'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:09:05 LOG:  duration: 0.000651 sec
+2004-05-07 12:09:05 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='462' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:09:05 LOG:  duration: 0.002571 sec
+2004-05-07 12:09:40 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:09:40 LOG:  duration: 0.000785 sec
+2004-05-07 12:09:40 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:09:40 LOG:  duration: 0.001868 sec
+2004-05-07 12:09:40 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','5','OTHER','0','Other','1083946180','/forum/index.php','0');
+2004-05-07 12:09:40 LOG:  duration: 0.002414 sec
+2004-05-07 12:09:40 LOG:  query: SELECT * FROM groups WHERE group_id='5'
+2004-05-07 12:09:40 LOG:  duration: 0.002861 sec
+2004-05-07 12:09:40 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:09:40 LOG:  duration: 0.001031 sec
+2004-05-07 12:09:40 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:09:40 LOG:  duration: 0.000415 sec
+2004-05-07 12:09:40 LOG:  query: SELECT *
+			FROM forum_group_list_vw
+			WHERE group_id='5' 
+			AND is_public =1 
+			ORDER BY group_forum_id;
+2004-05-07 12:09:40 LOG:  duration: 0.045931 sec
+2004-05-07 12:10:00 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:00 LOG:  duration: 0.000802 sec
+2004-05-07 12:10:00 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:10:00 LOG:  duration: 0.001884 sec
+2004-05-07 12:10:00 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='ripper'
+			AND status IN ('A','H')
+		
+2004-05-07 12:10:00 LOG:  duration: 0.003094 sec
+2004-05-07 12:10:00 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','2.0','Other','1083946200','/projects/ripper','0');
+2004-05-07 12:10:00 LOG:  duration: 0.002670 sec
+2004-05-07 12:10:00 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:10:00 LOG:  duration: 0.001082 sec
+2004-05-07 12:10:00 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:10:00 LOG:  duration: 0.000481 sec
+2004-05-07 12:10:00 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='145'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:10:00 LOG:  duration: 0.003712 sec
+2004-05-07 12:10:00 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='145'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:10:00 LOG:  duration: 0.003270 sec
+2004-05-07 12:10:00 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='145'
+2004-05-07 12:10:00 LOG:  duration: 0.001060 sec
+2004-05-07 12:10:00 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='145' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:10:00 LOG:  duration: 0.001684 sec
+2004-05-07 12:10:00 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='145' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:10:00 LOG:  duration: 0.001286 sec
+2004-05-07 12:10:00 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='145' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:10:00 LOG:  duration: 0.002247 sec
+2004-05-07 12:10:00 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='145'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:10:00 LOG:  duration: 0.002633 sec
+2004-05-07 12:10:00 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=145
+2004-05-07 12:10:00 LOG:  duration: 0.001152 sec
+2004-05-07 12:10:00 LOG:  query: SELECT * FROM project_group_list WHERE group_id='145' AND is_public=1
+2004-05-07 12:10:00 LOG:  duration: 0.001202 sec
+2004-05-07 12:10:00 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='145'
+	
+2004-05-07 12:10:00 LOG:  duration: 0.093956 sec
+2004-05-07 12:10:00 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='145' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:10:00 LOG:  duration: 0.002689 sec
+2004-05-07 12:10:01 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:01 LOG:  duration: 0.001085 sec
+2004-05-07 12:10:01 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='618'
+2004-05-07 12:10:01 LOG:  duration: 0.006769 sec
+2004-05-07 12:10:01 LOG:  query: SELECT * FROM groups WHERE group_id='85'
+2004-05-07 12:10:01 LOG:  duration: 0.001098 sec
+2004-05-07 12:10:03 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:03 LOG:  duration: 0.000805 sec
+2004-05-07 12:10:03 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='618'
+2004-05-07 12:10:03 LOG:  duration: 0.005442 sec
+2004-05-07 12:10:03 LOG:  query: SELECT * FROM groups WHERE group_id='85'
+2004-05-07 12:10:03 LOG:  duration: 0.001100 sec
+2004-05-07 12:10:03 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:03 LOG:  duration: 0.000785 sec
+2004-05-07 12:10:03 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='618'
+2004-05-07 12:10:03 LOG:  duration: 0.005529 sec
+2004-05-07 12:10:03 LOG:  query: SELECT * FROM groups WHERE group_id='85'
+2004-05-07 12:10:03 LOG:  duration: 0.001086 sec
+2004-05-07 12:10:04 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:04 LOG:  duration: 0.000815 sec
+2004-05-07 12:10:04 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:10:04 LOG:  duration: 0.002201 sec
+2004-05-07 12:10:04 LOG:  query: 
+			SELECT *
+			FROM groups
+			WHERE unix_group_name='winjobscheduler'
+			AND status IN ('A','H')
+		
+2004-05-07 12:10:04 LOG:  duration: 0.003206 sec
+2004-05-07 12:10:04 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','IE','6.0','Win','1083946204','/projects/winjobscheduler/','0');
+2004-05-07 12:10:04 LOG:  duration: 0.153676 sec
+2004-05-07 12:10:04 LOG:  query: select classname from supported_languages where language_code = 'en-gb'
+2004-05-07 12:10:04 LOG:  duration: 0.001147 sec
+2004-05-07 12:10:04 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:10:04 LOG:  duration: 0.000358 sec
+2004-05-07 12:10:04 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:10:04 LOG:  duration: 0.000621 sec
+2004-05-07 12:10:04 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:10:04 LOG:  duration: 0.000393 sec
+2004-05-07 12:10:04 LOG:  query: SELECT users.user_id,users.user_name,users.realname
+	FROM users,user_group
+	WHERE user_group.user_id=users.user_id
+	AND user_group.group_id='96'
+	AND user_group.admin_flags = 'A'
+	AND users.status='A'
+2004-05-07 12:10:04 LOG:  duration: 0.003554 sec
+2004-05-07 12:10:04 LOG:  query: 
+		SELECT trove_cat.fullpath AS fullpath,
+			trove_cat.fullpath_ids AS fullpath_ids,
+			trove_cat.trove_cat_id AS trove_cat_id
+		FROM trove_cat,trove_group_link
+		WHERE trove_cat.trove_cat_id=trove_group_link.trove_cat_id
+		AND trove_group_link.group_id='96'
+		ORDER BY trove_cat.fullpath
+2004-05-07 12:10:04 LOG:  duration: 0.003642 sec
+2004-05-07 12:10:04 LOG:  query: SELECT percentile FROM project_weekly_metric WHERE group_id='96'
+2004-05-07 12:10:04 LOG:  duration: 0.001206 sec
+2004-05-07 12:10:04 LOG:  query: SELECT name 
+					FROM people_job,people_job_category 
+					WHERE people_job.category_id=people_job_category.category_id 
+					AND people_job.status_id=1 
+					AND group_id='96' 
+					GROUP BY name LIMIT 2 OFFSET 0
+2004-05-07 12:10:04 LOG:  duration: 0.001759 sec
+2004-05-07 12:10:04 LOG:  query: select count(users.user_id) from user_group, users where user_group.group_id='96' and users.user_id=user_group.user_id and users.status='A'
+2004-05-07 12:10:04 LOG:  duration: 0.001379 sec
+2004-05-07 12:10:04 LOG:  query: SELECT frs_package.package_id,frs_package.name AS package_name,frs_release.name AS release_name,frs_release.release_id AS release_id,frs_release.release_date AS release_date FROM frs_package,frs_release WHERE frs_package.package_id=frs_release.package_id AND frs_package.group_id='96' AND frs_release.status_id=1 ORDER BY frs_package.package_id,frs_release.release_date DESC
+2004-05-07 12:10:04 LOG:  duration: 0.002394 sec
+2004-05-07 12:10:04 LOG:  query: SELECT agl.*,aca.count,aca.open_count
+	FROM artifact_group_list agl
+	LEFT JOIN artifact_counts_agg aca USING (group_artifact_id)
+	WHERE agl.group_id='96'
+	AND agl.is_public=1
+	ORDER BY group_artifact_id ASC
+2004-05-07 12:10:04 LOG:  duration: 0.002759 sec
+2004-05-07 12:10:04 LOG:  query: SELECT type, count FROM project_sums_agg WHERE group_id=96
+2004-05-07 12:10:04 LOG:  duration: 0.001197 sec
+2004-05-07 12:10:04 LOG:  query: SELECT * FROM project_group_list WHERE group_id='96' AND is_public=1
+2004-05-07 12:10:04 LOG:  duration: 0.001213 sec
+2004-05-07 12:10:04 LOG:  query: 
+		SELECT sum(commits) AS commits,sum(adds) AS adds
+		FROM stats_cvs_group
+		WHERE group_id='96'
+	
+2004-05-07 12:10:05 LOG:  duration: 0.085162 sec
+2004-05-07 12:10:05 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.group_id='96' AND news_bytes.is_approved <> '4' 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:10:05 LOG:  duration: 0.002711 sec
+2004-05-07 12:10:11 LOG:  query: INSERT INTO frs_dlstats_file (ip_address,file_id,month,day,user_id) 
+		VALUES ('200.164.12.32','618','200405','07','100')
+2004-05-07 12:10:11 LOG:  duration: 0.005014 sec
+2004-05-07 12:10:16 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:16 LOG:  duration: 0.001026 sec
+2004-05-07 12:10:16 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='262'
+2004-05-07 12:10:16 LOG:  duration: 0.006691 sec
+2004-05-07 12:10:16 LOG:  query: SELECT * FROM groups WHERE group_id='30'
+2004-05-07 12:10:16 LOG:  duration: 0.001101 sec
+2004-05-07 12:10:36 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:36 LOG:  duration: 0.000811 sec
+2004-05-07 12:10:36 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:10:36 LOG:  duration: 0.002106 sec
+2004-05-07 12:10:36 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','167','IE','6.0','Win','1083946236','/frs/index.php','0');
+2004-05-07 12:10:36 LOG:  duration: 0.003057 sec
+2004-05-07 12:10:36 LOG:  query: select classname from supported_languages where language_code = 'es'
+2004-05-07 12:10:36 LOG:  duration: 0.001711 sec
+2004-05-07 12:10:36 LOG:  query: SELECT *
+	FROM frs_package 
+	WHERE group_id='167' AND status_id='1' 
+	ORDER BY name
+2004-05-07 12:10:36 LOG:  duration: 0.002001 sec
+2004-05-07 12:10:36 LOG:  query: SELECT * FROM groups WHERE group_id='167'
+2004-05-07 12:10:36 LOG:  duration: 0.002164 sec
+2004-05-07 12:10:36 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='Spanish'
+2004-05-07 12:10:36 LOG:  duration: 0.000525 sec
+2004-05-07 12:10:36 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='4'
+2004-05-07 12:10:36 LOG:  duration: 0.000336 sec
+2004-05-07 12:10:36 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='178'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:10:36 LOG:  duration: 0.002189 sec
+2004-05-07 12:10:36 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='434' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:36 LOG:  duration: 0.004681 sec
+2004-05-07 12:10:36 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='414' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:36 LOG:  duration: 0.002519 sec
+2004-05-07 12:10:36 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='413' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:36 LOG:  duration: 0.002432 sec
+2004-05-07 12:10:36 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='412' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:36 LOG:  duration: 0.002434 sec
+2004-05-07 12:10:36 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='411' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:36 LOG:  duration: 0.002421 sec
+2004-05-07 12:10:36 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='410' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:36 LOG:  duration: 0.002433 sec
+2004-05-07 12:10:37 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:37 LOG:  duration: 0.000785 sec
+2004-05-07 12:10:37 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:10:37 LOG:  duration: 0.001885 sec
+2004-05-07 12:10:37 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','167','IE','6.0','Win','1083946237','/frs/index.php','0');
+2004-05-07 12:10:37 LOG:  duration: 0.004505 sec
+2004-05-07 12:10:37 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:10:37 LOG:  duration: 0.001479 sec
+2004-05-07 12:10:37 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:10:37 LOG:  duration: 0.000365 sec
+2004-05-07 12:10:37 LOG:  query: SELECT *
+	FROM frs_package 
+	WHERE group_id='167' AND status_id='1' 
+	ORDER BY name
+2004-05-07 12:10:37 LOG:  duration: 0.001805 sec
+2004-05-07 12:10:37 LOG:  query: SELECT * FROM groups WHERE group_id='167'
+2004-05-07 12:10:37 LOG:  duration: 0.002068 sec
+2004-05-07 12:10:37 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:10:37 LOG:  duration: 0.000525 sec
+2004-05-07 12:10:37 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:10:37 LOG:  duration: 0.000380 sec
+2004-05-07 12:10:37 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='178'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:10:37 LOG:  duration: 0.001818 sec
+2004-05-07 12:10:37 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='434' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:37 LOG:  duration: 0.004349 sec
+2004-05-07 12:10:37 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='414' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:37 LOG:  duration: 0.002472 sec
+2004-05-07 12:10:37 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='413' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:37 LOG:  duration: 0.002433 sec
+2004-05-07 12:10:37 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='412' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:37 LOG:  duration: 0.002413 sec
+2004-05-07 12:10:37 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='411' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:37 LOG:  duration: 0.002447 sec
+2004-05-07 12:10:37 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='410' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:37 LOG:  duration: 0.002482 sec
+2004-05-07 12:10:41 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:41 LOG:  duration: 0.000818 sec
+2004-05-07 12:10:41 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:10:41 LOG:  duration: 0.001883 sec
+2004-05-07 12:10:41 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Mac','1083946241','/export/rss_sfnews.php','0');
+2004-05-07 12:10:41 LOG:  duration: 0.004441 sec
+2004-05-07 12:10:41 LOG:  query: SELECT forum_id,summary,post_date,details,group_id FROM news_bytes  WHERE is_approved=1  order by post_date desc LIMIT 10 OFFSET 0
+2004-05-07 12:10:41 LOG:  duration: 0.003840 sec
+2004-05-07 12:10:46 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:46 LOG:  duration: 0.000809 sec
+2004-05-07 12:10:46 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:10:46 LOG:  duration: 0.001891 sec
+2004-05-07 12:10:46 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','167','IE','6.0','Win','1083946246','/frs/index.php','0');
+2004-05-07 12:10:46 LOG:  duration: 0.004132 sec
+2004-05-07 12:10:46 LOG:  query: select classname from supported_languages where language_code = 'en-us'
+2004-05-07 12:10:46 LOG:  duration: 0.001508 sec
+2004-05-07 12:10:46 LOG:  query: select classname from supported_languages where language_code = 'en'
+2004-05-07 12:10:46 LOG:  duration: 0.000387 sec
+2004-05-07 12:10:46 LOG:  query: SELECT *
+	FROM frs_package 
+	WHERE group_id='167' AND status_id='1' 
+	ORDER BY name
+2004-05-07 12:10:46 LOG:  duration: 0.001773 sec
+2004-05-07 12:10:46 LOG:  query: SELECT * FROM groups WHERE group_id='167'
+2004-05-07 12:10:46 LOG:  duration: 0.002056 sec
+2004-05-07 12:10:46 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:10:46 LOG:  duration: 0.000518 sec
+2004-05-07 12:10:46 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:10:46 LOG:  duration: 0.000349 sec
+2004-05-07 12:10:46 LOG:  query: SELECT * FROM frs_release 
+		WHERE package_id='178'
+		AND status_id=1 ORDER BY release_date DESC, name ASC
+2004-05-07 12:10:46 LOG:  duration: 0.001825 sec
+2004-05-07 12:10:46 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='434' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:46 LOG:  duration: 0.004333 sec
+2004-05-07 12:10:46 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='414' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:46 LOG:  duration: 0.002482 sec
+2004-05-07 12:10:46 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='413' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:46 LOG:  duration: 0.002478 sec
+2004-05-07 12:10:46 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='412' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:46 LOG:  duration: 0.002459 sec
+2004-05-07 12:10:46 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='411' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:46 LOG:  duration: 0.002432 sec
+2004-05-07 12:10:46 LOG:  query: SELECT frs_file.filename AS filename,
+				frs_file.file_size AS file_size,
+				frs_file.file_id AS file_id,
+				frs_file.release_time AS release_time,
+				frs_filetype.name AS type,
+				frs_processor.name AS processor,
+				frs_dlstats_filetotal_agg.downloads AS downloads 
+				FROM frs_filetype,frs_processor,
+				frs_file LEFT JOIN frs_dlstats_filetotal_agg ON frs_dlstats_filetotal_agg.file_id=frs_file.file_id 
+				WHERE release_id='410' 
+				AND frs_filetype.type_id=frs_file.type_id 
+				AND frs_processor.processor_id=frs_file.processor_id 
+				ORDER BY filename
+2004-05-07 12:10:46 LOG:  duration: 0.002412 sec
+2004-05-07 12:10:51 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:10:51 LOG:  duration: 0.000809 sec
+2004-05-07 12:10:51 LOG:  query: SELECT frs_file.filename,frs_file.file_id,groups.unix_group_name,groups.group_id
+	FROM frs_package,frs_release,frs_file,groups
+	WHERE frs_release.release_id=frs_file.release_id
+	AND groups.group_id=frs_package.group_id
+	AND frs_release.package_id=frs_package.package_id
+	AND frs_file.file_id='610'
+2004-05-07 12:10:51 LOG:  duration: 0.005537 sec
+2004-05-07 12:10:51 LOG:  query: SELECT * FROM groups WHERE group_id='167'
+2004-05-07 12:10:51 LOG:  duration: 0.001114 sec
+2004-05-07 12:11:03 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:11:03 LOG:  duration: 0.000776 sec
+2004-05-07 12:11:03 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:11:03 LOG:  duration: 0.001886 sec
+2004-05-07 12:11:03 LOG:  query: SELECT
+		u.*,sl.language_id, sl.name, sl.filename, sl.classname, sl.language_code, t.dirname, t.fullname
+		FROM users u,
+		supported_languages sl,
+		themes t
+		WHERE u.language=sl.language_id 
+		AND u.theme_id=t.theme_id
+		AND u.user_id='102'
+	
+2004-05-07 12:11:03 LOG:  duration: 0.005630 sec
+2004-05-07 12:11:03 LOG:  query: SELECT * FROM user_group WHERE user_id='102' AND group_id='1' AND admin_flags='A'
+2004-05-07 12:11:03 LOG:  duration: 0.001944 sec
+2004-05-07 12:11:03 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','5.0','Linux','1083946263','/export/index.php','0');
+2004-05-07 12:11:03 LOG:  duration: 0.002654 sec
+2004-05-07 12:11:03 LOG:  query: SELECT classname FROM supported_languages WHERE language_id='1'
+2004-05-07 12:11:03 LOG:  duration: 0.000472 sec
+2004-05-07 12:11:03 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:11:03 LOG:  duration: 0.000614 sec
+2004-05-07 12:11:03 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:11:03 LOG:  duration: 0.000389 sec
+2004-05-07 12:11:03 LOG:  query: SELECT * FROM groups WHERE group_id='1'
+2004-05-07 12:11:03 LOG:  duration: 0.002024 sec
+2004-05-07 12:11:03 LOG:  query: SELECT * FROM user_group 
+			WHERE user_id='102' 
+			AND group_id='1'
+2004-05-07 12:11:03 LOG:  duration: 0.000552 sec
+2004-05-07 12:11:05 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:11:05 LOG:  duration: 0.000794 sec
+2004-05-07 12:11:05 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:11:05 LOG:  duration: 0.001867 sec
+2004-05-07 12:11:05 LOG:  query: SELECT
+		u.*,sl.language_id, sl.name, sl.filename, sl.classname, sl.language_code, t.dirname, t.fullname
+		FROM users u,
+		supported_languages sl,
+		themes t
+		WHERE u.language=sl.language_id 
+		AND u.theme_id=t.theme_id
+		AND u.user_id='102'
+	
+2004-05-07 12:11:05 LOG:  duration: 0.004729 sec
+2004-05-07 12:11:05 LOG:  query: SELECT * FROM user_group WHERE user_id='102' AND group_id='1' AND admin_flags='A'
+2004-05-07 12:11:06 LOG:  duration: 0.001628 sec
+2004-05-07 12:11:06 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','MOZILLA','5.0','Linux','1083946266','/export/rss_sfnewreleases.php','0');
+2004-05-07 12:11:06 LOG:  duration: 0.004375 sec
+2004-05-07 12:11:06 LOG:  query: SELECT classname FROM supported_languages WHERE language_id='1'
+2004-05-07 12:11:06 LOG:  duration: 0.000450 sec
+2004-05-07 12:11:06 LOG:  query: SELECT 
+					groups.group_id,
+					groups.group_name,
+					groups.unix_group_name,
+					groups.type_id,
+					news_bytes.forum_id,
+					news_bytes.summary,
+					news_bytes.post_date,
+					news_bytes.details 
+				FROM 
+					news_bytes,
+					groups 
+				WHERE 
+					news_bytes.group_id=groups.group_id 
+					AND groups.status='A'
+					AND groups.is_public = 1
+				ORDER BY 
+					post_date 
+				DESC
+2004-05-07 12:11:06 LOG:  duration: 0.012615 sec
+2004-05-07 12:11:06 LOG:  query: begin; select getdatabaseencoding(); commit
+2004-05-07 12:11:06 LOG:  duration: 0.000793 sec
+2004-05-07 12:11:06 LOG:  query: SELECT plugin_id, plugin_name FROM plugins
+2004-05-07 12:11:06 LOG:  duration: 0.001886 sec
+2004-05-07 12:11:06 LOG:  query: INSERT INTO activity_log (day,hour,group_id,browser,ver,platform,time,page,type) VALUES (20040507,'12','0','OTHER','0','Other','1083946266','/index.php','0');
+2004-05-07 12:11:06 LOG:  duration: 0.003889 sec
+2004-05-07 12:11:06 LOG:  query: SELECT language_id FROM supported_languages WHERE classname='English'
+2004-05-07 12:11:06 LOG:  duration: 0.001505 sec
+2004-05-07 12:11:06 LOG:  query: SELECT language_code FROM supported_languages WHERE language_id='1'
+2004-05-07 12:11:06 LOG:  duration: 0.000520 sec
+2004-05-07 12:11:06 LOG:  query: SELECT groups.group_name,groups.unix_group_name,
+		groups.type_id,users.user_name,users.realname,
+		news_bytes.forum_id,news_bytes.summary,news_bytes.post_date,news_bytes.details 
+		FROM users,news_bytes,groups 
+		WHERE news_bytes.is_approved=1 
+		AND users.user_id=news_bytes.submitted_by 
+		AND news_bytes.group_id=groups.group_id 
+		ORDER BY post_date DESC LIMIT 10 OFFSET 0
+2004-05-07 12:11:06 LOG:  duration: 0.011179 sec
+2004-05-07 12:11:06 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1050'
+2004-05-07 12:11:06 LOG:  duration: 0.002933 sec
+2004-05-07 12:11:06 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1044'
+2004-05-07 12:11:06 LOG:  duration: 0.000658 sec
+2004-05-07 12:11:06 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1037'
+2004-05-07 12:11:06 LOG:  duration: 0.000671 sec
+2004-05-07 12:11:06 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1030'
+2004-05-07 12:11:06 LOG:  duration: 0.000644 sec
+2004-05-07 12:11:06 LOG:  query: SELECT total FROM forum_group_list_vw WHERE group_forum_id='1027'
+2004-05-07 12:11:06 LOG:  duration: 0.000688 sec
+2004-05-07 12:11:06 LOG:  query: SELECT count(*) AS count FROM groups WHERE status='A' AND is_public=1
+2004-05-07 12:11:06 LOG:  duration: 0.002325 sec
+2004-05-07 12:11:06 LOG:  query: SELECT count(*) AS count FROM users WHERE status='A' and user_id != 100
+2004-05-07 12:11:06 LOG:  duration: 0.074923 sec
+2004-05-07 12:11:06 LOG:  query: 
+		SELECT groups.group_id,
+		groups.group_name,
+		groups.unix_group_name,
+		frs_dlstats_grouptotal_vw.downloads
+		FROM frs_dlstats_grouptotal_vw,groups
+		WHERE
+		frs_dlstats_grouptotal_vw.group_id=groups.group_id AND groups.is_public='1' and groups.status='A'
+		ORDER BY downloads DESC
+	 LIMIT 10 OFFSET 0
+2004-05-07 12:11:06 LOG:  duration: 0.017451 sec
+2004-05-07 12:11:06 LOG:  query: SELECT groups.group_name,groups.unix_group_name,groups.group_id,project_weekly_metric.ranking,project_weekly_metric.percentile FROM groups,project_weekly_metric WHERE groups.group_id=project_weekly_metric.group_id AND groups.is_public=1 AND groups.type_id=1  AND groups.status != 'D'  ORDER BY ranking ASC LIMIT 10 OFFSET 0
+2004-05-07 12:11:06 LOG:  duration: 0.004165 sec
+2004-05-07 12:11:06 LOG:  query: SELECT group_id,unix_group_name,group_name,register_time FROM groups WHERE is_public=1 AND status='A' AND type_id=1 AND register_time > 0 ORDER BY register_time DESC LIMIT 10 OFFSET 0
+2004-05-07 12:11:06 LOG:  duration: 0.002575 sec
