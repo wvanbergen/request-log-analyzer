@@ -80,10 +80,16 @@ describe RequestLogAnalyzer::FileFormat::Rails do
           @rails.should parse_line(line).as(:failure).and_capture(:error => 'NoMethodError', :message => "undefined method `update_domain_account' for nil:NilClass")
         end
 
-        it "should parse a :cache_hit line correctly" do
-          line = prefix + 'Filter chain halted as [#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>] rendered_or_redirected.'
+        it "should parse a :cache_hit line correctly with an filter instance reference" do
+          line = prefix + 'Filter chain halted as [#<ActionController::Filters::AroundFilter:0x2a999ad120 @identifier=nil, @kind=:filter, @options={:only=>#<Set: {"cached"}>, :if=>:not_logged_in?, :unless=>nil}, @method=#<ActionController::Caching::Actions::ActionCacheFilter:0x2a999ad620 @check=nil, @options={:store_options=>{}, :layout=>nil, :cache_path=>#<Proc:0x0000002a999b8890@/app/controllers/cached_controller.rb:8>}>>] did_not_yield.'
           @rails.should parse_line(line).as(:cache_hit)
         end
+
+        it "should parse a :cache_hit line correctly with an proc instance reference" do
+          line = prefix + 'Filter chain halted as [#<ActionController::Filters::AroundFilter:0x2a9a923e38 @method=#<Proc:0x0000002a9818b3f8@/usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.5/lib/action_controller/caching/actions.rb:64>, @kind=:filter, @identifier=nil, @options={:unless=>nil, :if=>nil, :only=>#<Set: {"show"}>}>] did_not_yield.'          
+          @rails.should parse_line(line).as(:cache_hit)
+        end
+
 
         it "should parse a :parameters line correctly" do
           line = prefix + '  Parameters: {"action"=>"cached", "controller"=>"cached"}'

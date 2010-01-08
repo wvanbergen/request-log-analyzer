@@ -119,13 +119,13 @@ module RequestLogAnalyzer::FileFormat
                         { :name => :file,        :type => :string }]),
 
       :cache_hit => RequestLogAnalyzer::LineDefinition.new(:cache_hit,
-          :regexp => /Filter chain halted as \[\#<ActionController::Caching::Actions::ActionCacheFilter/),
+          :regexp => /Filter chain halted as \[\#<ActionController::Filters::AroundFilter.*\@method=.*(?:Caching::Actions::ActionCacheFilter|action_controller\/caching\/actions\.rb).*\] did_not_yield/),
 
       :parameters => RequestLogAnalyzer::LineDefinition.new(:parameters,
           :teaser   => /  Parameters:/,
           :regexp   => /  Parameters:\s+(\{.*\})/,
           :captures => [{ :name => :params, :type => :eval }]),
-          
+
       :rendered => RequestLogAnalyzer::LineDefinition.new(:rendered,
           :teaser   => /Rendered /,
           :regexp   => /Rendered (\w+(?:\/\w+)+) \((\d+\.\d+)ms\)/,
