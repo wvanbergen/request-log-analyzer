@@ -41,7 +41,7 @@ module RequestLogAnalyzer::FileFormat
         # Sanitize an SQL query so that it can be used as a category field.
         # sql.gsub!(/\/\*.*\*\//, '')                                       # remove comments
         sql.gsub!(/\s+/, ' ')                                             # remove excessive whitespace
-        sql.gsub!(/`([^`]+)`/, '\1')                                      # remove quotes from field names
+        sql.gsub!(/"([^"]+)"/, '\1')                                      # remove quotes from field names
         sql.gsub!(/'\d{4}-\d{2}-\d{2}'/, ':date')                         # replace dates
         sql.gsub!(/'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'/, ':datetime')   # replace timestamps
         sql.gsub!(/'[^']*'/, ':string')                                   # replace strings
