@@ -85,22 +85,22 @@ describe RequestLogAnalyzer::Tracker::Base do
     end
 
     it "should return the value of the block if one is given to the :if option" do
-      tracker = @tracker_class.new(:if => lambda { false } )
+      tracker = @tracker_class.new(:if => lambda { |r| false } )
       tracker.should_update?(request(:field => 'anything')).should be_false
     end
 
     it "should return the inverse value of the block if one is given to the :if option" do
-      tracker = @tracker_class.new(:unless => lambda { false } )
+      tracker = @tracker_class.new(:unless => lambda { |r| false } )
       tracker.should_update?(request(:field => 'anything')).should be_true
     end
 
     it "should return false if any of the checks fail" do
-      tracker = @tracker_class.new(:if => :field, :unless => lambda { false }, :line_type => :not_present )
+      tracker = @tracker_class.new(:if => :field, :unless => lambda { |r| false }, :line_type => :not_present )
       tracker.should_update?(request(:line_type => :present, :field => 'anything')).should be_false
     end
 
     it "should return true if all of the checks succeed" do
-      tracker = @tracker_class.new(:if => :field, :unless => lambda { false }, :line_type => :present )
+      tracker = @tracker_class.new(:if => :field, :unless => lambda { |r| false }, :line_type => :present )
       tracker.should_update?(request(:line_type => :present, :field => 'anything')).should be_true
     end
 
