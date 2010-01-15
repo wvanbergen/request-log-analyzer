@@ -82,13 +82,12 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
           capture[:provides].each { |field, field_type| t.column(field, column_type(field_type)) } if capture[:provides].kind_of?(Hash)
         end
       end
+      
+      # Add indices to table for more speedy querying
+      database.connection.add_index(self.table_name.to_sym, [:request_id]) # rescue
+      database.connection.add_index(self.table_name.to_sym, [:source_id])  # rescue
     end
-
-    # Add indices to table for more speedy querying
-    database.connection.add_index(self.table_name.to_sym, [:request_id]) # rescue
-    database.connection.add_index(self.table_name.to_sym, [:source_id])  # rescue
   end
-
 
   # Function to determine the column type for a field
   # TODO: make more robust / include in file-format definition
