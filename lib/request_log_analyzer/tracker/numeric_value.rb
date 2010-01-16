@@ -71,7 +71,7 @@ module RequestLogAnalyzer::Tracker
       return "- " if value.nil?
       return "0 " if value.zero?
 
-      case Math.log10(value).floor
+      case [Math.log10(value.abs).floor, 0].max
         when  0...4  then '%d ' % value
         when  4...7  then '%dk' % (value / 1000)
         when  7...10 then '%dM' % (value / 1000_000)

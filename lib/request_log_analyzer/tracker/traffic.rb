@@ -23,7 +23,7 @@ module RequestLogAnalyzer::Tracker
       return "-"   if bytes.nil?
       return "0 B" if bytes.zero?
       
-      case Math.log10(bytes).floor
+      case [Math.log10(bytes.abs).floor, 0].max
       when  0...4  then '%d B'  % bytes
       when  4...7  then '%d kB' % (bytes / 1000)
       when  7...10 then '%d MB' % (bytes / 1000_000)
