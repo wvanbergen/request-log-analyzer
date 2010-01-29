@@ -109,12 +109,12 @@ module RequestLogAnalyzer::Source
         @progress_handler = @dormant_progress_handler
         @progress_handler.call(:started, file) if @progress_handler
 
-        File.open(file, 'r') { |f| parse_io(f, options, &block) }
+        File.open(file, 'rb') { |f| parse_io(f, options, &block) }
 
         @progress_handler.call(:finished, file) if @progress_handler
         @progress_handler = nil
       else
-        IO.popen(decompress_file?(file), 'r') { |f| parse_io(f, options, &block) }
+        IO.popen(decompress_file?(file), 'rb') { |f| parse_io(f, options, &block) }
       end
 
       @source_changes_handler.call(:finished, @current_source) if @source_changes_handler

@@ -63,7 +63,7 @@ module RequestLogAnalyzer::FileFormat
     
     parsers = all_formats.map { |f| RequestLogAnalyzer::Source::LogParser.new(f, :parse_strategy => 'cautious') }
     
-    File.open(file, 'r') do |io|
+    File.open(file, 'rb') do |io|
       while io.lineno < line_count && (line = io.gets)
         parsers.each { |parser| parser.parse_line(line) } 
       end

@@ -66,6 +66,8 @@ module RequestLogAnalyzer
       else
         return false
       end
+    rescue
+      return false
     end
 
     alias :=~ :matches
