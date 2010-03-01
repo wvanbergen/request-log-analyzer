@@ -1,0 +1,7 @@
+Started GET "/queries" for 127.0.0.1 at 2010-02-25 16:15:18
+ SQL (0.2ms)  SET SQL_AUTO_IS_NULL=0
+ Processing by QueriesController#index as HTML
+ Query Load (0.4ms)  SELECT `queries`.* FROM `queries`
+Rendered collection (0.0ms)
+Rendered queries/index.html.erb (0.6ms)
+Completed in 9ms (Views: 4.9ms | ActiveRecord: 0.5ms) with 200
