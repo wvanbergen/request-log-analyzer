@@ -13,19 +13,21 @@ module RequestLogAnalyzer::FileFormat
       line.header = true
       line.teaser = /Started /
       line.regexp = /Started ([A-Z]+) "([^"]+)" for (#{ip_address}) at (#{timestamp('%Y-%m-%d %H:%M:%S')})/
-      line.captures << { :name => :method,    :type => :string    } <<
-                       { :name => :path,      :type => :string    } <<
-                       { :name => :ip,        :type => :string    } <<
-                       { :name => :timestamp, :type => :timestamp }
+      
+      line.capture(:method)
+      line.capture(:path)
+      line.capture(:ip)
+      line.capture(:timestamp).as(:timestamp)
     end
     
     # Processing by QueriesController#index as HTML
     line_definition :processing do |line|
       line.teaser = /Processing by /
       line.regexp = /Processing by (\w+)\#(\w+) as (\w+)/
-      line.captures << { :name => :controller, :type => :string } <<
-                       { :name => :action,     :type => :string } <<
-                       { :name => :format,     :type => :string }
+      
+      line.capture(:controller)
+      line.capture(:action)
+      line.capture(:format)
     end
     
     # Completed in 9ms (Views: 4.9ms | ActiveRecord: 0.5ms) with 200
@@ -33,18 +35,20 @@ module RequestLogAnalyzer::FileFormat
       line.footer = true
       line.teaser = /Completed in /
       line.regexp = /Completed in (\d+)ms \([^\)]*\) with (\d+)/
-      line.captures << { :name => :duration, :type => :duration, :unit => :msec } <<
-                       { :name => :status,   :type => :integer }
+
+      line.capture(:duration).as(:duration, :unit => :msec)
+      line.capture(:status).as(:integer)
     end
     
     # ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:
     line_definition :failure do |line|
       line.footer = true
       line.regexp = /((?:[A-Z]\w*[a-z]\w+\:\:)*[A-Z]\w*[a-z]\w+) \((.*)\)(?: on line #(\d+) of (.+))?\:\s*$/
-      line.captures << { :name => :error,   :type => :string  } <<
-                       { :name => :message, :type => :string  } <<
-                       { :name => :line,    :type => :integer } <<
-                       { :name => :file,    :type => :string  }
+
+      line.capture(:error)
+      line.capture(:message)
+      line.capture(:line).as(:integer)
+      line.capture(:file)
     end
     
     # # Not parsed at the moment:

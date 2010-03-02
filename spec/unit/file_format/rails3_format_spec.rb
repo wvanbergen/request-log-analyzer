@@ -25,15 +25,15 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     it "should parse :completed lines correctly" do
       line = 'Completed in 9ms (Views: 4.9ms | ActiveRecord: 0.5ms) with 200'
       @file_format.should parse_line(line).as(:completed).and_capture(
-        :duration => 0.009, :status => 200)
+          :duration => 0.009, :status => 200)
     end
     
     it "should pase :failure lines correctly" do
       line = "ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:"
       @file_format.should parse_line(line).as(:failure).and_capture(:line => 3, 
-        :error   => 'ActionView::Template::Error', 
-        :message => "undefined local variable or method `field' for #<Class>", 
-        :file    => '/Users/willem/Code/warehouse/app/views/queries/execute.csv.erb')
+          :error   => 'ActionView::Template::Error', 
+          :message => "undefined local variable or method `field' for #<Class>", 
+          :file    => '/Users/willem/Code/warehouse/app/views/queries/execute.csv.erb')
     end
   end
   

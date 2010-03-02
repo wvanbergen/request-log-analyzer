@@ -26,6 +26,19 @@ module RequestLogAnalyzer
       end
     end
 
+    class CaptureDefiner
+      attr_accessor :capture_hash
+      
+      def initialize(hash)
+        @capture_hash = hash
+      end
+      
+      def as(type, type_options = {})
+        @capture_hash.merge!(type_options.merge(:type => type))
+        return self
+      end
+    end
+
     attr_reader :name
     attr_accessor :teaser, :regexp, :captures
     attr_accessor :header, :footer
@@ -46,6 +59,12 @@ module RequestLogAnalyzer
       definition = self.new(name)
       yield(definition) if block_given?
       return definition
+    end
+    
+    def capture(name)
+      new_capture_hash = { :name => name, :type => :string}
+      captures << new_capture_hash
+      CaptureDefiner.new(new_capture_hash)
     end
 
     # Checks whether a given line matches this definition.
