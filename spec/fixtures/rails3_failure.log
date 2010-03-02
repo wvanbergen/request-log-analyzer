@@ -1,0 +1,19 @@
+Started POST "/queries/397638749/execute.csv" for 127.0.0.1 at 2010-03-01 18:44:33
+  Processing by QueriesController#execute as CSV
+  Parameters: {"commit"=>"Run query", "output_format"=>"csv", "authenticity_token"=>"pz9WcxkcrlG/43eg6BgSAnJL7yIsaffuHbYxPHUsUzQ=", "id"=>"397638749", "filters"=>{"89941177"=>{"mode"=>"include"}, "361892410"=>{"mode"=>"include"}}, "groupings"=>[{"89941177"=>nil}, {"361892410"=>nil}, {"448933666"=>nil}, {"1008597607"=>nil}], "aggregates"=>[{"718376355"=>nil}, {"991286192"=>nil}]}
+
+ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:
+1: <%=raw @result.fields.map { |f| f.humanize.to_json }.join(',') %>
+2: <% @result.each do |record| %>
+3:   <%=raw @result.fields.map { |f| record[field].to_s }.join(",") %>
+4: <% end %>
+
+    app/views/queries/execute.csv.erb:3:in `_render_template__652100315_2182241460_0'
+    app/views/queries/execute.csv.erb:3:in `map'
+    app/views/queries/execute.csv.erb:3:in `_render_template__652100315_2182241460_0'
+    app/views/queries/execute.csv.erb:2:in `_render_template__652100315_2182241460_0'
+    app/controllers/queries_controller.rb:34:in `execute'
+
+Rendered /Users/willem/.rvm/gems/ruby-1.8.7-p248/gems/actionpack-3.0.0.beta/lib/action_dispatch/middleware/templates/rescues/_trace.erb (1.0ms)
+Rendered /Users/willem/.rvm/gems/ruby-1.8.7-p248/gems/actionpack-3.0.0.beta/lib/action_dispatch/middleware/templates/rescues/_request_and_response.erb (9.7ms)
+Rendered /Users/willem/.rvm/gems/ruby-1.8.7-p248/gems/actionpack-3.0.0.beta/lib/action_dispatch/middleware/templates/rescues/template_error.erb within /Users/willem/.rvm/gems/ruby-1.8.7-p248/gems/actionpack-3.0.0.beta/lib/action_dispatch/middleware/templates/rescues/layout.erb (20.4ms)

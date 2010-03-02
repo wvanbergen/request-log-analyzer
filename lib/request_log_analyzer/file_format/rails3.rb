@@ -12,9 +12,9 @@ module RequestLogAnalyzer::FileFormat
     line_definition :started do |line|
       line.header = true
       line.teaser = /Started /
-      line.regexp = /Started ([A-Z]+) ("[^"]+") for (#{ip_address}) at (#{timestamp('%y-%m-%d %k:%M:%S')})/
+      line.regexp = /Started ([A-Z]+) "([^"]+)" for (#{ip_address}) at (#{timestamp('%Y-%m-%d %H:%M:%S')})/
       line.captures << { :name => :method,    :type => :string    } <<
-                       { :name => :url,       :type => :string    } <<
+                       { :name => :path,      :type => :string    } <<
                        { :name => :ip,        :type => :string    } <<
                        { :name => :timestamp, :type => :timestamp }
     end
@@ -37,6 +37,15 @@ module RequestLogAnalyzer::FileFormat
                        { :name => :status,   :type => :integer }
     end
     
+    # ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:
+    line_definition :failure do |line|
+      line.footer = true
+      line.regexp = /((?:[A-Z]\w*[a-z]\w+\:\:)*[A-Z]\w*[a-z]\w+) \((.*)\)(?: on line #(\d+) of (.+))?\:\s*$/
+      line.captures << { :name => :error,   :type => :string  } <<
+                       { :name => :message, :type => :string  } <<
+                       { :name => :line,    :type => :integer } <<
+                       { :name => :file,    :type => :string  }
+    end
     
     # # Not parsed at the moment:
     #  SQL (0.2ms)  SET SQL_AUTO_IS_NULL=0
@@ -44,7 +53,30 @@ module RequestLogAnalyzer::FileFormat
     # Rendered collection (0.0ms)
     # Rendered queries/index.html.erb (0.6ms)
     
+    REQUEST_CATEGORIZER = lambda { |request| "#{request[:controller]}##{request[:action]}.#{request[:format]}" }
     
+    report do |analyze|
+      
+      analyze.timespan
+      analyze.hourly_spread
+      
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Most requested'
+      analyze.frequency :method, :title => 'HTTP methods'
+      analyze.frequency :status, :title => 'HTTP statuses returned'
+      
+      analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
+      # analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
+      # analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
+      
+      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
+        :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
+    end
+    
+    class Request < RequestLogAnalyzer::Request
+      def convert_timestamp(value, defintion)
+        value.gsub(/[^0-9]/, '')[0...14].to_i
+      end
+    end
 
   end
 end
