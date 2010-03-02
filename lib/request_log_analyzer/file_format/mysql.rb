@@ -8,42 +8,45 @@ module RequestLogAnalyzer::FileFormat
       line.header = :alternative
       line.teaser = /\# Time: /
       line.regexp = /\# Time: (#{timestamp('%y%m%d %k:%M:%S')})/
-      line.captures << { :name => :timestamp, :type => :timestamp }
+      
+      line.capture(:timestamp).as(:timestamp)
     end
 
     line_definition :user_host do |line|
       line.header = :alternative
       line.teaser = /\# User\@Host\: /
       line.regexp = /\# User\@Host\: ([\w-]+)\[[\w-]+\] \@ ([\w\.-]*) \[(#{ip_address(true)})\]/
-      line.captures << { :name => :user, :type => :string } << 
-                       { :name => :host, :type => :string } <<
-                       { :name => :ip,   :type => :string }
+      
+      line.capture(:user)
+      line.capture(:host)
+      line.capture(:ip)
     end
 
     line_definition :query_statistics do |line|
       line.header = :alternative
       line.teaser = /\# Query_time: /
       line.regexp = /\# Query_time: (\d+(?:\.\d+)?)\s+Lock_time: (\d+(?:\.\d+)?)\s+Rows_sent: (\d+)\s+Rows_examined: (\d+)/
-      line.captures << { :name => :query_time, :type => :duration, :unit => :sec } <<
-                       { :name => :lock_time,  :type => :duration, :unit => :sec } <<
-                       { :name => :rows_sent, :type => :integer } <<
-                       { :name => :rows_examined, :type => :integer }
+      
+      line.capture(:query_time).as(:duration, :unit => :sec)
+      line.capture(:lock_time).as(:duration, :unit => :sec)
+      line.capture(:rows_sent).as(:integer)
+      line.capture(:rows_examined).as(:integer)
     end
 
     line_definition :use_database do |line|
       line.regexp   = /^use (\w+);\s*$/
-      line.captures << { :name => :database, :type => :string }
+      line.capture(:database)
     end
 
     line_definition :query_part do |line|
       line.regexp   = /^(?!(?:use |\# |SET ))(.*[^;\s])\s*$/
-      line.captures << { :name => :query_fragment, :type => :string }
+      line.capture(:query_fragment)
     end
 
     line_definition :query do |line|
-      line.regexp = /^(?!(?:use |\# |SET ))(.*);\s*$/
-      line.captures << { :name => :query, :type => :sql }
       line.footer = true
+      line.regexp = /^(?!(?:use |\# |SET ))(.*);\s*$/
+      line.capture(:query).as(:sql)
     end
 
     PER_USER       = :user

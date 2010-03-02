@@ -8,21 +8,23 @@ module RequestLogAnalyzer::FileFormat
       line.header = true
       line.teaser = /LOG\:  query\:/
       line.regexp = /(#{timestamp('%y-%m-%d %k:%M:%S')})\ LOG:  query:\s+(.*)/
-      line.captures << { :name => :timestamp, :type => :timestamp } <<
-                       { :name => :query_fragment, :type => :string }
+
+      line.capture(:timestamp).as(:timestamp)
+      line.capture(:query_fragment)
     end
       
     line_definition :duration do |line|
       line.footer = true
       line.teaser = /duration:/
       line.regexp = /#{timestamp('%y-%m-%d %k:%M:%S')}\ LOG\:  duration\: (.*)(\ )sec/
-      line.captures << { :name => :query_time, :type => :duration, :unit => :sec } <<
-                       { :name => :query, :type => :sql } # Hack to gather up fragments
+
+      line.capture(:query_time).as(:duration, :unit => :sec)
+      line.capture(:query).as(:sql) # Hack to gather up fragments
     end
     
     line_definition :query_fragment do |line|
       line.regexp = /^(?!.*LOG)\s*(.*)\s*/
-      line.captures << { :name => :query_fragment, :type => :string }
+      line.capture(:query_fragment)
     end
 
     report do |analyze|
