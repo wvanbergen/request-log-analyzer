@@ -11,7 +11,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :access do |line|
       line.header = true
       line.footer = true
-      line.regexp = /^([^\ ]+) ([^\ ]+) \[(#{timestamp('%d/%b/%Y:%H:%M:%S %z')})?\] (#{ip_address}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]+)" "([^"]+)"/
+      line.regexp = /^([^\ ]+) ([^\ ]+) \[(#{timestamp('%d/%b/%Y:%H:%M:%S %z')})?\] (#{ip_address}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]*)" "([^"]*)"/
       
       line.capture(:bucket_owner)
       line.capture(:bucket)
