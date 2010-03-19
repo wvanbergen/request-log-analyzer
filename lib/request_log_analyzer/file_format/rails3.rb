@@ -33,11 +33,11 @@ module RequestLogAnalyzer::FileFormat
     # Completed in 9ms (Views: 4.9ms | ActiveRecord: 0.5ms) with 200
     line_definition :completed do |line|
       line.footer = true
-      line.teaser = /Completed in /
-      line.regexp = /Completed in (\d+)ms \([^\)]*\) with (\d+)/
+      line.teaser = /Completed /
+      line.regexp = /Completed (\d+) .* in (\d+)ms \([^\)]*\)/
 
-      line.capture(:duration).as(:duration, :unit => :msec)
       line.capture(:status).as(:integer)
+      line.capture(:duration).as(:duration, :unit => :msec)
     end
     
     # ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:
