@@ -16,13 +16,17 @@ module RequestLogAnalyzer
       def initialize_copy(other)
         @line_definitions = other.line_definitions.dup
       end
-
-      def method_missing(name, *args, &block)
+      
+      def define_line(name, arg = {}, &block)
         if block_given?
           @line_definitions[name] = RequestLogAnalyzer::LineDefinition.define(name, &block)
         else
-          @line_definitions[name] = RequestLogAnalyzer::LineDefinition.new(name, args.first)
+          @line_definitions[name] = RequestLogAnalyzer::LineDefinition.new(name, arg)
         end
+      end
+
+      def method_missing(name, *args, &block)
+        define_line(name, args[0], &block)
       end
     end
 

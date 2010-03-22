@@ -201,7 +201,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
-      @line_definer.send(name, &block)
+      @line_definer.define_line(name, &block)
     end
 
     # Specifies multiple line definitions at once using a block
