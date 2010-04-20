@@ -39,7 +39,7 @@ module RequestLogAnalyzer
       # Removes certain string sequences which would be problematic for eval.
       #
       def sanitize_parameters(parameter_string)
-        parameter_string.gsub(/#</, '"').gsub(/>,/, '"')
+        parameter_string.gsub(/#</, '"').gsub(/>,/, '", ')
       end
 
       # Slow default method to parse timestamps.
