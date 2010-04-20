@@ -31,7 +31,8 @@ module RequestLogAnalyzer
       # Converts :eval field, which should evaluate to a hash.
       def convert_eval(value, capture_definition)
         eval(value).inject({}) { |h, (k, v)| h[k.to_sym] = v; h}
-      rescue SyntaxError
+			# Wide range of errors possible with wild eval TODO sanitize "value"
+      rescue Exception 
         nil
       end
 
