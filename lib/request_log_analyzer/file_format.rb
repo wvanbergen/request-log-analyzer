@@ -22,7 +22,12 @@ module RequestLogAnalyzer::FileFormat
 
     elsif file_format.kind_of?(String) && File.exist?(file_format)
       # load a format from a ruby file
-      require file_format
+      begin
+        require file_format
+      rescue LoadError # RVM hack, as Basedir for File.exists? sometimes differs from require.
+        require File.dirname(__FILE__) + '/file_format/' + file_format
+      end  
+
       const = RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb'))
       if RequestLogAnalyzer::FileFormat.const_defined?(const)
         klass = RequestLogAnalyzer::FileFormat.const_get(const)
