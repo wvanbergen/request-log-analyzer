@@ -20,13 +20,9 @@ module RequestLogAnalyzer::FileFormat
       # a usable class is provided. Use this format class.
       klass = file_format
 
-    elsif file_format.kind_of?(String) && File.exist?(file_format)
+    elsif file_format.kind_of?(String) && File.exist?(file_format) && File.file?(file_format)
       # load a format from a ruby file
-      begin
-        require file_format
-      rescue LoadError # RVM hack, as Basedir for File.exists? sometimes differs from require.
-        require File.dirname(__FILE__) + '/file_format/' + file_format
-      end  
+      require file_format
 
       const = RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb'))
       if RequestLogAnalyzer::FileFormat.const_defined?(const)
