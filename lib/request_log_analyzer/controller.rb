@@ -45,6 +45,7 @@ module RequestLogAnalyzer
       options[:report_sort]    = arguments[:report_sort]
       options[:report_amount]  = arguments[:report_amount]
       options[:mailhost]       = arguments[:mailhost] 
+      options[:silent]         = arguments[:silent] 
       
       # Apache format workaround
       if arguments[:rails_format]
@@ -114,6 +115,7 @@ module RequestLogAnalyzer
     # * <tt>:select</tt> Select specific {:field => :value} combination (expects a single hash).
     # * <tt>:source_files</tt> Source files to analyze. Provide either File, array of files or STDIN.
     # * <tt>:yaml</tt> Output to YAML file.
+    # * <tt>:silent</tt> Minimal output automatically implies :no_progress
     #
     # === Example
     # RequestLogAnalyzer::Controller.build(
@@ -135,6 +137,9 @@ module RequestLogAnalyzer
       options[:report_amount] ||= 20
       options[:report_sort]   ||= 'sum,mean'
       options[:boring]        ||= false
+      options[:silent]        ||= false
+      
+      options[:no_progress] = true if options[:silent]
       
       # Deprecation warnings
       if options[:dump]
@@ -181,7 +186,9 @@ module RequestLogAnalyzer
                                       :database => options[:database],                # FUGLY!
                                       :yaml => options[:yaml], 
                                       :reset_database => options[:reset_database],
-                                      :no_progress => options[:no_progress]})
+                                      :no_progress => options[:no_progress], 
+                                      :silent => options[:silent],
+                                    })
 
       # register filters
       if options[:after] || options[:before]
@@ -226,6 +233,7 @@ module RequestLogAnalyzer
     # * <tt>:yaml</tt> Yaml Dump the contrller should use.
     # * <tt>:output</tt> All report outputs get << through this output.
     # * <tt>:no_progress</tt> No progress bar
+    # * <tt>:silent</tt> Minimal output, only error
     def initialize(source, options = {})
 
       @source      = source
@@ -333,11 +341,13 @@ module RequestLogAnalyzer
       @source.finalize
 
       if @output.io.kind_of?(File)
-        puts
-        puts "Report written to: " + File.expand_path(@output.io.path)
-        puts "Need an expert to analyze your application?"
-        puts "Mail to contact@railsdoctors.com or visit us at http://railsdoctors.com"
-        puts "Thanks for using request-log-analyzer!"
+        unless @options[:silent]
+          puts
+          puts "Report written to: " + File.expand_path(@output.io.path)
+          puts "Need an expert to analyze your application?"
+          puts "Mail to contact@railsdoctors.com or visit us at http://railsdoctors.com"
+          puts "Thanks for using request-log-analyzer!"
+        end
         @output.io.close
       elsif @output.io.kind_of?(RequestLogAnalyzer::Mailer)
         @output.io.mail

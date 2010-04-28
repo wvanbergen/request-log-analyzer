@@ -36,6 +36,12 @@ describe RequestLogAnalyzer, 'running from command line' do
     output.any? { |line| /^Skipped requests\:\s*3\s/ =~ line }.should be_true
   end
 
+  it "should not write output with the --silent option" do
+    output = run("#{log_fixture(:rails_1x)} --silent --file #{temp_output_file(:report)}")
+    output.to_s.should eql("")
+    File.exist?(temp_output_file(:report)).should be_true
+  end
+
   it "should write output to a file with the --file option" do
     run("#{log_fixture(:rails_1x)} --file #{temp_output_file(:report)}")
     File.exist?(temp_output_file(:report)).should be_true

@@ -58,6 +58,7 @@ begin
     command_line.switch(:debug)
     command_line.switch(:no_progress)
     command_line.switch(:gets_memory_protection)
+    command_line.switch(:silent)
 
     command_line.minimum_parameters = 1
   end
@@ -88,6 +89,7 @@ rescue CommandLine::Error => e
   puts "  --output <format>          Output format. Supports 'html' and 'fixed_width'."
   puts "  --report-width <amount>    Width of ASCII report. Defaults to terminal width."
   puts "  --report-amount <amount>   Maximum numer of results per report."
+  puts "  --silent                   Skip the commercials (includes --no-progress)."
   puts "  --yaml <filename>          Dump the results in YAML format in the given file."
   puts
   puts "Examples:"
@@ -113,9 +115,11 @@ when :strip
   require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
 else
-  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
-  puts "Website: http://railsdoctors.com"
-  puts
+  unless arguments[:silent]
+    puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
+    puts "Website: http://railsdoctors.com"
+    puts
+  end
 
   # Run the request_log_analyzer!
   RequestLogAnalyzer::Controller.build_from_arguments(arguments).run!
