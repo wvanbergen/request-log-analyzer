@@ -57,6 +57,7 @@ begin
 
     command_line.switch(:debug)
     command_line.switch(:no_progress)
+    command_line.switch(:gets_memory_protection)
 
     command_line.minimum_parameters = 1
   end

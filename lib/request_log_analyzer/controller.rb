@@ -21,6 +21,8 @@ module RequestLogAnalyzer
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     def self.build_from_arguments(arguments)
       
+      require 'lib/mixins/gets_memory_protection' if arguments[:gets_memory_protection]
+      
       options = {}
       
       # Copy fields
