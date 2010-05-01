@@ -45,6 +45,7 @@ module RequestLogAnalyzer
       options[:report_sort]    = arguments[:report_sort]
       options[:report_amount]  = arguments[:report_amount]
       options[:mailhost]       = arguments[:mailhost] 
+      options[:mailsubject]    = arguments[:mailsubject]
       options[:silent]         = arguments[:silent] 
       
       # Apache format workaround
@@ -107,6 +108,7 @@ module RequestLogAnalyzer
     # * <tt>:format</tt> :rails, {:apache => 'FORMATSTRING'}, :merb, :amazon_s3, :mysql or RequestLogAnalyzer::FileFormat class. (Defaults to :rails).
     # * <tt>:mail</tt> Email the results to this email address.
     # * <tt>:mailhost</tt> Email the results to this mail server.
+    # * <tt>:mailsubject</tt> Email subject.
     # * <tt>:no_progress</tt> Do not display the progress bar (increases parsing speed).
     # * <tt>:output</tt> 'FixedWidth', 'HTML' or RequestLogAnalyzer::Output class. Defaults to 'FixedWidth'.
     # * <tt>:reject</tt> Reject specific {:field => :value} combination (expects a single hash).
@@ -163,7 +165,7 @@ module RequestLogAnalyzer
         output_object = %w[File StringIO].include?(options[:file].class.name) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
       elsif options[:mail]
-        output_object = RequestLogAnalyzer::Mailer.new(options[:mail], options[:mailhost])
+        output_object = RequestLogAnalyzer::Mailer.new(options[:mail], options[:mailhost], :subject => options[:mailsubject])
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount  }
       else
         output_object = STDOUT

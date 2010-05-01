@@ -34,6 +34,7 @@ begin
     command_line.option(:file, :alias => :e)
     command_line.option(:mail, :alias => :m)
     command_line.option(:mailhost, :default => 'localhost')
+    command_line.option(:mailsubject)    
     command_line.option(:parse_strategy, :default => 'assume-correct')
     command_line.option(:yaml)
     command_line.option(:dump) # To be deprecated
@@ -85,6 +86,7 @@ rescue CommandLine::Error => e
   puts "  --file <filename>          Redirect output to file."
   puts "  --mail <emailaddress>      Send report to an email address."
   puts "  --mailhost <server>        Use the given server as the SMTP server for sending email."
+  puts "  --mailsubject <text>       Overwrite default mailsubject."
   puts "  --no-progress              Hide the progress bar."
   puts "  --output <format>          Output format. Supports 'html' and 'fixed_width'."
   puts "  --report-width <amount>    Width of ASCII report. Defaults to terminal width."
