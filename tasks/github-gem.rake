@@ -119,24 +119,43 @@ module GithubGem
         checks = [:check_current_branch, :check_clean_status, :check_not_diverged, :check_version]
         checks.unshift('spec:basic') if has_specs?
         checks.unshift('test:basic') if has_tests?
-        checks.push << [:check_rubyforge] if gemspec.rubyforge_project
+        # checks.push << [:check_rubyforge] if gemspec.rubyforge_project
 
         desc "Perform all checks that would occur before a release"
         task(:release_checks => checks)
 
         release_tasks = [:release_checks, :set_version, :build, :github_release, :gemcutter_release]
-        release_tasks << [:rubyforge_release] if gemspec.rubyforge_project
+        # release_tasks << [:rubyforge_release] if gemspec.rubyforge_project
 
-        desc "Release a new verison of the gem"
+        desc "Release a new version of the gem using the VERSION environment variable"
         task(:release => release_tasks) { release_task }
+        
+        namespace(:release) do
+          desc "Release the next version of the gem, by incrementing the last version segment by 1"
+          task(:next => [:next_version] + release_tasks) { release_task }
 
-        task(:check_rubyforge)   { check_rubyforge_task }
-        task(:rubyforge_release) { rubyforge_release_task }
+          desc "Release the next version of the gem, using a bump increment (0.0.1)"
+          task(:bump => [:next_bump_version] + release_tasks) { release_task }
+
+          desc "Release the next version of the gem, using a minor increment (0.1.0)"
+          task(:minor => [:next_minor_version] + release_tasks) { release_task }
+
+          desc "Release the next version of the gem, using a major increment (1.0.0)"
+          task(:major => [:next_major_version] + release_tasks) { release_task }
+        end
+
+        # task(:check_rubyforge)   { check_rubyforge_task }
+        # task(:rubyforge_release) { rubyforge_release_task }
         task(:gemcutter_release) { gemcutter_release_task }
         task(:github_release => [:commit_modified_files, :tag_version]) { github_release_task }
         task(:tag_version) { tag_version_task }
         task(:commit_modified_files) { commit_modified_files_task }
 
+        task(:next_version)       { next_version_task }
+        task(:next_bump_version)  { next_version_task(:bump) }
+        task(:next_minor_version) { next_version_task(:minor) }
+        task(:next_major_version) { next_version_task(:major) }
+        
         desc "Updates the gem release tasks with the latest version on Github"
         task(:update_tasks) { update_tasks_task }
       end
@@ -160,6 +179,32 @@ module GithubGem
       sh "mv #{gemspec.name}-#{gemspec.version}.gem pkg/#{gemspec.name}-#{gemspec.version}.gem"
     end
 
+    def newest_version
+      git.tags.map { |tag| tag.name.split('-').last }.compact.map { |v| Gem::Version.new(v) }.max || Gem::Version.new('0.0.0')
+    end
+
+    def next_version(increment = nil)
+      next_version = newest_version.segments
+      increment_index = case increment
+        when :micro then 3
+        when :bump  then 2
+        when :minor then 1
+        when :major then 0
+        else next_version.length - 1
+      end
+      
+      next_version[increment_index] ||= 0
+      next_version[increment_index] = next_version[increment_index].succ
+      ((increment_index + 1)...next_version.length).each { |i| next_version[i] = 0 }
+      
+      Gem::Version.new(next_version.join('.'))
+    end
+
+    def next_version_task(increment = nil)
+      ENV['VERSION'] = next_version(increment).version
+      puts "Releasing version #{ENV['VERSION']}..."
+    end
+
     # Updates the version number in the gemspec file, the VERSION constant in the main
     # include file and the contents of the VERSION file.
     def version_task
@@ -173,9 +218,7 @@ module GithubGem
     def check_version_task
       raise "#{ENV['VERSION']} is not a valid version number!" if ENV['VERSION'] && !Gem::Version.correct?(ENV['VERSION'])
       proposed_version = Gem::Version.new(ENV['VERSION'] || gemspec.version)
-      # Loads the latest version number using the created tags
-      newest_version   = git.tags.map { |tag| tag.name.split('-').last }.compact.map { |v| Gem::Version.new(v) }.max
-      raise "This version (#{proposed_version}) is not higher than the highest tagged version (#{newest_version})" if newest_version && newest_version >= proposed_version
+      raise "This version (#{proposed_version}) is not higher than the highest tagged version (#{newest_version})" if newest_version >= proposed_version
     end
 
     # Checks whether the current branch is not diverged from the remote branch
@@ -216,19 +259,19 @@ module GithubGem
       git.push(remote, remote_branch, true)
     end
 
-    # Checks whether Rubyforge is configured properly
-    def check_rubyforge_task
-      # Login no longer necessary when using rubyforge 2.0.0 gem
-      # raise "Could not login on rubyforge!" unless `rubyforge login 2>&1`.strip.empty?
-      output = `rubyforge names`.split("\n")
-      raise "Rubyforge group not found!"   unless output.any? { |line| %r[^groups\s*\:.*\b#{Regexp.quote(gemspec.rubyforge_project)}\b.*] =~ line }
-      raise "Rubyforge package not found!" unless output.any? { |line| %r[^packages\s*\:.*\b#{Regexp.quote(gemspec.name)}\b.*] =~ line }
-    end
+    # # Checks whether Rubyforge is configured properly
+    # def check_rubyforge_task
+    #   # Login no longer necessary when using rubyforge 2.0.0 gem
+    #   # raise "Could not login on rubyforge!" unless `rubyforge login 2>&1`.strip.empty?
+    #   output = `rubyforge names`.split("\n")
+    #   raise "Rubyforge group not found!"   unless output.any? { |line| %r[^groups\s*\:.*\b#{Regexp.quote(gemspec.rubyforge_project)}\b.*] =~ line }
+    #   raise "Rubyforge package not found!" unless output.any? { |line| %r[^packages\s*\:.*\b#{Regexp.quote(gemspec.name)}\b.*] =~ line }
+    # end
 
-    # Task to release the .gem file toRubyforge.
-    def rubyforge_release_task
-      sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version.to_s, "pkg/#{gemspec.name}-#{gemspec.version}.gem"
-    end
+    # # Task to release the .gem file toRubyforge.
+    # def rubyforge_release_task
+    #   sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version.to_s, "pkg/#{gemspec.name}-#{gemspec.version}.gem"
+    # end
     
     def gemcutter_release_task
       sh "gem push pkg/#{gemspec.name}-#{gemspec.version}.gem"
