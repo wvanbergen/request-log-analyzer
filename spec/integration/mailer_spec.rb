@@ -30,8 +30,24 @@ describe RequestLogAnalyzer, 'running mailer integration' do
     find_string_in_file("From: <contact@railsdoctors.com>", @log_file).should_not be_nil
     find_string_in_file("To: <root@localhost>", @log_file).should_not be_nil
     find_string_in_file("From: Request-log-analyzer reporter <contact@railsdoctors.com>", @log_file).should_not be_nil
+    find_string_in_file("Subject: Request log analyzer report - generated on", @log_file).should_not be_nil
     find_string_in_file("Request summary", @log_file).should_not be_nil
     find_string_in_file("PeopleController#show.html [ |    1 |  0.29s |  0.29s |  0.00s |  0.29s |  0.29s", @log_file).should_not be_nil
+  end
+  
+  it "should allow a custom mail subject" do
+    RequestLogAnalyzer::Controller.build(
+      :mail         => 'root@localhost',
+      :mailhost     => 'localhost:2525',
+      :mailsubject  => 'TESTSUBJECT',
+      :source_files => log_fixture(:rails_1x),
+      :format       => RequestLogAnalyzer::FileFormat::Rails,
+      :no_progress  => true
+    ).run!
+    
+    Process.wait # Wait for mailer to complete
+
+    find_string_in_file("Subject: TESTSUBJECT", @log_file).should_not be_nil  
   end
 
   it "should send html mail" do    

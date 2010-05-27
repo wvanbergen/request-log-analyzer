@@ -46,7 +46,7 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
   end
 
   it "should parse a stream and find valid requests" do
-    io = File.new(log_fixture(:test_file_format), 'r')
+    io = File.new(log_fixture(:test_file_format), 'rb')
     @log_parser.parse_io(io) do |request|
       request.should be_kind_of(RequestLogAnalyzer::Request)
       request.should =~ :test

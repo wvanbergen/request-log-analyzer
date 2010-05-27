@@ -2,7 +2,7 @@
 
 This is a simple command line tool to analyze request log files in various formats to produce a performance report. Its purpose is to find what actions are best candidates for optimization.
 
-* Analyzes Rails request logs, Merb request logs, Apache access logs and more, or parses any other log format you specify.
+* Analyzes log files. Currently supports: Amazon S3, Apache, Delayed::Job, Merb, Mysql, PostgreSQL, Rack, Rails and more.
 * Combines multiple files and decompresses compressed files, which comes in handy if you are using logrotate.
 * Uses several metrics, including cumulative request time, mean request time, process blockers, database and rendering time, HTTP methods and statuses, Rails action cache statistics, etc.) (Sample output: http://wiki.github.com/wvanbergen/request-log-analyzer/sample-output)
 * Low memory footprint and reasonably fast, so it is safe to run on a production server.
@@ -36,4 +36,3 @@ Bergen (willem@railsdoctors.com) or Bart ten Brinke (bart@railsdoctors.com).
 * Project wiki at GitHub: http://wiki.github.com/wvanbergen/request-log-analyzer
 * railsdoctors homepage: http://railsdoctors.com
 * wvanbergen's blog posts: http://techblog.floorplanner.com/tag/request-log-analyzer
-* barttenbrinke's blog posts: http://movesonrails.com/articles/tag/analyzer

@@ -46,4 +46,22 @@ describe RequestLogAnalyzer::FileFormat::AmazonS3 do
     end
   end
 
+  it "should parse a COPY request correctly" do
+    line = '09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a testbucket [03/Mar/2010:23:04:59 +0000] 174.119.31.76 09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a ACCC34B843C87BC9 REST.COPY.OBJECT files/image.png "PUT /files/image.png HTTP/1.1" 200 - 234 65957 365 319 "-" "" -'
+    @file_format.should parse_line(line).as(:access).and_capture(
+        :bucket_owner    => '09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a', 
+        :bucket          => 'testbucket', 
+        :timestamp       => 20100303230459, 
+        :remote_ip       => '174.119.31.76', 
+        :requester       => '09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a',
+        :key             => 'files/image.png', 
+        :operation       => 'REST.COPY.OBJECT', 
+        :total_time      => 0.365, 
+        :turnaround_time => 0.319, 
+        :bytes_sent      => 234, 
+        :object_size     => 65957, 
+        :referer         => nil,
+        :user_agent      => '')
+  end
+
 end

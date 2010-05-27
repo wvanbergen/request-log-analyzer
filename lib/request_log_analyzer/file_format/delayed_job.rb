@@ -7,38 +7,42 @@ module RequestLogAnalyzer::FileFormat
     line_definition :job_lock do |line|
       line.header = true
       line.regexp = /\* \[JOB\] acquiring lock on (\S+)/
-      line.captures << { :name => :job, :type => :string }
+      
+      line.capture(:job)
     end
     
     line_definition :job_completed do |line|
       line.footer = true
       line.regexp = /\* \[JOB\] (\S+) completed after (\d+\.\d+)/
-      line.captures << { :name => :completed_job, :type => :string } << 
-                       { :name => :duration, :type => :duration, :unit => :sec }
+
+      line.capture(:completed_job)
+      line.capture(:duration).as(:duration, :unit => :sec) 
     end
     
     line_definition :job_failed do |line|
       line.footer = true
       line.regexp = /\* \[JOB\] (\S+) failed with (\S+)\: .* - (\d+) failed attempts/
-      line.captures << { :name => :failed_job, :type => :string  } << 
-                       { :name => :exception,  :type => :string  } << 
-                       { :name => :attempts,   :type => :integer }
       
+      line.capture(:failed_job)
+      line.capture(:exception)
+      line.capture(:attempts).as(:integer)
     end
     
     line_definition :job_lock_failed do |line|
       line.footer = true
       line.regexp = /\* \[JOB\] failed to acquire exclusive lock for (\S+)/
-      line.captures << { :name => :locked_job, :type => :string }
+      
+      line.capture(:locked_job)
     end
     
     # line_definition :batch_completed do |line|
     #   line.header = true
     #   line.footer = true
     #   line.regexp = /(\d+) jobs processed at (\d+\.\d+) j\/s, (\d+) failed .../
-    #   line.captures << { :name => :total_amount,  :type => :integer } << 
-    #                    { :name => :mean_duration, :type => :duration, :unit => :sec } <<
-    #                    { :name => :failed_amount, :type => :integer }
+    #
+    #   line.capture(:total_amount).as(:integer)
+    #   line.capture(:mean_duration).as(:duration, :unit => :sec)
+    #   line.capture(:failed_amount).as(:integer)
     # end
     
     report do |analyze|

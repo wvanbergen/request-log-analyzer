@@ -16,13 +16,30 @@ module RequestLogAnalyzer
       def initialize_copy(other)
         @line_definitions = other.line_definitions.dup
       end
-
-      def method_missing(name, *args, &block)
+      
+      def define_line(name, arg = {}, &block)
         if block_given?
           @line_definitions[name] = RequestLogAnalyzer::LineDefinition.define(name, &block)
         else
-          @line_definitions[name] = RequestLogAnalyzer::LineDefinition.new(name, args.first)
+          @line_definitions[name] = RequestLogAnalyzer::LineDefinition.new(name, arg)
         end
+      end
+
+      def method_missing(name, *args, &block)
+        define_line(name, args[0], &block)
+      end
+    end
+
+    class CaptureDefiner
+      attr_accessor :capture_hash
+      
+      def initialize(hash)
+        @capture_hash = hash
+      end
+      
+      def as(type, type_options = {})
+        @capture_hash.merge!(type_options.merge(:type => type))
+        return self
       end
     end
 
@@ -47,6 +64,12 @@ module RequestLogAnalyzer
       yield(definition) if block_given?
       return definition
     end
+    
+    def capture(name)
+      new_capture_hash = { :name => name, :type => :string}
+      captures << new_capture_hash
+      CaptureDefiner.new(new_capture_hash)
+    end
 
     # Checks whether a given line matches this definition.
     # It will return false if a line does not match. If the line matches, a hash is returned
@@ -66,6 +89,8 @@ module RequestLogAnalyzer
       else
         return false
       end
+    rescue
+      return false
     end
 
     alias :=~ :matches

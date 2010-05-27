@@ -15,6 +15,11 @@ describe RequestLogAnalyzer, 'running from command line' do
     output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
   end
 
+  it "should function correctly with the gets mixin" do
+    output = run("#{log_fixture(:rails_1x)} --gets-memory-protection")
+    output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
+  end
+  
   it "should find 2 requests when parsing a compressed file" do
     output = run("#{log_fixture(:decompression, :tgz)}")
     output.any? { |line| /^Parsed requests\:\s*2\s/ =~ line }.should be_true
@@ -29,6 +34,12 @@ describe RequestLogAnalyzer, 'running from command line' do
   it "should skip 3 requests with a --reject option" do
     output = run("#{log_fixture(:rails_1x)} --reject controller PeopleController")
     output.any? { |line| /^Skipped requests\:\s*3\s/ =~ line }.should be_true
+  end
+
+  it "should not write output with the --silent option" do
+    output = run("#{log_fixture(:rails_1x)} --silent --file #{temp_output_file(:report)}")
+    output.to_s.should eql("")
+    File.exist?(temp_output_file(:report)).should be_true
   end
 
   it "should write output to a file with the --file option" do

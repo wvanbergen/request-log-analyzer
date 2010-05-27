@@ -34,6 +34,7 @@ begin
     command_line.option(:file, :alias => :e)
     command_line.option(:mail, :alias => :m)
     command_line.option(:mailhost, :default => 'localhost')
+    command_line.option(:mailsubject)    
     command_line.option(:parse_strategy, :default => 'assume-correct')
     command_line.option(:yaml)
     command_line.option(:dump) # To be deprecated
@@ -57,6 +58,8 @@ begin
 
     command_line.switch(:debug)
     command_line.switch(:no_progress)
+    command_line.switch(:gets_memory_protection)
+    command_line.switch(:silent)
 
     command_line.minimum_parameters = 1
   end
@@ -83,10 +86,12 @@ rescue CommandLine::Error => e
   puts "  --file <filename>          Redirect output to file."
   puts "  --mail <emailaddress>      Send report to an email address."
   puts "  --mailhost <server>        Use the given server as the SMTP server for sending email."
+  puts "  --mailsubject <text>       Overwrite default mailsubject."
   puts "  --no-progress              Hide the progress bar."
   puts "  --output <format>          Output format. Supports 'html' and 'fixed_width'."
   puts "  --report-width <amount>    Width of ASCII report. Defaults to terminal width."
   puts "  --report-amount <amount>   Maximum numer of results per report."
+  puts "  --silent                   Skip the commercials (includes --no-progress)."
   puts "  --yaml <filename>          Dump the results in YAML format in the given file."
   puts
   puts "Examples:"
@@ -112,9 +117,11 @@ when :strip
   require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
 else
-  puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
-  puts "Website: http://railsdoctors.com"
-  puts
+  unless arguments[:silent]
+    puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
+    puts "Website: http://railsdoctors.com"
+    puts
+  end
 
   # Run the request_log_analyzer!
   RequestLogAnalyzer::Controller.build_from_arguments(arguments).run!

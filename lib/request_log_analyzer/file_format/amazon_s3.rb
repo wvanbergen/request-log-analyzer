@@ -11,24 +11,25 @@ module RequestLogAnalyzer::FileFormat
     line_definition :access do |line|
       line.header = true
       line.footer = true
-      line.regexp = /^([^\ ]+) ([^\ ]+) \[(#{timestamp('%d/%b/%Y:%H:%M:%S %z')})?\] (#{ip_address}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]+)" "([^"]+)"/
-      line.captures << { :name => :bucket_owner,    :type => :string } <<
-                       { :name => :bucket,          :type => :string } <<
-                       { :name => :timestamp,       :type => :timestamp } <<
-                       { :name => :remote_ip,       :type => :string } <<
-                       { :name => :requester,       :type => :string } <<
-                       { :name => :request_id,      :type => :string } <<
-                       { :name => :operation,       :type => :string } <<
-                       { :name => :key,             :type => :nillable_string } <<
-                       { :name => :request_uri,     :type => :string } <<
-                       { :name => :http_status,     :type => :integer } <<
-                       { :name => :error_code,      :type => :nillable_string } <<
-                       { :name => :bytes_sent,      :type => :traffic,  :unit => :byte } <<
-                       { :name => :object_size,     :type => :traffic,  :unit => :byte } <<
-                       { :name => :total_time,      :type => :duration, :unit => :msec } <<
-                       { :name => :turnaround_time, :type => :duration, :unit => :msec } <<
-                       { :name => :referer,         :type => :referer } <<
-                       { :name => :user_agent,      :type => :user_agent }
+      line.regexp = /^([^\ ]+) ([^\ ]+) \[(#{timestamp('%d/%b/%Y:%H:%M:%S %z')})?\] (#{ip_address}) ([^\ ]+) ([^\ ]+) (\w+(?:\.\w+)*) ([^\ ]+) "([^"]+)" (\d+) ([^\ ]+) (\d+) (\d+) (\d+) (\d+) "([^"]*)" "([^"]*)"/
+      
+      line.capture(:bucket_owner)
+      line.capture(:bucket)
+      line.capture(:timestamp).as(:timestamp)
+      line.capture(:remote_ip)
+      line.capture(:requester)
+      line.capture(:request_id)
+      line.capture(:operation)
+      line.capture(:key).as(:nillable_string)
+      line.capture(:request_uri)
+      line.capture(:http_status).as(:integer)
+      line.capture(:error_code).as(:nillable_string)
+      line.capture(:bytes_sent).as(:traffic, :unit => :byte)
+      line.capture(:object_size).as(:traffic, :unit => :byte)
+      line.capture(:total_time).as(:duration, :unit => :msec)
+      line.capture(:turnaround_time).as(:duration, :unit => :msec)
+      line.capture(:referer).as(:referer)
+      line.capture(:user_agent).as(:user_agent)
     end
 
     report do |analyze|

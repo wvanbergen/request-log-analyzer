@@ -20,9 +20,10 @@ module RequestLogAnalyzer::FileFormat
       # a usable class is provided. Use this format class.
       klass = file_format
 
-    elsif file_format.kind_of?(String) && File.exist?(file_format)
+    elsif file_format.kind_of?(String) && File.exist?(file_format) && File.file?(file_format)
       # load a format from a ruby file
       require file_format
+
       const = RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb'))
       if RequestLogAnalyzer::FileFormat.const_defined?(const)
         klass = RequestLogAnalyzer::FileFormat.const_get(const)
@@ -63,7 +64,7 @@ module RequestLogAnalyzer::FileFormat
     
     parsers = all_formats.map { |f| RequestLogAnalyzer::Source::LogParser.new(f, :parse_strategy => 'cautious') }
     
-    File.open(file, 'r') do |io|
+    File.open(file, 'rb') do |io|
       while io.lineno < line_count && (line = io.gets)
         parsers.each { |parser| parser.parse_line(line) } 
       end
@@ -201,7 +202,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
-      @line_definer.send(name, &block)
+      @line_definer.define_line(name, &block)
     end
 
     # Specifies multiple line definitions at once using a block
