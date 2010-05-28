@@ -28,7 +28,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
         :failed_job => 'BackgroundJob::ThumbnailSaver', :exception => 'ActiveRecord::RecordNotFound')
     end
     
-    it "" do
+    it "should parse a failed job lock line correctly" do
       line = "* [JOB] failed to acquire exclusive lock for BackgroundJob::ThumbnailSaver"
       @file_format.should parse_line(line).as(:job_lock_failed).and_capture(:locked_job => 'BackgroundJob::ThumbnailSaver')
     end
