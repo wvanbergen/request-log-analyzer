@@ -1,0 +1,19 @@
+Jun 18 11:27:37 derek rails[67783]: Processing FileRecordsController#inline (for 127.0.0.1 at 2010-06-18 11:27:37) [GET]
+Jun 18 11:27:37 derek rails[67783]: Session ID: 8abbd5bce47cfc8bd438c647f5a9e016
+Jun 18 11:27:37 derek rails[67783]: Parameters: {"id"=>"5171"}
+Jun 18 11:27:37 derek rails[67783]: Memory usage: 400000 | PID: 67783
+Jun 18 11:27:37 derek rails[67783]: Completed in 207ms (View: 0, DB: 258) | 200 OK [http://localhost/file_records/inline/5171]
+
+Jun 18 11:28:11 derek rails[700]: Processing InfoController#about (for 127.0.0.1 at 2010-06-18 11:28:11) [GET]
+Jun 18 11:28:12 derek rails[700]: Memory usage: 700000 | PID: 67783
+Jun 18 11:28:12 derek rails[700]: Completed in 379ms (View: 89, DB: 258) | 200 OK [http://localhost/info/about]
+
+Jun 18 11:28:11 derek rails[700]: Processing InfoController#board (for 127.0.0.1 at 2010-06-18 11:28:11) [GET]
+Jun 18 11:28:12 derek rails[700]: Memory usage: 750000 | PID: 67783
+Jun 18 11:28:12 derek rails[700]: Completed in 379ms (View: 89, DB: 258) | 200 OK [http://localhost/info/board]
+
+Jun 18 11:31:19 derek rails[67783]: Processing InnovationsController#innovation_param (for 127.0.0.1 at 2010-06-18 11:31:19) [GET]
+Jun 18 11:31:19 derek rails[67783]: Session ID: 8abbd5bce47cfc8bd438c647f5a9e016
+Jun 18 11:31:19 derek rails[67783]: Parameters: {"organization_param"=>"harvard", "innovation_param"=>"potent-ogt-inhibitors-for-the-treatment-of-cancer-and-diabeti"}
+Jun 18 11:31:31 derek rails[67783]: Memory usage: 430000 | PID: 67783
+Jun 18 11:31:31 derek rails[67783]: Completed in 11922ms (View: 200, DB: 11673) | 200 OK [http://localhost/harvard/potent-ogt-inhibitors-for-the-treatment-of-cancer-and-diabeti]
