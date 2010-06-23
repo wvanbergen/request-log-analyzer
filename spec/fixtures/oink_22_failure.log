@@ -1,3 +1,6 @@
+Jun 18 11:25:37 derek rails[67783]: Processing FileRecordsController#inline (for 127.0.0.1 at 2010-06-18 11:25:37) [GET]
+Jun 18 11:25:40 derek rails[67783]: NoMethodError (undefined method `update_domain_account' for nil:NilClass):
+
 Jun 18 11:27:37 derek rails[67783]: Processing FileRecordsController#inline (for 127.0.0.1 at 2010-06-18 11:27:37) [GET]
 Jun 18 11:27:37 derek rails[67783]: Session ID: 8abbd5bce47cfc8bd438c647f5a9e016
 Jun 18 11:27:37 derek rails[67783]: Parameters: {"id"=>"5171"}

@@ -79,7 +79,7 @@ describe RequestLogAnalyzer::FileFormat::Oink do
       end
       
       it "should parse requests" do
-        request_counter.should_receive(:hit!).exactly(3).times
+        request_counter.should_receive(:hit!).exactly(4).times
         
         @log_parser.parse_file(log_fixture(:oink_22_failure)) do |request|
           request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails::Request) && request.completed?
@@ -88,7 +88,7 @@ describe RequestLogAnalyzer::FileFormat::Oink do
       
       it "should ignore memory changes when a failure occurs" do
         @log_parser.parse_file(log_fixture(:oink_22_failure)) do |request|
-          if @log_parser.parsed_requests == 3
+          if @log_parser.parsed_requests == 4
             request[:memory_diff].should == nil
           end
         end

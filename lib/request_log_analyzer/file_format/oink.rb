@@ -42,6 +42,12 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
      update_pids
      super
    end
+   
+   # Accessor for memory information associated with the specified request PID. If no memory exists
+   # for this request's :pid, the memory tracking is initialized.
+   def pid_memory
+     file_format.pids[self[:pid]] ||= { :last_memory_reading => -1, :current_memory_reading => -1 }
+   end
     
    # Calculates :memory_diff for each request based on the last completed request that was not a failure.
    def update_pids
@@ -50,22 +56,21 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
      #
      # NOTE - the failure regex was not matching with a Rails Development log file.
      if has_line_type?(:failure) and processing = has_line_type?(:processing)
-       file_format.pids[processing[:pid]][:last_memory_reading] = -1
+       pid_memory[:last_memory_reading] = -1
      elsif mem_line = has_line_type?(:memory_usage)
-        pid,memory_reading = mem_line.values_at(:pid,:memory)
-        file_format.pids[pid] ||= { :last_memory_reading => -1, :current_memory_reading => -1 }
-        file_format.pids[pid][:current_memory_reading] = memory_reading
+        memory_reading = mem_line[:memory]
+        pid_memory[:current_memory_reading] = memory_reading
         # calcuate the change in memory
-        unless file_format.pids[pid][:current_memory_reading] == -1 || file_format.pids[pid][:last_memory_reading] == -1
+        unless pid_memory[:current_memory_reading] == -1 || pid_memory[:last_memory_reading] == -1
           # logged as kB, need to convert to bytes for the :traffic Tracker
-          memory_diff = (file_format.pids[pid][:current_memory_reading] - file_format.pids[pid][:last_memory_reading])*1024
+          memory_diff = (pid_memory[:current_memory_reading] - pid_memory[:last_memory_reading])*1024
           if memory_diff > 0
             self.attributes[:memory_diff] = memory_diff
           end # if memory_diff > 0
         end # unless
         
-        file_format.pids[pid][:last_memory_reading] = file_format.pids[pid][:current_memory_reading]
-        file_format.pids[pid][:current_memory_reading] = -1
+        pid_memory[:last_memory_reading] = pid_memory[:current_memory_reading]
+        pid_memory[:current_memory_reading] = -1
       end # if mem_line
       return true
    end # def update_pids
