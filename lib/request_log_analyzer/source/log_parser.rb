@@ -43,7 +43,9 @@ module RequestLogAnalyzer::Source
       @progress_handler = nil
 
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
-      raise "Unknown parse strategy" unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
+      unless PARSE_STRATEGIES.include?(@options[:parse_strategy])
+        raise "Unknown parse strategy: #{@options[@parse_strategy]}"
+      end
     end
 
     # Reads the input, which can either be a file, sequence of files or STDIN to parse

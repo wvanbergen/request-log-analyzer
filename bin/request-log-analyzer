@@ -93,6 +93,7 @@ rescue CommandLine::Error => e
   puts "  --report-amount <amount>   Maximum numer of results per report."
   puts "  --silent                   Skip the commercials (includes --no-progress)."
   puts "  --yaml <filename>          Dump the results in YAML format in the given file."
+  puts "  --parse-strategy <strategy> Legal values are 'assume-correct' or 'cautious'."
   puts
   puts "Examples:"
   puts "  request-log-analyzer production.log"
