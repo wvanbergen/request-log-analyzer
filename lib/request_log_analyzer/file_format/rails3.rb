@@ -8,11 +8,11 @@ module RequestLogAnalyzer::FileFormat
 
     extend CommonRegularExpressions
 
-    # Started GET "/queries" for 127.0.0.1 at 2010-02-25 16:15:18
+    # beta4: Started GET "/" for 127.0.0.1 at Wed Jul 07 09:13:27 -0700 2010 (different time format)
     line_definition :started do |line|
       line.header = true
       line.teaser = /Started /
-      line.regexp = /Started ([A-Z]+) "([^"]+)" for (#{ip_address}) at (#{timestamp('%Y-%m-%d %H:%M:%S')})/
+      line.regexp = /Started ([A-Z]+) "([^"]+)" for (#{ip_address}) at (#{timestamp('%a %b %d %H:%M:%S %z %Y')})/
       
       line.capture(:method)
       line.capture(:path)
@@ -77,8 +77,18 @@ module RequestLogAnalyzer::FileFormat
     end
     
     class Request < RequestLogAnalyzer::Request
-      def convert_timestamp(value, defintion)
-        value.gsub(/[^0-9]/, '')[0...14].to_i
+      # Used to handle conversion of abbrev. month name to a digit
+      MONTHS = %w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
+      
+      def convert_timestamp(value, definition)
+        value.gsub!(/\W/,'')
+        time_as_str = value[-4..-1] # year
+        # convert the month to a 2-digit representation
+        month = MONTHS.index(value[3..5])+1
+        month < 10 ? time_as_str << "0#{month}" : time_as_str << month
+        
+        time_as_str << value[6..13] # day of month + time
+        time_as_str.to_i
       end
     end
 

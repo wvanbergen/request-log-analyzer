@@ -10,7 +10,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     before(:each) { @file_format = RequestLogAnalyzer::FileFormat.load(:rails3) }
 
     it "should parse :started lines correctly" do
-      line = 'Started GET "/queries" for 127.0.0.1 at 2010-02-25 16:15:18'
+      line = 'Started GET "/queries" for 127.0.0.1 at Thu Feb 25 16:15:18 -0800 2010'
       @file_format.should parse_line(line).as(:started).and_capture(:method => 'GET', 
             :path => '/queries', :ip => '127.0.0.1', :timestamp => 20100225161518)
     end
@@ -50,7 +50,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     
     it "should parse a successful request correctly" do
       log = <<-EOLOG
-        Started GET "/" for 127.0.0.1 at 2010-03-19 06:40:41
+        Started GET "/" for 127.0.0.1 at Fri Mar 19 06:40:41 -0700 2010
           Processing by QueriesController#index as HTML
           SQL (16.3ms)  SHOW TABLES
           Query Load (32.0ms)  SELECT `queries`.* FROM `queries`
@@ -68,7 +68,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     
     it "should parse an unroutable request correctly" do
       log = <<-EOLOG
-        Started GET "/404" for 127.0.0.1 at 2010-03-19 06:40:57
+        Started GET "/404" for 127.0.0.1 at Fri Mar 19 06:40:57 -0700 2010
 
         ActionController::RoutingError (No route matches "/404"):
 
@@ -87,7 +87,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     
     it "should parse a failing request correctly" do
       log = <<-EOLOG
-        Started POST "/queries/397638749/execute.csv" for 127.0.0.1 at 2010-03-01 18:44:33
+        Started POST "/queries/397638749/execute.csv" for 127.0.0.1 at Mon Mar 01 18:44:33 -0800 2010
           Processing by QueriesController#execute as CSV
           Parameters: {"commit"=>"Run query", "authenticity_token"=>"pz9WcxkcrlG/43eg6BgSAnJL7yIsaffuHbYxPHUsUzQ=", "id"=>"397638749"}
 
