@@ -29,7 +29,7 @@ class File
     if @last_pos.nil? 
       seek(0, IO::SEEK_END)
       @last_pos = pos
-      seek(current_pos, IO::SEEK_SET)
+      seek(@current_pos, IO::SEEK_SET)
     end
     
     # 
