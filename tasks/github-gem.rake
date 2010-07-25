@@ -134,8 +134,8 @@ module GithubGem
           desc "Release the next version of the gem, by incrementing the last version segment by 1"
           task(:next => [:next_version] + release_tasks) { release_task }
 
-          desc "Release the next version of the gem, using a bump increment (0.0.1)"
-          task(:bump => [:next_bump_version] + release_tasks) { release_task }
+          desc "Release the next version of the gem, using a patch increment (0.0.1)"
+          task(:patch => [:next_patch_version] + release_tasks) { release_task }
 
           desc "Release the next version of the gem, using a minor increment (0.1.0)"
           task(:minor => [:next_minor_version] + release_tasks) { release_task }
@@ -152,7 +152,7 @@ module GithubGem
         task(:commit_modified_files) { commit_modified_files_task }
 
         task(:next_version)       { next_version_task }
-        task(:next_bump_version)  { next_version_task(:bump) }
+        task(:next_patch_version)  { next_version_task(:patch) }
         task(:next_minor_version) { next_version_task(:minor) }
         task(:next_major_version) { next_version_task(:major) }
         
@@ -187,7 +187,7 @@ module GithubGem
       next_version = newest_version.segments
       increment_index = case increment
         when :micro then 3
-        when :bump  then 2
+        when :patch then 2
         when :minor then 1
         when :major then 0
         else next_version.length - 1
