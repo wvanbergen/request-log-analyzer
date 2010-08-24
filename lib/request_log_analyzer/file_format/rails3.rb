@@ -30,14 +30,18 @@ module RequestLogAnalyzer::FileFormat
       line.capture(:format)
     end
     
-    # Completed in 9ms (Views: 4.9ms | ActiveRecord: 0.5ms) with 200
+    # Completed 200 OK in 224ms (Views: 200.2ms | ActiveRecord: 3.4ms)
+    # Completed 302 Found in 23ms
+    # Completed   in 189ms
     line_definition :completed do |line|
       line.footer = true
       line.teaser = /Completed /
-      line.regexp = /Completed (\d+) .* in (\d+)ms \([^\)]*\)/
+      line.regexp = /Completed (\d+)? .*in (\d+)ms(?:[^(]*\(Views: ((?:\d|\.)+)ms .* ActiveRecord: ((?:\d|\.)+)ms\))?/
 
       line.capture(:status).as(:integer)
       line.capture(:duration).as(:duration, :unit => :msec)
+      line.capture(:view).as(:duration, :unit => :msec)
+      line.capture(:db).as(:duration, :unit => :msec)
     end
     
     # ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:
@@ -69,8 +73,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :status, :title => 'HTTP statuses returned'
       
       analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
-      # analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
-      # analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
+      analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
+      analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
       
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
         :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
