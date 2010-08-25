@@ -217,7 +217,7 @@ module GithubGem
 
     def check_version_task
       raise "#{ENV['VERSION']} is not a valid version number!" if ENV['VERSION'] && !Gem::Version.correct?(ENV['VERSION'])
-      proposed_version = Gem::Version.new(ENV['VERSION'] || gemspec.version)
+      proposed_version = Gem::Version.new(ENV['VERSION'].dup || gemspec.version)
       raise "This version (#{proposed_version}) is not higher than the highest tagged version (#{newest_version})" if newest_version >= proposed_version
     end
 
