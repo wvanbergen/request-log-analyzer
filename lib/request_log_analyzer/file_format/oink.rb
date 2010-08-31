@@ -36,7 +36,7 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
     @pids ||= {}
   end
   
-  class Request
+  class Request < RequestLogAnalyzer::FileFormat::Rails::Request
    # Overrides the #validate method to handle PID updating.
    def validate
      update_pids
