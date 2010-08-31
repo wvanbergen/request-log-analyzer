@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 
-$:.unshift(File.dirname(__FILE__) + '/../lib')
+$:.unshift(File.expand_path('../lib', File.dirname(__FILE__)))
 require 'request_log_analyzer'
 require 'cli/command_line_arguments'
 require 'cli/progressbar'
@@ -115,7 +115,6 @@ when :console
   require 'cli/database_console'
   DatabaseConsole.new(arguments).run!
 when :strip
-  require File.dirname(__FILE__) + '/../lib/request_log_analyzer/log_processor'
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
 else
   unless arguments[:silent]

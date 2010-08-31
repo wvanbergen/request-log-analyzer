@@ -38,7 +38,7 @@ describe RequestLogAnalyzer, 'running from command line' do
 
   it "should not write output with the --silent option" do
     output = run("#{log_fixture(:rails_1x)} --silent --file #{temp_output_file(:report)}")
-    output.to_s.should eql("")
+    output.should be_empty
     File.exist?(temp_output_file(:report)).should be_true
   end
 

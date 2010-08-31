@@ -60,7 +60,7 @@ describe RequestLogAnalyzer::FileFormat do
     end
 
     it "should load a provided format file" do
-      format_filename = File.dirname(__FILE__) + '/../../lib/testing_format.rb'
+      format_filename = File.expand_path('../../lib/testing_format.rb', File.dirname(__FILE__))
       @file_format = RequestLogAnalyzer::FileFormat.load(format_filename)
       @file_format.should be_kind_of(TestingFormat)
     end
