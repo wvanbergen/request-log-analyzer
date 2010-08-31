@@ -4,6 +4,7 @@ request-log-analyzer-*.gem
 requests.db
 /pkg
 /doc
+.yardoc/
 /tmp
 /classes
 /files
