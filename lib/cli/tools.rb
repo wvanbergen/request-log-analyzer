@@ -34,7 +34,8 @@ def install_rake_tasks(install_type = :rails)
   if install_type.to_sym == :rails
     require 'ftools'
     if File.directory?('./lib/tasks/')
-      File.copy(File.dirname(__FILE__) + '/../../tasks/request_log_analyzer.rake', './lib/tasks/request_log_analyze.rake')
+      task_file = File.expand_path('../../tasks/request_log_analyzer.rake', File.dirname(__FILE__))
+      File.copy(task_file, './lib/tasks/request_log_analyze.rake')
       puts "Installed rake tasks."
       puts "To use, run: rake rla:report"
     else

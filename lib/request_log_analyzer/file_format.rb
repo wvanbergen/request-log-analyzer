@@ -56,7 +56,7 @@ module RequestLogAnalyzer::FileFormat
   
   # Returns an array of all FileFormat instances that are shipped with request-log-analyzer by default.
   def self.all_formats
-    @all_formats ||= Dir[File.dirname(__FILE__) + '/file_format/*.rb'].map do |file| 
+    @all_formats ||= Dir[File.expand_path('file_format/*.rb', File.dirname(__FILE__))].map do |file| 
       self.load(File.basename(file, '.rb')) 
     end
   end
