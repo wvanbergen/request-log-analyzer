@@ -1,11 +1,10 @@
 # Module for generating output
 module RequestLogAnalyzer::Output
 
-  # Load class files if needed
-  def self.const_missing(const)
-    RequestLogAnalyzer::load_default_class_file(self, const)
-  end
-
+  autoload :FixedWidth, 'request_log_analyzer/output/fixed_width'
+  autoload :HTML,       'request_log_analyzer/output/html'
+  autoload :FancyHTML,  'request_log_analyzer/output/fancy_html'
+  
   # Loads a Output::Base subclass instance.
   def self.load(file_format, *args)
     

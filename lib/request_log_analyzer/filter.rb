@@ -1,10 +1,8 @@
 module RequestLogAnalyzer::Filter
 
-  # Filter class loader using const_missing
-  # This function will automatically load the class file based on the name of the class
-  def self.const_missing(const)
-    RequestLogAnalyzer::load_default_class_file(self, const)
-  end
+  autoload :Field,     'request_log_analyzer/filter/field'
+  autoload :Timespan,  'request_log_analyzer/filter/timespan'
+  autoload :Anonymize, 'request_log_analyzer/filter/anonymize'
 
   # Base filter class used to filter input requests.
   # All filters should interit from this base.

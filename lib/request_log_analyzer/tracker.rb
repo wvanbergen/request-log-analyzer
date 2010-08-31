@@ -1,10 +1,11 @@
 module RequestLogAnalyzer::Tracker
 
-  # const_missing: this function is used to load subclasses in the RequestLogAnalyzer::Track namespace.
-  # It will automatically load the required file based on the class name
-  def self.const_missing(const)
-    RequestLogAnalyzer::load_default_class_file(self, const)
-  end
+  autoload :Duration,     'request_log_analyzer/tracker/duration'
+  autoload :Frequency,    'request_log_analyzer/tracker/frequency'
+  autoload :HourlySpread, 'request_log_analyzer/tracker/hourly_spread'
+  autoload :NumericValue, 'request_log_analyzer/tracker/numeric_value'
+  autoload :Timespan,     'request_log_analyzer/tracker/timespan'
+  autoload :Traffic,      'request_log_analyzer/tracker/traffic'
 
   # Base Tracker class. All other trackers inherit from this class
   #

@@ -8,12 +8,8 @@
 # - Currently, RequestLogAnalyzer::Source::LogParser is the only implemented source.
 module RequestLogAnalyzer::Source
 
-  # Loads constants that reside in the RequestLogAnalyzer::Source namespace. This function uses
-  # RequestLogAnalyzer::load_default_class_file to load the file in which the constant is declared.
-  # <tt>const</tt>:: The constant to load in the RequestLogAnalyzer::Source namespace.
-  def self.const_missing(const)
-    RequestLogAnalyzer::load_default_class_file(self, const)
-  end
+  autoload :LogParser,      'request_log_analyzer/source/log_parser'
+  autoload :DatabaseLoader, 'request_log_analyzer/source/database_loader'
 
   # The base Source class. All other sources should inherit from this class.
   #

@@ -10,11 +10,6 @@ module RequestLogAnalyzer::Output
   
   class FancyHTML < HTML
     
-    # Load class files if needed
-    def self.const_missing(const)
-      RequestLogAnalyzer::load_default_class_file(self, const)
-    end
-    
     def report_tracker(tracker)
       case tracker
       when RequestLogAnalyzer::Tracker::HourlySpread then report_hourly_spread(tracker)

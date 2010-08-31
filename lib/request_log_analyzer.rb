@@ -15,13 +15,19 @@ module RequestLogAnalyzer
   # Do not change the value by hand; it will be updated automatically by the gem release script.
   VERSION = "1.8.0"
 
-  # Loads constants in the RequestLogAnalyzer namespace using self.load_default_class_file(base, const)
-  # @param [Symbol] const The constant that is not yet loaded in the RequestLogAnalyzer namespace. This 
-  #        should  be passed as a string or symbol.
-  # @return [Module] The loaded module, nil if it was not found on the expected location.
-  def self.const_missing(const)
-    load_default_class_file(RequestLogAnalyzer, const)
-  end
+
+  autoload :Controller,     'request_log_analyzer/controller'
+  autoload :Aggregator,     'request_log_analyzer/aggregator'
+  autoload :Database,       'request_log_analyzer/database'
+  autoload :FileFormat,     'request_log_analyzer/file_format'
+  autoload :Filter,         'request_log_analyzer/filter'
+  autoload :LineDefinition, 'request_log_analyzer/line_definition'
+  autoload :LogProcessor,   'request_log_analyzer/log_processor'
+  autoload :Mailer,         'request_log_analyzer/mailer'
+  autoload :Output,         'request_log_analyzer/output'
+  autoload :Request,        'request_log_analyzer/request'
+  autoload :Source,         'request_log_analyzer/source'
+  autoload :Tracker,        'request_log_analyzer/tracker'
 
   # Loads constants that reside in the RequestLogAnalyzer tree using the constant name and its base 
   # constant to determine the filename.

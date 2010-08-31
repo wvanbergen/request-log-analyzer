@@ -1,8 +1,17 @@
 module RequestLogAnalyzer::FileFormat
 
-  def self.const_missing(const) # :nodoc:
-    RequestLogAnalyzer::load_default_class_file(self, const)
-  end
+  autoload :Rails,            'request_log_analyzer/file_format/rails'
+  autoload :Rails3,           'request_log_analyzer/file_format/rails3'
+  autoload :RailsDevelopment, 'request_log_analyzer/file_format/rails_development'
+  autoload :Oink,             'request_log_analyzer/file_format/oink'
+  autoload :Rack,             'request_log_analyzer/file_format/rack'
+  autoload :Merb,             'request_log_analyzer/file_format/merb'
+  autoload :Mysql,            'request_log_analyzer/file_format/mysql'
+  autoload :Postgresql,       'request_log_analyzer/file_format/postgresql'
+  autoload :DelayedJob,       'request_log_analyzer/file_format/delayed_job'
+  autoload :DelayedJob2,      'request_log_analyzer/file_format/delayed_job2'
+  autoload :Apache,           'request_log_analyzer/file_format/apache'
+  autoload :AmazonS3,         'request_log_analyzer/file_format/amazon_s3'
 
   # Loads a FileFormat::Base subclass instance.
   # You can provide:

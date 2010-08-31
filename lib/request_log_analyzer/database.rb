@@ -3,9 +3,11 @@ require 'active_record'
 
 class RequestLogAnalyzer::Database
 
-  def self.const_missing(const) # :nodoc:
-    RequestLogAnalyzer::load_default_class_file(self, const)
-  end
+  autoload :Connection, 'request_log_analyzer/database/connection'
+  autoload :Base,       'request_log_analyzer/database/base'
+  autoload :Request,    'request_log_analyzer/database/request'
+  autoload :Source,     'request_log_analyzer/database/source'
+  autoload :Warning,    'request_log_analyzer/database/warning'
 
   include RequestLogAnalyzer::Database::Connection
 

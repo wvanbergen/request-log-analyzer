@@ -1,8 +1,8 @@
 module RequestLogAnalyzer::Aggregator
 
-  def self.const_missing(const)
-    RequestLogAnalyzer::load_default_class_file(self, const)
-  end
+  autoload :Echo,             'request_log_analyzer/aggregator/echo'
+  autoload :Summarizer,       'request_log_analyzer/aggregator/summarizer'
+  autoload :DatabaseInserter, 'request_log_analyzer/aggregator/database_inserter'
 
   # The base class of an aggregator. This class provides the interface to which
   # every aggregator should comply (by simply subclassing this class).
