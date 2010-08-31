@@ -247,10 +247,20 @@ module RequestLogAnalyzer::FileFormat
       request_class.create(self, *hashes)
     end
 
-    # Checks whether the line definitions form a valid language.
-    # A file format should have at least a header and a footer line type
+    # Checks whether the file format is valid so it can be safely used with RLA.
     def valid?
+      valid_line_definitions? && valid_request_class?
+    end
+
+    # Checks whether the line definitions form a valid language.
+    # A file format should have at least a header and a footer line type    
+    def valid_line_definitions?
       line_definitions.any? { |(name, ld)| ld.header } && line_definitions.any? { |(name, ld)| ld.footer }
+    end
+    
+    # Checks whether the request class inherits from the base Request class.
+    def valid_request_class?
+      request_class.ancestors.include?(RequestLogAnalyzer::Request)
     end
 
     # Returns true if this language captures the given symbol in one of its line definitions
