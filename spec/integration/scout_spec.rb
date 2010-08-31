@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper.rb'
+require 'spec_helper'
 
 def capture_stdout_and_stderr_with_warnings_on
   $stdout, $stderr, warnings, $VERBOSE =

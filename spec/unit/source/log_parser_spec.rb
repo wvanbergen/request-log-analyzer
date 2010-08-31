@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../spec_helper'
+require 'spec_helper'
 
 describe RequestLogAnalyzer::Source::LogParser, :requests do
 
