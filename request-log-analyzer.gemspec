@@ -27,8 +27,15 @@ Gem::Specification.new do |s|
 
   s.requirements << "To use the database inserter, ActiveRecord and an appropriate database adapter are required."
 
-  s.add_development_dependency('rspec',    '>= 1.2.4')
-  s.add_development_dependency('git',      '>= 1.1.0')
+  s.add_development_dependency('rake')
+  s.add_development_dependency('rspec')
+  
+  s.add_development_dependency('activerecord')
+  s.add_development_dependency('sqlite3-ruby')
+  
+  s.add_development_dependency('git')
+  s.add_development_dependency('gemcutter')
+  
 
   s.authors  = ['Willem van Bergen', 'Bart ten Brinke']
   s.email    = ['willem@railsdoctors.com', 'bart@railsdoctors.com']
