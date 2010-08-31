@@ -32,7 +32,7 @@ module RequestLogAnalyzer::Aggregator
       # <tt>optiont</tt> The options to pass to the trackers.
       def track(tracker_klass, value_field = {}, other_options = {})
         options = value_field.kind_of?(Symbol) ? other_options.merge(:value => value_field) : value_field.merge(other_options) 
-        tracker_klass = RequestLogAnalyzer::Tracker.const_get(RequestLogAnalyzer::to_camelcase(tracker_klass)) if tracker_klass.kind_of?(Symbol)
+        tracker_klass = RequestLogAnalyzer::Tracker.const_get(RequestLogAnalyzer.to_camelcase(tracker_klass)) if tracker_klass.kind_of?(Symbol)
         @trackers << tracker_klass.new(options)
       end
     end
@@ -85,7 +85,7 @@ module RequestLogAnalyzer::Aggregator
       trackers_export = @trackers.inject({}) do |export, tracker|
         export[tracker.title] = tracker.to_yaml_object; export
       end
-      YAML::dump(trackers_export)
+      YAML.dump(trackers_export)
     end
 
     # Call report on all trackers.

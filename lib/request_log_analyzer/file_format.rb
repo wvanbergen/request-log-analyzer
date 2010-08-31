@@ -24,7 +24,7 @@ module RequestLogAnalyzer::FileFormat
       # load a format from a ruby file
       require file_format
 
-      const = RequestLogAnalyzer::to_camelcase(File.basename(file_format, '.rb'))
+      const = RequestLogAnalyzer.to_camelcase(File.basename(file_format, '.rb'))
       if RequestLogAnalyzer::FileFormat.const_defined?(const)
         klass = RequestLogAnalyzer::FileFormat.const_get(const)
       elsif Object.const_defined?(const)
@@ -35,7 +35,7 @@ module RequestLogAnalyzer::FileFormat
 
     else
       # load a provided file format
-      klass = RequestLogAnalyzer::FileFormat.const_get(RequestLogAnalyzer::to_camelcase(file_format))
+      klass = RequestLogAnalyzer::FileFormat.const_get(RequestLogAnalyzer.to_camelcase(file_format))
     end
 
     # check the returned klass to see if it can be used

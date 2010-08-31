@@ -156,7 +156,7 @@ module RequestLogAnalyzer
       if options[:output].is_a?(Class)
         output_class = options[:output]
       else
-        output_class = RequestLogAnalyzer::Output::const_get(options[:output])
+        output_class = RequestLogAnalyzer::Output.const_get(options[:output])
       end
       
       output_sort   = options[:report_sort].split(',').map { |s| s.to_sym }
@@ -287,7 +287,7 @@ module RequestLogAnalyzer
     # Adds an aggregator to the controller. The aggregator will be called for every request
     # that is parsed from the provided sources (see add_source)
     def add_aggregator(agg)
-      agg = RequestLogAnalyzer::Aggregator.const_get(RequestLogAnalyzer::to_camelcase(agg)) if agg.kind_of?(Symbol)
+      agg = RequestLogAnalyzer::Aggregator.const_get(RequestLogAnalyzer.to_camelcase(agg)) if agg.kind_of?(Symbol)
       @aggregators << agg.new(@source, @options)
     end
 
@@ -295,7 +295,7 @@ module RequestLogAnalyzer
 
     # Adds a request filter to the controller.
     def add_filter(filter, filter_options = {})
-      filter = RequestLogAnalyzer::Filter.const_get(RequestLogAnalyzer::to_camelcase(filter)) if filter.kind_of?(Symbol)
+      filter = RequestLogAnalyzer::Filter.const_get(RequestLogAnalyzer.to_camelcase(filter)) if filter.kind_of?(Symbol)
       @filters << filter.new(source.file_format, @options.merge(filter_options))
     end
 

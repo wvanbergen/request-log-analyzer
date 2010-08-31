@@ -53,7 +53,7 @@ module RequestLogAnalyzer::Spec::Helpers
   # Check if a given string can be found in the given file
   # Returns the line number if found, nil otherwise
   def find_string_in_file(string, file, options = {})
-    return nil unless File::exists?(file)
+    return nil unless File.exists?(file)
     
     line_counter = 0
 

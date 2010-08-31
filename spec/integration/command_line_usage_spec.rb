@@ -85,7 +85,7 @@ describe RequestLogAnalyzer, 'running from command line' do
   it "should dump the results to a YAML file" do
     run("#{log_fixture(:rails_1x)} --yaml #{temp_output_file(:yaml)}")
     File.exist?(temp_output_file(:yaml)).should be_true
-    YAML::load(File.read(temp_output_file(:yaml))).should have_at_least(1).item
+    YAML.load(File.read(temp_output_file(:yaml))).should have_at_least(1).item
   end
 
   it "should parse 4 requests from the standard input" do
