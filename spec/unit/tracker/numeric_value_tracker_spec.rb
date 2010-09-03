@@ -22,7 +22,7 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.categories['b'][:sum].should == 4
     end
   end
-  
+
 
   context 'dynamic category' do
     before(:each) do
@@ -40,9 +40,8 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.categories['slow'][:sum].should == 4
     end
   end
-  
-  describe '#update' do
 
+  describe '#update' do
     before(:each) do
       @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:value => :duration, :category => :category)
       @tracker.prepare
@@ -80,7 +79,20 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
     it "should calculate the duration standard deviation correctly" do
       @tracker.stddev('a').should be_close(0.1,  0.000001)
     end
-  end  
+
+    it "should calculate the 90th percentile correctly" do
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.ninetyprecentile('a').should eql(0.3)
+    end
+
+
+  end
 
   describe '#report' do
     before(:each) do
@@ -161,6 +173,6 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.display_value(9000_000_001_001_000).should eql('9000T')
     end
   end
-  
-  
+
+
 end

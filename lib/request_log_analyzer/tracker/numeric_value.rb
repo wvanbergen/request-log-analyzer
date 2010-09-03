@@ -1,14 +1,22 @@
 module RequestLogAnalyzer::Tracker
-  
+
   class NumericValue < Base
 
     attr_reader :categories
+
+    # Constants for bucket stuff
+    BUCKETS = 100
+    BUCKET_MIN = 1.0/100000
+    BUCKET_MAX =  100000
+    BUCKET_MIN_EXP = Math.log10(BUCKET_MIN).round # -5
+    BUCKET_MAX_EXP = Math.log10(BUCKET_MAX).round # 5
+    BUCKET_CONSTANT = BUCKETS / (BUCKET_MAX_EXP - BUCKET_MIN_EXP) # 10
 
     # Sets up the numeric value tracker. It will check whether the value and category
     # options are set that are used to extract and categorize the values during
     # parsing. Two lambda procedures are created for these tasks
     def prepare
-      
+
       raise "No value field set up for numeric tracker #{self.inspect}" unless options[:value]
       raise "No categorizer set up for numeric tracker #{self.inspect}" unless options[:category]
 
@@ -22,9 +30,9 @@ module RequestLogAnalyzer::Tracker
 
     # Get the value information from the request and store it in the respective categories.
     #
-    # If a request can contain multiple usable values for this tracker, the :multiple option 
+    # If a request can contain multiple usable values for this tracker, the :multiple option
     # should be set to true. In this case, all the values and respective categories will be
-    # read from the request using the #every method from the fields given in the :value and 
+    # read from the request using the #every method from the fields given in the :value and
     # :category option.
     #
     # If the request contains only one suitable value and the :multiple is not set, it will
@@ -38,11 +46,11 @@ module RequestLogAnalyzer::Tracker
         found_categories = request.every(options[:category])
         found_values     = request.every(options[:value])
         raise "Capture mismatch for multiple values in a request" unless found_categories.length == found_values.length
-        
-        found_categories.each_with_index do |cat, index| 
+
+        found_categories.each_with_index do |cat, index|
           update_statistics(cat, found_values[index]) if cat && found_values[index].kind_of?(Numeric)
         end
-        
+
       else
         category = @categorizer.call(request)
         value    = @valueizer.call(request)
@@ -90,7 +98,7 @@ module RequestLogAnalyzer::Tracker
       sortings.each do |sorting|
         report_table(output, sorting, :title => "#{title} - by #{sorting}")
       end
-      
+
       if options[:total]
         output.puts
         output.puts "#{output.colorize(title, :white, :bold)} - total: " + output.colorize(display_value(sum_overall), :brown, :bold)
@@ -116,13 +124,13 @@ module RequestLogAnalyzer::Tracker
       return nil if @categories.empty?
       @categories
     end
-    
 
-    # Update sthe running calculation of statistics with the newly found numeric value.
+
+    # Update the running calculation of statistics with the newly found numeric value.
     # <tt>category</tt>:: The category for which to update the running statistics calculations
     # <tt>number</tt>:: The numeric value to update the calculations with.
     def update_statistics(category, number)
-      @categories[category] ||= {:hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => number, :max => number }
+      @categories[category] ||= {:hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => number, :max => number, :buckets => Array.new(100,0), :ninetyprecentile => 0.0 }
       delta = number - @categories[category][:mean]
 
       @categories[category][:hits]           += 1
@@ -131,6 +139,11 @@ module RequestLogAnalyzer::Tracker
       @categories[category][:sum]            += number
       @categories[category][:min]             = number if number < @categories[category][:min]
       @categories[category][:max]             = number if number > @categories[category][:max]
+
+      # Update bucket
+      bucket_number = ((Math.log10(number) + (-BUCKET_MIN_EXP)) * BUCKET_CONSTANT).round
+
+      @categories[category][:buckets][bucket_number]       += 1
     end
 
     # Get the number of hits of a specific category.
@@ -167,6 +180,45 @@ module RequestLogAnalyzer::Tracker
     # <tt>cat</tt> The category
     def stddev(cat)
       Math.sqrt(variance(cat))
+    end
+
+    def ninetyprecentile(cat)
+      total_hits = self.hits(cat)
+
+      hits_to_skip = (total_hits * 0.05).round
+      hits_to_read = total_hits - (hits_to_skip * 2)
+
+      return_value = 0
+
+      @categories[cat][:buckets].each_with_index do |hits, index|
+        if hits_to_read == 0
+          break
+        end
+
+        # Skip bucket completely if we need to
+        if hits < hits_to_skip
+          hits_to_skip -= hits
+          next
+        end
+
+        # Skip the needed requests
+        if hits_to_skip > 0 && hits >= hits_to_skip
+          hits -= hits_to_skip
+          hits_to_skip = 0
+        end
+
+        # Stop if we are near the end of the bucket
+        if hits >= hits_to_read
+          hits = hits_to_read
+          hits_to_read = 0
+        end
+
+        return_value += ( hits * (10** ((index / BUCKET_CONSTANT) - (-BUCKET_MIN_EXP))) )
+      end
+
+      @categories[cat][:ninetyprecentile] = (return_value / (total_hits * 0.90))
+
+      return @categories[cat][:ninetyprecentile]
     end
 
     # Get the variance of the duration of a specific category.
