@@ -43,7 +43,9 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
 
   describe '#update' do
     before(:each) do
-      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:value => :duration, :category => :category)
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:value => :duration, :category => :category,
+                                                    :min_bucket_value => 0.0001, :max_bucket_value => 1000)
+
       @tracker.prepare
 
       @tracker.update(request(:category => 'a', :duration => 0.4))
@@ -80,7 +82,7 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.stddev('a').should be_close(0.1,  0.000001)
     end
 
-    it "should calculate the 90th percentile correctly" do
+    it "should calculate the bucket spread correctly" do
       @tracker.update(request(:category => 'a', :duration => 0.3))
       @tracker.update(request(:category => 'a', :duration => 0.3))
       @tracker.update(request(:category => 'a', :duration => 0.3))
@@ -88,10 +90,15 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.update(request(:category => 'a', :duration => 0.3))
       @tracker.update(request(:category => 'a', :duration => 0.3))
       @tracker.update(request(:category => 'a', :duration => 0.3))
-      @tracker.ninetyprecentile('a').should eql(0.3)
+      # 0.2, 0.3 and 0.4 are already there, so, 10 values in total
+      
+      @tracker.median('a').should be_close(0.3, 0.01)
+      
+      @tracker.percentile_interval('a', 80).begin.should be_close(0.3, 0.01)
+      @tracker.percentile_interval('a', 80).end.should be_close(0.3, 0.01)
+      @tracker.percentile_interval('a', 90).begin.should be_close(0.2, 0.01)
+      @tracker.percentile_interval('a', 90).end.should be_close(0.4, 0.01)
     end
-
-
   end
 
   describe '#report' do
