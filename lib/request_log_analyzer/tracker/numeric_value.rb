@@ -167,7 +167,6 @@ module RequestLogAnalyzer::Tracker
       @categories[category][:buckets][bucket_index(value)] += 1
     end
 
-
     # Returns the upper bound value that would include x% of the hits.
     def percentile_index(category, x, inclusive = false)
       total_encountered = 0
@@ -316,14 +315,16 @@ module RequestLogAnalyzer::Tracker
         {:title => 'Mean',   :align => :right, :highlight => (options[:highlight] == :mean),   :min_width => 6},
         {:title => 'StdDev', :align => :right, :highlight => (options[:highlight] == :stddev), :min_width => 6},
         {:title => 'Min',    :align => :right, :highlight => (options[:highlight] == :min),    :min_width => 6},
-        {:title => 'Max',    :align => :right, :highlight => (options[:highlight] == :max),    :min_width => 6}
+        {:title => 'Max',    :align => :right, :highlight => (options[:highlight] == :max),    :min_width => 6},
+        {:title => '95 %tile',    :align => :right, :highlight => (options[:highlight] == :percentile_interval),  :min_width => 11}
       ]
     end
 
     # Returns a row of statistics information for a report table, given a category
     def statistics_row(cat)
       [cat, hits(cat), display_value(sum(cat)), display_value(mean(cat)), display_value(stddev(cat)),
-                display_value(min(cat)), display_value(max(cat))]
+                display_value(min(cat)), display_value(max(cat)), 
+                display_value(percentile_interval(cat, 95).begin) + '-' + display_value(percentile_interval(cat, 95).end) ]
     end
   end
 end
