@@ -8,7 +8,7 @@ This is a simple command line tool to analyze request log files in various forma
 * Low memory footprint and reasonably fast, so it is safe to run on a production server.
 * MIT licensed
 
-See the project wiki at http://wiki.github.com/wvanbergen/request-log-analyzer for documentation and additional information.
+See the project wiki at http://github.com/wvanbergen/request-log-analyzer/wiki for documentation and additional information.
 
 == Installation & basic usage
 
@@ -22,7 +22,7 @@ request-log-analyzer like this:
 
   $ request-log-analyzer log/production.log
 
-For more details, other file formats, and available command line options, see the project's wiki at http://wiki.github.com/wvanbergen/request-log-analyzer
+For more details, other file formats, and available command line options, see the project's wiki at http://github.com/wvanbergen/request-log-analyzer/wiki
 
 == Additional information
 
@@ -33,6 +33,7 @@ Do you have a rails application that is not performing as it should? If you need
 an expert to analyze your application, feel free to contact either Willem van
 Bergen (willem@railsdoctors.com) or Bart ten Brinke (bart@railsdoctors.com).
 
-* Project wiki at GitHub: http://wiki.github.com/wvanbergen/request-log-analyzer
+* Project wiki at GitHub: http://github.com/wvanbergen/request-log-analyzer/wiki
+* Issue tracker at GitHub: http://github.com/wvanbergen/request-log-analyzer/issues
 * railsdoctors homepage: http://railsdoctors.com
 * wvanbergen's blog posts: http://techblog.floorplanner.com/tag/request-log-analyzer
