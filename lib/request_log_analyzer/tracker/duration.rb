@@ -25,6 +25,13 @@ module RequestLogAnalyzer::Tracker
     def prepare
       options[:value] = options[:duration] if options[:duration]
       super
+      
+      @number_of_buckets = options[:number_of_buckets] || 1000
+      @min_bucket_value  = options[:min_bucket_value] ? options[:min_bucket_value].to_f : 0.0001
+      @max_bucket_value  = options[:max_bucket_value] ? options[:max_bucket_value].to_f : 1000
+
+      # precalculate the bucket size
+      @bucket_size = (Math.log(@max_bucket_value) - Math.log(@min_bucket_value)) / @number_of_buckets.to_f
     end
 
     # Display a duration

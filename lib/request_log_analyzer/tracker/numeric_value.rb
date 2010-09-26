@@ -1,5 +1,5 @@
 module RequestLogAnalyzer::Tracker
-  
+
   class NumericValue < Base
 
     attr_reader :categories
@@ -8,7 +8,7 @@ module RequestLogAnalyzer::Tracker
     # options are set that are used to extract and categorize the values during
     # parsing. Two lambda procedures are created for these tasks
     def prepare
-      
+
       raise "No value field set up for numeric tracker #{self.inspect}" unless options[:value]
       raise "No categorizer set up for numeric tracker #{self.inspect}" unless options[:category]
 
@@ -16,15 +16,22 @@ module RequestLogAnalyzer::Tracker
         @categorizer = create_lambda(options[:category])
         @valueizer   = create_lambda(options[:value])
       end
+      
+      @number_of_buckets = options[:number_of_buckets] || 1000
+      @min_bucket_value  = options[:min_bucket_value] ? options[:min_bucket_value].to_f : 0.000001
+      @max_bucket_value  = options[:max_bucket_value] ? options[:max_bucket_value].to_f : 1_000_000_000
+
+      # precalculate the bucket size
+      @bucket_size = (Math.log(@max_bucket_value) - Math.log(@min_bucket_value)) / @number_of_buckets.to_f
 
       @categories = {}
     end
 
     # Get the value information from the request and store it in the respective categories.
     #
-    # If a request can contain multiple usable values for this tracker, the :multiple option 
+    # If a request can contain multiple usable values for this tracker, the :multiple option
     # should be set to true. In this case, all the values and respective categories will be
-    # read from the request using the #every method from the fields given in the :value and 
+    # read from the request using the #every method from the fields given in the :value and
     # :category option.
     #
     # If the request contains only one suitable value and the :multiple is not set, it will
@@ -38,11 +45,11 @@ module RequestLogAnalyzer::Tracker
         found_categories = request.every(options[:category])
         found_values     = request.every(options[:value])
         raise "Capture mismatch for multiple values in a request" unless found_categories.length == found_values.length
-        
-        found_categories.each_with_index do |cat, index| 
+
+        found_categories.each_with_index do |cat, index|
           update_statistics(cat, found_values[index]) if cat && found_values[index].kind_of?(Numeric)
         end
-        
+
       else
         category = @categorizer.call(request)
         value    = @valueizer.call(request)
@@ -90,7 +97,7 @@ module RequestLogAnalyzer::Tracker
       sortings.each do |sorting|
         report_table(output, sorting, :title => "#{title} - by #{sorting}")
       end
-      
+
       if options[:total]
         output.puts
         output.puts "#{output.colorize(title, :white, :bold)} - total: " + output.colorize(display_value(sum_overall), :brown, :bold)
@@ -116,13 +123,109 @@ module RequestLogAnalyzer::Tracker
       return nil if @categories.empty?
       @categories
     end
-    
 
-    # Update sthe running calculation of statistics with the newly found numeric value.
+
+    # Returns the bucket index for a value
+    def bucket_index(value)
+      return 0 if value < @min_bucket_value
+      return @number_of_buckets - 1 if value >= @max_bucket_value
+
+      ((Math.log(value) - Math.log(@min_bucket_value)) / @bucket_size).floor
+    end
+
+    # Returns the lower value of a bucket given its index
+    def bucket_lower_bound(index)
+      Math.exp((index * @bucket_size) + Math.log(@min_bucket_value))
+    end
+
+    # Returns the upper value of a bucket given its index
+    def bucket_upper_bound(index)
+      bucket_lower_bound(index + 1)
+    end
+
+    # Returns the average of the lower and upper bound of the bucket.
+    def bucket_average_value(index)
+      (bucket_lower_bound(index) + bucket_upper_bound(index)) / 2
+    end
+
+    # Returns a single value representing a bucket.
+    def bucket_value(index, type = nil)
+      case type
+      when :begin, :start, :lower, :lower_bound; bucket_lower_bound(index)
+      when :end, :finish, :upper, :upper_bound;  bucket_upper_bound(index)
+      else bucket_average_value(index)
+      end
+    end
+
+    # Returns the range of values for a bucket.
+    def bucket_interval(index)
+      Range.new(bucket_lower_bound(index), bucket_upper_bound(index), true)
+    end
+
+    # Records a hit on a bucket that includes the given value.
+    def bucketize(category, value)
+      @categories[category][:buckets][bucket_index(value)] += 1
+    end
+
+    # Returns the upper bound value that would include x% of the hits.
+    def percentile_index(category, x, inclusive = false)
+      total_encountered = 0
+      @categories[category][:buckets].each_with_index do |count, index|
+        total_encountered += count
+        percentage = ((total_encountered.to_f / hits(category).to_f) * 100).floor
+        return index if (inclusive && percentage >= x) || (!inclusive && percentage > x)
+      end
+    end
+
+    def percentile_indices(category, start, finish)
+      result = [nil, nil]
+      total_encountered = 0
+      @categories[category][:buckets].each_with_index do |count, index|
+        total_encountered += count
+        percentage = ((total_encountered.to_f / hits(category).to_f) * 100).floor
+        if !result[0] && percentage > start
+          result[0] = index
+        elsif !result[1] && percentage >= finish
+          result[1] = index
+          return result
+        end
+      end
+    end
+
+    def percentile(category, x, type = nil)
+      bucket_value(percentile_index(category, x, type == :upper), type)
+    end
+    
+    
+    def median(category)
+      percentile(category, 50, :average)
+    end
+
+    # Returns a percentile interval, i.e. the lower bound and the upper bound of the values
+    # that represent the x%-interval for the bucketized dataset.
+    #
+    # A 90% interval means that 5% of the values would have been lower than the lower bound and
+    # 5% would have been higher than the upper bound, leaving 90% of the values within the bounds.
+    # You can also provide a Range to specify the lower bound and upper bound percentages (e.g. 5..95).
+    def percentile_interval(category, x)
+      case x
+      when Range
+        lower, upper = percentile_indices(category, x.begin, x.end)
+        Range.new(bucket_lower_bound(lower), bucket_upper_bound(upper))
+      when Numeric
+        percentile_interval(category, Range.new((100 - x) / 2, (100 - (100 - x) / 2)))
+      else 
+        raise 'What does it mean?'
+      end
+    end
+
+    # Update the running calculation of statistics with the newly found numeric value.
     # <tt>category</tt>:: The category for which to update the running statistics calculations
     # <tt>number</tt>:: The numeric value to update the calculations with.
     def update_statistics(category, number)
-      @categories[category] ||= {:hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => number, :max => number }
+      @categories[category] ||= { :hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => number, :max => number, 
+                                  :buckets => Array.new(@number_of_buckets, 0) }
+      
       delta = number - @categories[category][:mean]
 
       @categories[category][:hits]           += 1
@@ -131,6 +234,8 @@ module RequestLogAnalyzer::Tracker
       @categories[category][:sum]            += number
       @categories[category][:min]             = number if number < @categories[category][:min]
       @categories[category][:max]             = number if number > @categories[category][:max]
+
+      bucketize(category, number)
     end
 
     # Get the number of hits of a specific category.
@@ -210,14 +315,16 @@ module RequestLogAnalyzer::Tracker
         {:title => 'Mean',   :align => :right, :highlight => (options[:highlight] == :mean),   :min_width => 6},
         {:title => 'StdDev', :align => :right, :highlight => (options[:highlight] == :stddev), :min_width => 6},
         {:title => 'Min',    :align => :right, :highlight => (options[:highlight] == :min),    :min_width => 6},
-        {:title => 'Max',    :align => :right, :highlight => (options[:highlight] == :max),    :min_width => 6}
+        {:title => 'Max',    :align => :right, :highlight => (options[:highlight] == :max),    :min_width => 6},
+        {:title => '95 %tile',    :align => :right, :highlight => (options[:highlight] == :percentile_interval),  :min_width => 11}
       ]
     end
 
     # Returns a row of statistics information for a report table, given a category
     def statistics_row(cat)
       [cat, hits(cat), display_value(sum(cat)), display_value(mean(cat)), display_value(stddev(cat)),
-                display_value(min(cat)), display_value(max(cat))]
+                display_value(min(cat)), display_value(max(cat)), 
+                display_value(percentile_interval(cat, 95).begin) + '-' + display_value(percentile_interval(cat, 95).end) ]
     end
   end
 end

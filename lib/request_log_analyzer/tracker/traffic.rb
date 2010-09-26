@@ -16,6 +16,13 @@ module RequestLogAnalyzer::Tracker
       options[:value] = options[:traffic] if options[:traffic]
       options[:total] = true
       super
+      
+      @number_of_buckets = options[:number_of_buckets] || 1000
+      @min_bucket_value  = options[:min_bucket_value] ? options[:min_bucket_value].to_f : 1
+      @max_bucket_value  = options[:max_bucket_value] ? options[:max_bucket_value].to_f : 1000_000_000_000
+
+      # precalculate the bucket size
+      @bucket_size = (Math.log(@max_bucket_value) - Math.log(@min_bucket_value)) / @number_of_buckets.to_f
     end
 
     # Formats the traffic number using x B/kB/MB/GB etc notation

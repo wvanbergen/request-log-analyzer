@@ -22,7 +22,7 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.categories['b'][:sum].should == 4
     end
   end
-  
+
 
   context 'dynamic category' do
     before(:each) do
@@ -40,11 +40,12 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.categories['slow'][:sum].should == 4
     end
   end
-  
-  describe '#update' do
 
+  describe '#update' do
     before(:each) do
-      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:value => :duration, :category => :category)
+      @tracker = RequestLogAnalyzer::Tracker::NumericValue.new(:value => :duration, :category => :category,
+                                                    :min_bucket_value => 0.0001, :max_bucket_value => 1000)
+
       @tracker.prepare
 
       @tracker.update(request(:category => 'a', :duration => 0.4))
@@ -80,7 +81,25 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
     it "should calculate the duration standard deviation correctly" do
       @tracker.stddev('a').should be_close(0.1,  0.000001)
     end
-  end  
+
+    it "should calculate the bucket spread correctly" do
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      @tracker.update(request(:category => 'a', :duration => 0.3))
+      # 0.2, 0.3 and 0.4 are already there, so, 10 values in total
+      
+      @tracker.median('a').should be_close(0.3, 0.01)
+      
+      @tracker.percentile_interval('a', 80).begin.should be_close(0.3, 0.01)
+      @tracker.percentile_interval('a', 80).end.should be_close(0.3, 0.01)
+      @tracker.percentile_interval('a', 90).begin.should be_close(0.2, 0.01)
+      @tracker.percentile_interval('a', 90).end.should be_close(0.4, 0.01)
+    end
+  end
 
   describe '#report' do
     before(:each) do
@@ -113,9 +132,9 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
     it "should generate a YAML output" do
       @tracker.update(request(:category => 'a', :blah => 2))
       @tracker.update(request(:category => 'b', :blah => 3))
-      @tracker.to_yaml_object.should == {
-            "a" => { :min => 2, :hits => 1, :max => 2, :mean => 2.0, :sum => 2, :sum_of_squares => 0.0 },
-            "b" => { :min => 3, :hits => 1, :max => 3, :mean => 3.0, :sum => 3, :sum_of_squares => 0.0 }}
+      @tracker.to_yaml_object.keys.should =~ ['a', 'b']
+      @tracker.to_yaml_object['a'].should include(:min => 2, :hits => 1, :max => 2, :mean => 2.0, :sum => 2, :sum_of_squares => 0.0)
+      @tracker.to_yaml_object['b'].should include(:min => 3, :hits => 1, :max => 3, :mean => 3.0, :sum => 3, :sum_of_squares => 0.0)      
     end
   end
 
@@ -161,6 +180,4 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.display_value(9000_000_001_001_000).should eql('9000T')
     end
   end
-  
-  
 end
