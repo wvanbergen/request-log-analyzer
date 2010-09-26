@@ -240,29 +240,29 @@ module GithubGem
 
     # Fetches the latest updates from Github
     def fetch_origin_task
-      sh git, :fetch, remote
+      sh git, 'fetch', remote
     end
 
     # Commits every file that has been changed by the release task.
     def commit_modified_files_task
       if modified_files.any?
-        modified_files.each { |file| sh git, :add, file }
-        sh git, :commit, '-m', "Released #{gemspec.name} gem version #{gemspec.version}."
+        modified_files.each { |file| sh git, 'add', file }
+        sh git, 'commit', '-m', "Released #{gemspec.name} gem version #{gemspec.version}."
       end
     end
 
     # Adds a tag for the released version
     def tag_version_task
-      sh git, :tag, '-a', "#{gemspec.name}-#{gemspec.version}"
+      sh git, 'tag', '-a', "#{gemspec.name}-#{gemspec.version}"
     end
 
     # Pushes the changes and tag to github
     def github_release_task
-      sh git, :push, '--tags', remote, remote_branch
+      sh git, 'push', '--tags', remote, remote_branch
     end
 
     def gemcutter_release_task
-      sh "gem", :push, "pkg/#{gemspec.name}-#{gemspec.version}.gem"
+      sh "gem", 'push', "pkg/#{gemspec.name}-#{gemspec.version}.gem"
     end
 
     # Gem release task.
@@ -347,8 +347,8 @@ module GithubGem
 
       relative_file = File.expand_path(__FILE__).sub(%r[^#{@root_dir}/], '')
       if `#{git} ls-files -m #{relative_file}`.split("\n").any?
-        sh git, :add, relative_file
-        sh git, :commit, '-m', "Updated to latest gem release management tasks."
+        sh git, 'add', relative_file
+        sh git, 'commit', '-m', "Updated to latest gem release management tasks."
       else
         puts "Release managament tasks already are at the latest version."
       end
