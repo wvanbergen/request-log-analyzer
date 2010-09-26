@@ -2,7 +2,6 @@ require 'rubygems'
 require 'rake'
 require 'rake/tasklib'
 require 'date'
-require 'git'
 
 module GithubGem
 
@@ -24,7 +23,7 @@ module GithubGem
 
   class RakeTasks
 
-    attr_reader   :gemspec, :modified_files, :git
+    attr_reader   :gemspec, :modified_files
     attr_accessor :gemspec_file, :task_namespace, :main_include, :root_dir, :spec_pattern, :test_pattern, :remote, :remote_branch, :local_branch
 
     # Initializes the settings, yields itself for configuration
@@ -43,12 +42,15 @@ module GithubGem
 
       yield(self) if block_given?
 
-      @git = Git.open(@root_dir)
       load_gemspec!
       define_tasks!
     end
 
     protected
+
+    def git
+      ENV['GIT'] || 'git'
+    end
 
     # Define Unit test tasks
     def define_test_tasks!
@@ -165,7 +167,7 @@ module GithubGem
     # in the repository and the spec/test file pattern.
     def manifest_task
       # Load all the gem's files using "git ls-files"
-      repository_files = git.ls_files.keys
+      repository_files = `#{git} ls-files`.split("\n")
       test_files       = Dir[test_pattern] + Dir[spec_pattern]
 
       update_gemspec(:files, repository_files)
@@ -180,7 +182,7 @@ module GithubGem
     end
 
     def newest_version
-      git.tags.map { |tag| tag.name.split('-').last }.compact.map { |v| Gem::Version.new(v) }.max || Gem::Version.new('0.0.0')
+      `#{git} tag`.split("\n").map { |tag| tag.name.split('-').last }.compact.map { |v| Gem::Version.new(v) }.max || Gem::Version.new('0.0.0')
     end
 
     def next_version(increment = nil)
@@ -223,58 +225,44 @@ module GithubGem
 
     # Checks whether the current branch is not diverged from the remote branch
     def check_not_diverged_task
-      raise "The current branch is diverged from the remote branch!" if git.log.between('HEAD', git.remote(remote).branch(remote_branch).gcommit).any?
+      raise "The current branch is diverged from the remote branch!" if `#{git} rev-list HEAD..#{remote}/#{remote_branch}`.split("\n").any?
     end
 
     # Checks whether the repository status ic clean
     def check_clean_status_task
-      raise "The current working copy contains modifications" if git.status.changed.any?
+      raise "The current working copy contains modifications" if `#{git} ls-files -m`.split("\n").any?
     end
 
     # Checks whether the current branch is correct
     def check_current_branch_task
-      raise "Currently not on #{local_branch} branch!" unless git.branch.name == local_branch.to_s
+      raise "Currently not on #{local_branch} branch!" unless `#{git} branch`.split("\n").detect { |b| /^\* / =~ b } == "* #{local_branch}"
     end
 
     # Fetches the latest updates from Github
     def fetch_origin_task
-      git.fetch('origin')
+      sh git, 'fetch', remote
     end
 
     # Commits every file that has been changed by the release task.
     def commit_modified_files_task
       if modified_files.any?
-        modified_files.each { |file| git.add(file) }
-        git.commit("Released #{gemspec.name} gem version #{gemspec.version}")
+        modified_files.each { |file| sh git, 'add', file }
+        sh git, "commit -m", "Released #{gemspec.name} gem version #{gemspec.version}."
       end
     end
 
     # Adds a tag for the released version
     def tag_version_task
-      git.add_tag("#{gemspec.name}-#{gemspec.version}")
+      sh git 'tag -a', "#{gemspec.name}-#{gemspec.version}"
     end
 
     # Pushes the changes and tag to github
     def github_release_task
-      git.push(remote, remote_branch, true)
+      sh git, 'push --tags', remote, remote_branch
     end
 
-    # # Checks whether Rubyforge is configured properly
-    # def check_rubyforge_task
-    #   # Login no longer necessary when using rubyforge 2.0.0 gem
-    #   # raise "Could not login on rubyforge!" unless `rubyforge login 2>&1`.strip.empty?
-    #   output = `rubyforge names`.split("\n")
-    #   raise "Rubyforge group not found!"   unless output.any? { |line| %r[^groups\s*\:.*\b#{Regexp.quote(gemspec.rubyforge_project)}\b.*] =~ line }
-    #   raise "Rubyforge package not found!" unless output.any? { |line| %r[^packages\s*\:.*\b#{Regexp.quote(gemspec.name)}\b.*] =~ line }
-    # end
-
-    # # Task to release the .gem file toRubyforge.
-    # def rubyforge_release_task
-    #   sh 'rubyforge', 'add_release', gemspec.rubyforge_project, gemspec.name, gemspec.version.to_s, "pkg/#{gemspec.name}-#{gemspec.version}.gem"
-    # end
-    
     def gemcutter_release_task
-      sh "gem push pkg/#{gemspec.name}-#{gemspec.version}.gem"
+      sh "gem push", "pkg/#{gemspec.name}-#{gemspec.version}.gem"
     end
 
     # Gem release task.
@@ -357,15 +345,13 @@ module GithubGem
         open(__FILE__, "w") { |file| file.write(response.body) }
       end
 
-      relative_file = File.expand_path(__FILE__).sub(%r[^#{git.dir.path}/], '')
-      if git.status[relative_file] && git.status[relative_file].type == 'M'
-        git.add(relative_file)
-        git.commit("Updated to latest gem release management tasks.")
-        puts "Updated to latest version of gem release management tasks."
+      relative_file = File.expand_path(__FILE__).sub(%r[^#{@root_dir}/], '')
+      if `#{git} ls-files -m #{relative_file}`.split("\n").any?
+        sh git, 'add', relative_file
+        sh git, 'commit -m', "Updated to latest gem release management tasks."
       else
         puts "Release managament tasks already are at the latest version."
       end
     end
-
   end
 end
