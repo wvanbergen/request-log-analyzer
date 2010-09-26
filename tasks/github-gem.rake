@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'rake/tasklib'
 require 'date'
+require 'set'
 
 module GithubGem
 
@@ -32,7 +33,7 @@ module GithubGem
       @gemspec_file   = GithubGem.detect_gemspec_file
       @task_namespace = task_namespace
       @main_include   = GithubGem.detect_main_include
-      @modified_files = []
+      @modified_files = Set.new
       @root_dir       = Dir.pwd
       @test_pattern   = 'test/**/*_test.rb'
       @spec_pattern   = 'spec/**/*_spec.rb'
@@ -49,7 +50,7 @@ module GithubGem
     protected
 
     def git
-      ENV['GIT'] || 'git'
+      @git ||= ENV['GIT'] || 'git'
     end
 
     # Define Unit test tasks
@@ -245,8 +246,9 @@ module GithubGem
 
     # Commits every file that has been changed by the release task.
     def commit_modified_files_task
-      if modified_files.any?
-        modified_files.each { |file| sh git, 'add', file }
+      really_modified = `#{git} ls-files -m #{modified_files.join(' ')}`.split("\n")
+      if really_modified.any?
+        really_modified.each { |file| sh git, 'add', file }
         sh git, 'commit', '-m', "Released #{gemspec.name} gem version #{gemspec.version}."
       end
     end
