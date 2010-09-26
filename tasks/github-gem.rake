@@ -253,7 +253,7 @@ module GithubGem
 
     # Adds a tag for the released version
     def tag_version_task
-      sh git, 'tag', '-a', "#{gemspec.name}-#{gemspec.version}"
+      sh git, 'tag', '-a', "#{gemspec.name}-#{gemspec.version}", '-m', "Released #{gemspec.name} gem version #{gemspec.version}."
     end
 
     # Pushes the changes and tag to github
