@@ -246,7 +246,7 @@ module GithubGem
 
     # Commits every file that has been changed by the release task.
     def commit_modified_files_task
-      really_modified = `#{git} ls-files -m #{modified_files.join(' ')}`.split("\n")
+      really_modified = `#{git} ls-files -m #{modified_files.entries.join(' ')}`.split("\n")
       if really_modified.any?
         really_modified.each { |file| sh git, 'add', file }
         sh git, 'commit', '-m', "Released #{gemspec.name} gem version #{gemspec.version}."
