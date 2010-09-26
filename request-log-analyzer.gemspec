@@ -29,13 +29,9 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('rake')
   s.add_development_dependency('rspec')
-  
+
   s.add_development_dependency('activerecord')
   s.add_development_dependency('sqlite3-ruby')
-  
-  s.add_development_dependency('git')
-  s.add_development_dependency('gemcutter')
-  
 
   s.authors  = ['Willem van Bergen', 'Bart ten Brinke']
   s.email    = ['willem@railsdoctors.com', 'bart@railsdoctors.com']
