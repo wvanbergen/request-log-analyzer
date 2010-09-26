@@ -38,4 +38,3 @@ into SQLite database Y. The Summarizer will output its reports.
 
 The output is pushed to a RequestLogAnalyzer::Output object, which takes care of the output.
 It can generate either ASCII, UTF8 or even HTML output.
-
