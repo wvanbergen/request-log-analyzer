@@ -2,33 +2,33 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
   # capture the PID
   HODEL3000_PROCESSING = /\[(\d+)\]: Processing ((?:\w+::)*\w+)#(\w+)(?: to (\w+))? \(for (#{ip_address}) at (#{timestamp('%Y-%m-%d %H:%M:%S')})\) \[([A-Z]+)\]/
   
-  LINE_DEFINITIONS[:processing] = RequestLogAnalyzer::LineDefinition.new(:processing, :header => true,
-          :teaser   => /Processing /,
-          :regexp   => Regexp.union(LINE_DEFINITIONS[:processing].regexp,HODEL3000_PROCESSING),
-          :captures => [{ :name => :controller, :type  => :string }, # Default Rails Processing
+  # TODO: fix me!
+  line_definition :processing do |line|
+    line.header = true
+    line.regexp = Regexp.union(LINE_DEFINITIONS[:processing].regexp,HODEL3000_PROCESSING)
+    line.captures = [   { :name => :controller, :type  => :string }, # Default Rails Processing
                         { :name => :action,     :type  => :string },
                         { :name => :format,     :type  => :string, :default => 'html' },
                         { :name => :ip,         :type  => :string },
                         { :name => :timestamp,  :type  => :timestamp },
                         { :name => :method,     :type  => :string },
-                        { :name => :pid, :type => :integer },        # Hodel 3000 Processing w/PID
+                        { :name => :pid,        :type  => :integer }, # Hodel 3000 Processing w/PID
                         { :name => :controller, :type  => :string },
                         { :name => :action,     :type  => :string },
                         { :name => :format,     :type  => :string, :default => 'html' },
                         { :name => :ip,         :type  => :string },
                         { :name => :timestamp,  :type  => :timestamp },
-                        { :name => :method,     :type  => :string }])
+                        { :name => :method,     :type  => :string }]
+  end
   
-  # capture the memory usage
-  LINE_DEFINITIONS[:memory_usage] = RequestLogAnalyzer::LineDefinition.new(:memory_usage,
-   :regexp   => /\[(\d+)\]: Memory usage: (\d+) /,
-   :captures => [{ :name => :pid, :type => :integer },{ :name => :memory, :type => :traffic }])
-  
-  # capture :memory usage in all line collections
-  LINE_COLLECTIONS.each { |k,v| LINE_COLLECTIONS[k] << :memory_usage }
+  line_definition :memory_usage do |line|
+    line.regexp   = /\[(\d+)\]: Memory usage: (\d+)/
+    line.capture(:pid).as(:integer)
+    line.capture(:memory).as(:traffic)
+  end
   
   report(:append) do |analyze|
-      analyze.traffic :memory_diff, :category => REQUEST_CATEGORIZER, :title => "Largest Memory Increases", :line_type => :memory_usage
+    analyze.traffic :memory_diff, :category => REQUEST_CATEGORIZER, :title => "Largest Memory Increases", :line_type => :memory_usage
   end
   
   # Keep a record of PIDs and their memory usage when validating requests.

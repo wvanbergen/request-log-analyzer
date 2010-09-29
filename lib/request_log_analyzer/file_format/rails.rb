@@ -25,9 +25,9 @@ module RequestLogAnalyzer::FileFormat
       lines.each do |line|
         line = line.to_sym
         if LINE_COLLECTIONS.has_key?(line)
-          LINE_COLLECTIONS[line].each { |l| definitions_hash[l] = LINE_DEFINITIONS[l] }
+          LINE_COLLECTIONS[line].each { |l| definitions_hash[l] ||= LINE_DEFINITIONS[l] }
         elsif LINE_DEFINITIONS.has_key?(line)
-          definitions_hash[line] = LINE_DEFINITIONS[line]
+          definitions_hash[line] ||= LINE_DEFINITIONS[line]
         else
           raise "Unrecognized Rails log line name: #{line.inspect}!"
         end
