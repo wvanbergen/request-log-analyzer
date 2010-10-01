@@ -21,19 +21,12 @@ describe RequestLogAnalyzer::FileFormat::Rails do
         :controller => 'QueriesController', :action => 'index', :format => 'HTML')
     end
     
-    
-    # it "should parse beta :completed lines correctly" do
-    #   line = 'Completed in 9ms (Views: 4.9ms | ActiveRecord: 0.5ms) with 200'
-    #   @file_format.should parse_line(line).as(:completed).and_capture(
-    #       :duration => 0.009, :status => 200)
-    # end
-    
     it "should parse :completed lines correctly" do
       line = 'Completed 200 OK in 170ms (Views: 78.4ms | ActiveRecord: 48.2ms)'
       @file_format.should parse_line(line).as(:completed).and_capture(
           :duration => 0.170, :status => 200)
     end
-    
+
     it "should pase :failure lines correctly" do
       line = "ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:"
       @file_format.should parse_line(line).as(:failure).and_capture(:line => 3, 

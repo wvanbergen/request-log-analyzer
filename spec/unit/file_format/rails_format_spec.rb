@@ -75,6 +75,11 @@ describe RequestLogAnalyzer::FileFormat::Rails do
           @rails.should parse_line(line).as(:completed).and_capture(:duration => 0.614, :db => 0.031, :view => 0.120, :status => 200, :url => 'http://floorplanner.local/demo')
         end
 
+        it "should parse a Rails 2.2 style :completed line correctly when AR is disabled" do
+          line = prefix + 'Completed in 597ms (View: 298 | 200 OK [http://shapado.com]'
+          @rails.should parse_line(line).as(:completed).and_capture(:duration => 0.597, :db => nil, :view => 0.298, :status => 200, :url => 'http://shapado.com')
+        end
+
         it "should parse a :failure line with exception correctly" do
           line = prefix + "NoMethodError (undefined method `update_domain_account' for nil:NilClass):"
           @rails.should parse_line(line).as(:failure).and_capture(:error => 'NoMethodError', :message => "undefined method `update_domain_account' for nil:NilClass")
