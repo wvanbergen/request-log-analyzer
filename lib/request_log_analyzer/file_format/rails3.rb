@@ -89,7 +89,7 @@ module RequestLogAnalyzer::FileFormat
         time_as_str = value[-4..-1] # year
         # convert the month to a 2-digit representation
         month = MONTHS.index(value[3..5])+1
-        month < 10 ? time_as_str << "0#{month}" : time_as_str << month
+        month < 10 ? time_as_str << "0#{month}" : time_as_str << month.to_s
         
         time_as_str << value[6..13] # day of month + time
         time_as_str.to_i
