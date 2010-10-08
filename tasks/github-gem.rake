@@ -271,8 +271,7 @@ module GithubGem
     # All work is done by the task's dependencies, so just display a release completed message.
     def release_task
       puts
-      puts '------------------------------------------------------------'
-      puts "Released #{gemspec.name} version #{gemspec.version}"
+      puts "Release successful."
     end
 
     private
@@ -332,6 +331,9 @@ module GithubGem
 
         # Reload the gemspec so the changes are incorporated
         load_gemspec!
+        
+        # Also mark the Gemfile.lock file as changed because of the new version.
+        modified_files << 'Gemfile.lock' if File.exist?(File.join(root_dir, 'Gemfile.lock'))
       end
     end
 
