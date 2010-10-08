@@ -32,6 +32,12 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       @file_format.should parse_line(line).as(:completed).and_capture(
           :duration => 0.170, :status => 200)
     end
+    
+    it "should parse :completed lines correctly when ActiveRecord is not mentioned" do
+      line = 'Completed 200 OK in 364ms (Views: 31.4ms)'
+      @file_format.should parse_line(line).as(:completed).and_capture(:duration => 0.364, :status => 200)
+    end
+    
 
     it "should pase :failure lines correctly" do
       line = "ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:"
