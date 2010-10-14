@@ -71,23 +71,23 @@ module GithubGem
 
     # Defines RSpec tasks
     def define_rspec_tasks!
-      require 'spec/rake/spectask'
+      require 'rspec/core/rake_task'
 
       namespace(:spec) do
         desc "Verify all RSpec examples for #{gemspec.name}"
-        Spec::Rake::SpecTask.new(:basic) do |t|
-          t.spec_files = FileList[spec_pattern]
+        RSpec::Core::RakeTask.new(:basic) do |t|
+          t.pattern = spec_pattern
         end
 
         desc "Verify all RSpec examples for #{gemspec.name} and output specdoc"
-        Spec::Rake::SpecTask.new(:specdoc) do |t|
-          t.spec_files = FileList[spec_pattern]
-          t.spec_opts << '--format' << 'specdoc' << '--color'
+        RSpec::Core::RakeTask.new(:specdoc) do |t|
+          t.pattern = spec_pattern
+          t.rspec_opts = ['--format', 'documentation', '--color']
         end
 
         desc "Run RCov on specs for #{gemspec.name}"
-        Spec::Rake::SpecTask.new(:rcov) do |t|
-          t.spec_files = FileList[spec_pattern]
+        RSpec::Core::RakeTask.new(:rcov) do |t|
+          t.pattern = spec_pattern
           t.rcov = true
           t.rcov_opts = ['--exclude', '"spec/*,gems/*"', '--rails']
         end

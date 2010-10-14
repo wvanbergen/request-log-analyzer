@@ -1,4 +1,4 @@
-module RequestLogAnalyzer::Spec::Matchers
+module RequestLogAnalyzer::RSpec::Matchers
 
   class HasLineDefinition
 

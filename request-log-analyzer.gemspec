@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.requirements << "To use the database inserter, ActiveRecord and an appropriate database adapter are required."
 
   s.add_development_dependency('rake')
-  s.add_development_dependency('rspec')
+  s.add_development_dependency('rspec', '~> 2.0')
 
   s.add_development_dependency('activerecord')
   s.add_development_dependency('sqlite3-ruby')

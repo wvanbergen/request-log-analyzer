@@ -1,4 +1,4 @@
-module RequestLogAnalyzer::Spec::Helpers
+module RequestLogAnalyzer::RSpec::Helpers
 
   # Create or return a new TestingFormat
   def testing_format

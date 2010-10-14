@@ -1,4 +1,4 @@
-module RequestLogAnalyzer::Spec::Macros
+module RequestLogAnalyzer::RSpec::Macros
 
   def test_databases
     require 'yaml'

@@ -1,4 +1,4 @@
-module RequestLogAnalyzer::Spec::Mocks
+module RequestLogAnalyzer::RSpec::Mocks
 
   def mock_source
     source = mock('RequestLogAnalyzer::Source::Base')
