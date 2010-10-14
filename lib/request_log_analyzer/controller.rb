@@ -216,7 +216,7 @@ module RequestLogAnalyzer
         end
       end
 
-      if options[:reject]
+      if options[:select]
         options[:select].each do |(field, value)|
           controller.add_filter(:field, :mode => :select, :field => field, :value => value)
         end
