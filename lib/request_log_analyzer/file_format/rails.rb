@@ -82,7 +82,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Rails > 2.1 completed line example
     # Completed in 614ms (View: 120, DB: 31) | 200 OK [http://floorplanner.local/demo]
-    RAILS_22_COMPLETED = /Completed in (\d+)ms \((?:View: (\d+))?,?(?:.?DB: (\d+))\) \| (\d{3}).+\[http.+\]/
+    RAILS_22_COMPLETED = /Completed in (\d+)ms \((?:View: (\d+))?,?(?:.?DB: (\d+))?\)? \| (\d{3}).+\[(http.+)\]/
                         
     # A hash of definitions for all common lines in Rails logs.
     LINE_DEFINITIONS = {
