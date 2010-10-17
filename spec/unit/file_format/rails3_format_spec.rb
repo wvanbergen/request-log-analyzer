@@ -26,6 +26,11 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       @file_format.should parse_line(line).as(:processing).and_capture(
         :controller => 'QueriesController', :action => 'index', :format => 'HTML')
     end
+    it "should parse nested :processing lines correctly" do
+      line = ' Processing by Projects::QueriesController#index as HTML'
+      @file_format.should parse_line(line).as(:processing).and_capture(
+        :controller => 'Projects::QueriesController', :action => 'index', :format => 'HTML')
+    end
     
     it "should parse :completed lines correctly" do
       line = 'Completed 200 OK in 170ms (Views: 78.4ms | ActiveRecord: 48.2ms)'
