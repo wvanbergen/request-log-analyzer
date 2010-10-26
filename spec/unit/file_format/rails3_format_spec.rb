@@ -20,6 +20,12 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       @file_format.should parse_line(line).as(:started).and_capture(:method => 'GET',
             :path => '/queries', :ip => '127.0.0.1', :timestamp => 20101025161518)
     end
+    
+    it "should parse :started lines in Ruby 1.9.2 format correctly" do
+      line = 'Started GET "/queries" for 127.0.0.1 at 2010-10-26 02:27:15 +0000'
+      @file_format.should parse_line(line).as(:started).and_capture(:method => 'GET',
+            :path => '/queries', :ip => '127.0.0.1', :timestamp => 20101026022715)
+    end
 
     it "should parse :processing lines correctly" do
       line = ' Processing by QueriesController#index as HTML'

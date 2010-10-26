@@ -12,7 +12,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :started do |line|
       line.header = true
       line.teaser = /Started /
-      line.regexp = /Started ([A-Z]+) "([^"]+)" for (#{ip_address}) at (#{timestamp('%a %b %d %H:%M:%S %z %Y')})/
+      line.regexp = /Started ([A-Z]+) "([^"]+)" for (#{ip_address}) at (#{timestamp('%a %b %d %H:%M:%S %z %Y')}|#{timestamp('%Y-%m-%d %H:%M:%S %z')})/
       
       line.capture(:method)
       line.capture(:path)
@@ -85,14 +85,23 @@ module RequestLogAnalyzer::FileFormat
       MONTHS = %w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
       
       def convert_timestamp(value, definition)
-        value.gsub!(/\W/,'')
-        time_as_str = value[-4..-1] # year
-        # convert the month to a 2-digit representation
-        month = MONTHS.index(value[3..5])+1
-        month < 10 ? time_as_str << "0#{month}" : time_as_str << month.to_s
-        
-        time_as_str << value[6..13] # day of month + time
-        time_as_str.to_i
+        # the time value can be in 2 formats: 
+        # - 2010-10-26 02:27:15 +0000 (ruby 1.9.2)
+        # - Thu Oct 25 16:15:18 -0800 2010
+        if value =~ /^#{CommonRegularExpressions::TIMESTAMP_PARTS['Y']}/
+          value.gsub!(/\W/,'')
+          value[0..13].to_i
+        else
+          value.gsub!(/\W/,'')
+          time_as_str = value[-4..-1] # year
+          # convert the month to a 2-digit representation
+          month = MONTHS.index(value[3..5])+1
+          month < 10 ? time_as_str << "0#{month}" : time_as_str << month.to_s
+
+          time_as_str << value[6..13] # day of month + time
+          time_as_str.to_i
+        end
+
       end
     end
 
