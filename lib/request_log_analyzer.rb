@@ -13,7 +13,7 @@ module RequestLogAnalyzer
 
   # The current version of request-log-analyzer.
   # Do not change the value by hand; it will be updated automatically by the gem release script.
-  VERSION = "1.9.6"
+  VERSION = "1.9.7"
 
 
   autoload :Controller,     'request_log_analyzer/controller'
