@@ -18,6 +18,12 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
                                     :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888)
     end
 
+    it "should parse a :job_lock line correctly when the worker is one of many" do
+      line = "2010-05-17T17:37:34+0000: [Worker(delayed_job.0 host:hostname.co.uk pid:11888)] acquired lock on S3FileJob"
+      @file_format.should parse_line(line).as(:job_lock).and_capture(:timestamp => 20100517173734,
+                                    :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888)
+    end
+
     it "should parse a :job_completed line correctly" do
       line = '2010-05-17T17:37:35+0000: [Worker(delayed_job host:hostname.co.uk pid:11888)] S3FileJob completed after 1.0676'
       @file_format.should parse_line(line).as(:job_completed).and_capture(:timestamp => 20100517173735,
