@@ -54,11 +54,11 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
     end
 
     it "should sum of the durations for a category correctly" do
-      @tracker.sum('a').should be_close(0.9, 0.000001)
+      @tracker.sum('a').should be_within(0.000001).of(0.9)
     end
 
     it "should overall sum of the durations correctly" do
-      @tracker.sum_overall.should be_close(0.9, 0.000001)
+      @tracker.sum_overall.should be_within(0.000001).of(0.9)
     end
 
     it "should keep track of the minimum and maximum duration" do
@@ -67,19 +67,19 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
     end
 
     it "should calculate the mean duration correctly" do
-      @tracker.mean('a').should be_close(0.3, 0.000001)
+      @tracker.mean('a').should be_within(0.000001).of(0.3)
     end
 
     it "should calculate the overall mean duration correctly" do
-      @tracker.mean_overall.should be_close(0.3, 0.000001)
+      @tracker.mean_overall.should be_within(0.000001).of(0.3)
     end
 
     it "should calculate the duration variance correctly" do
-      @tracker.variance('a').should be_close(0.01, 0.000001)
+      @tracker.variance('a').should be_within(0.000001).of(0.01)
     end
 
     it "should calculate the duration standard deviation correctly" do
-      @tracker.stddev('a').should be_close(0.1,  0.000001)
+      @tracker.stddev('a').should be_within(0.000001).of(0.1)
     end
 
     it "should calculate the bucket spread correctly" do
@@ -92,12 +92,12 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.update(request(:category => 'a', :duration => 0.3))
       # 0.2, 0.3 and 0.4 are already there, so, 10 values in total
       
-      @tracker.median('a').should be_close(0.3, 0.01)
+      @tracker.median('a').should be_within(0.01).of(0.3)
       
-      @tracker.percentile_interval('a', 80).begin.should be_close(0.3, 0.01)
-      @tracker.percentile_interval('a', 80).end.should be_close(0.3, 0.01)
-      @tracker.percentile_interval('a', 90).begin.should be_close(0.2, 0.01)
-      @tracker.percentile_interval('a', 90).end.should be_close(0.4, 0.01)
+      @tracker.percentile_interval('a', 80).begin.should be_within(0.01).of(0.3)
+      @tracker.percentile_interval('a', 80).end.should be_within(0.01).of(0.3)
+      @tracker.percentile_interval('a', 90).begin.should be_within(0.01).of(0.2)
+      @tracker.percentile_interval('a', 90).end.should be_within(0.01).of(0.4)
     end
   end
 
