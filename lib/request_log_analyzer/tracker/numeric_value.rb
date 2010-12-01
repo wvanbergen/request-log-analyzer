@@ -122,7 +122,9 @@ module RequestLogAnalyzer::Tracker
     def to_yaml_object
       return nil if @categories.empty?
       @categories.each do |cat, info|
-        @categories[cat][:percentile_interval] = percentile_interval(cat, 95) if info[:buckets]
+        info[:stddev] = stddev(cat)
+        info[:median] = median(cat) if info[:buckets]
+        info[:interval_95_percent] = percentile_interval(cat, 95) if info[:buckets]
       end
       @categories
     end
