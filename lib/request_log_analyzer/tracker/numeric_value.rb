@@ -121,9 +121,11 @@ module RequestLogAnalyzer::Tracker
     # Returns all the categories and the tracked duration as a hash than can be exported to YAML
     def to_yaml_object
       return nil if @categories.empty?
+      @categories.each do |cat, info|
+        @categories[cat][:percentile_interval] = percentile_interval(cat, 95) if info[:buckets]
+      end
       @categories
     end
-
 
     # Returns the bucket index for a value
     def bucket_index(value)

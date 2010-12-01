@@ -1,4 +1,4 @@
-require 'spec_helper'
+require '~/programming/request-log-analyzer/request-log-analyzer/spec/spec_helper'
 
 describe RequestLogAnalyzer::Tracker::NumericValue do
 
@@ -133,8 +133,11 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.update(request(:category => 'a', :blah => 2))
       @tracker.update(request(:category => 'b', :blah => 3))
       @tracker.to_yaml_object.keys.should =~ ['a', 'b']
+      
       @tracker.to_yaml_object['a'].should include(:min => 2, :hits => 1, :max => 2, :mean => 2.0, :sum => 2, :sum_of_squares => 0.0)
-      @tracker.to_yaml_object['b'].should include(:min => 3, :hits => 1, :max => 3, :mean => 3.0, :sum => 3, :sum_of_squares => 0.0)      
+      @tracker.to_yaml_object['a'][:percentile_interval].member?(2).should be_true
+      @tracker.to_yaml_object['b'].should include(:min => 3, :hits => 1, :max => 3, :mean => 3.0, :sum => 3, :sum_of_squares => 0.0)
+      @tracker.to_yaml_object['b'][:percentile_interval].should be_true
     end
   end
 
