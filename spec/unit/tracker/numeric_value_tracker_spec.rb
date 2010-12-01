@@ -1,4 +1,4 @@
-require '~/programming/request-log-analyzer/request-log-analyzer/spec/spec_helper'
+require 'spec_helper'
 
 describe RequestLogAnalyzer::Tracker::NumericValue do
 
