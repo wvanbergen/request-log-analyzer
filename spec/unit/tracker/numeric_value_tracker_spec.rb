@@ -135,9 +135,10 @@ describe RequestLogAnalyzer::Tracker::NumericValue do
       @tracker.to_yaml_object.keys.should =~ ['a', 'b']
       
       @tracker.to_yaml_object['a'].should include(:min => 2, :hits => 1, :max => 2, :mean => 2.0, :sum => 2, :sum_of_squares => 0.0)
-      @tracker.to_yaml_object['a'][:interval_95_percent].member?(2).should be_true
+      @tracker.to_yaml_object['a'][:interval_95_percent].should be_member(2)
+      
       @tracker.to_yaml_object['b'].should include(:min => 3, :hits => 1, :max => 3, :mean => 3.0, :sum => 3, :sum_of_squares => 0.0)
-      @tracker.to_yaml_object['b'][:interval_95_percent].should be_true
+      @tracker.to_yaml_object['b'][:interval_95_percent].should be_member(3)
     end
   end
 
