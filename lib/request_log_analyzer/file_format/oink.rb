@@ -26,6 +26,12 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
     line.capture(:pid).as(:integer)
     line.capture(:memory).as(:traffic)
   end
+
+  line_definition :instance_type_counter do |line|
+    line.regexp = /\[(\d+)\]: Instantiation Breakdown: (.*)$/
+    line.capture(:pid).as(:integer) 
+    line.capture(:instance_counts).as(:pipe_separated_counts)
+  end
   
   report(:append) do |analyze|
     analyze.traffic :memory_diff, :category => REQUEST_CATEGORIZER, :title => "Largest Memory Increases", :line_type => :memory_usage
@@ -35,7 +41,7 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
   def pids
     @pids ||= {}
   end
-  
+
   class Request < RequestLogAnalyzer::FileFormat::Rails::Request
    # Overrides the #validate method to handle PID updating.
    def validate
@@ -74,5 +80,17 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
       end # if mem_line
       return true
    end # def update_pids
+
+  def convert_pipe_separated_counts(value, capture_definition)
+    count_strings = value.split(' | ')
+    count_arrays = count_strings.map do |count_string|
+      if count_string =~ /^(\w+): (\d+)/
+        [$1.downcase, $2.to_i]
+      end
+    end
+
+    Hash[count_arrays]
+  end
+  
   end # class Request
 end

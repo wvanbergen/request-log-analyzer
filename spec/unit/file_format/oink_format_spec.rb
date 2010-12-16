@@ -30,6 +30,13 @@ describe RequestLogAnalyzer::FileFormat::Oink do
       line = 'Aug 14 21:16:30 derek rails[67783]: Processing PeopleController#index (for 1.1.1.1 at 2008-08-14 21:16:30) [GET]'
       @oink.should parse_line(line).as(:processing).and_capture(:pid => 67783, :controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET', :ip => '1.1.1.1')
     end
+
+    it "should parse a :instance_type_counter correctly" do
+
+      line = "Dec 13 12:00:44 storenvy rails[26364]: Instantiation Breakdown: Total: 732 | User: 376 | Post: 323 | Comment: 32 | Blog: 1"
+
+      @oink.should parse_line(line).as(:instance_type_counter).and_capture(:pid => 26364, :instance_counts =>  {'Total' => 732, 'User' => 376, 'Post' => 323, 'Comment' => 32, 'Blog' => 1})
+    end
   end
   
   describe '#parse_io' do
