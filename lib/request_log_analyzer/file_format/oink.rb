@@ -85,7 +85,7 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
     count_strings = value.split(' | ')
     count_arrays = count_strings.map do |count_string|
       if count_string =~ /^(\w+): (\d+)/
-        [$1.downcase, $2.to_i]
+        [$1, $2.to_i]
       end
     end
 
