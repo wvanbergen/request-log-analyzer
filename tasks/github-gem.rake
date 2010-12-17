@@ -220,7 +220,7 @@ module GithubGem
 
     def check_version_task
       raise "#{ENV['VERSION']} is not a valid version number!" if ENV['VERSION'] && !Gem::Version.correct?(ENV['VERSION'])
-      proposed_version = Gem::Version.new(ENV['VERSION'].dup || gemspec.version)
+      proposed_version = Gem::Version.new((ENV['VERSION'] || gemspec.version).dup)
       raise "This version (#{proposed_version}) is not higher than the highest tagged version (#{newest_version})" if newest_version >= proposed_version
     end
 
@@ -339,22 +339,26 @@ module GithubGem
 
     # Updates the tasks file using the latest file found on Github
     def update_tasks_task
-      require 'net/http'
+      require 'net/https'
+      require 'uri'
+      
+      uri = URI.parse('https://github.com/wvanbergen/github-gem/raw/master/tasks/github-gem.rake')
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      response = http.request(Net::HTTP::Get.new(uri.path))
 
-      server = 'github.com'
-      path   = '/wvanbergen/github-gem/raw/master/tasks/github-gem.rake'
-
-      Net::HTTP.start(server) do |http|
-        response = http.get(path)
+      if Net::HTTPSuccess === response
         open(__FILE__, "w") { |file| file.write(response.body) }
-      end
-
-      relative_file = File.expand_path(__FILE__).sub(%r[^#{@root_dir}/], '')
-      if `#{git} ls-files -m #{relative_file}`.split("\n").any?
-        sh git, 'add', relative_file
-        sh git, 'commit', '-m', "Updated to latest gem release management tasks."
+        relative_file = File.expand_path(__FILE__).sub(%r[^#{@root_dir}/], '')
+        if `#{git} ls-files -m #{relative_file}`.split("\n").any?
+          sh git, 'add', relative_file
+          sh git, 'commit', '-m', "Updated to latest gem release management tasks."
+        else
+          puts "Release managament tasks already are at the latest version."
+        end
       else
-        puts "Release managament tasks already are at the latest version."
+        raise "Download failed with HTTP status #{response.code}!"
       end
     end
   end
