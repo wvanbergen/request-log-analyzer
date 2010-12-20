@@ -20,11 +20,11 @@ module RequestLogAnalyzer
     # Builds a RequestLogAnalyzer::Controller given parsed command line arguments
     # <tt>arguments<tt> A CommandLine::Arguments hash containing parsed commandline parameters.
     def self.build_from_arguments(arguments)
-      
+
       require 'mixins/gets_memory_protection' if arguments[:gets_memory_protection]
-      
+
       options = {}
-      
+
       # Copy fields
       options[:database]       = arguments[:database]
       options[:reset_database] = arguments[:reset_database]
@@ -33,7 +33,7 @@ module RequestLogAnalyzer
       options[:mail]           = arguments[:mail]
       options[:no_progress]    = arguments[:no_progress]
       options[:format]         = arguments[:format]
-      options[:output]         = arguments[:output].downcase
+      options[:output]         = arguments[:output]
       options[:file]           = arguments[:file]
       options[:after]          = arguments[:after]
       options[:before]         = arguments[:before]
@@ -44,25 +44,25 @@ module RequestLogAnalyzer
       options[:report_width]   = arguments[:report_width]
       options[:report_sort]    = arguments[:report_sort]
       options[:report_amount]  = arguments[:report_amount]
-      options[:mailhost]       = arguments[:mailhost] 
+      options[:mailhost]       = arguments[:mailhost]
       options[:mailsubject]    = arguments[:mailsubject]
-      options[:silent]         = arguments[:silent] 
-      options[:parse_strategy] = arguments[:parse_strategy] 
-      
+      options[:silent]         = arguments[:silent]
+      options[:parse_strategy] = arguments[:parse_strategy]
+
       # Apache format workaround
       if arguments[:rails_format]
         options[:format] = {:rails => arguments[:rails_format]}
       elsif arguments[:apache_format]
         options[:format] = {:apache => arguments[:apache_format]}
       end
-      
+
       # Handle output format casing
       if options[:output].class == String
         options[:output] = 'FancyHTML'  if options[:output] =~ /^fancy_?html$/i
         options[:output] = 'HTML'       if options[:output] =~ /^html$/i
         options[:output] = 'FixedWidth' if options[:output] =~ /^fixed_?width$/i
       end
-      
+
       # Register sources
       if arguments.parameters.length == 1
         file = arguments.parameters[0]
@@ -77,7 +77,7 @@ module RequestLogAnalyzer
       else
         options.store(:source_files, arguments.parameters)
       end
-      
+
       # Guess file format
       if !options[:format] && options[:source_files]
         options[:format] = :rails # Default
@@ -91,7 +91,7 @@ module RequestLogAnalyzer
           end
         end
       end
-      
+
       build(options)
     end
 
@@ -124,7 +124,7 @@ module RequestLogAnalyzer
     # RequestLogAnalyzer::Controller.build(
     #   :output       => :HTML,
     #   :mail         => 'root@localhost',
-    #   :after        => Time.now - 24*60*60, 
+    #   :after        => Time.now - 24*60*60,
     #   :source_files => '/var/log/passenger.log'
     # ).run!
     #
@@ -141,15 +141,15 @@ module RequestLogAnalyzer
       options[:report_sort]   ||= 'sum,mean'
       options[:boring]        ||= false
       options[:silent]        ||= false
-      
+
       options[:no_progress] = true if options[:silent]
-      
+
       # Deprecation warnings
       if options[:dump]
         warn "[DEPRECATION] `:dump` is deprecated.  Please use `:yaml` instead."
         options[:yaml]          = options[:dump]
       end
-      
+
       # Set the output class
       output_args   = {}
       output_object = nil
@@ -158,10 +158,10 @@ module RequestLogAnalyzer
       else
         output_class = RequestLogAnalyzer::Output.const_get(options[:output])
       end
-      
+
       output_sort   = options[:report_sort].split(',').map { |s| s.to_sym }
       output_amount = options[:report_amount] == 'all' ? :all : options[:report_amount].to_i
-      
+
       if options[:file]
         output_object = %w[File StringIO].include?(options[:file].class.name) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
@@ -173,26 +173,26 @@ module RequestLogAnalyzer
         output_args   = {:width => options[:report_width].to_i, :color => !options[:boring],
                         :characters => (options[:boring] ? :ascii : :utf), :sort => output_sort, :amount => output_amount }
       end
-      
+
       output_instance = output_class.new(output_object, output_args)
-      
+
       # Create the controller with the correct file format
       if options[:format].kind_of?(Hash)
         file_format = RequestLogAnalyzer::FileFormat.load(options[:format].keys[0], options[:format].values[0])
       else
         file_format = RequestLogAnalyzer::FileFormat.load(options[:format])
       end
-      
+
       # Kickstart the controller
-      controller = 
-        Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format,  
-                                                                 :source_files => options[:source_files], 
+      controller =
+        Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format,
+                                                                 :source_files => options[:source_files],
                                                                  :parse_strategy => options[:parse_strategy]),
                        { :output         => output_instance,
                          :database       => options[:database],                # FUGLY!
-                         :yaml           => options[:yaml], 
+                         :yaml           => options[:yaml],
                          :reset_database => options[:reset_database],
-                         :no_progress    => options[:no_progress], 
+                         :no_progress    => options[:no_progress],
                          :silent         => options[:silent]
                        })
 
@@ -230,7 +230,7 @@ module RequestLogAnalyzer
 
       file_format.setup_environment(controller)
       return controller
-    end  
+    end
 
     # Builds a new Controller for the given log file format.
     # <tt>format</tt> Logfile format. Defaults to :rails
@@ -248,7 +248,7 @@ module RequestLogAnalyzer
       @filters     = []
       @output      = options[:output]
       @interrupted = false
-      
+
       # Register the request format for this session after checking its validity
       raise "Invalid file format!" unless @source.file_format.valid?
 
