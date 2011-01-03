@@ -1,24 +1,25 @@
 module RequestLogAnalyzer::FileFormat
 
+  # PostgresQL spec 8.3.7
   class Postgresql < Base
 
     extend CommonRegularExpressions
     
     line_definition :query do |line|
       line.header = true
-      line.teaser = /LOG\:  query\:/
-      line.regexp = /(#{timestamp('%y-%m-%d %k:%M:%S')})\ LOG:  query:\s+(.*)/
+      line.teaser = /.*LOG\:/
+      line.regexp = /(#{timestamp('%Y-%m-%d %k:%M:%S')})\ \S+ \[\d+\]\:\ \[.*\]\ LOG\:\ \ \d+\:\ duration\: (.*)\ ms\ \ statement:\ (.*)/
 
       line.capture(:timestamp).as(:timestamp)
+      line.capture(:query_time).as(:duration, :unit => :sec)
       line.capture(:query_fragment)
     end
       
-    line_definition :duration do |line|
+    line_definition :location do |line|
       line.footer = true
-      line.teaser = /duration:/
-      line.regexp = /#{timestamp('%y-%m-%d %k:%M:%S')}\ LOG\:  duration\: (.*)(\ )sec/
+      line.teaser = /.*LOCATION:/
+      line.regexp = /.*(\ )LOCATION:/
 
-      line.capture(:query_time).as(:duration, :unit => :sec)
       line.capture(:query).as(:sql) # Hack to gather up fragments
     end
     
