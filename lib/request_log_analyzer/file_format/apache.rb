@@ -30,20 +30,23 @@ module RequestLogAnalyzer::FileFormat
 
     # A hash that defines how the log format directives should be parsed.
     LOG_DIRECTIVES = {
-      '%' => { :regexp => '%', :captures => [] },
-      'h' => { :regexp => '([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)',  :captures => [{:name => :remote_host, :type => :string}] },
-      'a' => { :regexp => "(#{ip_address})", :captures => [{:name => :remote_ip, :type => :string}] },
-      'b' => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :traffic}] },
-      'c' => { :regexp => '(\+|\-|\X)', :captures => [{:name => :connection_status, :type => :integer}] },
-      'D' => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :musec}] },
-      'l' => { :regexp => '([\w-]+)', :captures => [{:name => :remote_logname, :type => :nillable_string}] },
-      'T' => { :regexp => '((?:\d+(?:\.\d+))|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] },
-      't' => { :regexp => "\\[(#{APACHE_TIMESTAMP})?\\]", :captures => [{:name => :timestamp, :type => :timestamp}] },
-      's' => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] },
-      'u' => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] },
-      'U' => { :regexp => '(\/\S*)', :captures => [{:name => :path, :type => :string}] },
-      'r' => { :regexp => '([A-Z]+) (\S+) HTTP\/(\d+(?:\.\d+)*)', :captures => [{:name => :http_method, :type => :string},
-                       {:name => :path, :type => :path}, {:name => :http_version, :type => :string}]},
+      '%' => { nil => { :regexp => '%', :captures => [] } },
+      'h' => { nil => { :regexp => '([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)',  :captures => [{:name => :remote_host, :type => :string}] } },
+      'a' => { nil => { :regexp => "(#{ip_address})", :captures => [{:name => :remote_ip, :type => :string}] } },
+      'b' => { nil => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :traffic}] } },
+      'c' => { nil => { :regexp => '(\+|\-|\X)', :captures => [{:name => :connection_status, :type => :integer}] } },
+      'D' => { nil     => { :regexp => '(\d+|-)', :captures => [ {:name => :duration, :type => :duration, :unit => :musec }] },
+               'micro' => { :regexp => '(\d+|-)', :captures => [ {:name => :duration, :type => :duration, :unit => :musec }] },
+               'milli' => { :regexp => '(\d+|-)', :captures => [ {:name => :duration, :type => :duration, :unit => :msec }] }
+             },
+      'l' => { nil => { :regexp => '([\w-]+)', :captures => [{:name => :remote_logname, :type => :nillable_string}] } },
+      'T' => { nil => { :regexp => '((?:\d+(?:\.\d+))|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] } },
+      't' => { nil => { :regexp => "\\[(#{APACHE_TIMESTAMP})?\\]", :captures => [{:name => :timestamp, :type => :timestamp}] } },
+      's' => { nil => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] } },
+      'u' => { nil => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] } },
+      'U' => { nil => { :regexp => '(\/\S*)', :captures => [{:name => :path, :type => :string}] } },
+      'r' => { nil => { :regexp => '([A-Z]+) (\S+) HTTP\/(\d+(?:\.\d+)*)', :captures => [{:name => :http_method, :type => :string},
+                       {:name => :path, :type => :path}, {:name => :http_version, :type => :string}]} },
       'i' => { 'Referer'    => { :regexp => '(\S+)', :captures => [{:name => :referer, :type => :nillable_string}] },
                'User-agent' => { :regexp => '(.*)',  :captures => [{:name => :user_agent, :type => :user_agent}] }
              }
@@ -72,14 +75,13 @@ module RequestLogAnalyzer::FileFormat
 
         if variable
           # Check if we recognize the log directive
-          directive = LOG_DIRECTIVES[variable]
-          directive = directive[arg] if directive && arg
+          directive = LOG_DIRECTIVES[variable][arg] rescue nil
 
           if directive
             line_regexp << directive[:regexp]   # Parse the value of the directive
             captures    += directive[:captures] # Add the directive's information to the captures
           else
-            puts "%#{directive} log directiven not yet supported, field is ignored."
+            puts "%#{directive} log directive is not yet supported, field is ignored."
             line_regexp << '.*' # Just accept any input for this literal
           end
         end

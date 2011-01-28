@@ -28,6 +28,23 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       @line_definition.captures?(:duration).should be_true
     end
   end
+  
+  describe '.access_line_definition' do
+    it "should parse values in microseconds when no argument is given to %D" do
+      format = RequestLogAnalyzer::FileFormat::Apache.create('%D')
+      format.should parse_line('12345').and_capture(:duration => 0.012345)
+    end
+    
+    it "should parse values in microseconds when micro is given as argument to %D" do
+      format = RequestLogAnalyzer::FileFormat::Apache.create('%{micro}D')
+      format.should parse_line('12345').and_capture(:duration => 0.012345)
+    end
+    
+    it "should parse values in microseconds when micro is given as argument to %D" do
+      format = RequestLogAnalyzer::FileFormat::Apache.create('%{milli}D')
+      format.should parse_line('12345').and_capture(:duration => 12.345)
+    end
+  end
 
   describe '.create' do
 
