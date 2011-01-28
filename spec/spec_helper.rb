@@ -3,6 +3,7 @@ $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'rubygems'
 require 'rspec'
 require 'request_log_analyzer'
+require 'stringio'
 
 module RequestLogAnalyzer::RSpec
 end
