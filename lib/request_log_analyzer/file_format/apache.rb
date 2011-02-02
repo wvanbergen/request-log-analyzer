@@ -81,7 +81,7 @@ module RequestLogAnalyzer::FileFormat
             line_regexp << directive[:regexp]   # Parse the value of the directive
             captures    += directive[:captures] # Add the directive's information to the captures
           else
-            puts "%#{directive} log directive is not yet supported, field is ignored."
+            puts "Apache log directive %#{arg}#{variable} is not yet supported by RLA, the field will be ignored."
             line_regexp << '.*' # Just accept any input for this literal
           end
         end
