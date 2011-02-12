@@ -16,7 +16,7 @@ module RequestLogAnalyzer::FileFormat
       line.capture(:local_ip)
       line.capture(:port).as(:integer)
       line.capture(:method)
-      line.capture(:path)
+      line.capture(:path).as(:path)
       line.capture(:http_status).as(:integer)
       line.capture(:bytes_sent).as(:traffic, :unit => :byte)
       line.capture(:bytes_received).as(:traffic, :unit => :byte)
@@ -38,7 +38,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :category => :referer,    :title => "Referers"
 
       analyze.duration :duration => :duration,  :category => :path, :title => 'Request duration'
-      analyze.traffic  :traffic => :bytes_sent, :category => :path, :title => 'Traffic'
+      analyze.traffic  :traffic => :bytes_sent, :category => :path, :title => 'Traffic out'
+      analyze.traffic  :traffic => :bytes_received, :category => :path, :title => 'Traffic in'
     end
     
     class Request < RequestLogAnalyzer::Request
