@@ -128,21 +128,10 @@ module RequestLogAnalyzer::FileFormat
         "#{value[7,4]}#{MONTHS[value[3,3]]}#{value[0,2]}#{value[12,2]}#{value[15,2]}#{value[18,2]}".to_i
       end
 
-      # This function can be overridden to rewrite the path for better categorization in the
-      # reports.
-      def convert_path(value, definition)
-        value
-      end
-
       # This function can be overridden to simplify the user agent string for better
       # categorization in the reports
       def convert_user_agent(value, definition)
         value # TODO
-      end
-
-      # Make sure that the string '-' is parsed as a nil value.
-      def convert_nillable_string(value, definition)
-        value == '-' ? nil : value
       end
     end
   end

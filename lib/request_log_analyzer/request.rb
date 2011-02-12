@@ -27,6 +27,13 @@ module RequestLogAnalyzer
       def convert_integer(value, capture_definition); value.to_i; end
       def convert_sym(value, capture_definition);     value.to_sym; end
       def convert_symbol(value, capture_definition);  value.to_sym; end
+      def convert_nillable_string(value, definition); value == '-' ? nil : value ; end
+      
+      # This function can be overridden to rewrite the path for better categorization in the
+      # reports.
+      def convert_path(value, definition)
+        value
+      end
 
       # Converts :eval field, which should evaluate to a hash.
       def convert_eval(value, capture_definition)

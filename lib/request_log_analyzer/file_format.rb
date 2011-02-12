@@ -13,6 +13,7 @@ module RequestLogAnalyzer::FileFormat
   autoload :DelayedJob21,     'request_log_analyzer/file_format/delayed_job21'
   autoload :Apache,           'request_log_analyzer/file_format/apache'
   autoload :AmazonS3,         'request_log_analyzer/file_format/amazon_s3'
+  autoload :W3c,              'request_log_analyzer/file_format/w3c'
 
   # Loads a FileFormat::Base subclass instance.
   # You can provide:
