@@ -9,3 +9,5 @@ requests.db
 /classes
 /files
 /coverage
+Gemfile.lock
+/.bundle/
