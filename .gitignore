@@ -11,3 +11,4 @@ requests.db
 /coverage
 Gemfile.lock
 /.bundle/
+*.rbc
