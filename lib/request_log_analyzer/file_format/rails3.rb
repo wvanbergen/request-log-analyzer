@@ -23,7 +23,7 @@ module RequestLogAnalyzer::FileFormat
     # Processing by QueriesController#index as HTML
     line_definition :processing do |line|
       line.teaser = /Processing by /
-      line.regexp = /Processing by ([A-Za-z0-9\-:]+)\#(\w+) as ([\w\/\*]+)/
+      line.regexp = /Processing by ([A-Za-z0-9\-:]+)\#(\w+) as ([\w\/\*]*)/
       
       line.capture(:controller)
       line.capture(:action)

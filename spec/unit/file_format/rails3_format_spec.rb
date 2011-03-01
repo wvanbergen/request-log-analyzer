@@ -2,61 +2,70 @@ require 'spec_helper'
 
 describe RequestLogAnalyzer::FileFormat::Rails do
 
-  it "should be a valid file format" do
-    RequestLogAnalyzer::FileFormat.load(:rails3).should be_valid
-  end
+  subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
+  let(:log_parser) {RequestLogAnalyzer::Source::LogParser.new(subject) }
   
+  it { should be_valid }
+
   describe '#parse_line' do
     before(:each) { @file_format = RequestLogAnalyzer::FileFormat.load(:rails3) }
 
     it "should parse :started lines correctly" do
       line = 'Started GET "/queries" for 127.0.0.1 at Thu Feb 25 16:15:18 -0800 2010'
-      @file_format.should parse_line(line).as(:started).and_capture(:method => 'GET', 
+      subject.should parse_line(line).as(:started).and_capture(:method => 'GET', 
             :path => '/queries', :ip => '127.0.0.1', :timestamp => 20100225161518)
     end
     
     it "should parse :started lines in Oct, Nov and Dec correctly" do
       line = 'Started GET "/queries" for 127.0.0.1 at Thu Oct 25 16:15:18 -0800 2010'
-      @file_format.should parse_line(line).as(:started).and_capture(:method => 'GET',
+      subject.should parse_line(line).as(:started).and_capture(:method => 'GET',
             :path => '/queries', :ip => '127.0.0.1', :timestamp => 20101025161518)
     end
     
     it "should parse :started lines in Ruby 1.9.2 format correctly" do
       line = 'Started GET "/queries" for 127.0.0.1 at 2010-10-26 02:27:15 +0000'
-      @file_format.should parse_line(line).as(:started).and_capture(:method => 'GET',
+      subject.should parse_line(line).as(:started).and_capture(:method => 'GET',
             :path => '/queries', :ip => '127.0.0.1', :timestamp => 20101026022715)
     end
 
     it "should parse :processing lines correctly" do
       line = ' Processing by QueriesController#index as HTML'
-      @file_format.should parse_line(line).as(:processing).and_capture(
+      subject.should parse_line(line).as(:processing).and_capture(
         :controller => 'QueriesController', :action => 'index', :format => 'HTML')
     end
+    
     it "should parse nested :processing lines correctly" do
       line = ' Processing by Projects::QueriesController#index as HTML'
-      @file_format.should parse_line(line).as(:processing).and_capture(
+      subject.should parse_line(line).as(:processing).and_capture(
         :controller => 'Projects::QueriesController', :action => 'index', :format => 'HTML')
     end
+    
     it "should parse :processing lines correctly with format */*" do
       line = '  Processing by ProjectsController#avatar as */*'
-      @file_format.should parse_line(line).as(:processing).and_capture(
+      subject.should parse_line(line).as(:processing).and_capture(
         :controller => 'ProjectsController', :action => 'avatar', :format => '*/*')
+    end
+
+    it "should parse :processing lines correctly without format" do
+      line = '  Processing by ProjectsController#avatar as '
+      subject.should parse_line(line).as(:processing).and_capture(
+        :controller => 'ProjectsController', :action => 'avatar', :format => '')
     end
     
     it "should parse :completed lines correctly" do
       line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms)'
-      @file_format.should parse_line(line).as(:completed).and_capture(
+      subject.should parse_line(line).as(:completed).and_capture(
           :duration => 0.170, :view => 0.078, :db => 0.0482, :status => 200)
     end
     
     it "should parse :completed lines correctly when ActiveRecord is not mentioned" do
       line = 'Completed 200 OK in 364ms (Views: 31.4ms)'
-      @file_format.should parse_line(line).as(:completed).and_capture(:duration => 0.364, :status => 200)
+      subject.should parse_line(line).as(:completed).and_capture(:duration => 0.364, :status => 200)
     end
     
     it "should parse :completed lines correctly when other durations are specified" do
       line = 'Completed 200 OK in 384ms (Views: 222.0ms | ActiveRecord: 121.0ms | Sphinx: 0.0ms)'
-      @file_format.should parse_line(line).as(:completed).and_capture(:duration => 0.384, :view => 0.222, 
+      subject.should parse_line(line).as(:completed).and_capture(:duration => 0.384, :view => 0.222, 
           :db => 0.121, :status => 200)
     end
     
@@ -71,10 +80,6 @@ describe RequestLogAnalyzer::FileFormat::Rails do
   end
   
   describe '#parse_io' do
-    before(:each) do
-      @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat.load(:rails3))
-    end
-    
     it "should parse a successful request correctly" do
       log = <<-EOLOG
         Started GET "/" for 127.0.0.1 at Fri Mar 19 06:40:41 -0700 2010
@@ -86,9 +91,9 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       EOLOG
       
       request_counter.should_receive(:hit!).once
-      @log_parser.should_not_receive(:warn)
+      log_parser.should_not_receive(:warn)
       
-      @log_parser.parse_io(StringIO.new(log)) do |request|
+      log_parser.parse_io(StringIO.new(log)) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
       end
     end
@@ -105,9 +110,9 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       EOLOG
 
       request_counter.should_receive(:hit!).once
-      @log_parser.should_not_receive(:warn)
+      log_parser.should_not_receive(:warn)
       
-      @log_parser.parse_io(StringIO.new(log)) do |request|
+      log_parser.parse_io(StringIO.new(log)) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
       end
     end
@@ -137,9 +142,9 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       EOLOG
 
       request_counter.should_receive(:hit!).once
-      @log_parser.should_not_receive(:warn)
+      log_parser.should_not_receive(:warn)
       
-      @log_parser.parse_io(StringIO.new(log)) do |request|
+      log_parser.parse_io(StringIO.new(log)) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
       end
     end
