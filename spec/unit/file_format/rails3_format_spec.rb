@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RequestLogAnalyzer::FileFormat::Rails do
+describe RequestLogAnalyzer::FileFormat::Rails3 do
 
   subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
   let(:log_parser) {RequestLogAnalyzer::Source::LogParser.new(subject) }
