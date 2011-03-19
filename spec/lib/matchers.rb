@@ -48,6 +48,13 @@ module RequestLogAnalyzer::RSpec::Matchers
       @failure_message = message
       return false
     end
+    
+    def description
+      description = "parse line #{@line.inspect}"
+      description << " as line type #{@line_type.inspect}" if @line_type
+      description << " and capture #{@captures.keys.to_sentence}" unless @captures.empty?
+      description
+    end
 
     def matches?(file_format)
       if @line_hash = file_format.parse_line(@line)
