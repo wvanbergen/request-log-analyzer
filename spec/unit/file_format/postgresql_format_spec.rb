@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::FileFormat::Postgresql do
   subject { RequestLogAnalyzer::FileFormat.load(:Postgresql) }
   let(:log_parser)  { RequestLogAnalyzer::Source::LogParser.new(subject) }
   
-  it { should be_valid }
+  it { should be_well_formed }
 
   describe '#parse_line' do
     it "should parse a :query line correctly" do
@@ -34,7 +34,7 @@ describe RequestLogAnalyzer::FileFormat::Postgresql do
 
       request_counter.should_receive(:hit!).exactly(1).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_io(StringIO.new(fixture)) do |request|
+      log_parser.parse_string(fixture) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Postgresql::Request) && request.completed?
         request[:query].should == 'INSERT INTO delayed_jobs (failed_at, locked_by, created_at, handler, updated_at, priority, run_at, attempts, locked_at, last_error) VALUES(NULL, NULL, :string, E:string, :string, :int, :string, :int, NULL, NULL) RETURNING id'
       end

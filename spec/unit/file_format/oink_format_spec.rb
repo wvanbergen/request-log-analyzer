@@ -7,7 +7,7 @@ describe RequestLogAnalyzer::FileFormat::Oink do
       before(:each) { @oink = RequestLogAnalyzer::FileFormat.load(:oink) }
 
       it "should create a valid file format" do
-        @oink.should be_valid
+        @oink.should be_well_formed
       end
       
       it "should parse :memory_usage line" do

@@ -260,9 +260,12 @@ module RequestLogAnalyzer::FileFormat
     end
 
     # Checks whether the file format is valid so it can be safely used with RLA.
-    def valid?
+    def well_formed?
       valid_line_definitions? && valid_request_class?
     end
+    
+    alias_method :valid?, :well_formed?
+  
 
     # Checks whether the line definitions form a valid language.
     # A file format should have at least a header and a footer line type    

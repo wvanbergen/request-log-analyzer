@@ -8,7 +8,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       before(:each) { @rails = RequestLogAnalyzer::FileFormat.load(:rails) }
 
       it "should create a valid file format" do
-        @rails.should be_valid
+        @rails.should be_well_formed
       end
 
       it "should parse the production lines" do
@@ -21,7 +21,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       before(:each) { @rails = RequestLogAnalyzer::FileFormat.load(:rails, 'minimal,failure') }
 
       it "should return a valid language" do
-        @rails.should be_valid
+        @rails.should be_well_formed
       end
 
       it "should at least parse :processing and :completed lines" do
@@ -35,7 +35,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
         before(:each) { @rails = RequestLogAnalyzer::FileFormat.load(:rails, constant) }
 
         it "should return a valid language" do
-          @rails.should be_valid
+          @rails.should be_well_formed
         end
 
         it "should at least parse :processing and :completed lines" do

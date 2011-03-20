@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
   subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
   let(:log_parser) {RequestLogAnalyzer::Source::LogParser.new(subject) }
   
-  it { should be_valid }
+  it { should be_well_formed }
 
   describe '#parse_line' do
     before(:each) { @file_format = RequestLogAnalyzer::FileFormat.load(:rails3) }
@@ -93,7 +93,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       request_counter.should_receive(:hit!).once
       log_parser.should_not_receive(:warn)
       
-      log_parser.parse_io(StringIO.new(log)) do |request|
+      log_parser.parse_string(log) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
       end
     end
@@ -112,7 +112,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       request_counter.should_receive(:hit!).once
       log_parser.should_not_receive(:warn)
       
-      log_parser.parse_io(StringIO.new(log)) do |request|
+      log_parser.parse_string(log) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
       end
     end
@@ -144,7 +144,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       request_counter.should_receive(:hit!).once
       log_parser.should_not_receive(:warn)
       
-      log_parser.parse_io(StringIO.new(log)) do |request|
+      log_parser.parse_string(log) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
       end
     end

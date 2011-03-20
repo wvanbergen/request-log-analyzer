@@ -132,6 +132,13 @@ module RequestLogAnalyzer::Source
     def parse_stream(stream, options = {}, &block)
       parse_io(stream, options, &block)
     end
+    
+    # Parses a string. It will simply call parse_io. This function does not support progress updates.
+    # <tt>string</tt>:: The string that should be parsed.
+    # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
+    def parse_string(string, options = {}, &block)
+      parse_io(StringIO.new(string), options, &block)
+    end
 
     # This method loops over each line of the input stream. It will try to parse this line as any of
     # the lines that are defined by the current file format (see RequestLogAnalyazer::FileFormat).

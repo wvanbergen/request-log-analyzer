@@ -11,6 +11,12 @@ module RequestLogAnalyzer::RSpec::Matchers
       @captures += captures
       return self
     end
+    
+    def description
+      description = "have a #{@line_type.inspect} line definition"
+      description << " that captures #{@captures.join(', ')}" unless @captures.empty?
+      description
+    end
 
     def matches?(file_format)
       file_format = file_format.create if file_format.kind_of?(Class)
@@ -24,10 +30,19 @@ module RequestLogAnalyzer::RSpec::Matchers
 
   class ParseLine
     
-    def initialize(line)
+    def initialize(line, line_description = nil)
       @line      = line
       @captures  = {}
       @line_type = nil
+      @line_description = line_description
+    end
+
+    def line_description
+      @line_description ||= if @line_type 
+        "a #{@line_type.inspect} line"
+      else
+        "line #{@line.inspect}"
+      end
     end
 
     def failure_message
@@ -50,7 +65,7 @@ module RequestLogAnalyzer::RSpec::Matchers
     end
     
     def description
-      description = "parse line #{@line.inspect}"
+      description = "parse #{line_description}"
       description << " as line type #{@line_type.inspect}" if @line_type
       description << " and capture #{@captures.keys.join(', ')} correctly" unless @captures.empty?
       description
@@ -77,8 +92,7 @@ module RequestLogAnalyzer::RSpec::Matchers
     return HasLineDefinition.new(line_type)
   end
 
-  def parse_line(line)
-    ParseLine.new(line)
+  def parse_line(line, line_description = nil)
+    ParseLine.new(line, line_description)
   end
-
 end

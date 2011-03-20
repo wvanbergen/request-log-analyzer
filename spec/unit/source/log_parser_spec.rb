@@ -11,7 +11,7 @@ describe RequestLogAnalyzer::Source::LogParser, :requests do
   end
 
   it "should have a valid language" do
-    @log_parser.file_format.should be_valid
+    @log_parser.file_format.should be_well_formed
   end
 
   it "should set the :source for every parsed line" do

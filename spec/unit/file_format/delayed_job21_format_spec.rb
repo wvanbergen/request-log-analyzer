@@ -4,7 +4,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
 
   subject { RequestLogAnalyzer::FileFormat.load(:delayed_job21) }
   
-  it { should be_valid }
+  it { should be_well_formed }
 
   describe '#parse_line' do
     
@@ -41,9 +41,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
       request_counter.should_receive(:hit!).exactly(3).times
       log_parser.should_not_receive(:warn)
 
-      log_parser.parse_io(StringIO.new(fragment)) do |request|
-        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::DelayedJob21::Request)
-      end
+      log_parser.parse_string(fragment) { request_counter.hit! } 
     end
   end
 end

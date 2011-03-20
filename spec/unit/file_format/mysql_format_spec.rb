@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RequestLogAnalyzer::FileFormat::Mysql do
 
   it "should be a valid file format" do
-    RequestLogAnalyzer::FileFormat.load(:mysql).should be_valid
+    RequestLogAnalyzer::FileFormat.load(:mysql).should be_well_formed
   end
 
   describe '#parse_line' do
@@ -89,7 +89,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
 # Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
 SELECT /*!40001 SQL_NO_CACHE */ * FROM `events`;
 EOS
-      @log_parser.parse_io(StringIO.new(fixture)) do |request|
+      @log_parser.parse_string(fixture) do |request|
         request.should be_kind_of(RequestLogAnalyzer::FileFormat::Mysql::Request)
         request[:query].should == 'SELECT /*!:int SQL_NO_CACHE */ * FROM events'
       end
@@ -105,7 +105,7 @@ SELECT * FROM `clients` WHERE (1=1
                                AND clients.index > 0
                               ) AND (clients.deleted_at IS NULL);
 EOS
-      @log_parser.parse_io(StringIO.new(fixture)) do |request|
+      @log_parser.parse_string(fixture) do |request|
         request.should be_kind_of(RequestLogAnalyzer::FileFormat::Mysql::Request)
         request[:query].should == "SELECT * FROM clients WHERE (:int=:int AND clients.valid_from < :date AND (clients.valid_to IS NULL or clients.valid_to > :date) AND clients.index > :int ) AND (clients.deleted_at IS NULL)"
       end
@@ -120,7 +120,7 @@ EOS
       request_counter.should_receive(:hit!).once
       @log_parser.should_not_receive(:warn)
 
-      @log_parser.parse_io(StringIO.new(fixture)) do |request|
+      @log_parser.parse_string(fixture) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Mysql::Request) && request.completed?
       end
     end
@@ -138,7 +138,7 @@ EOS
       request_counter.should_receive(:hit!).once
       @log_parser.should_not_receive(:warn)
 
-      @log_parser.parse_io(StringIO.new(fixture)) do |request|
+      @log_parser.parse_string(fixture) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Mysql::Request) && request.completed?
         request[:query].should == 'SELECT /*!:int SQL_NO_CACHE */ * FROM events'
       end

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RequestLogAnalyzer::FileFormat::DelayedJob do
 
   it "should be a valid file format" do
-    RequestLogAnalyzer::FileFormat.load(:delayed_job).should be_valid
+    RequestLogAnalyzer::FileFormat.load(:delayed_job).should be_well_formed
   end
 
   describe '#parse_line' do
@@ -52,7 +52,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
       request_counter.should_receive(:hit!).exactly(3).times
       @log_parser.should_not_receive(:warn)
 
-      @log_parser.parse_io(StringIO.new(fragment)) do |request|
+      @log_parser.parse_string(fragment) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::DelayedJob2::Request)
       end
     end

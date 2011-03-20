@@ -58,7 +58,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
 
     it "should be a valid file format" do
-      @format.should be_valid
+      @format.should be_well_formed
     end
 
     it "should setup report trackers" do
@@ -76,7 +76,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
 
     it "should have a valid language definitions" do
-      @file_format.should be_valid
+      @file_format.should be_well_formed
     end
 
     it "should not parse a valid access log line" do
@@ -128,7 +128,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
 
     it "should have a valid language definitions" do
-      @file_format.should be_valid
+      @file_format.should be_well_formed
     end
 
     it "should not parse a valid access log line" do
@@ -187,7 +187,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
 
     it "should have a valid language definitions" do
-      @file_format.should be_valid
+      @file_format.should be_well_formed
     end
 
     it "should parse a valid access log line with status 500" do

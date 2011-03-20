@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
   subject { RequestLogAnalyzer::FileFormat.load(:haproxy) }
   let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
 
-  it { should be_valid }
+  it { should be_well_formed }
 
   let(:sample1) { 'Feb  6 12:14:14 localhost haproxy[14389]: 10.0.1.2:33317 [06/Feb/2009:12:14:14.655] http-in static/srv1 10/0/30/69/109 200 2750 - - ---- 1/1/1/1/0 0/0 {1wt.eu} {} "GET /index.html HTTP/1.1"' }
   let(:sample2) { 'haproxy[18113]: 127.0.0.1:34549 [15/Oct/2003:15:19:06.103] px-http px-http/<NOSRV> -1/-1/-1/-1/+50001 408 +2750 - - cR-- 2/2/2/0/+2 0/0 ""' }
@@ -21,7 +21,7 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
   it { should_not parse_line('nonsense') }
 
   it "should parse and convert the sample fields correctly" do
-    log_parser.parse_io(StringIO.new(sample1)) do |request|
+    log_parser.parse_string(sample1) do |request|
       request[:client_ip].should                      == '10.0.1.2'
       request[:accept_date].should                    == 20090206121414
       request[:frontend_name].should                  == 'http-in'
@@ -54,7 +54,7 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
   end
 
   it "should parse and convert edge case sample fields correctly" do
-    log_parser.parse_io(StringIO.new(sample2)) do |request|
+    log_parser.parse_string(sample2) do |request|
       request[:accept_date].should                    == 20031015151906
       request[:server_name].should                    == '<NOSRV>'
       request[:tq].should                             == nil

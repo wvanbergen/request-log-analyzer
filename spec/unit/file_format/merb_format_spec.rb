@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RequestLogAnalyzer::FileFormat::Merb do
 
   it "should be a valid file format" do
-    RequestLogAnalyzer::FileFormat.load(:merb).should be_valid
+    RequestLogAnalyzer::FileFormat.load(:merb).should be_well_formed
   end
 
   describe '#parse_line' do
