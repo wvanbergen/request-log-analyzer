@@ -2,39 +2,28 @@ require 'spec_helper'
 
 describe RequestLogAnalyzer::FileFormat::DelayedJob do
 
-  it "should be a valid file format" do
-    RequestLogAnalyzer::FileFormat.load(:delayed_job).should be_valid
-  end
+  subject { RequestLogAnalyzer::FileFormat.load(:delayed_job21) }
+  
+  it { should be_valid }
 
   describe '#parse_line' do
     
-    before(:each) do
-      @file_format = RequestLogAnalyzer::FileFormat.load(:delayed_job21)
-    end
+    let(:job_lock_sample1) { "2010-05-17T17:37:34+0000: [Worker(delayed_job host:hostname.co.uk pid:11888)] acquired lock on S3FileJob" } 
+    let(:job_lock_sample2) { "2010-05-17T17:37:34+0000: [Worker(delayed_job.0 host:hostname.co.uk pid:11888)] acquired lock on S3FileJob" } 
+    let(:job_completed_sample1) { '2010-05-17T17:37:35+0000: [Worker(delayed_job host:hostname.co.uk pid:11888)] S3FileJob completed after 1.0676' }
+    
+    it { should parse_line(job_lock_sample1).as(:job_lock).and_capture(
+          :timestamp => 20100517173734, :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888) }
 
-    it "should parse a :job_lock line correctly" do
-      line = "2010-05-17T17:37:34+0000: [Worker(delayed_job host:hostname.co.uk pid:11888)] acquired lock on S3FileJob"
-      @file_format.should parse_line(line).as(:job_lock).and_capture(:timestamp => 20100517173734,
-                                    :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888)
-    end
+    it { should parse_line(job_lock_sample2).as(:job_lock).and_capture(
+          :timestamp => 20100517173734, :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888) }
 
-    it "should parse a :job_lock line correctly when the worker is one of many" do
-      line = "2010-05-17T17:37:34+0000: [Worker(delayed_job.0 host:hostname.co.uk pid:11888)] acquired lock on S3FileJob"
-      @file_format.should parse_line(line).as(:job_lock).and_capture(:timestamp => 20100517173734,
-                                    :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888)
-    end
-
-    it "should parse a :job_completed line correctly" do
-      line = '2010-05-17T17:37:35+0000: [Worker(delayed_job host:hostname.co.uk pid:11888)] S3FileJob completed after 1.0676'
-      @file_format.should parse_line(line).as(:job_completed).and_capture(:timestamp => 20100517173735,
-                                    :duration => 1.0676, :host => 'hostname.co.uk', :pid => 11888, :job => 'S3FileJob')
-    end
+    it { should parse_line(job_completed_sample1).as(:job_completed).and_capture(
+          :timestamp => 20100517173735, :duration => 1.0676, :host => 'hostname.co.uk', :pid => 11888, :job => 'S3FileJob') }
   end
   
   describe '#parse_io' do
-    before(:each) do
-      @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat.load(:delayed_job21))
-    end
+    let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) } 
     
     it "should parse a batch of completed jobs without warnings" do
       fragment = <<-EOLOG
@@ -50,9 +39,9 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
       EOLOG
 
       request_counter.should_receive(:hit!).exactly(3).times
-      @log_parser.should_not_receive(:warn)
+      log_parser.should_not_receive(:warn)
 
-      @log_parser.parse_io(StringIO.new(fragment)) do |request|
+      log_parser.parse_io(StringIO.new(fragment)) do |request|
         request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::DelayedJob21::Request)
       end
     end
