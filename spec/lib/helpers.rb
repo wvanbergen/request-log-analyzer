@@ -12,7 +12,7 @@ module RequestLogAnalyzer::RSpec::Helpers
 
   # Creates a log file given some lines
   def log_stream(*lines)
-    StringIO.new(lines.join("\n") + "\n")
+    StringIO.new(lines.join("\n") << "\n")
   end
 
   # Request loopback

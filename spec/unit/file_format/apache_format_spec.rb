@@ -3,29 +3,27 @@ require 'spec_helper'
 describe RequestLogAnalyzer::FileFormat::Apache do
 
   describe '.access_line_definition' do
-    before(:each) do
-      @format_string   = '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i" %T'
-      @line_definition = RequestLogAnalyzer::FileFormat::Apache.access_line_definition(@format_string)
-    end
+    let(:format_string) { '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i" %T' }
+    subject { RequestLogAnalyzer::FileFormat::Apache.access_line_definition(format_string) }
 
     it "should create a Regexp to match the line" do
-      @line_definition.regexp.should be_kind_of(Regexp)
+      subject.regexp.should be_kind_of(Regexp)
     end
 
     it "should create a list of captures for the values in the lines" do
-      @line_definition.captures.should have(12).items
+      subject.captures.should have(12).items
     end
 
     it "should make it a header line" do
-      @line_definition.should be_header
+      subject.should be_header
     end
 
     it "should make it a footer line" do
-      @line_definition.should be_footer
+      subject.should be_footer
     end
 
     it "should capture :duration" do
-      @line_definition.captures?(:duration).should be_true
+      subject.captures?(:duration).should be_true
     end
   end
   
