@@ -9,6 +9,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
   it { should have_line_definition(:job_completed).capturing(:completed_job, :duration) }
   it { should have_line_definition(:job_lock_failed).capturing(:locked_job) }
   it { should have_line_definition(:job_failed).capturing(:failed_job, :attempts, :exception) }
+  it { should have(3).report_trackers }
 
   describe '#parse_line' do
     let(:job_lock_sample)        { '* [JOB] acquiring lock on BackgroundJob::ThumbnailSaver' }
@@ -30,7 +31,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) } 
     
     it "should parse a batch of completed jobs without warnings" do
-      fragment = <<-EOLOG
+      fragment = log_snippet(<<-EOLOG)
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver
           * [JOB] BackgroundJob::ThumbnailSaver completed after 0.9114
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver
@@ -40,11 +41,11 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
 
       request_counter.should_receive(:hit!).twice
       log_parser.should_not_receive(:warn)
-      log_parser.parse_string(fragment) { request_counter.hit! }
+      log_parser.parse_io(fragment) { request_counter.hit! }
     end
     
     it "should parse a batch with a failed job without warnings" do
-      fragment = <<-EOLOG
+      fragment = log_snippet(<<-EOLOG)
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver
           * [JOB] BackgroundJob::ThumbnailSaver completed after 1.0627
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver
@@ -57,7 +58,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
 
       request_counter.should_receive(:hit!).exactly(3).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_string(fragment) { request_counter.hit! }
+      log_parser.parse_io(fragment) { request_counter.hit! }
     end
   end
 end

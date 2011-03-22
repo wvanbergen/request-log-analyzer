@@ -11,7 +11,7 @@ module RequestLogAnalyzer::RSpec::Helpers
   end
 
   # Creates a log file given some lines
-  def log_stream(*lines)
+  def log_snippet(*lines)
     StringIO.new(lines.join("\n") << "\n")
   end
 

@@ -57,13 +57,12 @@ describe RequestLogAnalyzer::FileFormat::AmazonS3 do
   
   describe '#parse_io' do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
-    let(:snippet) { sample_get << "\n" << sample_copy << "\n" }
+    let(:snippet) { log_snippet(sample_get, sample_copy, 'nonsense line') }
     
     it "should parse requests correctly and not generate warnings" do
       request_counter.should_receive(:hit!).twice
       log_parser.should_not_receive(:warn)
-      
-      log_parser.parse_string(snippet) { request_counter.hit! }
+      log_parser.parse_io(snippet) { request_counter.hit! }
     end
   end
 end

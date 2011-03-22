@@ -34,12 +34,12 @@ describe RequestLogAnalyzer::FileFormat::W3c do
   
   describe '#parse_io' do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
-    let(:snippet) { irrelevant << "\n" << sample1 << "\n" << sample1 << "\n" }
+    let(:snippet) { log_snippet(irrelevant, sample1, sample1) }
     
     it "should parse a snippet successully without warnings" do
       request_counter.should_receive(:hit!).twice
       log_parser.should_not_receive(:warn)
-      log_parser.parse_string(snippet) { request_counter.hit! }
+      log_parser.parse_io(snippet) { request_counter.hit! }
     end
   end
 end

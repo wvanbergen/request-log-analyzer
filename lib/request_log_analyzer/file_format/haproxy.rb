@@ -5,7 +5,7 @@ module RequestLogAnalyzer::FileFormat
     extend CommonRegularExpressions
 
     # Define line types
-    line_definition :haproxy do |line|
+    line_definition :access do |line|
       line.header = true
       line.footer = true
 
@@ -28,7 +28,7 @@ module RequestLogAnalyzer::FileFormat
       }x
 
       line.capture(:client_ip).as(:string)
-      line.capture(:accept_date).as(:timestamp)
+      line.capture(:timestamp).as(:timestamp)
       line.capture(:frontend_name).as(:string)
       line.capture(:backend_name).as(:string)
       line.capture(:server_name).as(:string)
@@ -59,7 +59,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Define the summary report
     report do |analyze|
-      analyze.hourly_spread :field => :accept_date
+      analyze.hourly_spread :field => :timestamp
 
       analyze.frequency :client_ip,
         :title => "Hits per IP"

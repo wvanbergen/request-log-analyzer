@@ -7,7 +7,8 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob2 do
   it { should be_well_formed }
   it { should have_line_definition(:job_lock).capturing(:timestamp, :job, :host, :pid) }
   it { should have_line_definition(:job_completed).capturing(:timestamp, :duration, :host, :pid) }  
-
+  it { should have(4).report_trackers }
+  
   describe '#parse_line' do
     
     let(:job_lock_sample1)     { "2010-05-17T17:37:34+0000: * [Worker(delayed_job host:hostname.co.uk pid:11888)] acquired lock on S3FileJob" }

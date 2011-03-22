@@ -7,10 +7,12 @@ module RequestLogAnalyzer::RSpec::Matchers
       @captures  = []
     end
 
-    def capturing(*captures)
+    def and_capture(*captures)
       @captures += captures
       return self
     end
+    
+    alias_method :capturing, :and_capture
     
     def description
       description = "have a #{@line_type.inspect} line definition"
@@ -58,6 +60,8 @@ module RequestLogAnalyzer::RSpec::Matchers
       @captures = captures
       return self
     end
+    
+    alias_method :capturing, :and_capture
 
     def fail(message)
       @failure_message = message
