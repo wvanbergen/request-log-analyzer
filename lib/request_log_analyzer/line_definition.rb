@@ -70,6 +70,10 @@ module RequestLogAnalyzer
       captures << new_capture_hash
       CaptureDefiner.new(new_capture_hash)
     end
+    
+    def all_captured_variables
+      captures.map { |c| c[:name] } + captures.map { |c| c[:provides] }.compact.map { |pr| pr.keys }.flatten
+    end
 
     # Checks whether a given line matches this definition.
     # It will return false if a line does not match. If the line matches, a hash is returned
@@ -128,9 +132,7 @@ module RequestLogAnalyzer
 
     # Returns true if this line captures values of the given name
     def captures?(name)
-      captures.any? { |c| c[:name] == name }
+      all_captured_variables.include?(name)
     end
-
   end
-
 end

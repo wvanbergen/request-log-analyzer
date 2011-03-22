@@ -23,7 +23,7 @@ module RequestLogAnalyzer::RSpec::Matchers
     def matches?(file_format)
       file_format = file_format.create if file_format.kind_of?(Class)
       if ld = file_format.line_definitions[@line_type]
-        @captures.all? { |c| ld.captures.map { |cd| cd[:name] }.include?(c) }
+        @captures.all? { |c| ld.all_captured_variables.include?(c) }
       else
         false
       end

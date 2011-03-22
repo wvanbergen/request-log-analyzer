@@ -2,51 +2,36 @@ require 'spec_helper'
 
 describe RequestLogAnalyzer::FileFormat::Merb do
 
-  it "should be a valid file format" do
-    RequestLogAnalyzer::FileFormat.load(:merb).should be_well_formed
-  end
+  subject { RequestLogAnalyzer::FileFormat.load(:merb) }
+  
+  it { should be_well_formed }
+  it { should have_line_definition(:started).capturing(:timestamp) }
+  it { should have_line_definition(:params).capturing(:controller, :action, :namespace) }
+  it { should have_line_definition(:completed).capturing(:dispatch_time, :before_filters_time, :action_time, :after_filters_time) }
+  it { should have(4).report_trackers }
 
   describe '#parse_line' do
-    before(:each) do
-      @file_format = RequestLogAnalyzer::FileFormat.load(:merb)
-    end
+    let(:started_sample)          { '~ Started request handling: Fri Aug 29 11:10:23 +0200 2008' }
+    let(:prefixed_started_sample) { '~ Aug 31 18:35:24 typekit-web001 merb:  ~ Started request handling: Mon Aug 31 18:35:25 +0000 2009' }    
+    let(:params_sample)           { '~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"delete", "controller"=>"session"}' }
+    let(:completed_sample)        { '~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}' }
     
-    it "should parse a :started line correctly" do
-      line = '~ Started request handling: Fri Aug 29 11:10:23 +0200 2008'
-      @file_format.should parse_line(line).as(:started).and_capture(:timestamp => 20080829111023)
-    end
+    it { should parse_line(started_sample, 'a :started line without prefix').as(:started).and_capture(:timestamp => 20080829111023) }
+    it { should parse_line(prefixed_started_sample, 'a :started line with prefix').as(:started).and_capture(:timestamp => 20090831183525) }
+    it { should parse_line(params_sample).as(:params).and_capture(:controller => 'session', :action => 'delete', :namespace => nil) }
+    it { should parse_line(completed_sample).as(:completed).and_capture(:dispatch_time => 0.006117, 
+              :before_filters_time => 0.000712, :action_time => 0.005833, :after_filters_time => 6.1e-05) }
 
-    it "should parse a prefixed :started line correctly" do
-      line = '~ Aug 31 18:35:24 typekit-web001 merb:  ~ Started request handling: Mon Aug 31 18:35:25 +0000 2009'
-      @file_format.should parse_line(line).as(:started).and_capture(:timestamp => 20090831183525)
-    end
-
-    it "should parse a :params line correctly" do
-      line = '~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"delete", "controller"=>"session"}'
-      @file_format.should parse_line(line).as(:params).and_capture(:controller => 'session', :action => 'delete', :namespace => nil)
-    end
-
-    it "should parse a :completed line correctly" do
-      line = '~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}'
-      @file_format.should parse_line(line).as(:completed).and_capture(:dispatch_time => 0.006117, 
-        :before_filters_time => 0.000712, :action_time => 0.005833, :after_filters_time => 6.1e-05)
-    end
+    it { should_not parse_line('~ nonsense', 'a nonsense line') }
   end
 
   describe '#parse_io' do
-    before(:each) do
-      @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat.load(:merb))
-    end
+    let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) } 
 
-    it "should parse a stream and find valid Merb requests" do
-      @log_parser.parse_file(log_fixture(:merb)) do |request|
-        request.should be_kind_of(RequestLogAnalyzer::FileFormat::Merb::Request)
-      end
-    end
-  
-    it "should find 11 completed requests" do
-      @log_parser.should_receive(:handle_request).exactly(11).times
-      @log_parser.parse_file(log_fixture(:merb))
+    it "should parse a log fragment correctly without warnings" do
+      log_parser.should_receive(:handle_request).exactly(11).times
+      log_parser.should_not_receive(:warn)
+      log_parser.parse_file(log_fixture(:merb))
     end
   end
 end
