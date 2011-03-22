@@ -297,5 +297,10 @@ module RequestLogAnalyzer::FileFormat
 
       return nil
     end
+    
+    # Returns the max line length for this file format if any.
+    def max_line_length
+      self.class.const_get(MAX_LINE_LENGTH) if self.class.const_defined?(:MAX_LINE_LENGTH)
+    end
   end
 end
