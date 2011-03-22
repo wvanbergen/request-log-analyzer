@@ -5,9 +5,11 @@ describe RequestLogAnalyzer::FileFormat::W3c do
   subject { RequestLogAnalyzer::FileFormat.load(:w3c) }
 
   it { should be_well_formed }
-  it { should have_line_definition(:access).capturing(:timestamp, :remote_ip, :username, :local_ip, :port, :method, 
-            :path, :http_status, :bytes_sent, :bytes_received, :duration, :user_agent, :referer)}
+  it { should have_line_definition(:access).capturing(:timestamp, :remote_ip, :username, :local_ip, :port,
+            :method, :path, :http_status, :bytes_sent, :bytes_received, :duration, :user_agent, :referer) }
 
+  it { should have(10).report_trackers }
+  
   let(:sample1) { '2002-05-24 20:18:01 172.224.24.114 - 206.73.118.24 80 GET /Default.htm - 200 7930 248 31 Mozilla/4.0+(compatible;+MSIE+5.01;+Windows+2000+Server) http://64.224.24.114/' }
   let(:irrelevant) { '#Software: Microsoft Internet Information Services 6.0' }
   

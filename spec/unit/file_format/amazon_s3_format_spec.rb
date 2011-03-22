@@ -4,13 +4,15 @@ describe RequestLogAnalyzer::FileFormat::AmazonS3 do
   
   subject { RequestLogAnalyzer::FileFormat.load(:amazon_s3) }
 
-  let(:sample_get)  { '2f88111968424e6306bf4d292c0188ccb94ff9374ea2836b50a1a79f7cd656e1 sample-bucket [06/Oct/2006:01:42:14 +0000] 207.171.172.6 65a011a29cdf8ec533ec3d1ccaae921c C980091AD89C936A REST.GET.OBJECT object.png "GET /sample-bucket/object.png HTTP/1.1" 200 - 1243 1243 988 987 "-" "aranhabot"' }
-  let(:sample_copy) { '09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a testbucket [03/Mar/2010:23:04:59 +0000] 174.119.31.76 09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a ACCC34B843C87BC9 REST.COPY.OBJECT files/image.png "PUT /files/image.png HTTP/1.1" 200 - 234 65957 365 319 "-" "" -' }
-  
   it { should be_well_formed }
   it { should have_line_definition(:access).capturing(:bucket_owner, :bucket, :timestamp, :remote_ip, :requester,
         :key, :operation, :total_time, :turnaround_time, :bytes_sent, :object_size, :referer, :user_agent) }
 
+  it { should have(7).report_trackers }
+
+  let(:sample_get)  { '2f88111968424e6306bf4d292c0188ccb94ff9374ea2836b50a1a79f7cd656e1 sample-bucket [06/Oct/2006:01:42:14 +0000] 207.171.172.6 65a011a29cdf8ec533ec3d1ccaae921c C980091AD89C936A REST.GET.OBJECT object.png "GET /sample-bucket/object.png HTTP/1.1" 200 - 1243 1243 988 987 "-" "aranhabot"' }
+  let(:sample_copy) { '09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a testbucket [03/Mar/2010:23:04:59 +0000] 174.119.31.76 09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a ACCC34B843C87BC9 REST.COPY.OBJECT files/image.png "PUT /files/image.png HTTP/1.1" 200 - 234 65957 365 319 "-" "" -' }
+  
   describe '#parse_line' do
     it { should parse_line(sample_get, 'a GET line').and_capture(
               :bucket_owner    => '2f88111968424e6306bf4d292c0188ccb94ff9374ea2836b50a1a79f7cd656e1',
@@ -60,9 +62,9 @@ describe RequestLogAnalyzer::FileFormat::AmazonS3 do
     let(:snippet) { log_snippet(sample_get, sample_copy, 'nonsense line') }
     
     it "should parse requests correctly and not generate warnings" do
-      request_counter.should_receive(:hit!).twice
+      log_parser.should_receive(:handle_request).twice
       log_parser.should_not_receive(:warn)
-      log_parser.parse_io(snippet) { request_counter.hit! }
+      log_parser.parse_io(snippet)
     end
   end
 end

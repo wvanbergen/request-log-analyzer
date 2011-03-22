@@ -6,8 +6,10 @@ describe RequestLogAnalyzer::FileFormat::Rack do
   let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
   
   it { should be_well_formed }
-  it { should have_line_definition(:access).capturing(:remote_host, :user, :remote_logname, :timestamp, :http_method, :path, 
-          :http_version, :http_status, :bytes_sent, :duration) }
+  it { should have_line_definition(:access).capturing(:remote_host, :user, :remote_logname, 
+          :timestamp, :http_method, :path, :http_version, :http_status, :bytes_sent, :duration) }
+
+  it { should have(7).report_trackers }
 
   let(:sample1) { '127.0.0.1 - - [23/Nov/2009 21:47:47] "GET /css/stylesheet.css HTTP/1.1" 200 3782 0.0024' }
   let(:sample2) { '127.0.0.1 - - [16/Sep/2009 07:40:08] "GET /favicon.ico HTTP/1.1" 500 63183 0.0453' }

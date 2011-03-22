@@ -16,8 +16,8 @@ describe RequestLogAnalyzer::FileFormat::Merb do
     let(:params_sample)           { '~ Params: {"_method"=>"delete", "authenticity_token"=>"[FILTERED]", "action"=>"delete", "controller"=>"session"}' }
     let(:completed_sample)        { '~ {:dispatch_time=>0.006117, :after_filters_time=>6.1e-05, :before_filters_time=>0.000712, :action_time=>0.005833}' }
     
-    it { should parse_line(started_sample, 'a :started line without prefix').as(:started).and_capture(:timestamp => 20080829111023) }
-    it { should parse_line(prefixed_started_sample, 'a :started line with prefix').as(:started).and_capture(:timestamp => 20090831183525) }
+    it { should parse_line(started_sample, 'without prefix').as(:started).and_capture(:timestamp => 20080829111023) }
+    it { should parse_line(prefixed_started_sample, 'with prefix').as(:started).and_capture(:timestamp => 20090831183525) }
     it { should parse_line(params_sample).as(:params).and_capture(:controller => 'session', :action => 'delete', :namespace => nil) }
     it { should parse_line(completed_sample).as(:completed).and_capture(:dispatch_time => 0.006117, 
               :before_filters_time => 0.000712, :action_time => 0.005833, :after_filters_time => 6.1e-05) }

@@ -17,10 +17,10 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob2 do
     let(:starting_sample)      { '2010-05-17T17:36:44+0000: *** Starting job worker delayed_job host:hostname.co.uk pid:11888' } 
     let(:summary_sample)       { '3 jobs processed at 0.3163 j/s, 0 failed ...' }
     
-    it { should parse_line(job_lock_sample1, 'a :job_lock line with a single worker').as(:job_lock).and_capture(
+    it { should parse_line(job_lock_sample1, 'with a single worker').as(:job_lock).and_capture(
                     :timestamp => 20100517173734, :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888) }
 
-    it { should parse_line(job_lock_sample2, 'a :job_lock line with a multiple workers').as(:job_lock).and_capture(
+    it { should parse_line(job_lock_sample2, 'with multiple workers').as(:job_lock).and_capture(
                     :timestamp => 20100517173734, :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888) }
 
     it { should parse_line(job_completed_sample).as(:job_completed).and_capture(:timestamp => 20100517173735,

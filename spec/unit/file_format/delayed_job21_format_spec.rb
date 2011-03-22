@@ -15,10 +15,10 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
     let(:job_lock_sample2) { "2010-05-17T17:37:34+0000: [Worker(delayed_job.0 host:hostname.co.uk pid:11888)] acquired lock on S3FileJob" } 
     let(:job_completed_sample1) { '2010-05-17T17:37:35+0000: [Worker(delayed_job host:hostname.co.uk pid:11888)] S3FileJob completed after 1.0676' }
 
-    it { should parse_line(job_lock_sample1).as(:job_lock).and_capture(
+    it { should parse_line(job_lock_sample1, 'with a single worker').as(:job_lock).and_capture(
           :timestamp => 20100517173734, :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888) }
 
-    it { should parse_line(job_lock_sample2).as(:job_lock).and_capture(
+    it { should parse_line(job_lock_sample2, 'with multiple workers').as(:job_lock).and_capture(
           :timestamp => 20100517173734, :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888) }
 
     it { should parse_line(job_completed_sample1).as(:job_completed).and_capture(

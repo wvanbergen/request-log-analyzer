@@ -3,12 +3,11 @@ require 'spec_helper'
 describe RequestLogAnalyzer::FileFormat::Rails3 do
 
   subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
-  let(:log_parser) {RequestLogAnalyzer::Source::LogParser.new(subject) }
   
   it { should be_well_formed }
-
+  it { should have(9).report_trackers }
+  
   describe '#parse_line' do
-    before(:each) { @file_format = RequestLogAnalyzer::FileFormat.load(:rails3) }
 
     it "should parse :started lines correctly" do
       line = 'Started GET "/queries" for 127.0.0.1 at Thu Feb 25 16:15:18 -0800 2010'
@@ -72,7 +71,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
 
     it "should pase :failure lines correctly" do
       line = "ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:"
-      @file_format.should parse_line(line).as(:failure).and_capture(:line => 3, 
+      subject.should parse_line(line).as(:failure).and_capture(:line => 3, 
           :error   => 'ActionView::Template::Error', 
           :message => "undefined local variable or method `field' for #<Class>", 
           :file    => '/Users/willem/Code/warehouse/app/views/queries/execute.csv.erb')
@@ -80,6 +79,8 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
   end
   
   describe '#parse_io' do
+    let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
+
     it "should parse a successful request correctly" do
       log = <<-EOLOG
         Started GET "/" for 127.0.0.1 at Fri Mar 19 06:40:41 -0700 2010
