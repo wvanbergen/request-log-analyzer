@@ -34,18 +34,18 @@ module RequestLogAnalyzer::FileFormat
     end
 
     line_definition :use_database do |line|
-      line.regexp   = /^use (\w+);\s*$/
+      line.regexp   = /^\s*use (\w+);\s*$/
       line.capture(:database)
     end
 
     line_definition :query_part do |line|
-      line.regexp   = /^(?!(?:use |\# |SET ))(.*[^;\s])\s*$/
+      line.regexp   = /^\s*(?!(?:use |\# |SET ))(.*[^;\s])\s*$/
       line.capture(:query_fragment)
     end
 
     line_definition :query do |line|
       line.footer = true
-      line.regexp = /^(?!(?:use |\# |SET ))(.*);\s*$/
+      line.regexp = /^(?!\s*(?:use |\# |SET ))(.*);\s*$/
       line.capture(:query).as(:sql)
     end
 
@@ -84,7 +84,7 @@ module RequestLogAnalyzer::FileFormat
         sql.gsub!(/(:int,)+:int/, ':ints')                                # replace multiple ints by a list
         sql.gsub!(/(:string,)+:string/, ':strings')                       # replace multiple strings by a list
 
-        return sql.rstrip
+        return sql.strip
       end
 
       def host

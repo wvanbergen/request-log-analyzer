@@ -40,7 +40,13 @@ module RequestLogAnalyzer::RSpec::Matchers
     end
 
     def line_description
-      @line_description ||= if @line_type 
+      @full_line_description ||= if @line_description
+        if @line_type && @line_description =~ /^(?:with|without|having|using) /
+          "a #{@line_type.inspect} line #{@line_description}"
+        else
+          @line_description
+        end
+      elsif @line_type 
         "a #{@line_type.inspect} line"
       else
         "line #{@line.inspect}"
