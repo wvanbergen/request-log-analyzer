@@ -39,9 +39,9 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
           2 jobs processed at 1.0832 j/s, 0 failed ...
       EOLOG
 
-      request_counter.should_receive(:hit!).twice
+      log_parser.should_receive(:handle_request).twice
       log_parser.should_not_receive(:warn)
-      log_parser.parse_io(fragment) { request_counter.hit! }
+      log_parser.parse_io(fragment)
     end
     
     it "should parse a batch with a failed job without warnings" do
@@ -56,9 +56,9 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
           2 jobs processed at 1.4707 j/s, 1 failed ...
       EOLOG
 
-      request_counter.should_receive(:hit!).exactly(3).times
+      log_parser.should_receive(:handle_request).exactly(3).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_io(fragment) { request_counter.hit! }
+      log_parser.parse_io(fragment)
     end
   end
 end

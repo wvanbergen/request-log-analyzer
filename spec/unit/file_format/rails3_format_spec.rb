@@ -91,12 +91,9 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
         Completed 200 OK in 170ms (Views: 78.4ms | ActiveRecord: 48.2ms)
       EOLOG
       
-      request_counter.should_receive(:hit!).once
+      log_parser.should_receive(:handle_request).once
       log_parser.should_not_receive(:warn)
-      
-      log_parser.parse_string(log) do |request|
-        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
-      end
+      log_parser.parse_string(log)
     end
     
     it "should parse an unroutable request correctly" do
@@ -110,12 +107,9 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       
       EOLOG
 
-      request_counter.should_receive(:hit!).once
+      log_parser.should_receive(:handle_request).once
       log_parser.should_not_receive(:warn)
-      
-      log_parser.parse_string(log) do |request|
-        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
-      end
+      log_parser.parse_string(log)
     end
     
     it "should parse a failing request correctly" do
@@ -142,12 +136,9 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
 
       EOLOG
 
-      request_counter.should_receive(:hit!).once
+      log_parser.should_receive(:handle_request).once
       log_parser.should_not_receive(:warn)
-      
-      log_parser.parse_string(log) do |request|
-        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Rails3::Request) && request.completed?
-      end
+      log_parser.parse_string(log)
     end
   end
 end

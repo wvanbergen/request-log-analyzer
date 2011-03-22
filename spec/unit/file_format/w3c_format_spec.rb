@@ -39,9 +39,9 @@ describe RequestLogAnalyzer::FileFormat::W3c do
     let(:snippet) { log_snippet(irrelevant, sample1, sample1) }
     
     it "should parse a snippet successully without warnings" do
-      request_counter.should_receive(:hit!).twice
+      log_parser.should_receive(:handle_request).twice
       log_parser.should_not_receive(:warn)
-      log_parser.parse_io(snippet) { request_counter.hit! }
+      log_parser.parse_io(snippet)
     end
   end
 end

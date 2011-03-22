@@ -70,8 +70,4 @@ module RequestLogAnalyzer::RSpec::Mocks
     connection.stub!(:table_creator).and_return(table_creator)
     return connection
   end
-
-  def request_counter
-    @request_counter ||= mock('aggregator to count request')
-  end
 end

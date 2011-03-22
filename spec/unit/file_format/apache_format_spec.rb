@@ -84,9 +84,9 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
       
       it "should parse a log snippet successfully without warnings" do
-        request_counter.should_receive(:hit!).exactly(10).times
+        log_parser.should_receive(:handle_request).exactly(10).times
         log_parser.should_not_receive(:warn)
-        log_parser.parse_file(log_fixture(:apache_common)) { request_counter.hit! }
+        log_parser.parse_file(log_fixture(:apache_common))
       end
     end
   end
@@ -123,9 +123,9 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
       
       it "should parse a log snippet successfully without warnings" do
-        request_counter.should_receive(:hit!).exactly(5).times
+        log_parser.should_receive(:handle_request).exactly(5).times
         log_parser.should_not_receive(:warn)
-        log_parser.parse_file(log_fixture(:apache_combined)) { request_counter.hit! }
+        log_parser.parse_file(log_fixture(:apache_combined))
       end
     end
   end

@@ -43,9 +43,9 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
         2010-05-19T11:47:26+0000: Exiting...
       EOLOG
 
-      request_counter.should_receive(:hit!).exactly(3).times
+      log_parser.should_receive(:handle_request).exactly(3).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_io(fragment) { request_counter.hit! }
+      log_parser.parse_io(fragment)
     end
   end
 end

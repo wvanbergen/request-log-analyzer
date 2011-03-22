@@ -47,9 +47,9 @@ describe RequestLogAnalyzer::FileFormat::Rack do
     let(:snippet) { log_snippet(irrelevant, sample1, sample2, sample3) }
     
     it "shouldparse a snippet without warnings" do
-      request_counter.should_receive(:hit!).exactly(3).times
+      log_parser.should_receive(:handle_request).exactly(3).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_io(snippet) { request_counter.hit! }
+      log_parser.parse_io(snippet)
     end
   end
 end
