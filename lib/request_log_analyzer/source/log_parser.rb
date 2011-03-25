@@ -15,6 +15,8 @@ module RequestLogAnalyzer::Source
 
     # The maximum number of bytes to read from a line.
     DEFAULT_MAX_LINE_LENGTH = 8096
+    
+    DEFAULT_LINE_DIVIDER = "\n"
 
     # The default parse strategy that will be used to parse the input.
     DEFAULT_PARSE_STRATEGY = 'assume-correct'
@@ -53,6 +55,10 @@ module RequestLogAnalyzer::Source
 
     def max_line_length
       file_format.max_line_length || DEFAULT_MAX_LINE_LENGTH
+    end
+    
+    def line_divider
+      file_format.line_divider || DEFAULT_LINE_DIVIDER
     end
 
     # Reads the input, which can either be a file, sequence of files or STDIN to parse
@@ -161,8 +167,9 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A hash of options that can be used by the parser.
     def parse_io(io, options = {}, &block) # :yields: request
       @max_line_length = options[:max_line_length] || max_line_length
-      @current_lineno = 0
-      while line = io.gets(@max_line_length)
+      @line_divider    = options[:line_divider]    || line_divider
+      @current_lineno  = 0
+      while line = io.gets(@line_divider, @max_line_length)
         @current_lineno += 1
         @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 255 == 0
         parse_line(line, &block)
@@ -310,5 +317,4 @@ module RequestLogAnalyzer::Source
       hash[:line_definition].footer
     end
   end
-
 end

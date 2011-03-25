@@ -322,5 +322,9 @@ module RequestLogAnalyzer::FileFormat
     def max_line_length
       self.class.const_get(MAX_LINE_LENGTH) if self.class.const_defined?(:MAX_LINE_LENGTH)
     end
+
+    def line_divider
+      self.class.const_get(LINE_DIVIDER) if self.class.const_defined?(:LINE_DIVIDER)
+    end
   end
 end
