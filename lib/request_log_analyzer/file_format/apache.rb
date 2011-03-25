@@ -31,7 +31,7 @@ module RequestLogAnalyzer::FileFormat
     # A hash that defines how the log format directives should be parsed.
     LOG_DIRECTIVES = {
       '%' => { nil => { :regexp => '%', :captures => [] } },
-      'h' => { nil => { :regexp => '([A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)',  :captures => [{:name => :remote_host, :type => :string}] } },
+      'h' => { nil => { :regexp => "(#{hostname_or_ip_address})",  :captures => [{:name => :remote_host, :type => :string}] } },
       'a' => { nil => { :regexp => "(#{ip_address})", :captures => [{:name => :remote_ip, :type => :string}] } },
       'b' => { nil => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :traffic}] } },
       'c' => { nil => { :regexp => '(\+|\-|\X)', :captures => [{:name => :connection_status, :type => :integer}] } },
