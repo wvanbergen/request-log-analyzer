@@ -163,9 +163,11 @@ module RequestLogAnalyzer::Source
     # - The method will yield progress updates if a progress handler is installed using progress=
     # - The method will yield parse warnings if a warning handler is installed using warning=
     #
+    # This is a Ruby 1.9 specific version that offers memory protection.
+    #
     # <tt>io</tt>:: The IO instance to use as source
     # <tt>options</tt>:: A hash of options that can be used by the parser.
-    def parse_io(io, options = {}, &block) # :yields: request
+    def parse_io_19(io, options = {}, &block) # :yields: request
       @max_line_length = options[:max_line_length] || max_line_length
       @line_divider    = options[:line_divider]    || line_divider
       @current_lineno  = 0
@@ -178,6 +180,35 @@ module RequestLogAnalyzer::Source
       warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
       @current_lineno = nil
     end
+    
+    # This method loops over each line of the input stream. It will try to parse this line as any of
+    # the lines that are defined by the current file format (see RequestLogAnalyazer::FileFormat).
+    # It will then combine these parsed line into requests using heuristics. These requests (see
+    # RequestLogAnalyzer::Request) will then be yielded for further processing in the pipeline.
+    #
+    # - RequestLogAnalyzer::LineDefinition#matches is called to test if a line matches a line definition of the file format.
+    # - update_current_request is used to combine parsed lines into requests using heuristics.
+    # - The method will yield progress updates if a progress handler is installed using progress=
+    # - The method will yield parse warnings if a warning handler is installed using warning=
+    #
+    # This is a Ruby 1.8 specific version that doesn't offer memory protection.
+    #
+    # <tt>io</tt>:: The IO instance to use as source
+    # <tt>options</tt>:: A hash of options that can be used by the parser.    
+    def parse_io_18(io, options = {}, &block) # :yields: request
+      @line_divider    = options[:line_divider]    || line_divider
+      @current_lineno  = 0
+      while line = io.gets(@line_divider)
+        @current_lineno += 1
+        @progress_handler.call(:progress, io.pos) if @progress_handler && @current_lineno % 255 == 0
+        parse_line(line, &block)
+      end
+
+      warn(:unfinished_request_on_eof, "End of file reached, but last request was not completed!") unless @current_request.nil?
+      @current_lineno = nil
+    end
+    
+    alias_method :parse_io, RUBY_VERSION.to_f < 1.9 ? :parse_io_18 : :parse_io_19
     
     # Parses a single line using the current file format. If successful, use the parsed
     # information to build a request
