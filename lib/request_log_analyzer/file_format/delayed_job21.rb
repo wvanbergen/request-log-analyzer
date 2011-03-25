@@ -8,7 +8,7 @@ module RequestLogAnalyzer::FileFormat
     
     line_definition :job_lock do |line|
       line.header = true
-      line.regexp = /(#{timestamp('%Y-%m-%dT%H:%M:%S%z')}): \[Worker\(\S+ host:(\S+) pid:(\d+)\)\] acquired lock on (\S+)/
+      line.regexp = /(#{timestamp('%Y-%m-%dT%H:%M:%S%z')}): \[Worker\(\S+ host:(#{hostname_or_ip_address}) pid:(\d+)\)\] acquired lock on (\S+)/
       
       line.capture(:timestamp).as(:timestamp)
       line.capture(:host)
@@ -18,7 +18,7 @@ module RequestLogAnalyzer::FileFormat
     
     line_definition :job_completed do |line|
       line.footer = true
-      line.regexp = /(#{timestamp('%Y-%m-%dT%H:%M:%S%z')}): \[Worker\(\S+ host:(\S+) pid:(\d+)\)\] (\S+) completed after (\d+\.\d+)/
+      line.regexp = /(#{timestamp('%Y-%m-%dT%H:%M:%S%z')}): \[Worker\(\S+ host:(#{hostname_or_ip_address}) pid:(\d+)\)\] (\S+) completed after (\d+\.\d+)/
       line.capture(:timestamp).as(:timestamp)
       line.capture(:host)
       line.capture(:pid).as(:integer)

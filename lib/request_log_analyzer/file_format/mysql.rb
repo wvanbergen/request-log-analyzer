@@ -15,7 +15,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :user_host do |line|
       line.header = :alternative
       line.teaser = /\# User\@Host\: /
-      line.regexp = /\# User\@Host\: ([\w-]+)\[[\w-]+\] \@ ([\w\.-]*) \[(#{ip_address(true)})\]/
+      line.regexp = /\# User\@Host\: ([\w-]+)\[[\w-]+\] \@ (#{hostname(true)}) \[(#{ip_address(true)})\]/
       
       line.capture(:user)
       line.capture(:host)
