@@ -172,6 +172,10 @@ module RequestLogAnalyzer::FileFormat
       add_blank_option(Regexp.union(ipv4_regexp, ipv6_regexp), blank)
     end
     
+    def anchored(regexp)
+      /^#{regexp}$/
+    end
+    
     protected
     
     # Allow the field to be blank if this option is given. This can be true to 
