@@ -8,9 +8,6 @@
 # - Currently, RequestLogAnalyzer::Source::LogParser is the only implemented source.
 module RequestLogAnalyzer::Source
 
-  autoload :LogParser,      'request_log_analyzer/source/log_parser'
-  autoload :DatabaseLoader, 'request_log_analyzer/source/database_loader'
-
   # The base Source class. All other sources should inherit from this class.
   #
   # A source implememtation should at least implement the each_request method, which should yield
@@ -66,3 +63,5 @@ module RequestLogAnalyzer::Source
 
   end
 end
+
+require 'request_log_analyzer/source/log_parser'
