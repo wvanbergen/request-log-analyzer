@@ -32,10 +32,8 @@ describe RequestLogAnalyzer::FileFormat::Postgresql do
         2010-10-10 15:00:02 GMT [38747]: [1670-1] LOCATION:  exec_simple_query, postgres.c:1081
       EOS
 
-      request_counter.should_receive(:hit!).exactly(1).times
       log_parser.should_not_receive(:warn)
       log_parser.parse_string(fixture) do |request|
-        request_counter.hit! if request.kind_of?(RequestLogAnalyzer::FileFormat::Postgresql::Request) && request.completed?
         request[:query].should == 'INSERT INTO delayed_jobs (failed_at, locked_by, created_at, handler, updated_at, priority, run_at, attempts, locked_at, last_error) VALUES(NULL, NULL, :string, E:string, :string, :int, :string, :int, NULL, NULL) RETURNING id'
       end
     end
