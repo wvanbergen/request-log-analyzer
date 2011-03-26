@@ -1,9 +1,5 @@
 module RequestLogAnalyzer::Aggregator
 
-  autoload :Echo,             'request_log_analyzer/aggregator/echo'
-  autoload :Summarizer,       'request_log_analyzer/aggregator/summarizer'
-  autoload :DatabaseInserter, 'request_log_analyzer/aggregator/database_inserter'
-
   # The base class of an aggregator. This class provides the interface to which
   # every aggregator should comply (by simply subclassing this class).
   class Base
@@ -47,3 +43,7 @@ module RequestLogAnalyzer::Aggregator
 
   end
 end
+
+require 'request_log_analyzer/aggregator/echo'
+require 'request_log_analyzer/aggregator/summarizer'
+require 'request_log_analyzer/aggregator/database_inserter'

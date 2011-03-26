@@ -1,4 +1,3 @@
-
 module RequestLogAnalyzer::Aggregator
 
   # The database aggregator will create an SQLite3 database with all parsed request information.
@@ -19,6 +18,8 @@ module RequestLogAnalyzer::Aggregator
     # Establishes a connection to the database and creates the necessary database schema for the
     # current file format
     def prepare
+      require 'request_log_analyzer/database'
+      
       @sources = {}
       @database = RequestLogAnalyzer::Database.new(options[:database])
       @database.file_format = source.file_format

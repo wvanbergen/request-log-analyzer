@@ -3,12 +3,7 @@ require 'active_record'
 
 class RequestLogAnalyzer::Database
 
-  autoload :Connection, 'request_log_analyzer/database/connection'
-  autoload :Base,       'request_log_analyzer/database/base'
-  autoload :Request,    'request_log_analyzer/database/request'
-  autoload :Source,     'request_log_analyzer/database/source'
-  autoload :Warning,    'request_log_analyzer/database/warning'
-
+  require 'request_log_analyzer/database/connection'
   include RequestLogAnalyzer::Database::Connection
 
   attr_accessor :file_format
@@ -100,5 +95,9 @@ class RequestLogAnalyzer::Database
       end
     end
   end
-
 end
+
+require 'request_log_analyzer/database/base'
+require 'request_log_analyzer/database/request'
+require 'request_log_analyzer/database/source'
+require 'request_log_analyzer/database/warning'

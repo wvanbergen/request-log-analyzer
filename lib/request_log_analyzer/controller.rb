@@ -56,7 +56,6 @@ module RequestLogAnalyzer
 
       # Handle output format casing
       if options[:output].class == String
-        options[:output] = 'FancyHTML'  if options[:output] =~ /^fancy_?html$/i
         options[:output] = 'HTML'       if options[:output] =~ /^html$/i
         options[:output] = 'FixedWidth' if options[:output] =~ /^fixed_?width$/i
       end

@@ -1,9 +1,5 @@
 module RequestLogAnalyzer::Filter
 
-  autoload :Field,     'request_log_analyzer/filter/field'
-  autoload :Timespan,  'request_log_analyzer/filter/timespan'
-  autoload :Anonymize, 'request_log_analyzer/filter/anonymize'
-
   # Base filter class used to filter input requests.
   # All filters should interit from this base.
   class Base
@@ -24,5 +20,8 @@ module RequestLogAnalyzer::Filter
       request
     end
   end
-
 end
+
+require 'request_log_analyzer/filter/field'
+require 'request_log_analyzer/filter/timespan'
+require 'request_log_analyzer/filter/anonymize'

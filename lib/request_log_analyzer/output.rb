@@ -1,10 +1,6 @@
 # Module for generating output
 module RequestLogAnalyzer::Output
 
-  autoload :FixedWidth, 'request_log_analyzer/output/fixed_width'
-  autoload :HTML,       'request_log_analyzer/output/html'
-  autoload :FancyHTML,  'request_log_analyzer/output/fancy_html'
-  
   # Loads a Output::Base subclass instance.
   def self.load(file_format, *args)
     
@@ -111,6 +107,8 @@ module RequestLogAnalyzer::Output
     def table_has_header?(columns)
       columns.any? { |column| !column[:title].nil? }
     end
-
   end
 end
+
+require 'request_log_analyzer/output/fixed_width'
+require 'request_log_analyzer/output/html'

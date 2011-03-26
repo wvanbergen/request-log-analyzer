@@ -1,12 +1,5 @@
 module RequestLogAnalyzer::Tracker
 
-  autoload :Duration,     'request_log_analyzer/tracker/duration'
-  autoload :Frequency,    'request_log_analyzer/tracker/frequency'
-  autoload :HourlySpread, 'request_log_analyzer/tracker/hourly_spread'
-  autoload :NumericValue, 'request_log_analyzer/tracker/numeric_value'
-  autoload :Timespan,     'request_log_analyzer/tracker/timespan'
-  autoload :Traffic,      'request_log_analyzer/tracker/traffic'
-
   # Base Tracker class. All other trackers inherit from this class
   #
   # Accepts the following options:
@@ -100,3 +93,10 @@ module RequestLogAnalyzer::Tracker
     end
   end
 end
+
+require 'request_log_analyzer/tracker/numeric_value'
+require 'request_log_analyzer/tracker/duration'
+require 'request_log_analyzer/tracker/frequency'
+require 'request_log_analyzer/tracker/hourly_spread'
+require 'request_log_analyzer/tracker/timespan'
+require 'request_log_analyzer/tracker/traffic'
