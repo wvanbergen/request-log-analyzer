@@ -29,6 +29,13 @@ module RequestLogAnalyzer::FileFormat
       line.capture(:action)
       line.capture(:format)
     end
+
+    # Parameters: {"action"=>"cached", "controller"=>"cached"}
+    line_definition :parameters do |line|
+      line.teaser   = /  Parameters:/
+      line.regexp   = /  Parameters:\s+(\{.*\})/
+      line.capture(:params).as(:eval)
+    end
     
     # Completed 200 OK in 224ms (Views: 200.2ms | ActiveRecord: 3.4ms)
     # Completed 302 Found in 23ms
