@@ -7,9 +7,9 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
 
   it { should be_well_formed }
 
-  it { should have_line_definition(:haproxy13).capturing(:client_ip, :timestamp, :frontend_name, :backend_name, :server_name, :tq, :tw, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :actconn, :feconn, :beconn, :srv_conn, :retries, :srv_queue, :backend_queue, :captured_request_headers, :captured_response_headers, :http_request) }
-  it { should have_line_definition(:haproxy12).capturing(:client_ip, :timestamp, :frontend_name, :server_name, :tq, :tw, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :srv_conn, :listener_conn, :process_conn, :srv_queue, :backend_queue, :captured_request_headers, :captured_response_headers, :http_request) }
-  it { should have_line_definition(:haproxy11).capturing(:client_ip, :timestamp, :frontend_name, :server_name, :tq, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :listener_conn, :process_conn, :captured_request_headers, :captured_response_headers, :http_request) }
+  it { should have_line_definition(:haproxy13).capturing(:client_ip, :accept_date, :frontend_name, :backend_name, :server_name, :tq, :tw, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :actconn, :feconn, :beconn, :srv_conn, :retries, :srv_queue, :backend_queue, :captured_request_headers, :captured_response_headers, :http_request) }
+  it { should have_line_definition(:haproxy12).capturing(:client_ip, :accept_date, :frontend_name, :server_name, :tq, :tw, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :srv_conn, :listener_conn, :process_conn, :srv_queue, :backend_queue, :captured_request_headers, :captured_response_headers, :http_request) }
+  it { should have_line_definition(:haproxy11).capturing(:client_ip, :accept_date, :frontend_name, :server_name, :tq, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :listener_conn, :process_conn, :captured_request_headers, :captured_response_headers, :http_request) }
 
   it { should have(14).report_trackers }
 
@@ -20,33 +20,33 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
 
   describe '#parse_line' do
     it { should parse_line(sample_haproxy13, 'an haproxy 1.3 access line').and_capture(
-            :client_ip => '10.0.1.2',     :tq => 0.010,   :captured_request_cookie => nil,
-            :timestamp => 20090206121414, :tw => 0.000,   :captured_response_cookie => nil,
-            :frontend_name => 'http-in',  :tc => 0.030,   :clientside_persistence_cookie => nil,
-            :backend_name => 'static',    :tr => 0.069,   :serverside_persistence_cookie => nil,
-            :server_name => 'srv1',       :tt => 0.109,   :termination_event_code => nil,
-            :status_code => 200,          :actconn => 1,  :terminated_session_state => nil,
-            :bytes_read => 2750,          :feconn => 1,   :captured_request_headers => '{1wt.eu}',
-            :backend_queue => 0,          :beconn => 1,   :captured_response_headers => nil,
-            :retries => 0,                :srv_conn => 1, :srv_queue => 0,
+            :client_ip => '10.0.1.2',       :tq => 0.010,   :captured_request_cookie => nil,
+            :accept_date => 20090206121414, :tw => 0.000,   :captured_response_cookie => nil,
+            :frontend_name => 'http-in',    :tc => 0.030,   :clientside_persistence_cookie => nil,
+            :backend_name => 'static',      :tr => 0.069,   :serverside_persistence_cookie => nil,
+            :server_name => 'srv1',         :tt => 0.109,   :termination_event_code => nil,
+            :status_code => 200,            :actconn => 1,  :terminated_session_state => nil,
+            :bytes_read => 2750,            :feconn => 1,   :captured_request_headers => '{1wt.eu}',
+            :backend_queue => 0,            :beconn => 1,   :captured_response_headers => nil,
+            :retries => 0,                  :srv_conn => 1, :srv_queue => 0,
             :http_request => 'GET /index.html HTTP/1.1')
     }
 
     it { should parse_line(sample_haproxy12, 'an haproxy 1.2 access line').and_capture(
-            :client_ip => '127.0.0.1',    :tq => 0.000,         :captured_request_cookie => nil,
-            :timestamp => 20110315063645, :tw => 0.000,         :captured_response_cookie => nil,
-            :frontend_name => 'as-proxy', :tc => 0.000,         :clientside_persistence_cookie => 'N',
-            :server_name => 'mc-search-2',:tr => 0.730,         :serverside_persistence_cookie => 'N',
-            :status_code => 200,          :tt => 0.731,         :termination_event_code => nil,
-            :bytes_read => 29404,         :listener_conn => 54, :terminated_session_state => nil,
-            :backend_queue => 0,          :process_conn => 54,  :captured_request_headers => '{66.249.68.216}',
-            :srv_queue => 0,              :srv_conn => 2,       :captured_response_headers => nil,
+            :client_ip => '127.0.0.1',      :tq => 0.000,         :captured_request_cookie => nil,
+            :accept_date => 20110315063645, :tw => 0.000,         :captured_response_cookie => nil,
+            :frontend_name => 'as-proxy',   :tc => 0.000,         :clientside_persistence_cookie => 'N',
+            :server_name => 'mc-search-2',  :tr => 0.730,         :serverside_persistence_cookie => 'N',
+            :status_code => 200,            :tt => 0.731,         :termination_event_code => nil,
+            :bytes_read => 29404,           :listener_conn => 54, :terminated_session_state => nil,
+            :backend_queue => 0,            :process_conn => 54,  :captured_request_headers => '{66.249.68.216}',
+            :srv_queue => 0,                :srv_conn => 2,       :captured_response_headers => nil,
             :http_request => 'GET /neighbor/26014153 HTTP/1.0')
     }
 
     it { should parse_line(sample_haproxy11, 'an haproxy 1.1 access line').and_capture(
             :client_ip => '127.0.0.1',      :tq => 0.009,       :captured_request_cookie => nil,
-            :timestamp => 20031015083217,   :tc => 0.007,       :captured_response_cookie => nil,
+            :accept_date => 20031015083217, :tc => 0.007,       :captured_response_cookie => nil,
             :frontend_name => 'relais-http',:tr => 0.014,       :clientside_persistence_cookie => nil,
             :server_name => 'Srv1',         :tt => 0.030,       :serverside_persistence_cookie => nil,
             :status_code => 502,            :listener_conn => 2,:termination_event_code => 'P',
@@ -56,14 +56,14 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
     }
     
     it { should parse_line(sample_errors, 'a failed access line').and_capture(
-            :timestamp => 20031015151906, :tq => nil,    :captured_request_cookie => nil,
-            :server_name => '<NOSRV>',    :tw => nil,    :captured_response_cookie => nil,
-            :bytes_read => 2750,          :tc => nil,    :clientside_persistence_cookie => nil,
-            :retries => 2,                :tr => nil,    :serverside_persistence_cookie => nil,
-            :http_request => nil,         :tt => 50.001, :termination_event_code => 'c',
-                                                         :terminated_session_state => 'R',
-                                                         :captured_request_headers => nil,
-                                                         :captured_response_headers => nil)
+            :accept_date => 20031015151906, :tq => nil,    :captured_request_cookie => nil,
+            :server_name => '<NOSRV>',      :tw => nil,    :captured_response_cookie => nil,
+            :bytes_read => 2750,            :tc => nil,    :clientside_persistence_cookie => nil,
+            :retries => 2,                  :tr => nil,    :serverside_persistence_cookie => nil,
+            :http_request => nil,           :tt => 50.001, :termination_event_code => 'c',
+                                                           :terminated_session_state => 'R',
+                                                           :captured_request_headers => nil,
+                                                           :captured_response_headers => nil)
     }
     
     it { should_not parse_line('nonsense') }

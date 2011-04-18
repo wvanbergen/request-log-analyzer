@@ -42,7 +42,7 @@ module RequestLogAnalyzer::FileFormat
       )
 
       line.capture(:client_ip).as(:string)
-      line.capture(:timestamp).as(:timestamp)
+      line.capture(:accept_date).as(:timestamp)
       line.capture(:frontend_name).as(:string)
       line.capture(:backend_name).as(:string)
       line.capture(:server_name).as(:string)
@@ -86,7 +86,7 @@ module RequestLogAnalyzer::FileFormat
       )
 
       line.capture(:client_ip).as(:string)
-      line.capture(:timestamp).as(:timestamp)
+      line.capture(:accept_date).as(:timestamp)
       line.capture(:frontend_name).as(:string)
       line.capture(:server_name).as(:string)
       line.capture(:tq).as(:nillable_duration, :unit => :msec)
@@ -127,7 +127,7 @@ module RequestLogAnalyzer::FileFormat
       )
 
       line.capture(:client_ip).as(:string)
-      line.capture(:timestamp).as(:timestamp)
+      line.capture(:accept_date).as(:timestamp)
       line.capture(:frontend_name).as(:string)
       line.capture(:server_name).as(:string)
       line.capture(:tq).as(:nillable_duration, :unit => :msec)
@@ -153,7 +153,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Define the summary report
     report do |analyze|
-      analyze.hourly_spread :field => :timestamp
+      analyze.hourly_spread :field => :accept_date
 
       analyze.frequency :client_ip,
         :title => "Hits per IP"
