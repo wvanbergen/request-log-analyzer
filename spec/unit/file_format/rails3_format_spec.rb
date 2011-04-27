@@ -50,6 +50,11 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       subject.should parse_line(line).as(:processing).and_capture(
         :controller => 'ProjectsController', :action => 'avatar', :format => '')
     end
+
+    it "should parse a :parameters line correctly" do
+      line = '  Parameters: {"action"=>"cached", "controller"=>"cached"}'
+      subject.should parse_line(line).as(:parameters).and_capture(:params => {:action => 'cached', :controller => 'cached'})
+    end
     
     it "should parse :completed lines correctly" do
       line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms)'
