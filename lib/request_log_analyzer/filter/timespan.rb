@@ -30,11 +30,11 @@ module RequestLogAnalyzer::Filter
     # Returns nil otherwise
     # <tt>request</tt> Request object.
     def filter(request)
-      if @after && @before && request.timestamp <= @before && @after <= request.timestamp
+      if @after && @before && request.timestamp && request.timestamp <= @before && @after <= request.timestamp
         return request
-      elsif @after && @before.nil? && @after <= request.timestamp
+      elsif @after && @before.nil? && request.timestamp && @after <= request.timestamp
         return request
-      elsif @before && @after.nil? && request.timestamp <= @before
+      elsif @before && @after.nil? && request.timestamp && request.timestamp <= @before
         return request
       end
 
