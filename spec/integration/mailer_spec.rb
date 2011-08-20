@@ -20,7 +20,7 @@ describe RequestLogAnalyzer, 'running mailer integration' do
     RequestLogAnalyzer::Controller.build(
       :mail         => 'root@localhost',
       :mailhost     => 'localhost:2525',
-      :source_files => log_fixture(:rails_1x),
+      :source_files => log_fixture('rails_1x'),
       :format       => RequestLogAnalyzer::FileFormat::Rails,
       :no_progress  => true
     ).run!
@@ -40,7 +40,7 @@ describe RequestLogAnalyzer, 'running mailer integration' do
       :mail         => 'root@localhost',
       :mailhost     => 'localhost:2525',
       :mailsubject  => 'TESTSUBJECT',
-      :source_files => log_fixture(:rails_1x),
+      :source_files => log_fixture('rails_1x'),
       :format       => RequestLogAnalyzer::FileFormat::Rails,
       :no_progress  => true
     ).run!
@@ -55,7 +55,7 @@ describe RequestLogAnalyzer, 'running mailer integration' do
       :output       => 'HTML',
       :mail         => 'root@localhost',
       :mailhost     => 'localhost:2525',
-      :source_files => log_fixture(:rails_1x),
+      :source_files => log_fixture('rails_1x'),
       :format       => RequestLogAnalyzer::FileFormat::Rails,
       :no_progress  => true
     ).run!

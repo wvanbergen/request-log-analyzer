@@ -7,7 +7,7 @@ describe RequestLogAnalyzer::Database do
 
     context 'for a Rails request database' do
       before(:each) do
-        @database = RequestLogAnalyzer::Database.new(log_fixture(:rails, :db))
+        @database = RequestLogAnalyzer::Database.new(log_fixture('rails', :db))
         @database.load_database_schema!
       end
 

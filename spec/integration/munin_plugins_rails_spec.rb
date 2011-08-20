@@ -4,7 +4,7 @@ describe RequestLogAnalyzer, 'when harvesting like munin-plugins-rails the YAML 
   
   before(:each) do 
     cleanup_temp_files!    
-    run("#{log_fixture(:rails_1x)} --dump #{temp_output_file(:yaml)}")
+    run("#{log_fixture('rails_1x')} --dump #{temp_output_file(:yaml)}")
     @rla = YAML::load(File.read(temp_output_file(:yaml)))
   end
   

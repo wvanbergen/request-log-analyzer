@@ -86,7 +86,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       it "should parse a log snippet successfully without warnings" do
         log_parser.should_receive(:handle_request).exactly(10).times
         log_parser.should_not_receive(:warn)
-        log_parser.parse_file(log_fixture(:apache_common))
+        log_parser.parse_file(log_fixture('apache_common'))
       end
     end
   end
@@ -125,7 +125,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
       it "should parse a log snippet successfully without warnings" do
         log_parser.should_receive(:handle_request).exactly(5).times
         log_parser.should_not_receive(:warn)
-        log_parser.parse_file(log_fixture(:apache_combined))
+        log_parser.parse_file(log_fixture('apache_combined'))
       end
     end
   end

@@ -105,7 +105,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
     it "should find 26 completed sloq query entries" do
       log_parser.should_not_receive(:warn)
       log_parser.should_receive(:handle_request).exactly(26).times
-      log_parser.parse_file(log_fixture(:mysql_slow_query))
+      log_parser.parse_file(log_fixture('mysql_slow_query'))
     end
   end
 end

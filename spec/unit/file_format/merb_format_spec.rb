@@ -31,7 +31,7 @@ describe RequestLogAnalyzer::FileFormat::Merb do
     it "should parse a log fragment correctly without warnings" do
       log_parser.should_receive(:handle_request).exactly(11).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_file(log_fixture(:merb))
+      log_parser.parse_file(log_fixture('merb'))
     end
   end
 end
