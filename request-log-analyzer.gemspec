@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rspec', '~> 2.0')
 
   s.add_development_dependency('activerecord')
-  s.add_development_dependency('sqlite3-ruby')
+  s.add_development_dependency('sqlite3')
 
   s.authors  = ['Willem van Bergen', 'Bart ten Brinke']
   s.email    = ['willem@railsdoctors.com', 'bart@railsdoctors.com']
