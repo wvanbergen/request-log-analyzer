@@ -86,34 +86,39 @@ describe RequestLogAnalyzer::Source::LogParser, :decompression do
     @log_parser = RequestLogAnalyzer::Source::LogParser.new(RequestLogAnalyzer::FileFormat::Rails.create)
   end
 
-  it "should parse a rails gzipped log file" do
-    @log_parser.should_receive(:handle_request).once
-    @log_parser.parse_file(log_fixture(:decompression, "log.gz"))
-    @log_parser.parsed_lines.should > 0
+  if `which gunzip` != ""
+    it "should parse a rails gzipped log file" do
+      @log_parser.should_receive(:handle_request).once
+      @log_parser.parse_file(log_fixture(:decompression, "log.gz"))
+      @log_parser.parsed_lines.should > 0
+    end
+
+    it "should parse a rails tar gzipped log folder" do
+      @log_parser.should_receive(:handle_request).twice
+      @log_parser.parse_file(log_fixture(:decompression, "tar.gz"))
+      @log_parser.parsed_lines.should > 1
+    end
   end
 
-  it "should parse a rails tar gzipped log folder" do
-    @log_parser.should_receive(:handle_request).twice
-    @log_parser.parse_file(log_fixture(:decompression, "tar.gz"))
-    @log_parser.parsed_lines.should > 1
-  end
+  if `which bunzip2` != ""
+    it "should parse a rails tar gzipped log folder" do
+      @log_parser.should_receive(:handle_request).twice
+      @log_parser.parse_file(log_fixture(:decompression, "tgz"))
+      @log_parser.parsed_lines.should > 1
+    end
 
-  it "should parse a rails tar gzipped log folder" do
-    @log_parser.should_receive(:handle_request).twice
-    @log_parser.parse_file(log_fixture(:decompression, "tgz"))
-    @log_parser.parsed_lines.should > 1
+    it "should parse a rails bz2 zipped log file" do
+      @log_parser.should_receive(:handle_request).once
+      @log_parser.parse_file(log_fixture(:decompression, "log.bz2"))
+      @log_parser.parsed_lines.should > 0
+    end
   end
-
-  it "should parse a rails bz2 zipped log file" do
-    @log_parser.should_receive(:handle_request).once
-    @log_parser.parse_file(log_fixture(:decompression, "log.bz2"))
-    @log_parser.parsed_lines.should > 0
+  
+  if `which unzip` != ""
+    it "should parse a rails zipped log file" do
+      @log_parser.should_receive(:handle_request).once
+      @log_parser.parse_file(log_fixture(:decompression, "log.zip"))
+      @log_parser.parsed_lines.should > 0
+    end
   end
-
-  it "should parse a rails zipped log file" do
-    @log_parser.should_receive(:handle_request).once
-    @log_parser.parse_file(log_fixture(:decompression, "log.zip"))
-    @log_parser.parsed_lines.should > 0
-  end
-
 end
