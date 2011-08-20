@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'request_log_analyzer/database'
 
 describe RequestLogAnalyzer::Database do
 
