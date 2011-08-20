@@ -13,8 +13,8 @@ module GithubGem
 
   # Detects the main include file of this project using heuristics
   def self.detect_main_include
-    if detect_gemspec_file =~ /^(\.*)\.gemspec$/ && File.exist?("lib/#{$1}.rb")
-      "lib/#{$1}.rb"
+    if File.exist?(File.expand_path("../lib/#{File.basename(detect_gemspec_file, '.gemspec').gsub(/-/, '/')}.rb", detect_gemspec_file))
+      "lib/#{File.basename(detect_gemspec_file, '.gemspec').gsub(/-/, '/')}.rb"
     elsif FileList['lib/*.rb'].length == 1
       FileList['lib/*.rb'].first
     else
@@ -23,6 +23,8 @@ module GithubGem
   end
 
   class RakeTasks
+
+    include Rake::DSL if Rake.const_defined?('DSL')
 
     attr_reader   :gemspec, :modified_files
     attr_accessor :gemspec_file, :task_namespace, :main_include, :root_dir, :spec_pattern, :test_pattern, :remote, :remote_branch, :local_branch
@@ -342,7 +344,7 @@ module GithubGem
       require 'net/https'
       require 'uri'
       
-      uri = URI.parse('https://github.com/wvanbergen/github-gem/raw/master/tasks/github-gem.rake')
+      uri = URI.parse('https://raw.github.com/wvanbergen/github-gem/master/tasks/github-gem.rake')
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
