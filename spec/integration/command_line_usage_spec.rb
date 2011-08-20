@@ -14,7 +14,7 @@ describe RequestLogAnalyzer, 'running from command line' do
     output = run("#{log_fixture(:rails_1x)}")
     output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
   end
-  
+
   it "should find 2 requests when parsing a compressed file" do
     output = run("#{log_fixture(:decompression, :tgz)}")
     output.any? { |line| /^Parsed requests\:\s*2\s/ =~ line }.should be_true
@@ -58,7 +58,7 @@ describe RequestLogAnalyzer, 'running from command line' do
   end
 
   it "should use no colors in the report with the --boring option" do
-    output = run("#{log_fixture(:rails_1x)} --boring")
+    output = run("#{log_fixture(:rails_1x)} --boring --format rails")
     output.any? { |line| /\e/ =~ line }.should be_false
   end
 
@@ -84,7 +84,7 @@ describe RequestLogAnalyzer, 'running from command line' do
   end
 
   it "should parse 4 requests from the standard input" do
-    output = run("- < #{log_fixture(:rails_1x)}")
+    output = run("--format rails - < #{log_fixture(:rails_1x)}")
     output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
   end
 end
