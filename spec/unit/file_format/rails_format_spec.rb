@@ -141,24 +141,24 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     it "should parse a Rails 2.1 style log and find valid Rails requests without warnings" do
       log_parser.should_receive(:handle_request).exactly(4).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_file(log_fixture('rails_1x'))\
+      log_parser.parse_file(log_fixture(:rails_1x))\
     end
 
     it "should parse a Rails 2.2 style log and find valid Rails requests without warnings" do
       log_parser.should_receive(:handle_request).once
       log_parser.should_not_receive(:warn)
-      log_parser.parse_file(log_fixture('rails_22'))
+      log_parser.parse_file(log_fixture(:rails_22))
     end
 
     it "should parse a Rails SyslogLogger file with prefix and find valid requests without warnings" do
       log_parser.should_receive(:handle_request).once
       log_parser.should_not_receive(:warn)
-      log_parser.parse_file(log_fixture('syslog_1x'))
+      log_parser.parse_file(log_fixture(:syslog_1x))
     end
 
     it "should parse cached requests" do
       log_parser.should_not_receive(:warn)
-      log_parser.parse_file(log_fixture('rails_22_cached')) do |request|
+      log_parser.parse_file(log_fixture(:rails_22_cached)) do |request|
         request.should be_completed
         request =~ :cache_hit
       end
@@ -168,7 +168,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       log_parser.should_not_receive(:handle_request)
       log_parser.should_receive(:warn).with(:unclosed_request, anything).once
       log_parser.should_receive(:warn).with(:no_current_request, anything).at_least(:twice)
-      log_parser.parse_file(log_fixture('rails_unordered'))
+      log_parser.parse_file(log_fixture(:rails_unordered))
     end
   end
 end

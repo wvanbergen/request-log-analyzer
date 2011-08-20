@@ -16,7 +16,7 @@ describe RequestLogAnalyzer, 'when using the rla API like the scout plugin' do
     sio = StringIO.new
     
     # place an IO object where I want RequestLogAnalyzer to read from
-    open(log_fixture('rails_1x')) do |log|
+    open(log_fixture(:rails_1x)) do |log|
       completed_count = 0
       log.each do |line|
         completed_count += 1 if line =~ /\ACompleted\b/

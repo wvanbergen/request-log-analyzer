@@ -34,23 +34,23 @@ describe RequestLogAnalyzer::FileFormat::Oink do
       it "should parse requests" do
         log_parser.should_receive(:handle_request).exactly(4).times
         log_parser.should_not_receive(:warn)
-        log_parser.parse_file(log_fixture('oink_22'))
+        log_parser.parse_file(log_fixture(:oink_22))
       end
       
       it "should not record :memory_diff on first request" do
-        log_parser.parse_file(log_fixture('oink_22')) do |request|
+        log_parser.parse_file(log_fixture(:oink_22)) do |request|
           request[:memory_diff].should == nil if log_parser.parsed_requests == 1
         end
       end
       
       it "should record :memory_diff of 2nd tracked PID" do
-        log_parser.parse_file(log_fixture('oink_22')) do |request|
+        log_parser.parse_file(log_fixture(:oink_22)) do |request|
           request[:memory_diff].should == 50000 * 1024 if log_parser.parsed_requests == 3
         end
       end
       
       it "should record :memory_diff of 1st tracked PID" do
-        log_parser.parse_file(log_fixture('oink_22')) do |request|
+        log_parser.parse_file(log_fixture(:oink_22)) do |request|
           request[:memory_diff].should == 30000 * 1024 if log_parser.parsed_requests == 4
         end
       end
@@ -60,11 +60,11 @@ describe RequestLogAnalyzer::FileFormat::Oink do
       it "should parse requests" do
         log_parser.should_receive(:handle_request).exactly(4).times
         log_parser.should_not_receive(:warn)
-        log_parser.parse_file(log_fixture('oink_22_failure'))
+        log_parser.parse_file(log_fixture(:oink_22_failure))
       end
       
       it "should ignore memory changes when a failure occurs" do
-        log_parser.parse_file(log_fixture('oink_22_failure')) do |request|
+        log_parser.parse_file(log_fixture(:oink_22_failure)) do |request|
           request[:memory_diff].should == nil if log_parser.parsed_requests == 4
         end
       end
