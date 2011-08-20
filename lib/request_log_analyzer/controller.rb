@@ -77,7 +77,7 @@ module RequestLogAnalyzer
 
       # Guess file format
       if !options[:format] && options[:source_files]
-        options[:format] = :rails # Default
+        options[:format] = :rails3 # Default
 
         if options[:source_files] != $stdin
           if options[:source_files].class == String
