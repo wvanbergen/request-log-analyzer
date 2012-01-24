@@ -106,7 +106,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should create the :belongs_to relation to the source class" do
-      @klass.should_receive(:belongs_to).with(:source, {:class_name=>"RequestLogAnalyzer::Database::Request"})
+      @klass.should_receive(:belongs_to).with(:source, {:class_name=>"RequestLogAnalyzer::Database::Source"})
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 
