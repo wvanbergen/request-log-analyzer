@@ -42,7 +42,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should set the :belongs_to relationship with the Request class" do
-      @orm_class.should_receive(:belongs_to).with(:request)
+      @orm_class.should_receive(:belongs_to).with(:request, {:class_name=>"RequestLogAnalyzer::Database::Request"})
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
     end
 
@@ -57,7 +57,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should set the :belongs_to relationship with the Source class" do
-      @orm_class.should_receive(:belongs_to).with(:source)
+      @orm_class.should_receive(:belongs_to).with(:source, {:class_name=>"RequestLogAnalyzer::Database::Source"})
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
     end
 
@@ -96,7 +96,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should create the :belongs_to relation to the request class" do
-      @klass.should_receive(:belongs_to).with(:request)
+      @klass.should_receive(:belongs_to).with(:request, {:class_name=>"RequestLogAnalyzer::Database::Request"})
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 
@@ -106,7 +106,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should create the :belongs_to relation to the source class" do
-      @klass.should_receive(:belongs_to).with(:source)
+      @klass.should_receive(:belongs_to).with(:source, {:class_name=>"RequestLogAnalyzer::Database::Request"})
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 
