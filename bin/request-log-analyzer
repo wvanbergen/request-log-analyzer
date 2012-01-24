@@ -17,6 +17,8 @@ begin
 
     command_line.command(:console) do |cons|
       cons.option(:database, :alias => :d, :required => true)
+      cons.option(:format, :alias => :f)
+      cons.option(:apache_format)
     end
 
     command_line.command(:strip) do |strip|

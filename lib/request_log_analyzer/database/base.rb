@@ -24,8 +24,8 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     klass.line_definition = definition
 
     # Set relations with requests and sources table
-    klass.belongs_to :request
-    klass.belongs_to :source
+    klass.belongs_to :request, :class_name => RequestLogAnalyzer::Database::Request.name
+    klass.belongs_to :source, :class_name => RequestLogAnalyzer::Database::Source.name
 
     # Serialize complex fields into the database
     definition.captures.select { |c| c.has_key?(:provides) }.each do |capture|
@@ -45,12 +45,12 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     klass.set_table_name(table)
 
     if klass.column_names.include?('request_id')
-      klass.belongs_to :request
+      klass.belongs_to :request, :class_name => RequestLogAnalyzer::Database::Request.name
       RequestLogAnalyzer::Database::Request.has_many table.to_sym
     end
 
     if klass.column_names.include?('source_id')
-      klass.belongs_to :source
+      klass.belongs_to :source, :class_name => RequestLogAnalyzer::Database::Source.name
       RequestLogAnalyzer::Database::Source.has_many table.to_sym
     end
 

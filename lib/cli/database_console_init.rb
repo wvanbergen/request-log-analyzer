@@ -1,5 +1,7 @@
 # Setup the include path
-$:.unshift(File.expand_path('..', File.dirname(__FILE__))
+$:.unshift(File.expand_path('..', File.dirname(__FILE__)))
+require 'request_log_analyzer'
+require 'request_log_analyzer/database'
 
 $database = RequestLogAnalyzer::Database.new(ENV['RLA_DBCONSOLE_DATABASE'])
 $database.load_database_schema!
