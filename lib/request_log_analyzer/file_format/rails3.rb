@@ -2,7 +2,7 @@ module RequestLogAnalyzer::FileFormat
 
   # Default FileFormat class for Rails 3 logs.
   #
-  # For now, this is just a basic implementation. It will probaby change after 
+  # For now, this is just a basic implementation. It will probaby change after
   # Rails 3 final has been released.
   class Rails3 < Base
 
@@ -32,14 +32,14 @@ module RequestLogAnalyzer::FileFormat
 
     # Parameters: {"action"=>"cached", "controller"=>"cached"}
     line_definition :parameters do |line|
-      line.teaser   = /  Parameters:/
-      line.regexp   = /  Parameters:\s+(\{.*\})/
+      line.teaser = / Parameters:/
+      line.regexp = / Parameters:\s+(\{.*\})/
       line.capture(:params).as(:eval)
     end
     
     # Completed 200 OK in 224ms (Views: 200.2ms | ActiveRecord: 3.4ms)
     # Completed 302 Found in 23ms
-    # Completed   in 189ms
+    # Completed in 189ms
     line_definition :completed do |line|
       line.footer = true
       line.teaser = /Completed /
@@ -63,8 +63,8 @@ module RequestLogAnalyzer::FileFormat
     end
     
     # # Not parsed at the moment:
-    #  SQL (0.2ms)  SET SQL_AUTO_IS_NULL=0
-    #  Query Load (0.4ms)  SELECT `queries`.* FROM `queries`
+    # SQL (0.2ms) SET SQL_AUTO_IS_NULL=0
+    # Query Load (0.4ms) SELECT `queries`.* FROM `queries`
     # Rendered collection (0.0ms)
     # Rendered queries/index.html.erb (0.6ms)
     
@@ -79,9 +79,9 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :method, :title => 'HTTP methods'
       analyze.frequency :status, :title => 'HTTP statuses returned'
       
-      analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
-      analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
-      analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
+      analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration", :line_type => :completed
+      analyze.duration :view, :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
+      analyze.duration :db, :category => REQUEST_CATEGORIZER, :title => "Database time", :line_type => :completed
       
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
         :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
@@ -92,7 +92,7 @@ module RequestLogAnalyzer::FileFormat
       MONTHS = %w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
       
       def convert_timestamp(value, definition)
-        # the time value can be in 2 formats: 
+        # the time value can be in 2 formats:
         # - 2010-10-26 02:27:15 +0000 (ruby 1.9.2)
         # - Thu Oct 25 16:15:18 -0800 2010
         if value =~ /^#{CommonRegularExpressions::TIMESTAMP_PARTS['Y']}/
