@@ -43,25 +43,30 @@ module RequestLogAnalyzer::FileFormat
     line_definition :completed do |line|
       line.footer = true
       line.teaser = /Completed /
-      line.regexp = /Completed (\d+)? .*in (\d+(?:\.\d+)?)ms(?:[^\(]*\(Views: (\d+(?:\.\d+)?)ms .* ActiveRecord: (\d+(?:\.\d+)?)ms.*\))?/
-      
+      line.regexp = /Completed (\d+)? .*in (\d+(?:\.\d+)?)ms[^\(]*\(Views: (\d+(?:\.\d+)?)ms .* ActiveRecord: (\d+(?:\.\d+)?)ms(?: .* Solr: (\d+(?:\.\d+)?)ms)?(?: .* Redis: (\d+(?:\.\d+)?)ms)?.*\)/
       line.capture(:status).as(:integer)
       line.capture(:duration).as(:duration, :unit => :msec)
       line.capture(:view).as(:duration, :unit => :msec)
       line.capture(:db).as(:duration, :unit => :msec)
+      line.capture(:solr).as(:duration, :unit => :msec)
+      line.capture(:redis).as(:duration, :unit => :msec)
     end
     
     # ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:
     line_definition :failure do |line|
-      line.footer = true
       line.regexp = /((?:[A-Z]\w*[a-z]\w+\:\:)*[A-Z]\w*[a-z]\w+) \((.*)\)(?: on line #(\d+) of (.+))?\:\s*$/
-
       line.capture(:error)
       line.capture(:message)
       line.capture(:line).as(:integer)
       line.capture(:file)
     end
-    
+
+    line_definition :trace do |line|
+      line.regexp = /(.+):(\d+):.+\`(.+)\'/
+      line.capture(:file)
+      line.capture(:line_number).as(:integer)
+      line.capture(:function)
+    end
     # # Not parsed at the moment:
     #  SQL (0.2ms)  SET SQL_AUTO_IS_NULL=0
     #  Query Load (0.4ms)  SELECT `queries`.* FROM `queries`
@@ -82,6 +87,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration",    :line_type => :completed
       analyze.duration :view,     :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
       analyze.duration :db,       :category => REQUEST_CATEGORIZER, :title => "Database time",       :line_type => :completed
+      analyze.duration :solr,     :category => REQUEST_CATEGORIZER, :title => "Solr time",           :line_type => :completed
+      analyze.duration :redis,    :category => REQUEST_CATEGORIZER, :title => "Redis time",          :line_type => :completed
       
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
         :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }

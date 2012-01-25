@@ -44,6 +44,8 @@ module RequestLogAnalyzer
       options[:report_amount]  = arguments[:report_amount]
       options[:mailhost]       = arguments[:mailhost]
       options[:mailsubject]    = arguments[:mailsubject]
+      options[:mailfrom]       = arguments[:mailfrom]
+      options[:mailfromalias]  = arguments[:mailfromalias]
       options[:silent]         = arguments[:silent]
       options[:parse_strategy] = arguments[:parse_strategy]
 
@@ -163,7 +165,8 @@ module RequestLogAnalyzer
         output_object = %w[File StringIO].include?(options[:file].class.name) ? options[:file] : File.new(options[:file], "w+")
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount }
       elsif options[:mail]
-        output_object = RequestLogAnalyzer::Mailer.new(options[:mail], options[:mailhost], :subject => options[:mailsubject])
+        output_object = RequestLogAnalyzer::Mailer.new(options[:mail], options[:mailhost], :subject => options[:mailsubject],
+                                                      :from =>options[:mailfrom], :from_alias => options[:mailfromalias])
         output_args   = {:width => 80, :color => false, :characters => :ascii, :sort => output_sort, :amount => output_amount  }
       else
         output_object = STDOUT
