@@ -37,6 +37,8 @@ begin
     command_line.option(:mail, :alias => :m)
     command_line.option(:mailhost, :default => 'localhost')
     command_line.option(:mailsubject)
+    command_line.option(:mailfrom)
+    command_line.option(:mailfromalias)
     command_line.option(:parse_strategy, :default => 'assume-correct')
     command_line.option(:yaml)
     command_line.option(:dump) # To be deprecated
