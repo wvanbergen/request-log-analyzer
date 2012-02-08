@@ -35,8 +35,8 @@ module RequestLogAnalyzer::Aggregator
       @request_object = RequestLogAnalyzer::Database::Request.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
         class_columns = database.get_class(line[:line_type]).column_names.reject { |column| ['id', 'source_id', 'request_id'].include?(column) }
-        attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s) }.flatten]
-        attributes[:source_id] = @sources[line[:source]].id if @sources[line[:source]]
+        attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s)}.flatten]
+        attributes.each{|k,v| attributes[k] = v.force_encoding("UTF-8") if v.is_a?(String) }
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
       end
       @request_object.save!
