@@ -31,8 +31,13 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rspec', '~> 2.0')
 
   s.add_development_dependency('activerecord')
-  s.add_development_dependency('sqlite3')
 
+  if defined?(JRUBY_VERSION)
+    s.add_development_dependency('sqlite3-ruby')
+  else
+    s.add_development_dependency('sqlite3')
+  end
+  
   s.authors  = ['Willem van Bergen', 'Bart ten Brinke']
   s.email    = ['willem@railsdoctors.com', 'bart@railsdoctors.com']
   s.homepage = 'http://railsdoctors.com'
