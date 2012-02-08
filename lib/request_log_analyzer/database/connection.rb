@@ -13,13 +13,13 @@ module RequestLogAnalyzer::Database::Connection
 
   def connect(connection_identifier)
     if connection_identifier.kind_of?(Hash)
-      RequestLogAnalyzer::Database::Base.establish_connection(connection_identifier)
+      ActiveRecord::Base.establish_connection(connection_identifier)
     elsif connection_identifier == ':memory:'
-      RequestLogAnalyzer::Database::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
+      ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
     elsif connection_hash = RequestLogAnalyzer::Database::Connection.from_string(connection_identifier)
-      RequestLogAnalyzer::Database::Base.establish_connection(connection_hash)
+      ActiveRecord::Base.establish_connection(connection_hash)
     elsif connection_identifier.kind_of?(String) # Normal SQLite 3 database file
-      RequestLogAnalyzer::Database::Base.establish_connection(:adapter => 'sqlite3', :database => connection_identifier)
+      ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => connection_identifier)
     elsif connection_identifier.nil?
       nil
     else

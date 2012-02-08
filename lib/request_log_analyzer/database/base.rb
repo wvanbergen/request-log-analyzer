@@ -14,12 +14,12 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     self.class.name.underscore.gsub(/_line$/, '').to_sym
   end
 
-  class_inheritable_accessor :line_definition
+  class_attribute :line_definition
   cattr_accessor :database
 
   def self.subclass_from_line_definition(definition)
     klass = Class.new(RequestLogAnalyzer::Database::Base)
-    klass.set_table_name("#{definition.name}_lines")
+    klass.table_name = "#{definition.name}_lines"
 
     klass.line_definition = definition
 
@@ -42,7 +42,7 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     raise "Table #{table} not found!" unless database.connection.table_exists?(table)
 
     klass = Class.new(RequestLogAnalyzer::Database::Base)
-    klass.set_table_name(table)
+    klass.table_name = table
 
     if klass.column_names.include?('request_id')
       klass.belongs_to :request, :class_name => RequestLogAnalyzer::Database::Request.name

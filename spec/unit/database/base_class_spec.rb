@@ -12,7 +12,7 @@ describe RequestLogAnalyzer::Database::Base do
 
     before(:each) do
       @orm_class = mock('Line ActiveRecord::Base class')
-      @orm_class.stub!(:set_table_name)
+      @orm_class.stub!("table_name=")
       @orm_class.stub!(:belongs_to)
       @orm_class.stub!(:serialize)
       @orm_class.stub!(:line_definition=)
@@ -37,7 +37,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should set the table name for the subclass" do
-      @orm_class.should_receive(:set_table_name).with('test_lines')
+      @orm_class.should_receive("table_name=").with('test_lines')
       RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
     end
 
@@ -80,7 +80,7 @@ describe RequestLogAnalyzer::Database::Base do
 
       @klass = mock('ActiveRecord ORM class')
       @klass.stub!(:column_names).and_return(['id', 'request_id', 'source_id', 'lineno', 'duration'])
-      @klass.stub!(:set_table_name)
+      @klass.stub!("table_name=")
       @klass.stub!(:belongs_to)
       Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@klass)
     end
@@ -91,7 +91,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should set the table name" do
-      @klass.should_receive(:set_table_name).with('completed_lines')
+      @klass.should_receive("table_name=").with('completed_lines')
       RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 
