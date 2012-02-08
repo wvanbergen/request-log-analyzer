@@ -9,6 +9,15 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
       source_comparison
     end
   end
+  
+  # Handle format manually, because it is prohibidado in Rails 3.2.1
+  def format=(arg)
+    self.attributes[:format] = arg
+  end
+  
+  def format(arg)
+    self.attributes[:format]
+  end
 
   def line_type
     self.class.name.underscore.gsub(/_line$/, '').to_sym
@@ -75,8 +84,10 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
         t.column :lineno,     :integer
 
         line_definition.captures.each do |capture|
+          column_name = capture[:name]
+          column_name = 'file_format' if column_name == 'format'
           # Add a field for every capture
-          t.column(capture[:name], column_type(capture[:type]))
+          t.column(column_name, column_type(capture[:type]))
 
           # If the capture provides other field as well, create columns for them, too
           capture[:provides].each { |field, field_type| t.column(field, column_type(field_type)) } if capture[:provides].kind_of?(Hash)
