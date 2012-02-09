@@ -6,7 +6,7 @@ rvm:
   - ree
   - jruby-18mode
   - jruby-19mode
-  - rbx-18mode
+  - rbx-18mode #Works?
   - rbx-19mode
 notifications:
   email:
