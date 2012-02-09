@@ -33,7 +33,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency('activerecord')
 
   if defined?(JRUBY_VERSION)
-    s.add_development_dependency('sqlite3-ruby')
+    s.add_development_dependency('jdbc-sqlite3')
+    s.add_development_dependency('activerecord-jdbcsqlite3-adapter')
   else
     s.add_development_dependency('sqlite3')
   end

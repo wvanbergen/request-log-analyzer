@@ -1,6 +1,8 @@
 require 'spec_helper'
 require 'socket'
 
+unless defined?(JRUBY_VERSION) #No Fork on JRUBY
+
 describe RequestLogAnalyzer, 'running mailer integration' do
 
   before(:each) do
@@ -192,4 +194,8 @@ class Mailtrap
 
     write( from, to_list, lines.join( "\n" ) )
   end
+end
+
+else
+  p 'Skipping mailer integration specs, because of missing Process.fork()'
 end
