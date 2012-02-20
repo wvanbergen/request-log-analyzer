@@ -262,7 +262,7 @@ module RequestLogAnalyzer
     def handle_progress(message, value = nil)
       case message
       when :started
-        @progress_bar = CommandLine::ProgressBar.new(File.basename(value), File.size(value), STDOUT)
+        @progress_bar = CommandLine::ProgressBar.new(File.basename(value), File.size(value), STDERR)
       when :finished
         @progress_bar.finish
         @progress_bar = nil

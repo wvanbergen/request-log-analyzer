@@ -119,9 +119,9 @@ when :strip
   RequestLogAnalyzer::LogProcessor.build(:strip, arguments).run!
 else
   unless arguments[:silent]
-    puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
-    puts "Website: http://railsdoctors.com"
-    puts
+    STDERR.puts "Request-log-analyzer, by Willem van Bergen and Bart ten Brinke - version #{RequestLogAnalyzer::VERSION}"
+    STDERR.puts "Website: http://railsdoctors.com"
+    STDERR.puts
   end
 
   # Run the request_log_analyzer!
