@@ -13,7 +13,7 @@ module RequestLogAnalyzer
   
   # The current version of request-log-analyzer.
   # Do not change the value by hand; it will be updated automatically by the gem release script.
-  VERSION = "1.12.0"
+  VERSION = "1.12.1"
 
   # Convert a string/symbol in camelcase ({RequestLogAnalyzer::Controller}) to underscores 
   # (<tt>request_log_analyzer/controller</tt>). This function can be used to load the file (using 
