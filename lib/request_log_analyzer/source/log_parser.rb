@@ -309,7 +309,7 @@ module RequestLogAnalyzer::Source
           end
         else
           @skipped_lines += 1
-          warn(:no_current_request, "Parsebale line (#{request_data[:line_definition].name.inspect}) found outside of a request!")
+          warn(:no_current_request, "Parseable line (#{request_data[:line_definition].name.inspect}) found outside of a request!")
         end
       end
     end
