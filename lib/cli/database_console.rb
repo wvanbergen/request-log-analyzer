@@ -1,4 +1,3 @@
-
 class DatabaseConsole
 
   IRB = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
@@ -8,7 +7,7 @@ class DatabaseConsole
   end
 
   def run!
-    libraries = ['irb/completion', 'rubygems','./lib/cli/database_console_init']
+    libraries = ['irb/completion', 'rubygems','cli/database_console_init']
     libaries_string = libraries.map { |l| "-r #{l}" }.join(' ')
 
     ENV['RLA_DBCONSOLE_DATABASE'] = @arguments[:database]
