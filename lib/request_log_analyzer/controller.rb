@@ -116,6 +116,7 @@ module RequestLogAnalyzer
     # * <tt>:source_files</tt> Source files to analyze. Provide either File, array of files or STDIN.
     # * <tt>:yaml</tt> Output to YAML file.
     # * <tt>:silent</tt> Minimal output automatically implies :no_progress
+    # * <tt>:source</tt> The class to instantiate to grab the requestes, must be a RequestLogAnalyzer::Source::Base descendant. (Defaults to RequestLogAnalyzer::Source::LogParser)
     #
     # === Example
     # RequestLogAnalyzer::Controller.build(
@@ -138,6 +139,7 @@ module RequestLogAnalyzer
       options[:report_sort]   ||= 'sum,mean'
       options[:boring]        ||= false
       options[:silent]        ||= false
+      options[:source]        ||= RequestLogAnalyzer::Source::LogParser
 
       options[:no_progress] = true if options[:silent]
 
@@ -182,9 +184,9 @@ module RequestLogAnalyzer
 
       # Kickstart the controller
       controller =
-        Controller.new(RequestLogAnalyzer::Source::LogParser.new(file_format,
-                                                                 :source_files => options[:source_files],
-                                                                 :parse_strategy => options[:parse_strategy]),
+        Controller.new(options[:source].new(file_format,
+                                            :source_files => options[:source_files],
+                                            :parse_strategy => options[:parse_strategy]),
                        { :output         => output_instance,
                          :database       => options[:database],                # FUGLY!
                          :yaml           => options[:yaml],
