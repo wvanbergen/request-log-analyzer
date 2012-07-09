@@ -1,0 +1,11 @@
+--- 
+id: ac6c49e0-abfc-012f-156e-12313b100d5e
+setup:
+  commands:
+  - bundle install --without production
+test:
+  commands:
+  - bundle exec rake
+deploy: {}
+ruby_versions:
+- 1.9.2
