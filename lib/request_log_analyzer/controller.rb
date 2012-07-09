@@ -286,7 +286,7 @@ module RequestLogAnalyzer
     # Adds an aggregator to the controller. The aggregator will be called for every request
     # that is parsed from the provided sources (see add_source)
     def add_aggregator(agg)
-      agg = RequestLogAnalyzer::Aggregator.const_get(RequestLogAnalyzer.to_camelcase(agg)) if agg.respond_to? :to_str
+      agg = RequestLogAnalyzer::Aggregator.const_get(RequestLogAnalyzer.to_camelcase(agg)) if agg.kind_of?(String) || agg.kind_of?(Symbol)
       @aggregators << agg.new(@source, @options)
     end
 
