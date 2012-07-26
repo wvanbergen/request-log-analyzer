@@ -32,10 +32,10 @@ end
 # Raises if it cannot find the project folder or if the install_type is now known.
 def install_rake_tasks(install_type = :rails)
   if install_type.to_sym == :rails
-    require 'ftools'
+    require 'fileutils'
     if File.directory?('./lib/tasks/')
       task_file = File.expand_path('../../tasks/request_log_analyzer.rake', File.dirname(__FILE__))
-      File.copy(task_file, './lib/tasks/request_log_analyze.rake')
+      FileUtils.copy(task_file, './lib/tasks/request_log_analyze.rake')
       puts "Installed rake tasks."
       puts "To use, run: rake rla:report"
     else
