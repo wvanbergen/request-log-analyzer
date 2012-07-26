@@ -1,25 +1,40 @@
 namespace :rla do
   desc "Analyze the Rails log file using the request-log-analyzer gem."
   task :report  => :environment do
-    puts "Analyzing the Rails log file using the request-log-analyzer gem."
-    puts "  Environment: #{RAILS_ENV}"
-    puts "  Logfile: #{Rails.configuration.log_path}"
-    puts ""
-    IO.popen("request-log-analyzer #{Rails.configuration.log_path}") { |io| $stdout << io.read }
+    rails_env  = defined?(RAILS_ENV) ? RAILS_ENV : Rails.env
+    rails_root = defined?(RAILS_ROOT) ? RAILS_ROOT : Rails.root
+    rails_version = Rails.version.split(".").first.to_i
 
+    log_file   = defined?(Rails.configuration.log_path) ? Rails.configuration.log_path : Rails.configuration.paths["log"].first
+    log_format = rails_version > 2 ? "rails3" : "rails"
+
+    puts "Analyzing the Rails log file using the request-log-analyzer gem."
+    puts "  Environment: #{rails_env}"
+    puts "  Logfile: #{log_file}"
+    puts ""
+
+    IO.popen("request-log-analyzer #{log_file} --format #{log_format}") { |io| $stdout << io.read }
   end
 
   namespace :report do
     desc "Analyze the Rails log file using the request-log-analyzer gem and output an HTML file."
     task :html  => :environment do
-      output_file = Rails.configuration.log_path + ".html"
+      rails_env  = defined?(RAILS_ENV) ? RAILS_ENV : Rails.env
+      rails_root = defined?(RAILS_ROOT) ? RAILS_ROOT : Rails.root
+      rails_version = Rails.version.split(".").first.to_i
+
+      log_file   = defined?(Rails.configuration.log_path) ? Rails.configuration.log_path : Rails.configuration.paths["log"].first
+      log_format = rails_version > 2 ? "rails3" : "rails"
+
+      output_file = File.join(rails_root, 'public', 'performance.html')
 
       puts "Analyzing the Rails log file using the request-log-analyzer gem."
-      puts "  Environment: #{RAILS_ENV}"
-      puts "  Logfile: #{Rails.configuration.log_path}"
+      puts "  Environment: #{rails_env}"
+      puts "  Logfile: #{log_file}"
       puts "  Output: #{output_file}"
       puts ""
-      IO.popen("request-log-analyzer #{Rails.configuration.log_path} --output HTML --file #{output_file}") { |io| $stdout << io.read }
+
+      IO.popen("request-log-analyzer #{log_file} --output HTML --file #{output_file} --format #{log_format}") { |io| $stdout << io.read }
     end
   end
 
