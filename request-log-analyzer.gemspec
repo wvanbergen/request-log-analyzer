@@ -2,8 +2,8 @@ Gem::Specification.new do |s|
   s.name    = "request-log-analyzer"
   
   # Do not set the version and date field manually, this is done by the release script
-  s.version = "1.12.3"
-  s.date    = "2012-07-09"
+  s.version = "1.12.4"
+  s.date    = "2012-08-05"
 
   s.rubyforge_project = 'r-l-a'
 
