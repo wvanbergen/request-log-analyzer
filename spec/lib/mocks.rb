@@ -14,10 +14,9 @@ module RequestLogAnalyzer::RSpec::Mocks
     source.stub!(:prepare)
     source.stub!(:finalize)
 
-    source.stub!(:each_request).and_return do |block|
-      block.call(testing_format.request(:field => 'value1'))
-      block.call(testing_format.request(:field => 'value2'))
-    end
+    source.stub!(:each_request).
+      and_yield(testing_format.request(:field => 'value1')).
+      and_yield(testing_format.request(:field => 'value2'))
 
     return source
   end
