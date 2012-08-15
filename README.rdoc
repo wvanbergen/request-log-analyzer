@@ -7,6 +7,7 @@ This is a simple command line tool to analyze request log files in various forma
 * Uses several metrics, including cumulative request time, mean request time, process blockers, database and rendering time, HTTP methods and statuses, Rails action cache statistics, etc.) (Sample output: http://github.com/wvanbergen/request-log-analyzer/wiki/sample-output)
 * Low memory footprint and reasonably fast, so it is safe to run on a production server.
 * MIT licensed
+* Runs on all rubies {<img src="https://secure.travis-ci.org/wvanbergen/request-log-analyzer.png" />}[http://travis-ci.org/wvanbergen/request-log-analyzer]
 
 See the project wiki at http://github.com/wvanbergen/request-log-analyzer/wiki for documentation and additional information.
 
