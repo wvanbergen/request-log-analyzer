@@ -258,7 +258,7 @@ module RequestLogAnalyzer::FileFormat
       return self.new(line_definer.line_definitions, report_definer.trackers)
     end
 
-    def initialize(line_definitions = {}, report_trackers = [])
+    def initialize(line_definitions = OrderedHash.new, report_trackers = [])
       @line_definitions, @report_trackers = line_definitions, report_trackers
     end
 

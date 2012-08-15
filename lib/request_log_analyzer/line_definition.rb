@@ -10,7 +10,7 @@ module RequestLogAnalyzer
       attr_accessor :line_definitions
 
       def initialize
-        @line_definitions = {}
+        @line_definitions = OrderedHash.new
       end
 
       def initialize_copy(other)
@@ -66,7 +66,9 @@ module RequestLogAnalyzer
     end
     
     def capture(name)
-      new_capture_hash = { :name => name, :type => :string}
+      new_capture_hash = OrderedHash.new()
+      new_capture_hash[:name] = name
+      new_capture_hash[:type] = :string
       captures << new_capture_hash
       CaptureDefiner.new(new_capture_hash)
     end

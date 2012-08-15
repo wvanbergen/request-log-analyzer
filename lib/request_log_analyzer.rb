@@ -1,4 +1,5 @@
 require 'date'
+require 'ordered_hash'
 
 # RequestLogAnalyzer is the base namespace in which all functionality of RequestLogAnalyzer is implemented.
 # This module itselfs contains some functions to help with class and source file loading. The actual 
