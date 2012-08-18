@@ -17,8 +17,6 @@ describe RequestLogAnalyzer::Database::Base do
       @orm_class.stub!(:serialize)
       @orm_class.stub!(:line_definition=)
 
-      #RequestLogAnalyzer::Database::Base.stub(:new).and_return(@orm_class)
-
       RequestLogAnalyzer::Database::Request.stub!(:has_many)
       RequestLogAnalyzer::Database::Source.stub!(:has_many)
 
