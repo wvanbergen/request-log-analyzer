@@ -17,7 +17,7 @@ describe RequestLogAnalyzer::Database::Base do
       @orm_class.stub!(:serialize)
       @orm_class.stub!(:line_definition=)
 
-      Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@orm_class)
+      #RequestLogAnalyzer::Database::Base.stub(:new).and_return(@orm_class)
 
       RequestLogAnalyzer::Database::Request.stub!(:has_many)
       RequestLogAnalyzer::Database::Source.stub!(:has_many)
@@ -27,43 +27,42 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should create a new subclass using the Base class as parent" do
-      Class.should_receive(:new).with(RequestLogAnalyzer::Database::Base).and_return(@orm_class)
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
     it "should store the LineDefinition" do
       @orm_class.should_receive(:line_definition=).with(@line_definition)
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
     it "should set the table name for the subclass" do
       @orm_class.should_receive("table_name=").with('test_lines')
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
     it "should set the :belongs_to relationship with the Request class" do
       @orm_class.should_receive(:belongs_to).with(:request, {:class_name=>"RequestLogAnalyzer::Database::Request"})
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
     it "should set a :has_many relationship in the request class" do
       RequestLogAnalyzer::Database::Request.should_receive(:has_many).with(:test_lines)
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
     it "should set a :has_many relationship in the source class" do
       RequestLogAnalyzer::Database::Source.should_receive(:has_many).with(:test_lines)
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
     it "should set the :belongs_to relationship with the Source class" do
       @orm_class.should_receive(:belongs_to).with(:source, {:class_name=>"RequestLogAnalyzer::Database::Source"})
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
     it "should serialize a complex field" do
       @orm_class.should_receive(:serialize).with(:evaluated, Hash)
-      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition)
+      RequestLogAnalyzer::Database::Base.subclass_from_line_definition(@line_definition, @orm_class)
     end
 
   end
@@ -82,37 +81,31 @@ describe RequestLogAnalyzer::Database::Base do
       @klass.stub!(:column_names).and_return(['id', 'request_id', 'source_id', 'lineno', 'duration'])
       @klass.stub!("table_name=")
       @klass.stub!(:belongs_to)
-      Class.stub!(:new).with(RequestLogAnalyzer::Database::Base).and_return(@klass)
-    end
-
-    it "should create a new subclass using the Base class as parent" do
-      Class.should_receive(:new).with(RequestLogAnalyzer::Database::Base).and_return(@klass)
-      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
     end
 
     it "should set the table name" do
       @klass.should_receive("table_name=").with('completed_lines')
-      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
+      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines', @klass)
     end
 
     it "should create the :belongs_to relation to the request class" do
       @klass.should_receive(:belongs_to).with(:request, {:class_name=>"RequestLogAnalyzer::Database::Request"})
-      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
+      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines', @klass)
     end
 
     it "should create the :has_many relation in the request class" do
       RequestLogAnalyzer::Database::Request.should_receive(:has_many).with(:completed_lines)
-      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
+      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines', @klass)
     end
 
     it "should create the :belongs_to relation to the source class" do
       @klass.should_receive(:belongs_to).with(:source, {:class_name=>"RequestLogAnalyzer::Database::Source"})
-      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
+      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines', @klass)
     end
 
     it "should create the :has_many relation in the request class" do
       RequestLogAnalyzer::Database::Source.should_receive(:has_many).with(:completed_lines)
-      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines')
+      RequestLogAnalyzer::Database::Base.subclass_from_table('completed_lines', @klass)
     end
 
   end
