@@ -26,12 +26,12 @@ module RequestLogAnalyzer::Aggregator
       def method_missing(tracker_method, *args)
         track(tracker_method, *args)
       end
-      
+
       # Helper function to initialize a tracker and add it to the tracker array.
       # <tt>tracker_class</tt> The class to include
       # <tt>optiont</tt> The options to pass to the trackers.
       def track(tracker_klass, value_field = {}, other_options = {})
-        options = value_field.kind_of?(Symbol) ? other_options.merge(:value => value_field) : value_field.merge(other_options) 
+        options = value_field.kind_of?(Symbol) ? other_options.merge(:value => value_field) : value_field.merge(other_options)
         tracker_klass = RequestLogAnalyzer::Tracker.const_get(RequestLogAnalyzer.to_camelcase(tracker_klass)) if tracker_klass.kind_of?(Symbol)
         @trackers << tracker_klass.new(options)
       end
@@ -108,9 +108,12 @@ module RequestLogAnalyzer::Aggregator
 
       output.with_style(:cell_separator => false) do
         output.table({:width => 20}, {:font => :bold}) do |rows|
-          rows << ['Parsed lines:',    source.parsed_lines]
-          rows << ['Skipped lines:',   source.skipped_lines]
-          rows << ['Parsed requests:', source.parsed_requests]
+          source.processed_files.each do |f|
+            rows << ['Processsed File:', f]
+          end
+          rows << ['Parsed lines:',     source.parsed_lines]
+          rows << ['Skipped lines:',    source.skipped_lines]
+          rows << ['Parsed requests:',  source.parsed_requests]
           rows << ['Skipped requests:', source.skipped_requests]
           rows << ["Warnings:", @warnings_encountered.map { |(key, value)| "#{key}: #{value}" }.join(', ')] if has_warnings?
         end
