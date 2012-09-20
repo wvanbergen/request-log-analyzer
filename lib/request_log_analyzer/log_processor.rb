@@ -52,7 +52,7 @@ module RequestLogAnalyzer
     # in which the actual processing is performed.
     # <tt>file</tt> The file to process
     def process_file(file)
-      File.open(file, 'r') { |file| process_io(file) }
+      File.open(file, 'r') { |io| process_io(io) }
     end
 
     # Processes an input stream by iteration over each line and processing it according to
