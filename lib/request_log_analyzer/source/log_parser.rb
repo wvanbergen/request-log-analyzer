@@ -47,6 +47,7 @@ module RequestLogAnalyzer::Source
       @processed_files  = []
       @source_files     = options[:source_files]
       @progress_handler = nil
+      @warning_handler  = nil
 
       @options[:parse_strategy] ||= DEFAULT_PARSE_STRATEGY
       unless PARSE_STRATEGIES.include?(@options[:parse_strategy])

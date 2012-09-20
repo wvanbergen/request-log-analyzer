@@ -17,7 +17,7 @@ module CommandLine
     # <tt>definition</tt> The definition of the flag.
     def initialize(name, definition = {})
       @name            = CommandLine::Option.rewrite(name)
-      @alias           = definition[:alias].to_sym if definition[:alias]
+      @alias           = definition[:alias] ? definition[:alias].to_sym : nil
       @required        = definition.has_key?(:required) && definition[:required] == true
       @parameter_count = definition[:parameters] || 1
       @multiple        = definition[:multiple]   || false
