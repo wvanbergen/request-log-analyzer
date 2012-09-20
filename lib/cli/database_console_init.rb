@@ -30,7 +30,7 @@ class Request
       inspect_line = "   - #{line.line_type} (line #{line.lineno})"
       if (inspect_attributes = line.attributes.reject { |(k, v)| [:id, :source_id, :request_id, :lineno].include?(k.to_sym) }).any?
         inspect_attributes = inspect_attributes.map { |(k,v)| "#{k} = #{v.inspect}" }.join(', ')
-        inspect_line << "\n      " + wordwrap(inspect_attributes, terminal_width - 6, "      ")
+        inspect_line << "\n      " + wordwrap(inspect_attributes, CommandLine::Tools.terminal_width - 6, "      ")
       end
       inspect_line
     end

@@ -29,6 +29,7 @@ module CommandLine
       clear
       show
     end
+
     attr_reader   :title
     attr_reader   :current
     attr_reader   :total
@@ -120,13 +121,13 @@ module CommandLine
     end
 
     def show
-      arguments = @format_arguments.map {|method|
+      arguments = @format_arguments.map do |method|
         method = sprintf("fmt_%s", method)
         send(method)
-      }
+      end
       line = sprintf(@format, *arguments)
 
-      width = terminal_width(80)
+      width = CommandLine::Tools.terminal_width(80, @out)
       if line.length == width - 1
         @out.print(line + eol)
         @out.flush
@@ -159,7 +160,7 @@ module CommandLine
     public
     def clear
       @out.print "\r"
-      @out.print(" " * (terminal_width(80) - 1))
+      @out.print(" " * (CommandLine::Tools.terminal_width(80) - 1))
       @out.print "\r"
     end
 

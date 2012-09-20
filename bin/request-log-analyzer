@@ -54,7 +54,7 @@ begin
 
     command_line.switch(:boring, :b)
     command_line.option(:output, :alias => :o, :default => 'fixedwidth')
-    command_line.option(:report_width,  :default => terminal_width - 1)
+    command_line.option(:report_width,  :default => CommandLine::Tools.terminal_width - 1)
     command_line.option(:report_amount, :default => 20)
     command_line.option(:report_sort,   :default => 'sum,mean')
 
@@ -111,7 +111,7 @@ end
 
 case arguments.command
 when :install
-  install_rake_tasks(arguments.parameters[0])
+  CommandLine::Tools.install_rake_tasks(arguments.parameters[0])
 when :console
   require 'cli/database_console'
   DatabaseConsole.new(arguments).run!
