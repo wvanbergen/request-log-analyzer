@@ -43,27 +43,27 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
   end
 
   class Request < RequestLogAnalyzer::FileFormat::Rails::Request
-   # Overrides the #validate method to handle PID updating.
-   def validate
-     update_pids
-     super
-   end
+    # Overrides the #validate method to handle PID updating.
+    def validate
+      update_pids
+      super
+    end
    
-   # Accessor for memory information associated with the specified request PID. If no memory exists
-   # for this request's :pid, the memory tracking is initialized.
-   def pid_memory
-     file_format.pids[self[:pid]] ||= { :last_memory_reading => -1, :current_memory_reading => -1 }
-   end
+    # Accessor for memory information associated with the specified request PID. If no memory exists
+    # for this request's :pid, the memory tracking is initialized.
+    def pid_memory
+      file_format.pids[self[:pid]] ||= { :last_memory_reading => -1, :current_memory_reading => -1 }
+    end
     
-   # Calculates :memory_diff for each request based on the last completed request that was not a failure.
-   def update_pids
-     # memory isn't recorded with exceptions. need to set #last_memory_reading+ to -1 as
-     # the memory used could have changed. for the next request the memory change will not be recorded.
-     #
-     # NOTE - the failure regex was not matching with a Rails Development log file.
-     if has_line_type?(:failure) and processing = has_line_type?(:processing)
-       pid_memory[:last_memory_reading] = -1
-     elsif mem_line = has_line_type?(:memory_usage)
+    # Calculates :memory_diff for each request based on the last completed request that was not a failure.
+    def update_pids
+      # memory isn't recorded with exceptions. need to set #last_memory_reading+ to -1 as
+      # the memory used could have changed. for the next request the memory change will not be recorded.
+      #
+      # NOTE - the failure regex was not matching with a Rails Development log file.
+      if has_line_type?(:failure) and processing = has_line_type?(:processing)
+        pid_memory[:last_memory_reading] = -1
+      elsif mem_line = has_line_type?(:memory_usage)
         memory_reading = mem_line[:memory]
         pid_memory[:current_memory_reading] = memory_reading
         # calcuate the change in memory
@@ -79,18 +79,18 @@ class RequestLogAnalyzer::FileFormat::Oink < RequestLogAnalyzer::FileFormat::Rai
         pid_memory[:current_memory_reading] = -1
       end # if mem_line
       return true
-   end # def update_pids
-
-  def convert_pipe_separated_counts(value, capture_definition)
-    count_strings = value.split(' | ')
-    count_arrays = count_strings.map do |count_string|
-      if count_string =~ /^(\w+): (\d+)/
-        [$1, $2.to_i]
-      end
     end
 
-    Hash[count_arrays]
-  end
+    def convert_pipe_separated_counts(value, capture_definition)
+      count_strings = value.split(' | ')
+      count_arrays = count_strings.map do |count_string|
+        if count_string =~ /^(\w+): (\d+)/
+          [$1, $2.to_i]
+        end
+      end
+
+      Hash[count_arrays]
+    end
   
   end # class Request
 end
