@@ -103,7 +103,7 @@ module CommandLine
 
       def [](option_name)
         option_symbol = CommandLine::Option.rewrite(option_name)
-        if the_option = @options.detect { |(name, odef)| odef =~ option_symbol }
+        if the_option = @options.detect { |(_, odef)| odef =~ option_symbol }
           the_option[1]
         else
           raise CommandLine::UnknownOption, option_name
@@ -164,7 +164,7 @@ module CommandLine
     end
 
     def [](option)
-      if the_option = @options.detect { |(key, value)| key =~ option }
+      if the_option = @options.detect { |(key, _)| key =~ option }
         the_option[1]
       else
         @current_definition[option].default_value

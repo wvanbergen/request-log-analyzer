@@ -287,7 +287,7 @@ module RequestLogAnalyzer::FileFormat
     # Checks whether the line definitions form a valid language.
     # A file format should have at least a header and a footer line type    
     def valid_line_definitions?
-      line_definitions.any? { |(name, ld)| ld.header } && line_definitions.any? { |(name, ld)| ld.footer }
+      line_definitions.any? { |(_, ld)| ld.header } && line_definitions.any? { |(_, ld)| ld.footer }
     end
     
     # Checks whether the request class inherits from the base Request class.
@@ -297,7 +297,7 @@ module RequestLogAnalyzer::FileFormat
 
     # Returns true if this language captures the given symbol in one of its line definitions
     def captures?(name)
-      line_definitions.any? { |(name, ld)| ld.captures?(name) }
+      line_definitions.any? { |(_, ld)| ld.captures?(name) }
     end
 
     # Function that a file format con implement to monkey patch the environment.

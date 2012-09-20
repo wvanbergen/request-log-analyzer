@@ -68,7 +68,7 @@ module RequestLogAnalyzer::Tracker
       top_categories = output.slice_results(sorted_by(sort))
       output.with_style(:top_line => true) do
         output.table(*statistics_header(:title => options[:title], :highlight => sort)) do |rows|
-          top_categories.each { |(cat, info)| rows << statistics_row(cat) }
+          top_categories.each { |(category, _)| rows << statistics_row(category) }
         end
       end
     end
@@ -292,12 +292,12 @@ module RequestLogAnalyzer::Tracker
 
     # Get the cumlative duration of a all categories.
     def sum_overall
-      @categories.inject(0.0) { |sum, (name, cat)| sum + cat[:sum] }
+      @categories.inject(0.0) { |sum, (_, cat)| sum + cat[:sum] }
     end
 
     # Get the total hits of a all categories.
     def hits_overall
-      @categories.inject(0) { |sum, (name, cat)| sum + cat[:hits] }
+      @categories.inject(0) { |sum, (_, cat)| sum + cat[:hits] }
     end
 
     # Return categories sorted by a given key.

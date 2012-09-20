@@ -35,7 +35,7 @@ module RequestLogAnalyzer::Aggregator
       @request_object = RequestLogAnalyzer::Database::Request.new(:first_lineno => request.first_lineno, :last_lineno => request.last_lineno)
       request.lines.each do |line|
         class_columns = database.get_class(line[:line_type]).column_names.reject { |column| ['id', 'source_id', 'request_id'].include?(column) }
-        attributes = Hash[*line.select { |(k, v)| class_columns.include?(k.to_s)}.flatten]
+        attributes = Hash[*line.select { |(key, _)| class_columns.include?(key.to_s)}.flatten]
         
         # Fix encoding patch for 1.9.2
         attributes.each do |k,v|

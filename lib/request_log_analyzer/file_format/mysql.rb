@@ -93,7 +93,7 @@ module RequestLogAnalyzer::FileFormat
 
       # Convert the timestamp to an integer
       def convert_timestamp(value, definition)
-        all,y,m,d,h,i,s = value.split(/(\d\d)(\d\d)(\d\d)\s+(\d?\d):(\d\d):(\d\d)/)
+        _, y, m, d, h, i, s = value.split(/(\d\d)(\d\d)(\d\d)\s+(\d?\d):(\d\d):(\d\d)/)
         ('20%s%s%s%s%s%s' % [y,m,d,h.rjust(2, '0'),i,s]).to_i
       end
     end
