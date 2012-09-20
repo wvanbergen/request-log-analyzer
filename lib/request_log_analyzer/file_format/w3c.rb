@@ -8,7 +8,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :access do |line|
       line.header = true
       line.footer = true
-      line.regexp = /^(#{timestamp('%Y-%m-%d %H:%M:%S')}) (#{ip_address}) (.*) (#{ip_address}) (\d+) (\w+) ([\w|\/|.]+) \- (\d+) (\d+) (\d+) (\d+) (.*) (\S+)/
+      line.regexp = /^(#{timestamp('%Y-%m-%d %H:%M:%S')}) (#{ip_address}) (.*) (#{ip_address}) (\d+) (\w+) (\S+) \- (\d+) (\d+) (\d+) (\d+) (.*) (\S+)/
       
       line.capture(:timestamp).as(:timestamp)
       line.capture(:remote_ip)
@@ -49,8 +49,5 @@ module RequestLogAnalyzer::FileFormat
         "#{value[0,4]}#{value[5,2]}#{value[8,2]}#{value[11,2]}#{value[14,2]}#{value[17,2]}".to_i
       end
     end
-    
-
   end
-  
 end
