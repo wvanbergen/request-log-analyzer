@@ -121,7 +121,9 @@ module RequestLogAnalyzer::Source
       @current_source = File.expand_path(file)
       @source_changes_handler.call(:started, @current_source) if @source_changes_handler
 
-      if decompress_file?(file).empty?
+      if File.directory?(@current_source)
+        parse_files(Dir["#{ @current_source }/*"], options, &block)
+      elsif decompress_file?(file).empty?
 
         @progress_handler = @dormant_progress_handler
         @progress_handler.call(:started, file) if @progress_handler
