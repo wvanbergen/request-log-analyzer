@@ -10,6 +10,11 @@ module RequestLogAnalyzer::RSpec::Helpers
     File.dirname(__FILE__) + "/../fixtures/#{name}.#{extention}"
   end
 
+  # directory of logs
+  def log_directory_fixture(name)
+    File.dirname(__FILE__) + "/../fixtures/#{name}"
+  end
+
   # Creates a log file given some lines
   def log_snippet(*lines)
     StringIO.new(lines.join("\n") << "\n")
@@ -49,12 +54,12 @@ module RequestLogAnalyzer::RSpec::Helpers
   def temp_output_file(file_type)
     File.expand_path("#{File.dirname(__FILE__)}/../../tmp/spec.#{file_type}.tmp")
   end
-  
+
   # Check if a given string can be found in the given file
   # Returns the line number if found, nil otherwise
   def find_string_in_file(string, file, options = {})
     return nil unless File.exists?(file)
-    
+
     line_counter = 0
 
     File.open( file ) do |io|
@@ -66,7 +71,7 @@ module RequestLogAnalyzer::RSpec::Helpers
         return line_counter if line.include? string
       }
     end
-    
+
     return nil
   end
 end

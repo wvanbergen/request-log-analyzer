@@ -118,12 +118,15 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_file(file, options = {}, &block)
 
+      if File.directory?(file)
+        parse_files(Dir["#{ file }/*"], options, &block)
+        return
+      end
+
       @current_source = File.expand_path(file)
       @source_changes_handler.call(:started, @current_source) if @source_changes_handler
 
-      if File.directory?(@current_source)
-        parse_files(Dir["#{ @current_source }/*"], options, &block)
-      elsif decompress_file?(file).empty?
+      if decompress_file?(file).empty?
 
         @progress_handler = @dormant_progress_handler
         @progress_handler.call(:started, file) if @progress_handler
