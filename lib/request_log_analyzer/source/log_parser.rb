@@ -118,6 +118,11 @@ module RequestLogAnalyzer::Source
     # <tt>options</tt>:: A Hash of options that will be pased to parse_io.
     def parse_file(file, options = {}, &block)
 
+      if File.directory?(file)
+        parse_files(Dir["#{ file }/*"], options, &block)
+        return
+      end
+
       @current_source = File.expand_path(file)
       @source_changes_handler.call(:started, @current_source) if @source_changes_handler
 

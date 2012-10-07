@@ -87,4 +87,9 @@ describe RequestLogAnalyzer, 'running from command line' do
     output = run("--format rails - < #{log_fixture(:rails_1x)}")
     output.any? { |line| /^Parsed requests\:\s*4\s/ =~ line }.should be_true
   end
+
+  it "should accept a directory as a commandline option" do
+    output = run("#{log_directory_fixture("s3_logs")} --format amazon_s3")
+    output.any? { |line| /^Parsed requests:\s*8\s/ =~ line }.should be_true
+  end
 end
