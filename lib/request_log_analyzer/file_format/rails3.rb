@@ -61,13 +61,20 @@ module RequestLogAnalyzer::FileFormat
       line.capture(:line).as(:integer)
       line.capture(:file)
     end
-    
+
+    # Rendered queries/index.html.erb (0.6ms)
+    line_definition :rendered do |line|
+      line.teaser = / Rendered /
+      line.regexp = / Rendered ([a-zA-Z0-9_\-.]+(?:\/[a-zA-Z0-9_\-.]+)+) \((\d+(?:\.\d+)?)ms\)/
+      line.capture(:rendered_file)
+      line.capture(:rendered_duration).as(:duration, :unit => :msec)
+    end
+
     # # Not parsed at the moment:
     # SQL (0.2ms) SET SQL_AUTO_IS_NULL=0
     # Query Load (0.4ms) SELECT `queries`.* FROM `queries`
     # Rendered collection (0.0ms)
-    # Rendered queries/index.html.erb (0.6ms)
-    
+
     REQUEST_CATEGORIZER = lambda { |request| "#{request[:controller]}##{request[:action]}.#{request[:format]}" }
     
     report do |analyze|
@@ -82,6 +89,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration", :line_type => :completed
       analyze.duration :view, :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
       analyze.duration :db, :category => REQUEST_CATEGORIZER, :title => "Database time", :line_type => :completed
+
+      analyze.duration :rendered_duration, :category => :rendered_file, :title => 'Partials rendering time', :line_type => :rendered
       
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
         :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
