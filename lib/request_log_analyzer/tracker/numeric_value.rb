@@ -49,11 +49,10 @@ module RequestLogAnalyzer::Tracker
         found_categories.each_with_index do |cat, index|
           update_statistics(cat, found_values[index]) if cat && found_values[index].kind_of?(Numeric)
         end
-
       else
         category = @categorizer.call(request)
         value    = @valueizer.call(request)
-        update_statistics(category, value) if value.kind_of?(Numeric) && category
+        update_statistics(category, value) if (value.kind_of?(Numeric) || value.kind_of?(Array)) && category
       end
     end
 
@@ -227,6 +226,8 @@ module RequestLogAnalyzer::Tracker
     # <tt>category</tt>:: The category for which to update the running statistics calculations
     # <tt>number</tt>:: The numeric value to update the calculations with.
     def update_statistics(category, number)
+      return number.map {|n| update_statistics(category, n)} if number.is_a?(Array)
+
       @categories[category] ||= { :hits => 0, :sum => 0, :mean => 0.0, :sum_of_squares => 0.0, :min => number, :max => number, 
                                   :buckets => Array.new(@number_of_buckets, 0) }
       

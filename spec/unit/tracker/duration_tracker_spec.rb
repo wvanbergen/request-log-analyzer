@@ -24,6 +24,13 @@ describe RequestLogAnalyzer::Tracker::Duration do
       lambda { @tracker.report(mock_output) }.should_not raise_error
     end
 
+    it "should generate a report with arrays of durations are present" do
+      @tracker.update(request(:category => 'a', :duration => [0.1, 0.2]))
+      @tracker.update(request(:category => 'a', :duration => [0.2, 0.3]))
+      lambda { @tracker.report(mock_output) }.should_not raise_error
+      @tracker.to_yaml_object['a'].should include(:min => 0.1, :hits => 4, :max => 0.3, :mean => 0.2, :sum => 0.8)
+    end
+
     it "should generate a YAML output" do
       @tracker.update(request(:category => 'a', :duration => 0.2))
       @tracker.update(request(:category => 'b', :duration => 0.2))

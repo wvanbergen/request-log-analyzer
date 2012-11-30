@@ -64,10 +64,11 @@ module RequestLogAnalyzer::FileFormat
 
     # Rendered queries/index.html.erb (0.6ms)
     line_definition :rendered do |line|
+      line.compound = [:partial_duration]
       line.teaser = / Rendered /
       line.regexp = / Rendered ([a-zA-Z0-9_\-\/.]+(?:\/[a-zA-Z0-9_\-.]+)+)(?:\ within\ .*?)? \((\d+(?:\.\d+)?)ms\)/
       line.capture(:rendered_file)
-      line.capture(:rendered_duration).as(:duration, :unit => :msec)
+      line.capture(:partial_duration).as(:duration, :unit => :msec)
     end
 
     # # Not parsed at the moment:
@@ -87,7 +88,7 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :status, :title => 'HTTP statuses returned'
       
       analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration", :line_type => :completed
-      analyze.duration :rendered_duration, :category => :rendered_file, :title => 'Partials rendering time', :line_type => :rendered
+      analyze.duration :partial_duration, :category => :rendered_file, :title => 'Partials rendering time', :line_type => :rendered
       analyze.duration :view, :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
       analyze.duration :db, :category => REQUEST_CATEGORIZER, :title => "Database time", :line_type => :completed
       

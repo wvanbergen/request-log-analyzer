@@ -1,0 +1,13 @@
+Started GET "/foobartest" for 127.0.0.1 at 2012-11-21 15:21:13 +0100
+Processing by HomeController#foobartest as */*
+  Rendered home/foobartest_partial.html.slim (10.0ms)
+  Rendered home/foobartest_partial.html.slim (10.0ms)
+  Rendered home/foobartest_partial.html.slim (10.0ms)
+Completed 200 OK in 58ms (Views: 44.6ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/foobartest" for 127.0.0.1 at 2012-11-21 15:21:31 +0100
+Processing by HomeController#foobartest as */*
+  Rendered home/foobartest_partial.html.slim (100.0ms)
+  Rendered home/foobartest_partial.html.slim (0.0ms)
+Completed 200 OK in 2ms (Views: 0.6ms | ActiveRecord: 0.0ms)

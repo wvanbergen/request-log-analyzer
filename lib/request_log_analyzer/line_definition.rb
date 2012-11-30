@@ -44,7 +44,7 @@ module RequestLogAnalyzer
     end
 
     attr_reader :name
-    attr_accessor :teaser, :regexp, :captures
+    attr_accessor :teaser, :regexp, :captures, :compound
     attr_accessor :header, :footer
 
     alias_method :header?, :header
@@ -56,6 +56,7 @@ module RequestLogAnalyzer
       @name     = name
       @captures = []
       @teaser   = nil
+      @compound = []
       definition.each { |key, value| self.send("#{key.to_s}=".to_sym, value) }
     end
 

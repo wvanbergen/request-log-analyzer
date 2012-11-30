@@ -20,6 +20,10 @@ describe RequestLogAnalyzer, 'running from command line' do
     output.any? { |line| /^Parsed requests\:\s*2\s/ =~ line }.should be_true
   end
 
+  it "should find 5 partials in a rails3 fragment with partials" do
+    output = run("#{log_fixture(:rails_3_partials)}")
+    output.any? { |line| /^home\/foobartest_partial\.html\.slim.*5/ =~ line}.should eql true
+  end
 
   it "should skip 1 requests with a --select option" do
     output = run("#{log_fixture(:rails_1x)} --select controller PeopleController")
