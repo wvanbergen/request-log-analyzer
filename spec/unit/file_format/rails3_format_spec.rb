@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
   subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
   
   it { should be_well_formed }
-  it { should have(9).report_trackers }
+  it { should have(10).report_trackers }
   
   describe '#parse_line' do
 
@@ -81,6 +81,11 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
           :message => "undefined local variable or method `field' for #<Class>", 
           :file    => '/Users/willem/Code/warehouse/app/views/queries/execute.csv.erb')
     end
+
+    it "should parse :rendered lines correctly" do
+      line = " Rendered queries/index.html.erb (0.6ms)"
+      subject.should parse_line(line).as(:rendered).and_capture(:rendered_duration => 0.0006)
+    end
   end
   
   describe '#parse_io' do
@@ -113,7 +118,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       EOLOG
 
       log_parser.should_receive(:handle_request).once
-      log_parser.should_not_receive(:warn)
+      log_parser.should_receive(:warn).once
       log_parser.parse_string(log)
     end
     
@@ -142,7 +147,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       EOLOG
 
       log_parser.should_receive(:handle_request).once
-      log_parser.should_not_receive(:warn)
+      log_parser.should_receive(:warn).exactly(3).times
       log_parser.parse_string(log)
     end
   end
