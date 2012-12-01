@@ -20,6 +20,7 @@ module RequestLogAnalyzer::FileFormat
     LOG_FORMAT_DEFAULTS = {
       :common   => '%h %l %u %t "%r" %>s %b',
       :combined => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"',
+      :nginx    => '%a %t %h %u "%r" %>s %b',
       :rack     => '%h %l %u %t "%r" %>s %b %T',
       :referer  => '%{Referer}i -> %U',
       :agent    => '%{User-agent}i'
