@@ -1,5 +1,5 @@
 require 'date'
-require 'ordered_hash'
+require 'other/ordered_hash'
 
 # RequestLogAnalyzer is the base namespace in which all functionality of RequestLogAnalyzer is implemented.
 # This module itselfs contains some functions to help with class and source file loading. The actual 
@@ -11,7 +11,7 @@ module RequestLogAnalyzer
   
   # The current version of request-log-analyzer.
   # Do not change the value by hand; it will be updated automatically by the gem release script.
-  VERSION = "1.12.4"
+  VERSION = "1.12.6"
 
   # Convert a string/symbol in camelcase ({RequestLogAnalyzer::Controller}) to underscores 
   # (<tt>request_log_analyzer/controller</tt>). This function can be used to load the file (using 

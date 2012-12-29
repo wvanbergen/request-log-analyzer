@@ -76,7 +76,8 @@ rescue CommandLine::Error => e
   puts "Input options:"
   puts "  --after <date>             Only consider requests from <date> or later."
   puts "  --before <date>            Only consider requests before <date>."
-  puts "  --format <format>, -f:     Log file format. amazon_s3, apache, merb, mysql, rack or rails."
+  puts "  --format <format>, -f:     Log file format: amazon_s3, apache, delayed_job, haproxy, merb, mysql,"
+  puts "                             postgresql, rack, rails, rails3, w3c."
   puts "  --reject <field> <value>   Only consider requests where <field> does not match <value>."
   puts "  --select <field> <value>   Only consider requests where <field> matches <value>."
   puts

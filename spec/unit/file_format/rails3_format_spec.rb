@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
   subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
   
   it { should be_well_formed }
-  it { should have(9).report_trackers }
+  it { should have(10).report_trackers }
   
   describe '#parse_line' do
 
@@ -81,6 +81,11 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
           :message => "undefined local variable or method `field' for #<Class>", 
           :file    => '/Users/willem/Code/warehouse/app/views/queries/execute.csv.erb')
     end
+
+    it "should parse :rendered lines as an array" do
+      line = " Rendered queries/index.html.erb (0.6ms)"
+      subject.should parse_line(line).as(:rendered).and_capture(:partial_duration => [0.0006])
+    end
   end
   
   describe '#parse_io' do
@@ -100,7 +105,19 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       log_parser.should_not_receive(:warn)
       log_parser.parse_string(log)
     end
-    
+
+    it "should count partials correctly" do
+      log = <<-EOLOG
+        Started GET "/stream_support" for 127.0.0.1 at 2012-11-21 15:21:31 +0100
+        Processing by HomeController#stream_support as */*
+          Rendered home/stream_support.html.slim (33.2ms)
+          Rendered home/stream_support.html.slim (0.0ms)
+        Completed 200 OK in 2ms (Views: 0.6ms | ActiveRecord: 0.0ms)
+      EOLOG
+
+      log_parser.parse_string(log)
+    end
+
     it "should parse an unroutable request correctly" do
       log = <<-EOLOG
         Started GET "/404" for 127.0.0.1 at Fri Mar 19 06:40:57 -0700 2010
@@ -113,10 +130,10 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       EOLOG
 
       log_parser.should_receive(:handle_request).once
-      log_parser.should_not_receive(:warn)
+      log_parser.should_receive(:warn).once
       log_parser.parse_string(log)
     end
-    
+
     it "should parse a failing request correctly" do
       log = <<-EOLOG
         Started POST "/queries/397638749/execute.csv" for 127.0.0.1 at Mon Mar 01 18:44:33 -0800 2010
@@ -142,7 +159,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       EOLOG
 
       log_parser.should_receive(:handle_request).once
-      log_parser.should_not_receive(:warn)
+      log_parser.should_receive(:warn).exactly(3).times
       log_parser.parse_string(log)
     end
   end

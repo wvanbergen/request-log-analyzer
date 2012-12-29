@@ -116,6 +116,7 @@ module RequestLogAnalyzer
       value_hash[:line_type] = parsed_line[:line_definition].name
       value_hash[:lineno] = parsed_line[:lineno]
       value_hash[:source] = parsed_line[:source]
+      value_hash[:compound] = parsed_line[:line_definition].compound
       add_line_hash(value_hash)
     end
 
@@ -124,7 +125,19 @@ module RequestLogAnalyzer
     # The line should be provides as a hash of the fields parsed from the line.
     def add_line_hash(value_hash)
       @lines << value_hash
-      @attributes = value_hash.merge(@attributes)
+      if value_hash[:compound]
+        value_hash.each do |key, value|
+          if value_hash[:compound].include?(key)
+            @attributes[key] = [] if @attributes[key].nil?
+            @attributes[key] = [@attributes[key]] unless @attributes[key].is_a?(Array)
+            @attributes[key] << value
+          else
+            @attributes[key] = value unless key == :compound || @attributes[key]
+          end
+        end
+      else
+        @attributes = value_hash.merge(@attributes)
+      end
     end
 
     # Adds another line to the request. This method switches automatically between

@@ -20,7 +20,6 @@ describe RequestLogAnalyzer, 'running from command line' do
     output.any? { |line| /^Parsed requests\:\s*2\s/ =~ line }.should be_true
   end
 
-
   it "should skip 1 requests with a --select option" do
     output = run("#{log_fixture(:rails_1x)} --select controller PeopleController")
     output.any? { |line| /^Skipped requests\:\s*1\s/ =~ line }.should be_true

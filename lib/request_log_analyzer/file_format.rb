@@ -7,6 +7,7 @@ module RequestLogAnalyzer::FileFormat
   autoload :Rack,             'request_log_analyzer/file_format/rack'
   autoload :Merb,             'request_log_analyzer/file_format/merb'
   autoload :Mysql,            'request_log_analyzer/file_format/mysql'
+  autoload :Nginx,            'request_log_analyzer/file_format/nginx'
   autoload :Postgresql,       'request_log_analyzer/file_format/postgresql'
   autoload :DelayedJob,       'request_log_analyzer/file_format/delayed_job'
   autoload :DelayedJob2,      'request_log_analyzer/file_format/delayed_job2'
