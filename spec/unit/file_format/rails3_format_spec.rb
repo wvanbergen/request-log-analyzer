@@ -3,24 +3,24 @@ require 'spec_helper'
 describe RequestLogAnalyzer::FileFormat::Rails3 do
 
   subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
-  
+
   it { should be_well_formed }
-  it { should have(10).report_trackers }
-  
+  it { should have(11).report_trackers }
+
   describe '#parse_line' do
 
     it "should parse :started lines correctly" do
       line = 'Started GET "/queries" for 127.0.0.1 at Thu Feb 25 16:15:18 -0800 2010'
-      subject.should parse_line(line).as(:started).and_capture(:method => 'GET', 
+      subject.should parse_line(line).as(:started).and_capture(:method => 'GET',
             :path => '/queries', :ip => '127.0.0.1', :timestamp => 20100225161518)
     end
-    
+
     it "should parse :started lines in Oct, Nov and Dec correctly" do
       line = 'Started GET "/queries" for 127.0.0.1 at Thu Oct 25 16:15:18 -0800 2010'
       subject.should parse_line(line).as(:started).and_capture(:method => 'GET',
             :path => '/queries', :ip => '127.0.0.1', :timestamp => 20101025161518)
     end
-    
+
     it "should parse :started lines in Ruby 1.9.2 format correctly" do
       line = 'Started GET "/queries" for 127.0.0.1 at 2010-10-26 02:27:15 +0000'
       subject.should parse_line(line).as(:started).and_capture(:method => 'GET',
@@ -32,13 +32,13 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       subject.should parse_line(line).as(:processing).and_capture(
         :controller => 'QueriesController', :action => 'index', :format => 'HTML')
     end
-    
+
     it "should parse nested :processing lines correctly" do
       line = ' Processing by Projects::QueriesController#index as HTML'
       subject.should parse_line(line).as(:processing).and_capture(
         :controller => 'Projects::QueriesController', :action => 'index', :format => 'HTML')
     end
-    
+
     it "should parse :processing lines correctly with format */*" do
       line = '  Processing by ProjectsController#avatar as */*'
       subject.should parse_line(line).as(:processing).and_capture(
@@ -55,30 +55,35 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       line = '  Parameters: {"action"=>"cached", "controller"=>"cached"}'
       subject.should parse_line(line).as(:parameters).and_capture(:params => {:action => 'cached', :controller => 'cached'})
     end
-    
+
     it "should parse :completed lines correctly" do
       line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms)'
       subject.should parse_line(line).as(:completed).and_capture(
           :duration => 0.170, :view => 0.078, :db => 0.0482, :status => 200)
     end
-    
+
     it "should parse :completed lines correctly when ActiveRecord is not mentioned" do
       line = 'Completed 200 OK in 364ms (Views: 31.4ms)'
       subject.should parse_line(line).as(:completed).and_capture(:duration => 0.364, :status => 200)
     end
-    
+
     it "should parse :completed lines correctly when other durations are specified" do
       line = 'Completed 200 OK in 384ms (Views: 222.0ms | ActiveRecord: 121.0ms | Sphinx: 0.0ms)'
-      subject.should parse_line(line).as(:completed).and_capture(:duration => 0.384, :view => 0.222, 
+      subject.should parse_line(line).as(:completed).and_capture(:duration => 0.384, :view => 0.222,
           :db => 0.121, :status => 200)
     end
-    
 
-    it "should pase :failure lines correctly" do
+    it "should parse :routing_error lines correctly" do
+      line = "ActionController::RoutingError (No route matches [GET] \"/static/faq\"):"
+      subject.should parse_line(line).as(:routing_errors).and_capture(:missing_resource_method => "GET",
+          :missing_resource  => '/static/faq')
+    end
+
+    it "should parse :failure lines correctly" do
       line = "ActionView::Template::Error (undefined local variable or method `field' for #<Class>) on line #3 of /Users/willem/Code/warehouse/app/views/queries/execute.csv.erb:"
-      subject.should parse_line(line).as(:failure).and_capture(:line => 3, 
-          :error   => 'ActionView::Template::Error', 
-          :message => "undefined local variable or method `field' for #<Class>", 
+      subject.should parse_line(line).as(:failure).and_capture(:line => 3,
+          :error   => 'ActionView::Template::Error',
+          :message => "undefined local variable or method `field' for #<Class>",
           :file    => '/Users/willem/Code/warehouse/app/views/queries/execute.csv.erb')
     end
 
@@ -87,7 +92,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       subject.should parse_line(line).as(:rendered).and_capture(:partial_duration => [0.0006])
     end
   end
-  
+
   describe '#parse_io' do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
 
@@ -100,7 +105,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
         Rendered queries/index.html.erb within layouts/default (40.9ms)
         Completed 200 OK in 170ms (Views: 78.4ms | ActiveRecord: 48.2ms)
       EOLOG
-      
+
       log_parser.should_receive(:handle_request).once
       log_parser.should_not_receive(:warn)
       log_parser.parse_string(log)
@@ -115,22 +120,6 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
         Completed 200 OK in 2ms (Views: 0.6ms | ActiveRecord: 0.0ms)
       EOLOG
 
-      log_parser.parse_string(log)
-    end
-
-    it "should parse an unroutable request correctly" do
-      log = <<-EOLOG
-        Started GET "/404" for 127.0.0.1 at Fri Mar 19 06:40:57 -0700 2010
-
-        ActionController::RoutingError (No route matches "/404"):
-
-
-        Rendered /Users/rails/actionpack/lib/action_dispatch/middleware/templates/rescues/routing_error.erb within rescues/layout (1.0ms)
-      
-      EOLOG
-
-      log_parser.should_receive(:handle_request).once
-      log_parser.should_receive(:warn).once
       log_parser.parse_string(log)
     end
 
