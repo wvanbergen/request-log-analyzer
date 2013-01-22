@@ -103,7 +103,8 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
         :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
 
-      analyze.frequency :missing_resource, :title => "Routing Errors"
+      analyze.frequency :category => lambda{|x| "[#{x[:missing_resource_method]}] #{x[:missing_resource]}"},
+        :title => "Routing Errors", :if => lambda{ |request| !request[:missing_resource].nil? }
     end
 
     class Request < RequestLogAnalyzer::Request
