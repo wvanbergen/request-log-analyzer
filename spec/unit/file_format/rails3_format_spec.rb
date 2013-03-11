@@ -56,6 +56,11 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       subject.should parse_line(line).as(:parameters).and_capture(:params => {:action => 'cached', :controller => 'cached'})
     end
 
+    it "should parse a :parameters line with no indentation correctly" do
+      line = 'Parameters: {"action"=>"cached", "controller"=>"cached"}'
+      subject.should parse_line(line).as(:parameters).and_capture(:params => {:action => 'cached', :controller => 'cached'})
+    end
+
     it "should parse :completed lines correctly" do
       line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms)'
       subject.should parse_line(line).as(:completed).and_capture(
@@ -89,6 +94,11 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
 
     it "should parse :rendered lines as an array" do
       line = " Rendered queries/index.html.erb (0.6ms)"
+      subject.should parse_line(line).as(:rendered).and_capture(:partial_duration => [0.0006])
+    end
+
+    it "should parse :rendered lines with no identation as an array" do
+      line = "Rendered queries/index.html.erb (0.6ms)"
       subject.should parse_line(line).as(:rendered).and_capture(:partial_duration => [0.0006])
     end
   end
