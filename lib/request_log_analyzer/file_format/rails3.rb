@@ -32,8 +32,8 @@ module RequestLogAnalyzer::FileFormat
 
     # Parameters: {"action"=>"cached", "controller"=>"cached"}
     line_definition :parameters do |line|
-      line.teaser = / Parameters:/
-      line.regexp = / Parameters:\s+(\{.*\})/
+      line.teaser = /\bParameters:/
+      line.regexp = /\bParameters:\s+(\{.*\})/
       line.capture(:params).as(:eval)
     end
 
@@ -73,8 +73,8 @@ module RequestLogAnalyzer::FileFormat
     # Rendered queries/index.html.erb (0.6ms)
     line_definition :rendered do |line|
       line.compound = [:partial_duration]
-      line.teaser = / Rendered /
-      line.regexp = / Rendered ([a-zA-Z0-9_\-\/.]+(?:\/[a-zA-Z0-9_\-.]+)+)(?:\ within\ .*?)? \((\d+(?:\.\d+)?)ms\)/
+      line.teaser = /\bRendered /
+      line.regexp = /\bRendered ([a-zA-Z0-9_\-\/.]+(?:\/[a-zA-Z0-9_\-.]+)+)(?:\ within\ .*?)? \((\d+(?:\.\d+)?)ms\)/
       line.capture(:rendered_file)
       line.capture(:partial_duration).as(:duration, :unit => :msec)
     end
