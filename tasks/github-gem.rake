@@ -6,15 +6,20 @@ require 'set'
 
 module GithubGem
 
-  # Detects the gemspc file of this project using heuristics.
+  # Detects the gemspec file of this project using heuristics.
   def self.detect_gemspec_file
     FileList['*.gemspec'].first
   end
 
-  # Detects the main include file of this project using heuristics
+  # Detects the main include file of this project using heuristics.
   def self.detect_main_include
-    if File.exist?(File.expand_path("../lib/#{File.basename(detect_gemspec_file, '.gemspec').gsub(/-/, '/')}.rb", detect_gemspec_file))
-      "lib/#{File.basename(detect_gemspec_file, '.gemspec').gsub(/-/, '/')}.rb"
+    gemspec_file          = detect_gemspec_file
+    gemspec_file_basename = File.basename(gemspec_file, '.gemspec')
+    main_include_file     = gemspec_file_basename.gsub(/-/, '/') + '.rb'
+
+    # Prefer a file named like the gemspec file; else, load the first Ruby file.
+    if File.exist? File.expand_path("../lib/#{main_include_file}", gemspec_file)
+      "lib/#{main_include_file}"
     elsif FileList['lib/*.rb'].length == 1
       FileList['lib/*.rb'].first
     else
@@ -27,7 +32,9 @@ module GithubGem
     include Rake::DSL if Rake.const_defined?('DSL')
 
     attr_reader   :gemspec, :modified_files
-    attr_accessor :gemspec_file, :task_namespace, :main_include, :root_dir, :spec_pattern, :test_pattern, :remote, :remote_branch, :local_branch
+
+    attr_accessor :gemspec_file, :local_branch, :main_include, :remote, :remote_branch,
+                  :root_dir, :spec_pattern,:task_namespace, :test_pattern
 
     # Initializes the settings, yields itself for configuration
     # and defines the rake tasks based on the gemspec file.

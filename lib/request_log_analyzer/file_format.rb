@@ -1,3 +1,5 @@
+require 'request_log_analyzer/request'
+
 module RequestLogAnalyzer::FileFormat
 
   autoload :Rails,            'request_log_analyzer/file_format/rails'
@@ -204,36 +206,9 @@ module RequestLogAnalyzer::FileFormat
     # CLASS METHODS for format definition
     ####################################################################################
 
-    # Registers the line definer instance for a subclass.
-    def self.inherited(subclass)
-      if subclass.superclass == RequestLogAnalyzer::FileFormat::Base
-
-        # Create aline and report definer for this class
-        subclass.class_eval do
-          instance_variable_set(:@line_definer, RequestLogAnalyzer::LineDefinition::Definer.new)
-          instance_variable_set(:@report_definer, RequestLogAnalyzer::Aggregator::Summarizer::Definer.new)
-          class << self; attr_accessor :line_definer, :report_definer; end
-        end
-
-        # Create a custom Request class for this file format
-        subclass.const_set('Request', Class.new(RequestLogAnalyzer::Request)) unless subclass.const_defined?('Request')
-      else
-
-        # Copy the line and report definer from the parent class.
-        subclass.class_eval do
-          instance_variable_set(:@line_definer, superclass.line_definer.clone)
-          instance_variable_set(:@report_definer, superclass.report_definer.clone)
-          class << self; attr_accessor :line_definer, :report_definer; end
-        end
-
-        # Create a custom Request class based on the superclass's Request class
-        subclass.const_set('Request', Class.new(subclass.superclass::Request)) unless subclass.const_defined?('Request')
-      end
-    end
-
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
-      @line_definer.define_line(name, &block)
+      line_definer.define_line(name, &block)
     end
 
     # Specifies multiple line definitions at once using a block
@@ -250,6 +225,19 @@ module RequestLogAnalyzer::FileFormat
       self.report_definer.reset! if mode == :overwrite
       yield(self.report_definer)
     end
+
+    # Setup the default line definer.
+    def self.line_definer
+      @line_definer ||= ::RequestLogAnalyzer::LineDefinition::Definer.new
+    end
+
+    # Setup the default report definer.
+    def self.report_definer
+      @report_definer ||= ::RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
+    end
+
+    # Setup the default Request class.
+    Request = ::RequestLogAnalyzer::Request
 
     ####################################################################################
     # Instantiation
