@@ -206,27 +206,9 @@ module RequestLogAnalyzer::FileFormat
     # CLASS METHODS for format definition
     ####################################################################################
 
-    # Registers the line and report definers and the request class for a subclass.
-    def self.inherited(subclass)
-
-      line_definer   = subclass.superclass.line_definer.clone
-      report_definer = subclass.superclass.report_definer.clone
-      request_class  = Class.new(subclass.superclass::Request)
-
-      # Line and report definers in the subclass are clones of those in the superclass.
-      subclass.class_eval do
-        instance_variable_set(:@line_definer, line_definer)
-        instance_variable_set(:@report_definer, report_definer)
-        class << self; attr_accessor :line_definer, :report_definer; end
-      end
-
-      # Request class in the subclass is that of the superclass, unless the subclass defines it's own.
-      subclass.const_set('Request', request_class) unless subclass.const_defined?('Request')
-    end
-
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
-      @line_definer.define_line(name, &block)
+      line_definer.define_line(name, &block)
     end
 
     # Specifies multiple line definitions at once using a block
@@ -244,10 +226,18 @@ module RequestLogAnalyzer::FileFormat
       yield(self.report_definer)
     end
 
-    # Helpers used by RequestLogAnalyzer::FileFormat::Base.
+    # Setup the default line definer.
+    def self.line_definer
+      @line_definer ||= ::RequestLogAnalyzer::LineDefinition::Definer.new
+    end
+
+    # Setup the default report definer.
+    def self.report_definer
+      @report_definer ||= ::RequestLogAnalyzer::Aggregator::Summarizer::Definer.new
+    end
+
+    # Setup the default Request class.
     Request = ::RequestLogAnalyzer::Request
-    def self.line_definer   ; ::RequestLogAnalyzer::LineDefinition::Definer.new         ; end
-    def self.report_definer ; ::RequestLogAnalyzer::Aggregator::Summarizer::Definer.new ; end
 
     ####################################################################################
     # Instantiation
