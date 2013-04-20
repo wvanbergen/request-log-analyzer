@@ -9,7 +9,7 @@ sqlite3:
   database: ":memory:"
 
 mysql:
-  adapter: "mysql"
+  adapter: "mysql2"
   username: "root"
   database: "rla_test"
 

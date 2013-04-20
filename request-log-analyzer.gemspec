@@ -34,9 +34,15 @@ Gem::Specification.new do |s|
 
   if defined?(JRUBY_VERSION)
     s.add_development_dependency('jdbc-sqlite3')
+    s.add_development_dependency('jdbc-mysql')
+    s.add_development_dependency('jdbc-postgres')
     s.add_development_dependency('activerecord-jdbcsqlite3-adapter')
+    s.add_development_dependency('activerecord-jdbcmysql-adapter')
+    s.add_development_dependency('activerecord-jdbcpostgresql-adapter')
   else
     s.add_development_dependency('sqlite3')
+    s.add_development_dependency('mysql2')
+    s.add_development_dependency('pg')
   end
   
   s.authors  = ['Willem van Bergen', 'Bart ten Brinke']
