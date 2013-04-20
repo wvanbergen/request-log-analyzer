@@ -1,8 +1,10 @@
 language: ruby
+before_script:
+  - mysql -e 'create database rla_test;'
+  - psql -c 'create database rla_test;' -U postgres
 script: bundle exec rake
 rvm:
   - 1.8.7
-  - 1.9.2
   - 1.9.3
   - ruby-head
   - ree
