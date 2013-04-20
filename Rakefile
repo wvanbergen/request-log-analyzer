@@ -1,8 +1,11 @@
+require "bundler/gem_tasks"
+require "rspec/core/rake_task"
+
 Dir[File.dirname(__FILE__) + "/tasks/*.rake"].each { |file| load(file) }
 
-# Create rake tasks for a gem manages by github. The tasks are created in the
-# gem namespace
-GithubGem::RakeTasks.new(:gem)
+RSpec::Core::RakeTask.new(:spec) do |task|
+  task.pattern = "./spec/**/*_spec.rb"
+  task.rspec_opts = ['--color']
+end
 
-# Set the RSpec runner with specdoc output as default task.
-task :default => "spec:specdoc"
+task :default => :spec

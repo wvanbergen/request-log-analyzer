@@ -8,10 +8,6 @@ require 'other/ordered_hash'
 # The {RequestLogAnalyzer::VERSION} constant can be used to determine what version of request-log-analyzer
 # is running.
 module RequestLogAnalyzer
-  
-  # The current version of request-log-analyzer.
-  # Do not change the value by hand; it will be updated automatically by the gem release script.
-  VERSION = "1.12.8"
 
   # Convert a string/symbol in camelcase ({RequestLogAnalyzer::Controller}) to underscores 
   # (<tt>request_log_analyzer/controller</tt>). This function can be used to load the file (using 
@@ -34,6 +30,7 @@ module RequestLogAnalyzer
   end
 end
 
+require 'request_log_analyzer/version'
 require 'request_log_analyzer/controller'
 require 'request_log_analyzer/aggregator'
 require 'request_log_analyzer/file_format'
