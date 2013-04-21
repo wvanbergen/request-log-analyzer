@@ -167,7 +167,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should create a field of the correct type for every provided field" do
-      @database.connection.table_creator.should_receive(:column).with(:evaluated_field, :double)
+      @database.connection.table_creator.should_receive(:column).with(:evaluated_field, :float)
       @klass.create_table!
     end
   end
