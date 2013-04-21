@@ -33,9 +33,15 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency('activerecord')
   if defined?(JRUBY_VERSION)
     gem.add_development_dependency('jdbc-sqlite3')
+    gem.add_development_dependency('jdbc-mysql')
+    gem.add_development_dependency('jdbc-postgres')
     gem.add_development_dependency('activerecord-jdbcsqlite3-adapter')
+    gem.add_development_dependency('activerecord-jdbcmysql-adapter')
+    gem.add_development_dependency('activerecord-jdbcpostgresql-adapter')
   else
     gem.add_development_dependency('sqlite3')
+    gem.add_development_dependency('mysql2')
+    gem.add_development_dependency('pg')
   end
   
   gem.files = `git ls-files`.split($/)

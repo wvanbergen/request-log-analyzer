@@ -106,11 +106,11 @@ class RequestLogAnalyzer::Database::Base < ActiveRecord::Base
     when :hash;      :text
     when :text;      :text
     when :string;    :string
-    when :sec;       :double
-    when :msec;      :double
-    when :duration;  :double
-    when :float;     :double
-    when :double;    :double
+    when :sec;       :float
+    when :msec;      :float
+    when :duration;  :float
+    when :float;     :float
+    when :double;    :float
     when :integer;   :integer
     when :int;       :int
     when :timestamp; :datetime
