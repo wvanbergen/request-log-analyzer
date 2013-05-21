@@ -3,7 +3,7 @@ module RequestLogAnalyzer::FileFormat
   class Nginx < Apache
 
     def self.create(*args)
-      super(:nginx, *args)
+      super(:combined, *args)
     end
   end
 end
