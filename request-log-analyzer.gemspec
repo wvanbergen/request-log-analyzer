@@ -12,6 +12,7 @@ Gem::Specification.new do |gem|
   gem.authors  = ['Willem van Bergen', 'Bart ten Brinke']
   gem.email    = ['willem@railsdoctors.com', 'bart@railsdoctors.com']
   gem.homepage = 'http://railsdoctors.com'
+  gem.license  = "MIT"
 
   gem.summary     = "A command line tool to analyze request logs for Apache, Rails, Merb, MySQL and other web application servers"
   gem.description = <<-eos
