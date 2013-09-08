@@ -51,11 +51,11 @@ describe RequestLogAnalyzer::Database do
     before(:each) do
       @database = RequestLogAnalyzer::Database.new
       @database.file_format = testing_format
-      @database.stub!(:connection).and_return(mock_connection)
+      @database.stub(:connection).and_return(mock_connection)
 
       # Stub the expected method calls for the preparation, these will be tested separately
       @mock_class = Class.new(RequestLogAnalyzer::Database::Base)
-      @mock_class.stub!(:create_table!)
+      @mock_class.stub(:create_table!)
     end
 
     after(:each) { @database.remove_orm_classes! }
@@ -92,16 +92,16 @@ describe RequestLogAnalyzer::Database do
     before(:each) do
       @database = RequestLogAnalyzer::Database.new
       @connection = mock_connection
-      @database.stub!(:connection).and_return(@connection)
+      @database.stub(:connection).and_return(@connection)
 
       # Mock the has_many method of the defaukt ORM classes
-      RequestLogAnalyzer::Database::Request.stub!(:has_many)
-      RequestLogAnalyzer::Database::Source.stub!(:has_many)
+      RequestLogAnalyzer::Database::Request.stub(:has_many)
+      RequestLogAnalyzer::Database::Source.stub(:has_many)
 
       @mock_class = Class.new(RequestLogAnalyzer::Database::Base)
 
-      RequestLogAnalyzer::Database::Base.stub!(:subclass_from_table).and_return(@mock_class)
-      RequestLogAnalyzer::Database::Base.stub!(:subclass_from_line_definition).and_return(@mock_class)
+      RequestLogAnalyzer::Database::Base.stub(:subclass_from_table).and_return(@mock_class)
+      RequestLogAnalyzer::Database::Base.stub(:subclass_from_line_definition).and_return(@mock_class)
     end
 
     after(:each) { @database.remove_orm_classes! }

@@ -13,7 +13,7 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
     before(:each) do
       @database = mock_database(:create_database_schema!, :drop_database_schema!, :file_format=)
       @database_inserter = RequestLogAnalyzer::Aggregator::DatabaseInserter.new(@log_parser)
-      RequestLogAnalyzer::Database.stub!(:new).and_return(@database)
+      RequestLogAnalyzer::Database.stub(:new).and_return(@database)
     end
 
     it 'should establish the database connection' do
