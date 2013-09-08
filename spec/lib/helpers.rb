@@ -36,7 +36,7 @@ module RequestLogAnalyzer::RSpec::Helpers
     arguments = arguments.join(' ') if arguments.kind_of?(Array)
 
     output = []
-    IO.popen("#{binary} #{arguments}") do |pipe|
+    IO.popen("#{binary} #{arguments} 2>&1") do |pipe|
       output = pipe.readlines
     end
     $?.exitstatus.should == 0
