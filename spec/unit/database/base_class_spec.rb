@@ -11,17 +11,17 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     before(:each) do
-      @orm_class = mock('Line ActiveRecord::Base class')
-      @orm_class.stub!("table_name=")
-      @orm_class.stub!(:belongs_to)
-      @orm_class.stub!(:serialize)
-      @orm_class.stub!(:line_definition=)
+      @orm_class = double('Line ActiveRecord::Base class')
+      @orm_class.stub("table_name=")
+      @orm_class.stub(:belongs_to)
+      @orm_class.stub(:serialize)
+      @orm_class.stub(:line_definition=)
 
-      RequestLogAnalyzer::Database::Request.stub!(:has_many)
-      RequestLogAnalyzer::Database::Source.stub!(:has_many)
+      RequestLogAnalyzer::Database::Request.stub(:has_many)
+      RequestLogAnalyzer::Database::Source.stub(:has_many)
 
       @database = mock_database
-      RequestLogAnalyzer::Database::Base.stub!(:database).and_return(@database)
+      RequestLogAnalyzer::Database::Base.stub(:database).and_return(@database)
     end
 
     it "should create a new subclass using the Base class as parent" do
@@ -68,17 +68,17 @@ describe RequestLogAnalyzer::Database::Base do
   describe '.subclass_from_table' do
     before(:each) do
 
-      RequestLogAnalyzer::Database::Request.stub!(:has_many)
-      RequestLogAnalyzer::Database::Source.stub!(:has_many)
+      RequestLogAnalyzer::Database::Request.stub(:has_many)
+      RequestLogAnalyzer::Database::Source.stub(:has_many)
 
       @database = mock_database
-      @database.connection.stub!(:table_exists?).and_return(true)
-      RequestLogAnalyzer::Database::Base.stub!(:database).and_return(@database)
+      @database.connection.stub(:table_exists?).and_return(true)
+      RequestLogAnalyzer::Database::Base.stub(:database).and_return(@database)
 
-      @klass = mock('ActiveRecord ORM class')
-      @klass.stub!(:column_names).and_return(['id', 'request_id', 'source_id', 'lineno', 'duration'])
-      @klass.stub!("table_name=")
-      @klass.stub!(:belongs_to)
+      @klass = double('ActiveRecord ORM class')
+      @klass.stub(:column_names).and_return(['id', 'request_id', 'source_id', 'lineno', 'duration'])
+      @klass.stub("table_name=")
+      @klass.stub(:belongs_to)
     end
 
     it "should set the table name" do
@@ -118,9 +118,9 @@ describe RequestLogAnalyzer::Database::Base do
 
     before(:each) do
       @database = RequestLogAnalyzer::Database.new
-      @database.stub!(:connection).and_return(mock_connection)
+      @database.stub(:connection).and_return(mock_connection)
       @klass = @database.load_activerecord_class(@line_definition)
-      @klass.stub!(:table_exists?).and_return(false)
+      @klass.stub(:table_exists?).and_return(false)
     end
 
     after(:each) do
@@ -134,7 +134,7 @@ describe RequestLogAnalyzer::Database::Base do
     end
 
     it "should not create a table based on the line type name if it already exists" do
-      @klass.stub!(:table_exists?).and_return(true)
+      @klass.stub(:table_exists?).and_return(true)
       @database.connection.should_not_receive(:create_table).with(:test_lines)
       @klass.create_table!
     end

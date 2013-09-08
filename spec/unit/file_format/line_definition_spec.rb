@@ -31,7 +31,7 @@ describe RequestLogAnalyzer::LineDefinition do
   end
 
   describe '#convert_captured_values' do
-    let(:request) { mock('request', :convert_value => 'foo') }
+    let(:request) { double('request', :convert_value => 'foo') }
 
     it "should call convert_value for every captured value" do
       request.should_receive(:convert_value).twice
@@ -50,8 +50,8 @@ describe RequestLogAnalyzer::LineDefinition do
       } 
       
       before do
-        request.stub!(:convert_value).with("{:bar=>'baz'}", anything).and_return(:bar => 'baz')
-        request.stub!(:convert_value).with('baz', anything).and_return('foo')
+        request.stub(:convert_value).with("{:bar=>'baz'}", anything).and_return(:bar => 'baz')
+        request.stub(:convert_value).with('baz', anything).and_return('foo')
       end
 
       it "should call Request#convert_value for the initial hash and the value in the hash" do
