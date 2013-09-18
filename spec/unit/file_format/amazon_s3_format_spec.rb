@@ -53,8 +53,8 @@ describe RequestLogAnalyzer::FileFormat::AmazonS3 do
         :total_time      => 0.009,
         :turnaround_time => 0,
         :referer         => "https://s3-console-us-standard.console.aws.amazon.com/GetResource/Console.html?region=eu-west-1&pageLoadStartTime=1379427139127&locale=en_US",
-        :user_agent      => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.65 Safari/537.36",
-    )}
+        :user_agent      => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.65 Safari/537.36")
+    }
 
     it {should parse_line(sample_copy, 'a COPY line').and_capture(
         :bucket_owner    => '09216466b5571a8db0bf5abca72041fd3fc163e5eb83c51159735353ac6a2b9a',
