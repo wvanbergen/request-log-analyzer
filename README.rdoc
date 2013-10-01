@@ -48,4 +48,3 @@ Bergen (willem@railsdoctors.com) or Bart ten Brinke (bart@railsdoctors.com).
 * Project wiki at GitHub: http://github.com/wvanbergen/request-log-analyzer/wiki
 * Issue tracker at GitHub: http://github.com/wvanbergen/request-log-analyzer/issues
 * railsdoctors homepage: http://railsdoctors.com
-* wvanbergen's blog posts: http://techblog.floorplanner.com/tag/request-log-analyzer
