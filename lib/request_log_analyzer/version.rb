@@ -1,3 +1,3 @@
 module RequestLogAnalyzer
-  VERSION = "1.12.9"
+  VERSION = "1.12.10"
 end
