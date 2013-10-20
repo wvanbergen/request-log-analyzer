@@ -20,6 +20,7 @@ module RequestLogAnalyzer::FileFormat
     LOG_FORMAT_DEFAULTS = {
       :common   => '%h %l %u %t "%r" %>s %b',
       :combined => '%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-agent}i"',
+      :vhost_combined => '%h %l %v %t "%r" %>s %b "%{Referer}i" "%{User-agent}i" %T/%D',
       :nginx    => '%a %t %h %u "%r" %>s %b',
       :rack     => '%h %l %u %t "%r" %>s %b %T',
       :referer  => '%{Referer}i -> %U',
@@ -32,6 +33,7 @@ module RequestLogAnalyzer::FileFormat
     # A hash that defines how the log format directives should be parsed.
     LOG_DIRECTIVES = {
       '%' => { nil => { :regexp => '%', :captures => [] } },
+      'v' => { nil => { :regexp => "(#{hostname_or_ip_address})",  :captures => [{:name => :vhost, :type => :string}] } },
       'h' => { nil => { :regexp => "(#{hostname_or_ip_address})",  :captures => [{:name => :remote_host, :type => :string}] } },
       'a' => { nil => { :regexp => "(#{ip_address})", :captures => [{:name => :remote_ip, :type => :string}] } },
       'b' => { nil => { :regexp => '(\d+|-)', :captures => [{:name => :bytes_sent, :type => :traffic}] } },
@@ -41,7 +43,7 @@ module RequestLogAnalyzer::FileFormat
                'milli' => { :regexp => '(\d+|-)', :captures => [ {:name => :duration, :type => :duration, :unit => :msec }] }
              },
       'l' => { nil => { :regexp => '([\w-]+)', :captures => [{:name => :remote_logname, :type => :nillable_string}] } },
-      'T' => { nil => { :regexp => '((?:\d+(?:\.\d+))|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] } },
+      'T' => { nil => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] } },
       't' => { nil => { :regexp => "\\[(#{APACHE_TIMESTAMP})?\\]", :captures => [{:name => :timestamp, :type => :timestamp}] } },
       's' => { nil => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] } },
       'u' => { nil => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] } },
@@ -66,12 +68,11 @@ module RequestLogAnalyzer::FileFormat
     def self.access_line_definition(format_string)
       format_string ||= :common
       format_string   = LOG_FORMAT_DEFAULTS[format_string.to_sym] || format_string
-      
-      
+
       line_regexp = ''
       captures    = []
       format_string.scan(/([^%]*)(?:%(?:\{([^\}]+)\})?>?([A-Za-z%]))?/) do |literal, arg, variable|
-        
+
         line_regexp << Regexp.quote(literal) # Make sure to parse the literal before the directive
 
         if variable
@@ -87,7 +88,7 @@ module RequestLogAnalyzer::FileFormat
           end
         end
       end
-      
+
       # Return a new line definition object
       return RequestLogAnalyzer::LineDefinition.new(:access, :regexp => Regexp.new(line_regexp),
                                         :captures => captures, :header => true, :footer => true)
