@@ -96,7 +96,7 @@ module RequestLogAnalyzer::FileFormat
       analyze.frequency :status, :title => 'HTTP statuses returned'
 
       analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration", :line_type => :completed
-      analyze.duration :partial_duration, :category => :rendered_file, :title => 'Partials rendering time', :line_type => :rendered
+      analyze.duration :partial_duration, :category => :rendered_file, :title => 'Partials rendering time', :line_type => :rendered, :multiple => true
       analyze.duration :view, :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
       analyze.duration :db, :category => REQUEST_CATEGORIZER, :title => "Database time", :line_type => :completed
 
