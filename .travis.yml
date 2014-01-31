@@ -12,8 +12,7 @@ rvm:
   - jruby-18mode
   - jruby-19mode
   - jruby-head
-  - rbx-18mode
-  - rbx-19mode
+  - rbx
 gemfile:
   - Gemfile.activerecord2
   - Gemfile.activerecord3
@@ -22,6 +21,7 @@ matrix:
   allow_failures:
     - rvm: jruby-head
     - rvm: ruby-head
+    - rvm: rbx
   exclude:
     - gemfile: Gemfile.activerecord4
       rvm: 1.8.7

@@ -3,3 +3,7 @@ gemspec
 
 gem 'activerecord', '~> 2.1'
 gem 'activerecord-mysql2-adapter', :platforms => [:ruby]
+
+platform :rbx do
+  gem 'rubysl'
+end

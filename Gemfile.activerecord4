@@ -2,3 +2,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'activerecord', '~> 4.0'
+
+platform :rbx do
+  gem 'rubysl'
+end
