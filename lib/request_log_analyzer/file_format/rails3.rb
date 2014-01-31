@@ -12,7 +12,7 @@ module RequestLogAnalyzer::FileFormat
     line_definition :started do |line|
       line.header = true
       line.teaser = /Started /
-      line.regexp = /Started ([A-Z]+) "([^"]+)" for (#{ip_address}) at (#{timestamp('%a %b %d %H:%M:%S %z %Y')}|#{timestamp('%Y-%m-%d %H:%M:%S %z')})/
+      line.regexp = /Started ([A-Z]+) (?:\x1B\[(?:[0-9]{1,2}(?:;[0-9]{1,2})*)?[m|K])?"([^"]+)" for (#{ip_address}) at (#{timestamp('%a %b %d %H:%M:%S %z %Y')}|#{timestamp('%Y-%m-%d %H:%M:%S %z')})/
 
       line.capture(:method)
       line.capture(:path)
