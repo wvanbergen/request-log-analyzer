@@ -43,7 +43,7 @@ module RequestLogAnalyzer::FileFormat
                'milli' => { :regexp => '(\d+|-)', :captures => [ {:name => :duration, :type => :duration, :unit => :msec }] }
              },
       'l' => { nil => { :regexp => '([\w-]+)', :captures => [{:name => :remote_logname, :type => :nillable_string}] } },
-      'T' => { nil => { :regexp => '(\d+|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] } },
+      'T' => { nil => { :regexp => '(\d+(?:\.\d+)?|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] } },
       't' => { nil => { :regexp => "\\[(#{APACHE_TIMESTAMP})?\\]", :captures => [{:name => :timestamp, :type => :timestamp}] } },
       's' => { nil => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] } },
       'u' => { nil => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] } },
