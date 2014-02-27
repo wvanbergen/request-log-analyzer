@@ -15,6 +15,7 @@ module RequestLogAnalyzer::FileFormat
   autoload :DelayedJob2,      'request_log_analyzer/file_format/delayed_job2'
   autoload :DelayedJob21,     'request_log_analyzer/file_format/delayed_job21'
   autoload :DelayedJob3,      'request_log_analyzer/file_format/delayed_job3'
+  autoload :DelayedJob4,      'request_log_analyzer/file_format/delayed_job4'
   autoload :Apache,           'request_log_analyzer/file_format/apache'
   autoload :AmazonS3,         'request_log_analyzer/file_format/amazon_s3'
   autoload :W3c,              'request_log_analyzer/file_format/w3c'
