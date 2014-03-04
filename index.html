@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="request-log-analyzer : Create reports based on your log files." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>request-log-analyzer</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/wvanbergen/request-log-analyzer">View on GitHub</a>
+
+          <h1 id="project_title">request-log-analyzer</h1>
+          <h2 id="project_tagline">Create reports based on your log files.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/wvanbergen/request-log-analyzer/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/wvanbergen/request-log-analyzer/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="request-log-analyzer" class="anchor" href="#request-log-analyzer"><span class="octicon octicon-link"></span></a>Request-log-analyzer</h1>
+
+<p>This is a simple command line tool to analyze request log files in various formats to produce a performance report. Its purpose is to find what actions are best candidates for optimization.</p>
+
+<ul>
+<li>Analyzes log files. Currently supports: Amazon S3, Apache, Delayed::Job, Merb, Mysql, PostgreSQL, Rack, Rails and more.</li>
+<li>Combines multiple files and decompresses compressed files, which comes in handy if you are using logrotate.</li>
+<li>Uses several metrics, including cumulative request time, mean request time, process blockers, database and rendering time, HTTP methods and statuses, Rails action cache statistics, etc.) (Sample output: <a href="http://github.com/wvanbergen/request-log-analyzer/wiki/sample-output">http://github.com/wvanbergen/request-log-analyzer/wiki/sample-output</a>)</li>
+<li>Low memory footprint and reasonably fast, so it is safe to run on a production server.</li>
+<li>MIT licensed</li>
+<li>Runs on all rubies <img src="https://secure.travis-ci.org/wvanbergen/request-log-analyzer.png">
+</li>
+</ul><p>See the project wiki at <a href="http://github.com/wvanbergen/request-log-analyzer/wiki">http://github.com/wvanbergen/request-log-analyzer/wiki</a> for documentation and additional information.</p>
+
+<h2>
+<a name="installation--basic-usage" class="anchor" href="#installation--basic-usage"><span class="octicon octicon-link"></span></a>Installation &amp; basic usage</h2>
+
+<p>Install request-log-analyzer as a Ruby gem (you might need to run this command
+as root by prepending +sudo+ to it):</p>
+
+<p>$ gem install request-log-analyzer</p>
+
+<p>To analyze a Rails log file and produce a performance report, run
+request-log-analyzer like this:</p>
+
+<p>$ request-log-analyzer log/production.log</p>
+
+<p>For more details, other file formats, and available command line options, see the project's wiki at <a href="http://github.com/wvanbergen/request-log-analyzer/wiki">http://github.com/wvanbergen/request-log-analyzer/wiki</a></p>
+
+<h2>
+<a name="benchmarking-on-different-rubies" class="anchor" href="#benchmarking-on-different-rubies"><span class="octicon octicon-link"></span></a>Benchmarking on different rubies</h2>
+
+<p>$ time ./bin/request-log-analyzer 40MBRailsFile.log</p>
+
+<p>ruby-1.9.2-p180   15.19s user 0.95s system 99% cpu 16.143 total
+  ree-1.8.7-2011.03 22.81s user 1.28s system 92% cpu 25.938 total
+  ruby-1.8.7-p334   25.21s user 1.02s system 99% cpu 26.238 total
+  jruby-1.5.3       32.64s user 4.84s system 99% cpu 37.629 total
+  rbx-2.0.0pre      39.62s user 2.24s system 104% cpu 40.098 total
+  macruby           75.00s user 20.10s system 110% cpu 1:26.13 total</p>
+
+<h2>
+<a name="additional-information" class="anchor" href="#additional-information"><span class="octicon octicon-link"></span></a>Additional information</h2>
+
+<p>Request-log-analyzer was designed and built by Willem van Bergen and Bart ten
+Brinke.</p>
+
+<p>Do you have a rails application that is not performing as it should? If you need
+an expert to analyze your application, feel free to contact either Willem van
+Bergen (<a href="mailto:willem@railsdoctors.com">willem@railsdoctors.com</a>) or Bart ten Brinke (<a href="mailto:bart@railsdoctors.com">bart@railsdoctors.com</a>).</p>
+
+<ul>
+<li>Project wiki at GitHub: <a href="http://github.com/wvanbergen/request-log-analyzer/wiki">http://github.com/wvanbergen/request-log-analyzer/wiki</a>
+</li>
+<li>Issue tracker at GitHub: <a href="http://github.com/wvanbergen/request-log-analyzer/issues">http://github.com/wvanbergen/request-log-analyzer/issues</a>
+</li>
+<li>railsdoctors homepage: <a href="http://railsdoctors.com">http://railsdoctors.com</a>
+</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">request-log-analyzer maintained by <a href="https://github.com/wvanbergen">wvanbergen</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
