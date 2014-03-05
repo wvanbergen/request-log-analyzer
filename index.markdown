@@ -3,7 +3,7 @@ layout: default
 title: request-log-analyzer
 ---
 
-# request-log-analyzer
+# {{page.title}}
 
 A command line tool that parses your log files to create reports. 
 
