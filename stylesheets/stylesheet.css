@@ -366,6 +366,9 @@ Full-Width Styles
   background: #212121;
 }
 
+#main_content ul {
+  list-style: outside;
+}
 
 
 /*******************************************************************************
@@ -420,4 +423,8 @@ Small Device Styles
     font-size: 11px;
   }
 
+}
+header h1 a, header h1 a:hover {
+  color: white;
+  text-decoration: none;
 }
