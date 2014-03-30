@@ -25,7 +25,7 @@ module RequestLogAnalyzer::Tracker
     def prepare
       options[:value] = options[:duration] if options[:duration]
       super
-      
+
       @number_of_buckets = options[:number_of_buckets] || 1000
       @min_bucket_value  = options[:min_bucket_value] ? options[:min_bucket_value].to_f : 0.0001
       @max_bucket_value  = options[:max_bucket_value] ? options[:max_bucket_value].to_f : 1000
@@ -38,7 +38,8 @@ module RequestLogAnalyzer::Tracker
     def display_value(time)
       case time
       when nil       then '-'
-      when 0...60    then "%0.02fs" % time
+      when 0...1     then "%0.02fms" % (time*1000)
+      when 1...60    then "%0.02fs" % time
       when 60...3600 then "%dm%02ds" % [time / 60, (time % 60).round]
       else                "%dh%02dm%02ds" % [time / 3600, (time % 3600) / 60, (time % 60).round]
       end
