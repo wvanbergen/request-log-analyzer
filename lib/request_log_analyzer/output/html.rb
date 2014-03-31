@@ -53,7 +53,7 @@ module RequestLogAnalyzer::Output
       rows = Array.new
       yield(rows)
 
-      @io << tag(:table, {:id => 'mytable', :cellspacing => 0}) do |content|
+      @io << tag(:table, {:class => 'rla-report-table', :cellspacing => 0}) do |content|
         if table_has_header?(columns)
           content << tag(:tr) do
             columns.map { |col| tag(:th, col[:title]) }.join("\n")
@@ -102,7 +102,7 @@ module RequestLogAnalyzer::Output
         	background: #CAE8EA;
         }
 
-        #mytable {
+        .rla-report-table {
         	width: 700px;
         	padding: 0;
         	margin: 0;
