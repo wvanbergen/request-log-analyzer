@@ -34,7 +34,7 @@ describe RequestLogAnalyzer, 'running mailer integration' do
     find_string_in_file("From: Request-log-analyzer reporter <contact@railsdoctors.com>", @log_file).should_not be_nil
     find_string_in_file("Subject: Request log analyzer report - generated on", @log_file).should_not be_nil
     find_string_in_file("Request summary", @log_file).should_not be_nil
-    find_string_in_file("People |    1 | 40.30ms | 40.30ms | 0.00ms | 40.30ms | 40.30ms | 40.18ms-41.50ms", @log_file).should_not be_nil
+    find_string_in_file("PeopleControll |    1 |   40ms |   40ms |    0ms |   40ms |   40ms |   40ms-41ms", @log_file).should_not be_nil
   end
 
   it "should allow a custom mail subject" do
@@ -68,7 +68,7 @@ describe RequestLogAnalyzer, 'running mailer integration' do
     find_string_in_file("To: <root@localhost>", @log_file).should_not be_nil
     find_string_in_file("From: Request-log-analyzer reporter <contact@railsdoctors.com>", @log_file).should_not be_nil
     find_string_in_file('<h1>Request-log-analyzer summary report</h1>', @log_file).should_not be_nil
-    find_string_in_file('<td class="alt">287.08ms-296.48ms</td></tr><tr><td>DashboardController#index.html [GET]</td>', @log_file).should_not be_nil
+    find_string_in_file('<td class="alt">287ms-296ms</td></tr><tr><td>DashboardController#index.html [GET]</td>', @log_file).should_not be_nil
   end
 end
 
