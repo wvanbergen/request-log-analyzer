@@ -26,7 +26,7 @@ describe RequestLogAnalyzer, 'running mailer integration' do
       :format       => RequestLogAnalyzer::FileFormat::Rails,
       :no_progress  => true
     ).run!
-    
+
     Process.wait # Wait for mailer to complete
 
     find_string_in_file("From: <contact@railsdoctors.com>", @log_file).should_not be_nil
@@ -34,9 +34,9 @@ describe RequestLogAnalyzer, 'running mailer integration' do
     find_string_in_file("From: Request-log-analyzer reporter <contact@railsdoctors.com>", @log_file).should_not be_nil
     find_string_in_file("Subject: Request log analyzer report - generated on", @log_file).should_not be_nil
     find_string_in_file("Request summary", @log_file).should_not be_nil
-    find_string_in_file("PeopleControll |    1 |  0.04s |  0.04s |  0.00s |  0.04s |  0.04s | 0.04s-0.04s", @log_file).should_not be_nil
+    find_string_in_file("PeopleControll |    1 |   40ms |   40ms |    0ms |   40ms |   40ms |   40ms-41ms", @log_file).should_not be_nil
   end
-  
+
   it "should allow a custom mail subject" do
     RequestLogAnalyzer::Controller.build(
       :mail         => 'root@localhost',
@@ -46,13 +46,13 @@ describe RequestLogAnalyzer, 'running mailer integration' do
       :format       => RequestLogAnalyzer::FileFormat::Rails,
       :no_progress  => true
     ).run!
-    
+
     Process.wait # Wait for mailer to complete
 
-    find_string_in_file("Subject: TESTSUBJECT", @log_file).should_not be_nil  
+    find_string_in_file("Subject: TESTSUBJECT", @log_file).should_not be_nil
   end
 
-  it "should send html mail" do    
+  it "should send html mail" do
     RequestLogAnalyzer::Controller.build(
       :output       => 'HTML',
       :mail         => 'root@localhost',
@@ -61,14 +61,14 @@ describe RequestLogAnalyzer, 'running mailer integration' do
       :format       => RequestLogAnalyzer::FileFormat::Rails,
       :no_progress  => true
     ).run!
-  
+
     Process.wait # Wait for mailer to complete
 
     find_string_in_file("From: <contact@railsdoctors.com>", @log_file).should_not be_nil
     find_string_in_file("To: <root@localhost>", @log_file).should_not be_nil
     find_string_in_file("From: Request-log-analyzer reporter <contact@railsdoctors.com>", @log_file).should_not be_nil
     find_string_in_file('<h1>Request-log-analyzer summary report</h1>', @log_file).should_not be_nil
-    find_string_in_file('<td class="alt">0.29s-0.30s</td></tr><tr><td>DashboardController#index.html [GET]</td>', @log_file).should_not be_nil
+    find_string_in_file('<td class="alt">287ms-296ms</td></tr><tr><td>DashboardController#index.html [GET]</td>', @log_file).should_not be_nil
   end
 end
 
@@ -80,7 +80,7 @@ end
 #
 # Included in RLA because original mailtrap puts anoying stuff when called
 # through ruby.
-# 
+#
 # Mailtrap creates a TCP server that listens on a specified port for SMTP
 # clients. Accepts the connection and talks just enough of the SMTP protocol
 # for them to deliver a message which it writes to disk.
@@ -96,7 +96,7 @@ class Mailtrap
     @port = port
     @once = once
     @msgfile = msgfile
-    
+
     File.open( @msgfile, "a" ) do |file|
       file.puts "\n* Mailtrap started at #{@host}:#{port}\n"
     end
@@ -113,7 +113,7 @@ class Mailtrap
         def get_line
           line = gets
           line.chomp! unless line.nil?
-          line          
+          line
         end
       end
 
@@ -123,7 +123,7 @@ class Mailtrap
       end
 
       break if @once
-    end    
+    end
   end
 
   # Write a plain text dump of the incoming email to a text
