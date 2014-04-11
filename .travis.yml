@@ -12,7 +12,6 @@ rvm:
   - jruby-head
   - rbx
 gemfile:
-  - Gemfile.activerecord2
   - Gemfile.activerecord3
   - Gemfile.activerecord4
 matrix:
