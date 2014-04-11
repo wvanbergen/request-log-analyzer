@@ -29,6 +29,8 @@ Gem::Specification.new do |gem|
   gem.extra_rdoc_files = ['README.rdoc']
 
   gem.requirements << "To use the database inserter, ActiveRecord and an appropriate database adapter are required."
+  gem.required_ruby_version = '>= 1.9.3'
+
   gem.add_development_dependency('rake')
   gem.add_development_dependency('rspec', '~> 2.14')
   gem.add_development_dependency('activerecord')
