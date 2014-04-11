@@ -39,7 +39,7 @@ module RequestLogAnalyzer::Aggregator
         
         # Fix encoding patch for 1.9.2
         attributes.each do |k,v|
-          attributes[k] = v.force_encoding("UTF-8") if v.is_a?(String) && "".respond_to?("force_encoding")
+          attributes[k] = v.force_encoding("UTF-8") if v.is_a?(String)
         end
 
         @request_object.send("#{line[:line_type]}_lines").build(attributes)
