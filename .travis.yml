@@ -4,13 +4,10 @@ before_script:
   - psql -c 'create database rla_test;' -U postgres
 script: bundle exec rake
 rvm:
-  - 1.8.7
   - 1.9.3
   - 2.0.0
   - 2.1.1
   - ruby-head
-  - ree
-  - jruby-18mode
   - jruby-19mode
   - jruby-head
   - rbx
@@ -23,15 +20,6 @@ matrix:
     - rvm: jruby-head
     - rvm: ruby-head
     - rvm: rbx
-  exclude:
-    - gemfile: Gemfile.activerecord4
-      rvm: 1.8.7
-    - gemfile: Gemfile.activerecord4
-      rvm: ree
-    - gemfile: Gemfile.activerecord4
-      rvm: jruby-18mode
-    - gemfile: Gemfile.activerecord4
-      rvm: rbx-18mode
 notifications:
   email:
     - info@railsdoctors.com
