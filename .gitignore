@@ -12,3 +12,4 @@ requests.db
 Gemfile.lock
 /.bundle/
 *.rbc
+_site/
