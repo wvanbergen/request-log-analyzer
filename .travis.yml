@@ -10,7 +10,7 @@ rvm:
   - ruby-head
   - jruby-19mode
   - jruby-head
-  - rbx
+  - rbx-2
 gemfile:
   - Gemfile.activerecord3
   - Gemfile.activerecord4
@@ -18,7 +18,7 @@ matrix:
   allow_failures:
     - rvm: jruby-head
     - rvm: ruby-head
-    - rvm: rbx
+    - rvm: rbx-2
 notifications:
   email:
     - info@railsdoctors.com
