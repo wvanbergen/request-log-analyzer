@@ -52,6 +52,36 @@ describe RequestLogAnalyzer, 'running mailer integration' do
     find_string_in_file("Subject: TESTSUBJECT", @log_file).should_not be_nil
   end
 
+  it "should allow a custom mail sender address" do
+    RequestLogAnalyzer::Controller.build(
+      :mail         => 'root@localhost',
+      :mailhost     => 'localhost:2525',
+      :mailfrom     => 'customaddr@example.com',
+      :source_files => log_fixture(:rails_1x),
+      :format       => RequestLogAnalyzer::FileFormat::Rails,
+      :no_progress  => true
+    ).run!
+
+    Process.wait # Wait for mailer to complete
+
+    find_string_in_file("From: Request-log-analyzer reporter <customaddr@example.com>", @log_file).should_not be_nil
+  end
+
+  it "should allow a custom mail sender name" do
+    RequestLogAnalyzer::Controller.build(
+      :mail         => 'root@localhost',
+      :mailhost     => 'localhost:2525',
+      :mailfrom_name => 'Custom Name',
+      :source_files => log_fixture(:rails_1x),
+      :format       => RequestLogAnalyzer::FileFormat::Rails,
+      :no_progress  => true
+    ).run!
+
+    Process.wait # Wait for mailer to complete
+
+    find_string_in_file("From: Custom Name <contact@railsdoctors.com>", @log_file).should_not be_nil
+  end
+
   it "should send html mail" do
     RequestLogAnalyzer::Controller.build(
       :output       => 'HTML',

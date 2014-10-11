@@ -91,7 +91,7 @@ rescue CommandLine::Error => e
   puts "  --mail <emailaddress>      Send report to an email address."
   puts "  --mailhost <server>        Use the given server as the SMTP server for sending email."
   puts "  --mailfrom <address>       Overwrite default email sender address."
-  puts "  --mailfrom-name <name>     Overwrite default email serder name."
+  puts "  --mailfrom-name <name>     Overwrite default email sender name."
   puts "  --mailsubject <text>       Overwrite default mailsubject."
   puts "  --no-progress              Hide the progress bar."
   puts "  --output <format>          Output format. Supports 'html' and 'fixed_width'."
