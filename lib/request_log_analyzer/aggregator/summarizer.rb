@@ -109,7 +109,7 @@ module RequestLogAnalyzer::Aggregator
       output.with_style(:cell_separator => false) do
         output.table({:width => 20}, {:font => :bold}) do |rows|
           source.processed_files.each do |f|
-            rows << ['Processsed File:', f]
+            rows << ['Processed File:', f]
           end
           rows << ['Parsed lines:',     source.parsed_lines]
           rows << ['Skipped lines:',    source.skipped_lines]
