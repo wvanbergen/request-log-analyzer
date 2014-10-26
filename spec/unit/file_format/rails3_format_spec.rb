@@ -5,7 +5,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
   subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
 
   it { should be_well_formed }
-  it { should have(11).report_trackers }
+  it { should satisfy { |ff| ff.report_trackers.length == 11 } }
 
   describe '#parse_line' do
 

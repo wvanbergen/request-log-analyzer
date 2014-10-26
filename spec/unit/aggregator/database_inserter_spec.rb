@@ -78,10 +78,10 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
       it "should insert records in all relevant line tables" do
         @database_inserter.aggregate(@completed_request)
         request = RequestLogAnalyzer::Database::Request.first
-        request.should have(2).test_lines
-        request.should have(1).first_lines
-        request.should have(1).eval_lines
-        request.should have(1).last_lines
+        request.should satisfy { |r| r.test_lines.length == 2 }
+        request.should satisfy { |r| r.first_lines.length == 1 }
+        request.should satisfy { |r| r.eval_lines.length == 1 }
+        request.should satisfy { |r| r.last_lines.length == 1 }
       end
 
       it "should log a warning in the warnings table" do

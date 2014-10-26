@@ -17,11 +17,11 @@ Gem::Specification.new do |gem|
   gem.summary     = "A command line tool to analyze request logs for Apache, Rails, Merb, MySQL and other web application servers"
   gem.description = <<-eos
     Request log analyzer's purpose is to find out how your web application is being used, how it performs and to
-    focus your optimization efforts. This tool will parse all requests in the application's log file and aggregate the 
-    information. Once it is finished parsing the log file(s), it will show the requests that take op most server time 
+    focus your optimization efforts. This tool will parse all requests in the application's log file and aggregate the
+    information. Once it is finished parsing the log file(s), it will show the requests that take op most server time
     using various metrics. It can also insert all parsed request information into a database so you can roll your own
-    analysis. It supports Rails-, Merb- and Rack-based applications logs, Apache and Amazon S3 access logs and MySQL 
-    slow query logs out of the box, but file formats of other applications can easily be supported by supplying an 
+    analysis. It supports Rails-, Merb- and Rack-based applications logs, Apache and Amazon S3 access logs and MySQL
+    slow query logs out of the box, but file formats of other applications can easily be supported by supplying an
     easy to write log file format definition.
   eos
 
@@ -32,7 +32,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = '>= 1.9.3'
 
   gem.add_development_dependency('rake')
-  gem.add_development_dependency('rspec', '~> 2.14')
+  gem.add_development_dependency('rspec', '~> 3')
   gem.add_development_dependency('activerecord')
   if defined?(JRUBY_VERSION)
     gem.add_development_dependency('jdbc-sqlite3')
@@ -46,7 +46,7 @@ Gem::Specification.new do |gem|
     gem.add_development_dependency('mysql2')
     gem.add_development_dependency('pg')
   end
-  
+
   gem.files = `git ls-files`.split($/)
   gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
 

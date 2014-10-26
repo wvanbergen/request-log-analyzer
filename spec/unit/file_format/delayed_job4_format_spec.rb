@@ -8,7 +8,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
   it { should have_line_definition(:job_completed).capturing(:timestamp, :duration, :host, :pid, :job) }
   it { should have_line_definition(:job_failed).capturing(:timestamp, :host, :pid, :job, :attempts, :error) }
   it { should have_line_definition(:job_deleted).capturing(:timestamp, :host, :pid, :job, :failures) }
-  it { should have(6).report_trackers }
+  it { should satisfy { |ff| ff.report_trackers.length == 6 } }
 
 
   describe '#parse_line' do

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RequestLogAnalyzer::FileFormat::DelayedJob do
-  
+
   subject { RequestLogAnalyzer::FileFormat.load(:delayed_job) }
 
   it { should be_well_formed }
@@ -9,13 +9,13 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
   it { should have_line_definition(:job_completed).capturing(:completed_job, :duration) }
   it { should have_line_definition(:job_lock_failed).capturing(:locked_job) }
   it { should have_line_definition(:job_failed).capturing(:failed_job, :attempts, :exception) }
-  it { should have(3).report_trackers }
+  it { should satisfy { |ff| ff.report_trackers.length == 3 } }
 
   describe '#parse_line' do
     let(:job_lock_sample)        { '* [JOB] acquiring lock on BackgroundJob::ThumbnailSaver' }
     let(:job_completed_sample)   { '* [JOB] BackgroundJob::ThumbnailSaver completed after 0.7932' }
     let(:job_lock_failed_sample) { '* [JOB] failed to acquire exclusive lock for BackgroundJob::ThumbnailSaver' }
-    let(:job_failed_sample)      { "* [JOB] BackgroundJob::ThumbnailSaver failed with ActiveRecord::RecordNotFound: Couldn't find Design with ID=20413443 - 1 failed attempts" }  
+    let(:job_failed_sample)      { "* [JOB] BackgroundJob::ThumbnailSaver failed with ActiveRecord::RecordNotFound: Couldn't find Design with ID=20413443 - 1 failed attempts" }
     let(:summary_sample)         { '1 jobs processed at 1.0834 j/s, 0 failed ...' }
 
     it { should parse_line(job_lock_sample).as(:job_lock).and_capture(:job => 'BackgroundJob::ThumbnailSaver') }
@@ -28,8 +28,8 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
   end
 
   describe '#parse_io' do
-    let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) } 
-    
+    let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
+
     it "should parse a batch of completed jobs without warnings" do
       fragment = log_snippet(<<-EOLOG)
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver
@@ -43,7 +43,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
       log_parser.should_not_receive(:warn)
       log_parser.parse_io(fragment)
     end
-    
+
     it "should parse a batch with a failed job without warnings" do
       fragment = log_snippet(<<-EOLOG)
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver

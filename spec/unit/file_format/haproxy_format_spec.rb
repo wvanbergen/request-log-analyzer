@@ -11,7 +11,7 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
   it { should have_line_definition(:haproxy12).capturing(:client_ip, :timestamp, :frontend_name, :server_name, :tq, :tw, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :srv_conn, :listener_conn, :process_conn, :srv_queue, :backend_queue, :captured_request_headers, :captured_response_headers, :http_request) }
   it { should have_line_definition(:haproxy11).capturing(:client_ip, :timestamp, :frontend_name, :server_name, :tq, :tc, :tr, :tt, :status_code, :bytes_read, :captured_request_cookie, :captured_response_cookie, :termination_event_code, :terminated_session_state, :clientside_persistence_cookie, :serverside_persistence_cookie, :listener_conn, :process_conn, :captured_request_headers, :captured_response_headers, :http_request) }
 
-  it { should have(14).report_trackers }
+  it { should satisfy { |ff| ff.report_trackers.length == 14 } }
 
   let(:sample_haproxy13) { 'Feb  6 12:14:14 localhost haproxy[14389]: 10.0.1.2:33317 [06/Feb/2009:12:14:14.655] http-in static/srv1 10/0/30/69/109 200 2750 - - ---- 1/1/1/1/0 0/0 {1wt.eu} {} "GET /index.html HTTP/1.1"' }
   let(:sample_haproxy12) { 'Mar 15 06:36:49 localhost haproxy[9367]: 127.0.0.1:38990 [15/Mar/2011:06:36:45.103] as-proxy mc-search-2 0/0/0/730/731 200 29404 - - --NN 2/54/54 0/0 {66.249.68.216} {} "GET /neighbor/26014153 HTTP/1.0" ' }
@@ -54,7 +54,7 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
             :captured_request_headers => nil,                   :captured_response_headers => nil,
             :http_request => nil)
     }
-    
+
     it { should parse_line(sample_errors, 'a failed access line').and_capture(
             :timestamp => 20031015151906, :tq => nil,    :captured_request_cookie => nil,
             :server_name => '<NOSRV>',    :tw => nil,    :captured_response_cookie => nil,
@@ -65,14 +65,14 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
                                                          :captured_request_headers => nil,
                                                          :captured_response_headers => nil)
     }
-    
+
     it { should_not parse_line('nonsense') }
   end
-  
+
   describe '#parse_io' do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
     let(:snippet)    { log_snippet(sample_haproxy13, sample_haproxy12, sample_haproxy11, sample_errors, 'nonsense') }
-    
+
     it "should parse a log snippet without warnings" do
       log_parser.should_receive(:handle_request).exactly(4).times
       log_parser.should_not_receive(:warn)

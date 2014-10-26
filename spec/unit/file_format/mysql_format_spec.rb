@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RequestLogAnalyzer::FileFormat::Mysql do
 
   subject { RequestLogAnalyzer::FileFormat.load(:mysql) }
-  
+
   it { should be_well_formed }
   it { should have_line_definition(:time).capturing(:timestamp) }
   it { should have_line_definition(:user_host).capturing(:user, :host, :ip) }
@@ -11,10 +11,10 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
   it { should have_line_definition(:use_database).capturing(:database) }
   it { should have_line_definition(:query_part).capturing(:query_fragment) }
   it { should have_line_definition(:query).capturing(:query) }
-  it { should have(7).report_trackers }
-  
+  it { should satisfy { |ff| ff.report_trackers.length == 7 } }
+
   describe '#parse_line' do
-    
+
     let(:time_sample)                   { '# Time: 091112  8:13:56' }
     let(:user_host_sample)              { '# User@Host: admin[admin] @ db1 [10.0.0.1]' }
     let(:user_host_wo_host_sample)      { '# User@Host: admin[admin] @  [10.0.0.1]' }
@@ -53,7 +53,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
         # Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
         SELECT /*!40001 SQL_NO_CACHE */ * FROM `events`;
       EOS
-      
+
       log_parser.parse_string(fixture) do |request|
         request[:query].should == 'SELECT /*!:int SQL_NO_CACHE */ * FROM events'
       end
@@ -64,12 +64,12 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
         # Time: 091112 18:13:56
         # User@Host: admin[admin] @ db1 [10.0.0.1]
         # Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
-        SELECT * FROM `clients` WHERE (1=1 
+        SELECT * FROM `clients` WHERE (1=1
                                       AND clients.valid_from < '2009-12-05' AND (clients.valid_to IS NULL or clients.valid_to > '2009-11-20')
                                        AND clients.index > 0
                                       ) AND (clients.deleted_at IS NULL);
       EOS
-      
+
       log_parser.parse_string(fixture) do |request|
         request[:query].should == "SELECT * FROM clients WHERE (:int=:int AND clients.valid_from < :date AND (clients.valid_to IS NULL or clients.valid_to > :date) AND clients.index > :int ) AND (clients.deleted_at IS NULL)"
       end
@@ -81,7 +81,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
         # Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
         SELECT /*!40001 SQL_NO_CACHE */ * FROM `events`;
       EOS
-      
+
       log_parser.should_receive(:handle_request).once
       log_parser.should_not_receive(:warn)
       log_parser.parse_string(fixture)
