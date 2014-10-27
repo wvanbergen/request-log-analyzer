@@ -201,7 +201,7 @@ module RequestLogAnalyzer::FileFormat
   # is shared with all components of the application so they can act on the specifics of the format
   class Base
 
-    include ClassLevelInheritableAttributes
+    extend RequestLogAnalyzer::ClassLevelInheritableAttributes
     inheritable_attributes :line_definer, :report_definer
 
     attr_reader :line_definitions, :report_trackers

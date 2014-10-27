@@ -1,9 +1,5 @@
-module ClassLevelInheritableAttributes
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
-
-  module ClassMethods
+module RequestLogAnalyzer
+  module ClassLevelInheritableAttributes
     def inheritable_attributes(*args)
       @inheritable_attributes ||= [:inheritable_attributes]
       @inheritable_attributes += args
