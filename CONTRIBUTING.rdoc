@@ -29,4 +29,7 @@ Some final notes:
 
 == Release process
 
-- Update <tt>
+- Update <tt>RequestLogAnalyzer::VERSION</tt> constant.
+- Update <tt>CHANGELOG.rdoc</tt> by moving the items in the unreleased changes sections to a section for the new version.
+- Commit the changes.
+- Run <tt>rake release</tt>
