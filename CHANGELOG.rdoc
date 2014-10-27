@@ -1,0 +1,395 @@
+= Changelog
+
+This file keeps track of changes in the different request-log-analyzer releases. When creating a pull request,
+please add an entry to the "Not yet released" section in this document.
+
+== Not yet released
+
+* Nothing yet!
+
+== Request-log-analyzer 1.13 release cycle
+
+=== Version 1.13.3
+
+* Allow more flexible Apache user strings
+* Rspec 3
+* Reintroduce class attribute inheritance to keep writing your own custom analyser based on an existing one simple.
+* Rubucop cleanup
+
+=== Version 1.13.2
+
+=== Version 1.13.1
+
+* Adapt Delayed Job 4 Log format changes (Michael Stark)
+* Catch all errors when using eval (temporary workaround to prevent crashing)
+* Fix Rubinus in Travis config.
+* Enable the sender name and email address to be specified on the command line (Joshua Pettett)
+
+=== Version 1.13.0
+
+* Dropped Ruby 1.8 support
+* Dropped ActiveRecord 2 support
+* Removed OrdereredHash
+* Removed force_encoding check.
+
+== Request-log-analyzer 1.12 release cycle
+
+=== Version 1.12.11
+
+* Millisecond measuring units when measurements are under 1 second
+* Added specific class to html report
+* Allow floats for durations when using the %T directive in Apache format
+* Rubinius Fixes
+
+=== Version 1.12.10
+
+* Apache vhost combined now supported
+* Removed old blog from readme
+* S3 format parser more permissive, as it rejected real log files
+* Redid Travis build environment & requirements
+* Added MIT license to gemspec
+
+=== Version 1.12.9
+
+* Switched to new NGINX apache default (combined)
+* Enable database testing on Travis
+* Use bundler gem tasks for gemification
+
+=== Version 1.12.8
+
+* Rails 3 routing errors are now reported on.
+
+=== Version 1.12.7
+
+* Delayed Job 3 format now supported
+
+=== Version 1.12.6
+
+* Added NGINX support
+* Analyse & Report Rails3 partials
+* Added directories parsing support
+
+=== Version 1.12.5
+
+* Filename is now displayed in the header of the output
+* Added orderedhash class for Rubinius support
+* Fixed a number of Travis issues
+
+=== Version 1.12.4
+
+* Fixed version number being off.
+* Rake tasks are now Rails 2 & 3 compatible.
+* Ftools is replaced with fileutils.
+
+=== Version 1.12.3
+
+* Cleaned up internal API for nices Ruby integration.
+* Fixed small typo.
+* Replaced relative path reference to database_console_init with standard reference
+
+=== Version 1.12.2
+
+* Removed Encoding.default_external as it was unnecessary and caused problems with Ruby 1.9.3-head.
+
+=== Version 1.12.1
+
+* Database inserter now working for ActiveRecord 3: NOTE! The minimal ActiveRecord version required is 3!
+* Travis CI build support (http://travis-ci.org/#!/wvanbergen/request-log-analyzer)
+* Standard error and out are now cleaned up (#107)
+
+=== Version 1.12.0
+
+* Loading the database console now works again.
+
+== Request-log-analyzer 1.11 release cycle
+
+=== Version 1.11.0
+
+*Important:* The @--gets-memory-protection@ command line switch is gone. Ruby 1.9 offers this functionality without a performance penalty. If you want to keep using this option in Ruby 1.8, please do not upgrade to this version or copy paste the mixin.
+
+Also, removed some half-finished features that were not in a usable state and are not going to be further developed, like using a database as a request source and the "FancyHTML" output format.
+
+* The HAProxy file format now supports more old versions.
+* The Rails 3 format now reads "parameters" lines.
+* Better parsing of hostnames and IP addresses, fixing some edge cases in all file formats that use these.
+* Change @autoload@ magic to use regular @require@ to make the source code more understandable.
+* File format specs are refactored to be more readable.
+
+PostgreSQL format bug: we found that for some log files, about 50% of all queries will not get parsed. We are working on a fix for the file format; in the mean time you can still use it to get a feel of the performance.
+
+== Request-log-analyzer 1.10 release cycle
+
+=== Version 1.10.1
+
+* Small bugfix when using custom file formats in Ruby 1.9.2.
+* Small fix for Rails 3 processing line edge case.
+* Set up CI testing framework. Request-log-analyzer is now tested on Ruby 1.8.7, 1.9.2 and Ruby enterprise edition.
+
+=== Version 1.10.0
+
+* Add support for the W3C log format. @--format w3c@
+* Add support for HAProxy logs. @--format haproxy@
+* Add support for providing the unit used for the Apache %D directive. Default: @%D@, or @%{micro}D@, in which case the values will be interpreted as microseconds. @%{milli}D@ will interpret them as milliseconds instead. (@%T@ interprets the value as seconds.)
+* Fixed parsing of Rails 3 Completed lines when another duration is specified (ex: Sphinx)
+
+== Request-log-analyzer 1.9 release cycle
+
+=== Version 1.9.10
+
+* PostgreSQL format fixes
+* Fix in loading custom output formats from the command line.
+
+=== Version 1.9.9
+
+* Added parsing of object instantiation counts to Oink file format.
+
+=== Version 1.9.8
+
+* Fixed issue in Delayed::Job log parser when using multiple workers.
+* Added some stuff to the YAML result export.
+
+=== Version 1.9.7
+
+* Fixed a bug in parsing rails3's started line for Ruby 1.9.2 Time#to_s
+* Added benchmarks of different rubies
+
+=== Version 1.9.6
+
+* Small improvements to the Rails 3 file format.
+
+=== Version 1.9.5
+
+* Fixed a issue with the --select command line option not being parsed correctly.
+
+=== Version 1.9.4
+
+* Small fixes in both the Rails 2 and Rails 3 file formats.
+
+=== Version 1.9.3
+
+* Fixed a small date handling issue in Rails 3 file format.
+
+=== Version 1.9.2
+
+* Fixed an issue with the Rails 2 file format when ActiveRecord is disabled.
+
+=== Version 1.9.1
+
+* Fixed format auto-detection issue that caused a Rails log file to show up as an Oink file.
+
+=== Version 1.9.0
+
+* Added 90-percentile interval to numerical reports.
+* Some fixes for the Rails 3 file format
+
+== Request-log-analyzer 1.8 release cycle
+
+=== Version 1.8.1
+
+* Ruby 1.9.2 and Rails 3 compatibility fixes
+* Rails 3 log format improvements
+* Added log splitting on PID to Rails rake task @rake rla:split@ (Issue 56).
+* Several smaller bugfixes
+
+=== Version 1.8.0
+
+* Added Oink support for Rails.
+* Added @--mailsubject@ option (Issue 51).
+* Fixed require exception on empty rails folder
+
+== Request-log-analyzer 1.7 release cycle
+
+=== Version 1.7.0
+
+* @--silent@ option implemented. No output is given when this option is used. Ideal for cron job usage (Issue 46).
+* @--gets-memory-protection@ Includes a mixin to prevent Ruby gets from using huge amounts of memory when extremely long lines are encountered in a log (Issue 47). Please note that this option will suffer a 10% performance hit.
+
+== Request-log-analyzer 1.6 release cycle
+
+=== Version 1.6.4
+
+* Fixed a bug that disallowed line definition names that are also methods names of the Object class.
+
+=== Version 1.6.3
+
+* Initial support for Rails 3 logs. Add @--format rails3@ to your command line if auto-detection fails. <br />
+<em>Note:</em> The log format has changed since the release of the Rails 3 beta. Only the HEAD version of Rails 3 is supported by request-log-analyzer.
+* Fixed a bug in the [[Amazon S3 access log]] parser.
+* Improved the graphs when using the @FancyHTML@ output.
+* Added a nicer API to define capture values in a file format.
+
+=== Version 1.6.2
+
+* Rails 1.9 compatibility fixes related to string encodings.
+
+=== Version 1.6.1
+
+* Fixed a bug in the request database schema creation.
+* Minor bugfixes.
+
+=== Version 1.6.0
+
+* [[PostgreSQL query log]] support. (Add @--format postgresql@ to your command if auto-detection fails.) <br />
+We only had a limited sample of PostgreSQL log to implement the file format.Please support us and send in a fragment of your PostgreSQL query log file!
+* Fixed Rails action cache hit detection for newer Rails versions.
+
+== Request-log-analyzer 1.5 release cycle
+
+=== Version 1.5.4
+
+* Added support for [[DelayedJob log]] files. (Add @--format delayed_job@ to your command if auto-detection fails.)
+* Fixed Rails 3 ActiveRecord deprecation notice.
+
+=== Version 1.5.3
+
+* Fixed a small bug in the Rails development file format report.
+* Fixed the @:multiple => true@ option for frequency trackers
+* Added a beginning for a new output format: FancyHTML, which includes charts using the Google charts API. Add @--output FancyHTML@ to your command line to activate it.
+* Improved Sinatra/Rack format auto-detection.
+* Extracted regular expressions for common log fragments, like IP addresses and timestamps, to a shared module.
+
+=== Version 1.5.2
+
+* Support parsing IPv6 IP address as well. Thanks to "dissemble":http://github.com/dissemble for contributing the patch.
+* JRuby related fixes
+
+=== Version 1.5.1
+
+* Fixed a crasher bug in the HTML output of traffic reports.
+
+=== Version 1.5.0
+
+* Added file format autodetection: in most cases, providing the @--format@ parameter is no longer needed to select the correct file format. However, it is still possible to explicitly set the format if autodetection fails.
+* Added a [[MySQL slow query log]] parser (@--format mysql@). <br />
+Thanks "Bart Zonneveld":http://github.com/bartzon for contributing this functionality.
+* Mail host now configurable. Use @--mailhost <server>@  to specify this
+* Added specs to test mailing functionality using a mock SMTP server (mailtrap)
+
+== Request-log-analyzer 1.4 release cycle
+
+=== Version 1.4.2
+
+* Added correct content-type to emails sent via the @--mail@ option.
+
+=== Version 1.4.1
+
+* Fixed @--mail@ command line option which was broken since version 1.4.0.
+* Added Scout & Munin plugin integration tests
+
+=== Version 1.4.0
+
+* Initial version of request-log-analyzer API.
+* Added standard deviation to duration and traffic reports.
+* Added @--report-amount <n>@ to define the number of entries in the table in the report. Use @all@ to specify that all entries should be included. The default value is 20
+* Added @--report-sort <sortings>@ options to specify how the resulting duration and traffic tables should be sorted. You can specify multiple sort fields using a comma separated list, which results in multiple tables. Supported sortings are @sum@, @mean@, @stddev@ and @hits@. The default value is @sum,mean@.
+* Restructured the [[Rails request log]] parser to be more flexible about what lines to parse, using the @--rails-format <lines>@ command line switch.
+** @--rails-format minimal@ will only parse _processing_ and _completed_ lines.
+** @--rails-format production@ will parse exceptions and cache hits besides the minimal lines.
+** @--rails-format development@ will also parse SQL queries and template renderings
+** @--rails-format all@ will parse every known line type.
+** @--rails-format minimal,failure@ will parse the minimal lines and exceptions. Use a comma-separated list like this. to define your own line set.
+* Significantly improved the test coverage of the Rails log format.
+
+== Request-log-analyzer 1.3 release cycle
+
+=== Version 1.3.7
+
+* Fixed a crasher bug when parsing compressed files.
+* Speed optimizations by enabling teaser checks for lines.
+
+=== Version 1.3.6
+
+* Speed optimizations to improve parsing performance of frequently called methods, i.e. @Tracker#should_update@, @Request#convert_value@, @Request#convert_timestamp@, @Request#convert_traffic@ and @Request#convert_duration@.
+* Tweaked all file formats for increased performance
+* Cleaned up and simplified some old code.
+
+=== Version 1.3.5
+
+* Added statistics about data traffic for the file formats that contain this information (Apache, Amazon S3, Rack)
+* Added support for Rack CommonLogger logs (@--format rack@).
+* Added "agent" and "referer" Apache log format constants.
+* Improved request duration parsing (%D directive) from [[Apache access log]] files.
+* Fixed a bug in the database inserter that caused tables to be created with wrong fields.
+
+=== Version 1.3.4
+
+* Added [[Amazon S3 access log]] parser. Add @--format amazon_s3@ to you command line to use it. S3 access logs are disabled by default. See "the S3 documentation on server logging":http://docs.amazonwebservices.com/AmazonS3/latest/index.html?ServerLogs.html for more information to enable it.
+
+=== Version 1.3.3
+
+_Retracted release_
+
+=== Version 1.3.2
+
+* Tweaking to increase performance significantly.
+* Added a @--no-progress@ command line switch to disable the progress bar parsing for an additional speed improvement.
+
+=== Version 1.3.1
+
+* E-mail option to automatically send you reports: add <code>--mail my@address.com</code> to your command line.
+* Allow other database connections than SQLite3 by passing a connection string to the @--database@ command line option. Examples:
+** SQLite3 file database: @--database filename.db@ (as before)
+** Connection URI: <code>--database postgresql://rla:rla@localhost/requests</code>
+** ODBC-style: @--database adapter=mysql;username=root;host=localhost;database=requests@
+** Memory database: @--database adapter=sqlite3;database=:memory:@
+* Keep the previous database by default, pass the @--reset-database@ option to clear the database before parsing.
+* Added an IRB console to inspect a request database just like Rails's @script/console@. Run with <br />@request-log-analyzer console -d <connection string>@
+* Fixed some require paths that were causing problems.
+
+=== Version 1.3.0
+
+_Retracted release_
+
+== Request-log-analyzer 1.2 release cycle
+
+=== Version 1.2.9
+
+* Improved [[Apache access log]] format. Can now handle any kind of "Apache access log file format":http://httpd.apache.org/docs/1.3/mod/mod_log_config.html by providing the @--apache-format <format>@ command line argument.
+* Allow @FileFormats@ to be constructed dynamically (used for the Apache format implementation).
+* Refactored parameter passing during parsing to allow for more flexibility.
+
+=== Version 1.2.8
+
+_Retracted release_
+
+=== Version 1.2.7
+
+* Added [[Apache access log]] parser. To use, add @--format apache@ to your command line invocation
+* Make the release script send the gem to RubyForge as well.
+
+=== Version 1.2.6
+
+* New, more robust gem release script using the ruby-git gem.
+* Updated outdated information in the gemspec file
+
+=== Version 1.2.5
+
+* Improved Merb log format parser
+
+=== Version 1.2.4
+
+* More robust handling of database connections in database inserter.
+
+=== Version 1.2.3
+
+ * Refactored database functions
+ * Cleaned up specs and tried some heckle
+ * Interrupts are handled more gracefully
+ * Moved munin tracker to a "separate Github project":http://github.com/barttenbrinke/munin-plugins-rails/
+
+=== Version 1.2.2
+
+_Retracted release_
+
+=== Version 1.2.1
+
+ * Compressed logfile support
+ * Parsable YAML results as output (use @--dump <filename>@ command line option )
+ * "Full Rdoc documentation":http://wvanbergen.github.com/request-log-analyzer
+ * Introduced [[Changelog]]
+ * Updated rails rake tasks
+
+=== Version 1.2.0
+
+ * Ruby 1.9 support
+ * Rcov coverage (use @rake spec:rcov@ to generate the coverage report)
