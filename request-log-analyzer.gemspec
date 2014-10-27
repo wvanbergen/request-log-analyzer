@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
   eos
 
   gem.rdoc_options << '--title' << gem.name << '--main' << 'README.rdoc' << '--line-numbers' << '--inline-source'
-  gem.extra_rdoc_files = ['README.rdoc', 'DESIGN.rdoc', 'CHANGELOG.rdoc', 'LICENSE']
+  gem.extra_rdoc_files = ['README.rdoc', 'DESIGN.rdoc', 'CONTRIBUTING.rdoc', 'CHANGELOG.rdoc', 'LICENSE']
 
   gem.requirements << "To use the database inserter, ActiveRecord and an appropriate database adapter are required."
   gem.required_ruby_version = '>= 1.9.3'

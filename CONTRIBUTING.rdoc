@@ -1,0 +1,32 @@
+= Contributing to request-log-analyzer
+
+If you would like to help out, fork the project! If you want me to merge back the changes, please send a pull request. If you have any questions regarding helping out or the codebase, contact us.
+
+* Look at the issue tracker for things to work on: http://github.com/wvanbergen/request-log-analyzer/issues
+* DESIGN.rdoc contains some general information about how the project is set up internally. This may help you get started.
+* RDoc documentation can be found at http://rdoc.info/projects/wvanbergen/request-log-analyzer
+* See CHANGELOG.rdoc to see what changed over the different releases of request-log-analyzer.
+
+== Getting your changes accepted
+
+We really like to receive patches and we will gladly accept them from anybody regardless of race, gender, nationality, sexual orientation, coding ability or species, but please make sure to:
+
+
+- *Conform to* the current *coding style*. The style is not written down or defined explicitly, but comparing your code with the surrounding lines will give you a ballpark impression.
+- Make sure the *documentation* is up to date for the methods you add or change. We use *Yardoc* syntax.
+- Always *add specs* for any new functionality. Otherwise, we may break it in the future.
+- Always make sure that all the specs pass for all the Ruby versions we report. You can do this yourself using your ruby version manager of choice, or rely on Travis CI to do it for you. We will not merge pull requests for which Travis CI is failing.
+- Do not change the <tt>RequestLogAnalyzer::VERSION</tt> constant.
+- Add an entry toe <tt>CHANGELOG.rdoc</tt>
+- Make sure you're not including any *hard tabs* or *trailing spaces* in your changes. This drives me MAD!
+
+Some final notes:
+
+- Inform us that you're working on something. This way we can keep track on what is happening and we can assist if needed.
+- Don't hesitate to ask us any questions or advice.
+- Don't hesitate to tell us if we are not being helpful.
+
+
+== Release process
+
+- Update <tt>

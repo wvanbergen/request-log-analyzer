@@ -372,10 +372,10 @@ _Retracted release_
 
 === Version 1.2.3
 
- * Refactored database functions
- * Cleaned up specs and tried some heckle
- * Interrupts are handled more gracefully
- * Moved munin tracker to a "separate Github project":http://github.com/barttenbrinke/munin-plugins-rails/
+* Refactored database functions
+* Cleaned up specs and tried some heckle
+* Interrupts are handled more gracefully
+* Moved munin tracker to a "separate Github project":http://github.com/barttenbrinke/munin-plugins-rails/
 
 === Version 1.2.2
 
@@ -383,13 +383,13 @@ _Retracted release_
 
 === Version 1.2.1
 
- * Compressed logfile support
- * Parsable YAML results as output (use @--dump <filename>@ command line option )
- * "Full Rdoc documentation":http://wvanbergen.github.com/request-log-analyzer
- * Introduced [[Changelog]]
- * Updated rails rake tasks
+* Compressed logfile support
+* Parsable YAML results as output (use @--dump <filename>@ command line option )
+* "Full Rdoc documentation":http://wvanbergen.github.com/request-log-analyzer
+* Introduced [[Changelog]]
+* Updated rails rake tasks
 
 === Version 1.2.0
 
- * Ruby 1.9 support
- * Rcov coverage (use @rake spec:rcov@ to generate the coverage report)
+* Ruby 1.9 support
+* Rcov coverage (use @rake spec:rcov@ to generate the coverage report)
