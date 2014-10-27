@@ -16,6 +16,8 @@ module RequestLogAnalyzer
         instance_var = "@#{inheritable_attribute}"
         subclass.instance_variable_set(instance_var, instance_variable_get(instance_var))
       end
+
+      super
     end
   end
 end
