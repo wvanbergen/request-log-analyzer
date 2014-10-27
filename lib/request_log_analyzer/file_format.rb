@@ -1,7 +1,6 @@
 require 'request_log_analyzer/request'
 
 module RequestLogAnalyzer::FileFormat
-
   autoload :Rails,            'request_log_analyzer/file_format/rails'
   autoload :Rails3,           'request_log_analyzer/file_format/rails3'
   autoload :RailsDevelopment, 'request_log_analyzer/file_format/rails_development'
@@ -29,15 +28,15 @@ module RequestLogAnalyzer::FileFormat
   # * A symbol of a built-in file format (e.g. :rails)
   def self.load(file_format, *args)
     klass = nil
-    if file_format.kind_of?(RequestLogAnalyzer::FileFormat::Base)
+    if file_format.is_a?(RequestLogAnalyzer::FileFormat::Base)
       # this already is a file format! return itself
       return @current_file_format = file_format
 
-    elsif file_format.kind_of?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
+    elsif file_format.is_a?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
       # a usable class is provided. Use this format class.
       klass = file_format
 
-    elsif file_format.kind_of?(String) && File.exist?(file_format) && File.file?(file_format)
+    elsif file_format.is_a?(String) && File.exist?(file_format) && File.file?(file_format)
       # load a format from a ruby file
       require File.expand_path(file_format)
 
@@ -47,7 +46,7 @@ module RequestLogAnalyzer::FileFormat
       elsif Object.const_defined?(const)
         klass = Object.const_get(const)
       else
-        raise "Cannot load class #{const} from #{file_format}!"
+        fail "Cannot load class #{const} from #{file_format}!"
       end
 
     else
@@ -56,8 +55,8 @@ module RequestLogAnalyzer::FileFormat
     end
 
     # check the returned klass to see if it can be used
-    raise "Could not load a file format from #{file_format.inspect}" if klass.nil?
-    raise "Invalid FileFormat class from #{file_format.inspect}" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
+    fail "Could not load a file format from #{file_format.inspect}" if klass.nil?
+    fail "Invalid FileFormat class from #{file_format.inspect}" unless klass.is_a?(Class) && klass.ancestors.include?(RequestLogAnalyzer::FileFormat::Base)
 
     @current_file_format = klass.create(*args) # return an instance of the class
   end
@@ -65,7 +64,7 @@ module RequestLogAnalyzer::FileFormat
   # Returns an array of all FileFormat instances that are shipped with request-log-analyzer by default.
   def self.all_formats
     @all_formats ||= Dir[File.expand_path('file_format/*.rb', File.dirname(__FILE__))].map do |file|
-      self.load(File.basename(file, '.rb'))
+      load(File.basename(file, '.rb'))
     end
   end
 
@@ -78,8 +77,7 @@ module RequestLogAnalyzer::FileFormat
   # <tt>file</tt>:: The file to detect the file format for.
   # <tt>line_count</tt>:: The number of lines to take into consideration
   def self.autodetect(file, line_count = 50)
-
-    parsers = all_formats.map { |f| RequestLogAnalyzer::Source::LogParser.new(f, :parse_strategy => 'cautious') }
+    parsers = all_formats.map { |f| RequestLogAnalyzer::Source::LogParser.new(f, parse_strategy: 'cautious') }
 
     File.open(file, 'rb') do |io|
       while io.lineno < line_count && (line = io.gets)
@@ -116,7 +114,6 @@ module RequestLogAnalyzer::FileFormat
   # You need to extend (or include in an unlikely case) this module in your file format
   # to use these regular expression constructors.
   module CommonRegularExpressions
-
     TIMESTAMP_PARTS = {
       'a' => '(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)',
       'b' => '(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)',
@@ -148,10 +145,10 @@ module RequestLogAnalyzer::FileFormat
       format_string.scan(/([^%]*)(?:%([A-Za-z%]))?/) do |literal, variable|
         regexp << Regexp.quote(literal)
         if variable
-          if TIMESTAMP_PARTS.has_key?(variable)
+          if TIMESTAMP_PARTS.key?(variable)
             regexp << TIMESTAMP_PARTS[variable]
           else
-            raise "Unknown variable: %#{variable}"
+            fail "Unknown variable: %#{variable}"
           end
         end
       end
@@ -164,7 +161,6 @@ module RequestLogAnalyzer::FileFormat
     # Allow nil values if the blank option is given. This can be true to
     # allow an empty string or to a string substitute for the nil value.
     def ip_address(blank = false)
-
       # IP address regexp copied from Resolv::IPv4 and Resolv::IPv6,
       # but adjusted to work for the purpose of request-log-analyzer.
       ipv4_regexp                     = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/
@@ -187,8 +183,8 @@ module RequestLogAnalyzer::FileFormat
     # allow an empty string or a string alternative for the nil value.
     def add_blank_option(regexp, blank)
       case blank
-        when String; Regexp.union(regexp, Regexp.new(Regexp.quote(blank)))
-        when true;   Regexp.union(regexp, //)
+        when String then Regexp.union(regexp, Regexp.new(Regexp.quote(blank)))
+        when true then   Regexp.union(regexp, //)
         else regexp
       end
     end
@@ -200,7 +196,6 @@ module RequestLogAnalyzer::FileFormat
   # A subclass of this class is instantiated when request-log-analyzer is started and this instance
   # is shared with all components of the application so they can act on the specifics of the format
   class Base
-
     extend RequestLogAnalyzer::ClassLevelInheritableAttributes
     inheritable_attributes :line_definer, :report_definer
 
@@ -216,18 +211,18 @@ module RequestLogAnalyzer::FileFormat
     end
 
     # Specifies multiple line definitions at once using a block
-    def self.format_definition(&block)
+    def self.format_definition(&_block)
       if block_given?
-        yield self.line_definer
+        yield line_definer
       else
-        return self.line_definer
+        return line_definer
       end
     end
 
     # Specifies the summary report using a block.
-    def self.report(mode = :append, &block)
-      self.report_definer.reset! if mode == :overwrite
-      yield(self.report_definer)
+    def self.report(mode = :append, &_block)
+      report_definer.reset! if mode == :overwrite
+      yield(report_definer)
     end
 
     # Setup the default line definer.
@@ -247,9 +242,9 @@ module RequestLogAnalyzer::FileFormat
     # Instantiation
     ####################################################################################
 
-    def self.create(*args)
+    def self.create(*_args)
       # Ignore arguments
-      return self.new(line_definer.line_definitions, report_definer.trackers)
+      new(line_definer.line_definitions, report_definer.trackers)
     end
 
     def initialize(line_definitions = {}, report_trackers = [])
@@ -277,7 +272,6 @@ module RequestLogAnalyzer::FileFormat
 
     alias_method :valid?, :well_formed?
 
-
     # Checks whether the line definitions form a valid language.
     # A file format should have at least a header and a footer line type
     def valid_line_definitions?
@@ -296,17 +290,17 @@ module RequestLogAnalyzer::FileFormat
 
     # Function that a file format con implement to monkey patch the environment.
     # * <tt>controller</tt> The environment is provided as a controller instance
-    def setup_environment(controller)
+    def setup_environment(_controller)
     end
 
     # Parses a line by trying to parse it using every line definition in this file format
     def parse_line(line, &warning_handler)
-      self.line_definitions.each do |lt, definition|
+      line_definitions.each do |_lt, definition|
         match = definition.matches(line, &warning_handler)
         return match if match
       end
 
-      return nil
+      nil
     end
 
     # Returns the max line length for this file format if any.

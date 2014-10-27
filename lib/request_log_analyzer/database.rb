@@ -2,7 +2,6 @@ require 'rubygems'
 require 'active_record'
 
 class RequestLogAnalyzer::Database
-
   require 'request_log_analyzer/database/connection'
   include RequestLogAnalyzer::Database::Connection
 
@@ -45,7 +44,6 @@ class RequestLogAnalyzer::Database
   # Loads an ActiveRecord-based class that correspond to the given parameter, which can either be
   # a table name or a LineDefinition instance.
   def load_activerecord_class(linedefinition_or_table)
-
     case linedefinition_or_table
     when String, Symbol
       klass_name = linedefinition_or_table.to_s.singularize.camelize
@@ -58,13 +56,13 @@ class RequestLogAnalyzer::Database
     Object.const_set(klass_name, klass)
     klass = Object.const_get(klass_name)
     @line_classes << klass
-    return klass
+    klass
   end
 
   def fileformat_classes
-    raise "No file_format provided!" unless file_format
-    line_classes    = file_format.line_definitions.map { |(name, definition)| load_activerecord_class(definition) }
-    return default_classes + line_classes
+    fail 'No file_format provided!' unless file_format
+    line_classes    = file_format.line_definitions.map { |(_name, definition)| load_activerecord_class(definition) }
+    default_classes + line_classes
   end
 
   # Creates the database schema and related ActiveRecord::Base subclasses that correspond to the

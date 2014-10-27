@@ -1,9 +1,7 @@
 module RequestLogAnalyzer::Filter
-
   # Base filter class used to filter input requests.
   # All filters should interit from this base.
   class Base
-
     attr_reader :file_format, :options
 
     # Initializer

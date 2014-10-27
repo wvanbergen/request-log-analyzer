@@ -7,13 +7,11 @@
 # - The base class for all sources is RequestLogAnalyzer::Source::Base. All source classes should inherit from this class.
 # - Currently, RequestLogAnalyzer::Source::LogParser is the only implemented source.
 module RequestLogAnalyzer::Source
-
   # The base Source class. All other sources should inherit from this class.
   #
   # A source implememtation should at least implement the each_request method, which should yield
   # RequestLogAnalyzer::Request instances that will be fed through the pipleine.
   class Base
-
     # A hash of options
     attr_reader :options
 
@@ -52,15 +50,14 @@ module RequestLogAnalyzer::Source
     # This function is called to actually produce the requests that will be send into the pipeline.
     # The implementation should yield instances of RequestLogAnalyzer::Request.
     # <tt>options</tt>:: A Hash of options that can be used in the implementation.
-    def each_request(options = {}, &block) # :yields: request
-      return true
+    def each_request(_options = {}, &_block) # :yields: request
+      true
     end
 
     # This function is called after RequestLogAnalyzer::Source::Base#each_request finished. Any code to
     # wrap up, free resources, etc. can be put in this method.
     def finalize
     end
-
   end
 end
 

@@ -1,5 +1,4 @@
 module RequestLogAnalyzer::Tracker
-
   # Catagorize requests by frequency.
   # Count and analyze requests for a specific attribute
   #
@@ -21,19 +20,18 @@ module RequestLogAnalyzer::Tracker
   #  POST   |  11662 hits (24.2%) |=========
   #  DELETE |    512 hits (1.1%)  |
   class Frequency < Base
-
     attr_reader :categories
 
     # Check if categories are set up
     def prepare
       options[:category] = options[:value] if options[:value] && !options[:category]
-      raise "No categorizer set up for category tracker #{self.inspect}" unless options[:category]
-      
+      fail "No categorizer set up for category tracker #{inspect}" unless options[:category]
+
       @categorizer = create_lambda(options[:category]) unless options[:multiple]
-      
-      # Initialize the categories. Use the list of category names to 
+
+      # Initialize the categories. Use the list of category names to
       @categories = {}
-      options[:all_categories].each { |cat| @categories[cat] = 0 } if options[:all_categories].kind_of?(Enumerable)
+      options[:all_categories].each { |cat| @categories[cat] = 0 } if options[:all_categories].is_a?(Enumerable)
     end
 
     # Check HTTP method of a request and store that in the categories hash.
@@ -45,9 +43,9 @@ module RequestLogAnalyzer::Tracker
           if cat || options[:nils]
             @categories[cat] ||= 0
             @categories[cat] += 1
-          end          
+          end
         end
-        
+
       else
         cat = @categorizer.call(request)
         if cat || options[:nils]
@@ -65,7 +63,7 @@ module RequestLogAnalyzer::Tracker
 
     # Return the overall frequency
     def overall_frequency
-      categories.inject(0) { |carry, item| carry + item[1] }
+      categories.reduce(0) { |carry, item| carry + item[1] }
     end
 
     # Return the methods sorted by frequency
@@ -85,7 +83,7 @@ module RequestLogAnalyzer::Tracker
         sorted_categories = output.slice_results(sorted_by_frequency)
         total_hits        = overall_frequency
 
-        output.table({:align => :left}, {:align => :right }, {:align => :right}, {:type => :ratio, :width => :rest}) do |rows|
+        output.table({ align: :left }, { align: :right }, { align: :right }, { type: :ratio, width: :rest }) do |rows|
           sorted_categories.each do |(cat, count)|
             rows << [cat, "#{count} hits", '%0.1f%%' % ((count.to_f / total_hits.to_f) * 100.0), (count.to_f / total_hits.to_f)]
           end

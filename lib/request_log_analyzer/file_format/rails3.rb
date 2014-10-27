@@ -1,11 +1,9 @@
 module RequestLogAnalyzer::FileFormat
-
   # Default FileFormat class for Rails 3 logs.
   #
   # For now, this is just a basic implementation. It will probaby change after
   # Rails 3 final has been released.
   class Rails3 < Base
-
     extend CommonRegularExpressions
 
     # beta4: Started GET "/" for 127.0.0.1 at Wed Jul 07 09:13:27 -0700 2010 (different time format)
@@ -46,9 +44,9 @@ module RequestLogAnalyzer::FileFormat
       line.regexp = /Completed (\d+)? .*in (\d+(?:\.\d+)?)ms(?:[^\(]*\(Views: (\d+(?:\.\d+)?)ms .* ActiveRecord: (\d+(?:\.\d+)?)ms.*\))?/
 
       line.capture(:status).as(:integer)
-      line.capture(:duration).as(:duration, :unit => :msec)
-      line.capture(:view).as(:duration, :unit => :msec)
-      line.capture(:db).as(:duration, :unit => :msec)
+      line.capture(:duration).as(:duration, unit: :msec)
+      line.capture(:view).as(:duration, unit: :msec)
+      line.capture(:db).as(:duration, unit: :msec)
     end
 
     # ActionController::RoutingError (No route matches [GET] "/missing_stuff"):
@@ -76,7 +74,7 @@ module RequestLogAnalyzer::FileFormat
       line.teaser = /\bRendered /
       line.regexp = /\bRendered ([a-zA-Z0-9_\-\/.]+(?:\/[a-zA-Z0-9_\-.]+)+)(?:\ within\ .*?)? \((\d+(?:\.\d+)?)ms\)/
       line.capture(:rendered_file)
-      line.capture(:partial_duration).as(:duration, :unit => :msec)
+      line.capture(:partial_duration).as(:duration, unit: :msec)
     end
 
     # # Not parsed at the moment:
@@ -91,46 +89,44 @@ module RequestLogAnalyzer::FileFormat
       analyze.timespan
       analyze.hourly_spread
 
-      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Most requested'
-      analyze.frequency :method, :title => 'HTTP methods'
-      analyze.frequency :status, :title => 'HTTP statuses returned'
+      analyze.frequency category: REQUEST_CATEGORIZER, title: 'Most requested'
+      analyze.frequency :method, title: 'HTTP methods'
+      analyze.frequency :status, title: 'HTTP statuses returned'
 
-      analyze.duration :duration, :category => REQUEST_CATEGORIZER, :title => "Request duration", :line_type => :completed
-      analyze.duration :partial_duration, :category => :rendered_file, :title => 'Partials rendering time', :line_type => :rendered
-      analyze.duration :view, :category => REQUEST_CATEGORIZER, :title => "View rendering time", :line_type => :completed
-      analyze.duration :db, :category => REQUEST_CATEGORIZER, :title => "Database time", :line_type => :completed
+      analyze.duration :duration, category: REQUEST_CATEGORIZER, title: 'Request duration', line_type: :completed
+      analyze.duration :partial_duration, category: :rendered_file, title: 'Partials rendering time', line_type: :rendered
+      analyze.duration :view, category: REQUEST_CATEGORIZER, title: 'View rendering time', line_type: :completed
+      analyze.duration :db, category: REQUEST_CATEGORIZER, title: 'Database time', line_type: :completed
 
-      analyze.frequency :category => REQUEST_CATEGORIZER, :title => 'Process blockers (> 1 sec duration)',
-        :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
+      analyze.frequency category: REQUEST_CATEGORIZER, title: 'Process blockers (> 1 sec duration)',
+        if: lambda { |request| request[:duration] && request[:duration] > 1.0 }
 
-      analyze.frequency :category => lambda{|x| "[#{x[:missing_resource_method]}] #{x[:missing_resource]}"},
-        :title => "Routing Errors", :if => lambda{ |request| !request[:missing_resource].nil? }
+      analyze.frequency category: lambda { |x| "[#{x[:missing_resource_method]}] #{x[:missing_resource]}" },
+        title: 'Routing Errors', if: lambda { |request| !request[:missing_resource].nil? }
     end
 
     class Request < RequestLogAnalyzer::Request
       # Used to handle conversion of abbrev. month name to a digit
       MONTHS = %w(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)
 
-      def convert_timestamp(value, definition)
+      def convert_timestamp(value, _definition)
         # the time value can be in 2 formats:
         # - 2010-10-26 02:27:15 +0000 (ruby 1.9.2)
         # - Thu Oct 25 16:15:18 -0800 2010
         if value =~ /^#{CommonRegularExpressions::TIMESTAMP_PARTS['Y']}/
-          value.gsub!(/\W/,'')
+          value.gsub!(/\W/, '')
           value[0..13].to_i
         else
-          value.gsub!(/\W/,'')
+          value.gsub!(/\W/, '')
           time_as_str = value[-4..-1] # year
           # convert the month to a 2-digit representation
-          month = MONTHS.index(value[3..5])+1
+          month = MONTHS.index(value[3..5]) + 1
           month < 10 ? time_as_str << "0#{month}" : time_as_str << month.to_s
 
           time_as_str << value[6..13] # day of month + time
           time_as_str.to_i
         end
-
       end
     end
-
   end
 end

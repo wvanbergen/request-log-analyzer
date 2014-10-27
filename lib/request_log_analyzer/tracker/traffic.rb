@@ -1,5 +1,4 @@
 module RequestLogAnalyzer::Tracker
-
   # Analyze the average and total traffic of requests
   #
   # === Options
@@ -10,16 +9,15 @@ module RequestLogAnalyzer::Tracker
   # * <tt>:title</tt> Title do be displayed above the report
   # * <tt>:unless</tt> Handle request if this proc is false for the handled request.
   class Traffic < NumericValue
-
     # Check if duration and catagory option have been received,
     def prepare
       options[:value] = options[:traffic] if options[:traffic]
       options[:total] = true
       super
-      
+
       @number_of_buckets = options[:number_of_buckets] || 1000
       @min_bucket_value  = options[:min_bucket_value] ? options[:min_bucket_value].to_f : 1
-      @max_bucket_value  = options[:max_bucket_value] ? options[:max_bucket_value].to_f : 1000_000_000_000
+      @max_bucket_value  = options[:max_bucket_value] ? options[:max_bucket_value].to_f : 1_000_000_000_000
 
       # precalculate the bucket size
       @bucket_size = (Math.log(@max_bucket_value) - Math.log(@min_bucket_value)) / @number_of_buckets.to_f
@@ -27,15 +25,15 @@ module RequestLogAnalyzer::Tracker
 
     # Formats the traffic number using x B/kB/MB/GB etc notation
     def display_value(bytes)
-      return "-"   if bytes.nil?
-      return "0 B" if bytes.zero?
-      
+      return '-'   if bytes.nil?
+      return '0 B' if bytes.zero?
+
       case [Math.log10(bytes.abs).floor, 0].max
       when  0...4  then '%d B'  % bytes
       when  4...7  then '%d kB' % (bytes / 1000)
-      when  7...10 then '%d MB' % (bytes / 1000_000)
-      when 10...13 then '%d GB' % (bytes / 1000_000_000)
-      else              '%d TB' % (bytes / 1000_000_000_000)
+      when  7...10 then '%d MB' % (bytes / 1_000_000)
+      when 10...13 then '%d GB' % (bytes / 1_000_000_000)
+      else              '%d TB' % (bytes / 1_000_000_000_000)
       end
     end
 

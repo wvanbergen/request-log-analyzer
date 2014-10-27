@@ -1,5 +1,4 @@
 module RequestLogAnalyzer
-
   # The Request class represents a parsed request from the log file.
   # Instances are created by the LogParser and are passed to the different aggregators, so they
   # can do their aggregating work.
@@ -8,9 +7,7 @@ module RequestLogAnalyzer
   # Request#first(field_name) returns the first (only) value corresponding to the given field
   # Request#every(field_name) returns all values corresponding to the given field name as array.
   class Request
-
     module Converters
-
       # Default converter function, which converts the parsed strings to a native Ruby type
       # using the type indication in the line definition. It will use a custom connverter
       # method if one is available.
@@ -20,24 +17,47 @@ module RequestLogAnalyzer
         send(custom_converter_method, value, capture_definition)
       end
 
-      def convert_string(value, capture_definition);  value; end
-      def convert_float(value, capture_definition);   value.to_f; end
-      def convert_decimal(value, capture_definition); value.to_f; end
-      def convert_int(value, capture_definition);     value.to_i; end
-      def convert_integer(value, capture_definition); value.to_i; end
-      def convert_sym(value, capture_definition);     value.to_sym; end
-      def convert_symbol(value, capture_definition);  value.to_sym; end
-      def convert_nillable_string(value, definition); value == '-' ? nil : value ; end
-      
+      def convert_string(value, _capture_definition)
+        value
+      end
+
+      def convert_float(value, _capture_definition)
+        value.to_f
+      end
+
+      def convert_decimal(value, _capture_definition)
+        value.to_f
+      end
+
+      def convert_int(value, _capture_definition)
+        value.to_i
+      end
+
+      def convert_integer(value, _capture_definition)
+        value.to_i
+      end
+
+      def convert_sym(value, _capture_definition)
+        value.to_sym
+      end
+
+      def convert_symbol(value, _capture_definition)
+        value.to_sym
+      end
+
+      def convert_nillable_string(value, _definition)
+        value == '-' ? nil : value
+      end
+
       # This function can be overridden to rewrite the path for better categorization in the
       # reports.
-      def convert_path(value, definition)
+      def convert_path(value, _definition)
         value
       end
 
       # Converts :eval field, which should evaluate to a hash.
-      def convert_eval(value, capture_definition)
-        eval(sanitize_parameters(value)).inject({}) { |h, (k, v)| h[k.to_sym] = v; h}
+      def convert_eval(value, _capture_definition)
+        eval(sanitize_parameters(value)).reduce({}) { |h, (k, v)| h[k.to_sym] = v; h }
       rescue
         nil
       end
@@ -51,7 +71,7 @@ module RequestLogAnalyzer
       # Slow default method to parse timestamps.
       # Reimplement this function in a file format specific Request class
       # to improve the timestamp parsing speed.
-      def convert_timestamp(value, capture_definition)
+      def convert_timestamp(value, _capture_definition)
         DateTime.parse(value).strftime('%Y%m%d%H%M%S').to_i
       end
 
@@ -59,13 +79,13 @@ module RequestLogAnalyzer
       def convert_traffic(value, capture_definition)
         case capture_definition[:unit]
         when nil, :b, :B, :byte      then value.to_i
-        when :GB, :G, :gigabyte      then (value.to_f * 1000_000_000).round
-        when :GiB, :gibibyte         then (value.to_f * (2 ** 30)).round
-        when :MB, :M, :megabyte      then (value.to_f * 1000_000).round
-        when :MiB, :mebibyte         then (value.to_f * (2 ** 20)).round
+        when :GB, :G, :gigabyte      then (value.to_f * 1_000_000_000).round
+        when :GiB, :gibibyte         then (value.to_f * (2**30)).round
+        when :MB, :M, :megabyte      then (value.to_f * 1_000_000).round
+        when :MiB, :mebibyte         then (value.to_f * (2**20)).round
         when :KB, :K, :kilobyte, :kB then (value.to_f * 1000).round
-        when :KiB, :kibibyte         then (value.to_f * (2 ** 10)).round
-        else raise "Unknown traffic unit"
+        when :KiB, :kibibyte         then (value.to_f * (2**10)).round
+        else fail 'Unknown traffic unit'
         end
       end
 
@@ -73,14 +93,14 @@ module RequestLogAnalyzer
       def convert_duration(value, capture_definition)
         case capture_definition[:unit]
         when nil, :sec, :s     then value.to_f
-        when :microsec, :musec then value.to_f / 1000000.0
+        when :microsec, :musec then value.to_f / 1_000_000.0
         when :msec, :millisec  then value.to_f / 1000.0
-        else raise "Unknown duration unit"
+        else fail 'Unknown duration unit'
         end
       end
-      
+
       # Convert an epoch to an integer
-      def convert_epoch(value, capture_definition)
+      def convert_epoch(value, _capture_definition)
         Time.at(value.to_i).strftime('%Y%m%d%H%M%S').to_i
       end
     end
@@ -101,16 +121,16 @@ module RequestLogAnalyzer
     # Creates a new request that was parsed from the log with the given FileFormat. The hashes
     # that are passed to this function are added as lines to this request.
     def self.create(file_format, *hashes)
-      request = self.new(file_format)
+      request = new(file_format)
       hashes.flatten.each { |hash| request << hash }
-      return request
+      request
     end
 
     # Adds another line to the request when it is parsed in the LogParser.
     #
     # The line should be provided as a hash with the attributes line_definition, :captures,
     # :lineno and :source set. This function is called from LogParser.
-    def add_parsed_line (parsed_line)
+    def add_parsed_line(parsed_line)
       value_hash = parsed_line[:line_definition].convert_captured_values(parsed_line[:captures], self)
       value_hash[:line_type] = parsed_line[:line_definition].name
       value_hash[:lineno] = parsed_line[:lineno]
@@ -148,10 +168,10 @@ module RequestLogAnalyzer
     # Checks whether the given line type was parsed from the log file for this request
     def has_line_type?(line_type)
       return true if @lines.length == 1 && @lines[0][:line_type] == line_type.to_sym
-      @lines.detect { |l| l[:line_type] == line_type.to_sym }
+      @lines.find { |l| l[:line_type] == line_type.to_sym }
     end
 
-    alias :=~ :has_line_type?
+    alias_method :=~, :has_line_type?
 
     # Returns the value that was captured for the "field" of this request.
     # This function will return the first value that was captured if the field
@@ -160,11 +180,11 @@ module RequestLogAnalyzer
       @attributes[field]
     end
 
-    alias :[] :first
+    alias_method :[], :first
 
     # Returns an array of all the "field" values that were captured for this request
     def every(field)
-      @lines.inject([]) { |result, fields| result << fields[field] if fields.has_key?(field); result }
+      @lines.reduce([]) { |result, fields| result << fields[field] if fields.key?(field); result }
     end
 
     # Returns true if this request does not yet contain any parsed lines. This should only occur

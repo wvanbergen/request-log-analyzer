@@ -1,5 +1,5 @@
 # Setup the include path
-$:.unshift(File.expand_path('..', File.dirname(__FILE__)))
+$LOAD_PATH.unshift(File.expand_path('..', File.dirname(__FILE__)))
 require 'request_log_analyzer'
 require 'request_log_analyzer/database'
 
@@ -9,9 +9,9 @@ $database.register_default_orm_classes!
 
 require 'cli/tools'
 
-def wordwrap(string, max = 80, indent = "")
-  strings = [""]
-  string.split(", ").each do |item|
+def wordwrap(string, max = 80, indent = '')
+  strings = ['']
+  string.split(', ').each do |item|
     if strings.last.length == 0 || strings.last.length + item.length <= max
       strings.last << item << ', '
     else
@@ -28,9 +28,9 @@ class Request
 
     inspected_lines = lines.map do |line|
       inspect_line = "   - #{line.line_type} (line #{line.lineno})"
-      if (inspect_attributes = line.attributes.reject { |(k, v)| [:id, :source_id, :request_id, :lineno].include?(k.to_sym) }).any?
-        inspect_attributes = inspect_attributes.map { |(k,v)| "#{k} = #{v.inspect}" }.join(', ')
-        inspect_line << "\n      " + wordwrap(inspect_attributes, CommandLine::Tools.terminal_width - 6, "      ")
+      if (inspect_attributes = line.attributes.reject { |(k, _v)| [:id, :source_id, :request_id, :lineno].include?(k.to_sym) }).any?
+        inspect_attributes = inspect_attributes.map { |(k, v)| "#{k} = #{v.inspect}" }.join(', ')
+        inspect_line << "\n      " + wordwrap(inspect_attributes, CommandLine::Tools.terminal_width - 6, '      ')
       end
       inspect_line
     end
@@ -39,7 +39,7 @@ class Request
   end
 end
 
-puts "request-log-analyzer database console"
-puts "-------------------------------------"
-puts "The following ActiveRecord classes are available:"
-puts $database.orm_classes.map { |k| k.name.split('::').last }.join(", ")
+puts 'request-log-analyzer database console'
+puts '-------------------------------------'
+puts 'The following ActiveRecord classes are available:'
+puts $database.orm_classes.map { |k| k.name.split('::').last }.join(', ')

@@ -1,12 +1,9 @@
 module RequestLogAnalyzer
-
   # The line definition class is used to specify what lines should be parsed from the log file.
   # It contains functionality to match a line against the definition and parse the information
   # from this line. This is used by the LogParser class when parsing a log file..
   class LineDefinition
-
     class Definer
-
       attr_accessor :line_definitions
 
       def initialize
@@ -16,7 +13,7 @@ module RequestLogAnalyzer
       def initialize_copy(other)
         @line_definitions = other.line_definitions.dup
       end
-      
+
       def define_line(name, arg = {}, &block)
         if block_given?
           @line_definitions[name] = RequestLogAnalyzer::LineDefinition.define(name, &block)
@@ -32,14 +29,14 @@ module RequestLogAnalyzer
 
     class CaptureDefiner
       attr_accessor :capture_hash
-      
+
       def initialize(hash)
         @capture_hash = hash
       end
-      
+
       def as(type, type_options = {})
-        @capture_hash.merge!(type_options.merge(:type => type))
-        return self
+        @capture_hash.merge!(type_options.merge(type: type))
+        self
       end
     end
 
@@ -57,15 +54,15 @@ module RequestLogAnalyzer
       @captures = []
       @teaser   = nil
       @compound = []
-      definition.each { |key, value| self.send("#{key.to_s}=".to_sym, value) }
+      definition.each { |key, value| send("#{key}=".to_sym, value) }
     end
 
-    def self.define(name, &block)
-      definition = self.new(name)
+    def self.define(name, &_block)
+      definition = new(name)
       yield(definition) if block_given?
-      return definition
+      definition
     end
-    
+
     def capture(name)
       new_capture_hash = {}
       new_capture_hash[:name] = name
@@ -73,7 +70,7 @@ module RequestLogAnalyzer
       captures << new_capture_hash
       CaptureDefiner.new(new_capture_hash)
     end
-    
+
     def all_captured_variables
       captures.map { |c| c[:name] } + captures.map { |c| c[:provides] }.compact.map { |pr| pr.keys }.flatten
     end
@@ -86,7 +83,7 @@ module RequestLogAnalyzer
     def matches(line, &warning_handler)
       if @teaser.nil? || @teaser =~ line
         if match_data = line.match(@regexp)
-          return { :line_definition => self, :captures => match_data.captures}
+          return { line_definition: self, captures: match_data.captures }
         else
           if @teaser && warning_handler
             warning_handler.call(:teaser_check_failed, "Teaser matched for #{name.inspect}, but full line did not:\n#{line.inspect}")
@@ -100,7 +97,7 @@ module RequestLogAnalyzer
       return false
     end
 
-    alias :=~ :matches
+    alias_method :=~, :matches
 
     # matches the line and converts the captured values using the request's
     # convert_value function.
@@ -124,13 +121,13 @@ module RequestLogAnalyzer
 
         # Add items directly to the resulting hash from the converted value
         # if it is a hash and they are set in the :provides hash for this line definition
-        if converted.kind_of?(Hash) && capture[:provides].kind_of?(Hash)
+        if converted.is_a?(Hash) && capture[:provides].is_a?(Hash)
           capture[:provides].each do |name, type|
-            value_hash[name] ||= request.convert_value(converted[name], { :type => type })
+            value_hash[name] ||= request.convert_value(converted[name],  type: type)
           end
         end
       end
-      return value_hash
+      value_hash
     end
 
     # Returns true if this line captures values of the given name

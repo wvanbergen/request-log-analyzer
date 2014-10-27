@@ -1,10 +1,9 @@
 class RequestLogAnalyzer::Database::Request < RequestLogAnalyzer::Database::Base
-
   # Returns an array of all the Line objects of this request in the correct order.
   def lines
     @lines ||= begin
       lines = []
-      self.class.reflections.each { |r, d| lines += self.send(r).all }
+      self.class.reflections.each { |r, _d| lines += send(r).all }
       lines.sort
     end
   end
@@ -18,5 +17,4 @@ class RequestLogAnalyzer::Database::Request < RequestLogAnalyzer::Database::Base
       end
     end
   end
-
 end

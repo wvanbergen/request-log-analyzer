@@ -1,8 +1,6 @@
 module RequestLogAnalyzer::Output
-
   # HTML Output class. Generated a HTML-formatted report, including CSS.
   class HTML < Base
-
     # def initialize(io, options = {})
     #   super(io, options)
     # end
@@ -20,7 +18,7 @@ module RequestLogAnalyzer::Output
       @io << str
     end
 
-    alias :<< :print
+    alias_method :<<, :print
 
     # Put a string with newline
     def puts(str = '')
@@ -34,7 +32,7 @@ module RequestLogAnalyzer::Output
 
     # Render a single line
     # <tt>*font</tt> The font.
-    def line(*font)
+    def line(*_font)
       @io.puts(tag(:hr))
     end
 
@@ -43,17 +41,17 @@ module RequestLogAnalyzer::Output
     # <tt>url</tt> The url to link to.
     def link(text, url = nil)
       url = text if url.nil?
-      tag(:a, text, :href => url)
+      tag(:a, text, href: url)
     end
 
     # Generate a report table in HTML and push it into the output object.
     # <tt>*colums<tt> Columns hash
     # <tt>&block</tt>: A block yeilding the rows.
-    def table(*columns, &block)
-      rows = Array.new
+    def table(*columns, &_block)
+      rows = []
       yield(rows)
 
-      @io << tag(:table, {:class => 'rla-report-table', :cellspacing => 0}) do |content|
+      @io << tag(:table, class: 'rla-report-table', cellspacing: 0) do |content|
         if table_has_header?(columns)
           content << tag(:tr) do
             columns.map { |col| tag(:th, col[:title]) }.join("\n")
@@ -65,21 +63,20 @@ module RequestLogAnalyzer::Output
           odd = !odd
           content << tag(:tr) do
             if odd
-              row.map { |cell| tag(:td, cell, :class => 'alt') }.join("\n")
+              row.map { |cell| tag(:td, cell, class: 'alt') }.join("\n")
             else
               row.map { |cell| tag(:td, cell) }.join("\n")
             end
           end
         end
       end
-
     end
 
     # Genrate HTML header and associated stylesheet
     def header
       @io.content_type = content_type if @io.respond_to?(:content_type)
 
-      @io << "<html>"
+      @io << '<html>'
       @io << tag(:head) do |headers|
         headers << tag(:title, 'Request-log-analyzer report')
         headers << tag(:style, '
@@ -111,7 +108,7 @@ module RequestLogAnalyzer::Output
 
         caption {
         	padding: 0 0 5px 0;
-        	width: 700px;	
+        	width: 700px;
         	font: italic 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
         	text-align: right;
         }
@@ -142,7 +139,7 @@ module RequestLogAnalyzer::Output
         	background: #F5FAFA;
         	color: #797268;
         }
-        ', :type => "text/css")
+        ', type: 'text/css')
       end
       @io << '<body>'
       @io << tag(:h1, 'Request-log-analyzer summary report')
@@ -176,7 +173,7 @@ module RequestLogAnalyzer::Output
           "<#{tag}#{attributes} />"
         else
           if content.class == Float
-            "<#{tag}#{attributes}><div class='color_bar' style=\"width:#{(content*200).floor}px;\"/></#{tag}>"
+            "<#{tag}#{attributes}><div class='color_bar' style=\"width:#{(content * 200).floor}px;\"/></#{tag}>"
           else
             "<#{tag}#{attributes}>#{content}</#{tag}>"
           end

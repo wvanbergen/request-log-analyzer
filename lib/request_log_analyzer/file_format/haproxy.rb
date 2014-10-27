@@ -1,7 +1,5 @@
 module RequestLogAnalyzer::FileFormat
-
   class Haproxy < RequestLogAnalyzer::FileFormat::Base
-
     extend CommonRegularExpressions
 
     # substitute version specific parts of the haproxy entry regexp.
@@ -46,13 +44,13 @@ module RequestLogAnalyzer::FileFormat
       line.capture(:frontend_name).as(:string)
       line.capture(:backend_name).as(:string)
       line.capture(:server_name).as(:string)
-      line.capture(:tq).as(:nillable_duration, :unit => :msec)
-      line.capture(:tw).as(:nillable_duration, :unit => :msec)
-      line.capture(:tc).as(:nillable_duration, :unit => :msec)
-      line.capture(:tr).as(:nillable_duration, :unit => :msec)
-      line.capture(:tt).as(:duration, :unit => :msec)
+      line.capture(:tq).as(:nillable_duration, unit: :msec)
+      line.capture(:tw).as(:nillable_duration, unit: :msec)
+      line.capture(:tc).as(:nillable_duration, unit: :msec)
+      line.capture(:tr).as(:nillable_duration, unit: :msec)
+      line.capture(:tt).as(:duration, unit: :msec)
       line.capture(:status_code).as(:integer)
-      line.capture(:bytes_read).as(:traffic, :unit => :byte)
+      line.capture(:bytes_read).as(:traffic, unit: :byte)
       line.capture(:captured_request_cookie).as(:nillable_string)
       line.capture(:captured_response_cookie).as(:nillable_string)
       line.capture(:termination_event_code).as(:nillable_string)
@@ -89,13 +87,13 @@ module RequestLogAnalyzer::FileFormat
       line.capture(:timestamp).as(:timestamp)
       line.capture(:frontend_name).as(:string)
       line.capture(:server_name).as(:string)
-      line.capture(:tq).as(:nillable_duration, :unit => :msec)
-      line.capture(:tw).as(:nillable_duration, :unit => :msec)
-      line.capture(:tc).as(:nillable_duration, :unit => :msec)
-      line.capture(:tr).as(:nillable_duration, :unit => :msec)
-      line.capture(:tt).as(:duration, :unit => :msec)
+      line.capture(:tq).as(:nillable_duration, unit: :msec)
+      line.capture(:tw).as(:nillable_duration, unit: :msec)
+      line.capture(:tc).as(:nillable_duration, unit: :msec)
+      line.capture(:tr).as(:nillable_duration, unit: :msec)
+      line.capture(:tt).as(:duration, unit: :msec)
       line.capture(:status_code).as(:integer)
-      line.capture(:bytes_read).as(:traffic, :unit => :byte)
+      line.capture(:bytes_read).as(:traffic, unit: :byte)
       line.capture(:captured_request_cookie).as(:nillable_string)
       line.capture(:captured_response_cookie).as(:nillable_string)
       line.capture(:termination_event_code).as(:nillable_string)
@@ -130,12 +128,12 @@ module RequestLogAnalyzer::FileFormat
       line.capture(:timestamp).as(:timestamp)
       line.capture(:frontend_name).as(:string)
       line.capture(:server_name).as(:string)
-      line.capture(:tq).as(:nillable_duration, :unit => :msec)
-      line.capture(:tc).as(:nillable_duration, :unit => :msec)
-      line.capture(:tr).as(:nillable_duration, :unit => :msec)
-      line.capture(:tt).as(:duration, :unit => :msec)
+      line.capture(:tq).as(:nillable_duration, unit: :msec)
+      line.capture(:tc).as(:nillable_duration, unit: :msec)
+      line.capture(:tr).as(:nillable_duration, unit: :msec)
+      line.capture(:tt).as(:duration, unit: :msec)
       line.capture(:status_code).as(:integer)
-      line.capture(:bytes_read).as(:traffic, :unit => :byte)
+      line.capture(:bytes_read).as(:traffic, unit: :byte)
       line.capture(:captured_request_cookie).as(:nillable_string)
       line.capture(:captured_response_cookie).as(:nillable_string)
       line.capture(:termination_event_code).as(:nillable_string)
@@ -153,72 +151,71 @@ module RequestLogAnalyzer::FileFormat
 
     # Define the summary report
     report do |analyze|
-      analyze.hourly_spread :field => :timestamp
+      analyze.hourly_spread field: :timestamp
 
       analyze.frequency :client_ip,
-        :title => "Hits per IP"
+                        title: 'Hits per IP'
 
       analyze.frequency :frontend_name,
-        :title => "Hits per frontend service"
+                        title: 'Hits per frontend service'
 
       analyze.frequency :backend_name,
-        :title => "Hits per backend service"
+                        title: 'Hits per backend service'
 
       analyze.frequency :server_name,
-        :title => "Hits per backend server"
+                        title: 'Hits per backend server'
 
       analyze.frequency :status_code,
-        :title => "HTTP response code frequency"
+                        title: 'HTTP response code frequency'
 
       analyze.frequency :http_request,
-        :title => "Most popular requests"
+                        title: 'Most popular requests'
 
       analyze.frequency :http_request,
-        :title => "Most frequent HTTP 40x errors",
-        :category => lambda { |r| "#{r[:http_request]}"},
-        :if => lambda { |r| r[:status_code] >= 400 and r[:status_code] <= 417 }
+                        title: 'Most frequent HTTP 40x errors',
+                        category: lambda { |r| "#{r[:http_request]}" },
+                        if: lambda { |r| r[:status_code] >= 400 && r[:status_code] <= 417 }
 
       analyze.frequency :http_request,
-        :title => "Most frequent HTTP 50x errors",
-        :category => lambda { |r| "#{r[:http_request]}"},
-        :if => lambda { |r| r[:status_code] >= 500 and r[:status_code] <= 505 }
+                        title: 'Most frequent HTTP 50x errors',
+                        category: lambda { |r| "#{r[:http_request]}" },
+                        if: lambda { |r| r[:status_code] >= 500 && r[:status_code] <= 505 }
 
       analyze.traffic :bytes_read,
-        :title => "Traffic per frontend service",
-        :category => lambda { |r| "#{r[:frontend_name]}"}
+                      title: 'Traffic per frontend service',
+                      category: lambda { |r| "#{r[:frontend_name]}" }
 
       analyze.traffic :bytes_read,
-        :title => "Traffic per backend service",
-        :category => lambda { |r| "#{r[:backend_name]}"}
+                      title: 'Traffic per backend service',
+                      category: lambda { |r| "#{r[:backend_name]}" }
 
       analyze.traffic :bytes_read,
-        :title => "Traffic per backend server",
-        :category => lambda { |r| "#{r[:server_name]}"}
+                      title: 'Traffic per backend server',
+                      category: lambda { |r| "#{r[:server_name]}" }
 
       analyze.duration :tr,
-        :title => "Time waiting for backend response",
-        :category => lambda { |r| "#{r[:http_request]}"}
+                       title: 'Time waiting for backend response',
+                       category: lambda { |r| "#{r[:http_request]}" }
 
       analyze.duration :tt,
-        :title => "Total time spent on request",
-        :category => lambda { |r| "#{r[:http_request]}"}
+                       title: 'Total time spent on request',
+                       category: lambda { |r| "#{r[:http_request]}" }
     end
 
     # Define a custom Request class for the HAProxy file format to speed up
     # timestamp handling. Shamelessly copied from apache.rb
     class Request < RequestLogAnalyzer::Request
-
-      MONTHS = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
+      MONTHS = { 'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06',
                 'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12' }
 
       # Do not use DateTime.parse, but parse the timestamp ourselves to return
       # a integer to speed up parsing.
-      def convert_timestamp(value, definition)
-        "#{value[7,4]}#{MONTHS[value[3,3]]}#{value[0,2]}#{value[12,2]}#{value[15,2]}#{value[18,2]}".to_i
+      def convert_timestamp(value, _definition)
+        "#{value[7, 4]}#{MONTHS[value[3, 3]]}#{value[0, 2]}#{value[12, 2]}#{value[15, 2]}#{value[18, 2]}".to_i
       end
 
       # Make sure that the strings '-' or '{}' or '' are parsed as a nil value.
-      def convert_nillable_string(value, definition)
+      def convert_nillable_string(value, _definition)
         value =~ /-|\{\}|^$/ ? nil : value
       end
 
@@ -226,7 +223,6 @@ module RequestLogAnalyzer::FileFormat
       def convert_nillable_duration(value, definition)
         value == '-1' ? nil : convert_duration(value, definition)
       end
-
     end
   end
 end

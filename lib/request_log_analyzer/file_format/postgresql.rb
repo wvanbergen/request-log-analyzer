@@ -1,20 +1,18 @@
 module RequestLogAnalyzer::FileFormat
-
   # PostgresQL spec 8.3.7
   class Postgresql < Base
-
     extend CommonRegularExpressions
-    
+
     line_definition :query do |line|
       line.header = true
       line.teaser = /.*LOG\:/
       line.regexp = /(#{timestamp('%Y-%m-%d %k:%M:%S')})\ \S+ \[\d+\]\:\ \[.*\]\ LOG\:\ \ \d+\:\ duration\: (.*)\ ms\ \ statement:\ (.*)/
 
       line.capture(:timestamp).as(:timestamp)
-      line.capture(:query_time).as(:duration, :unit => :sec)
+      line.capture(:query_time).as(:duration, unit: :sec)
       line.capture(:query_fragment)
     end
-      
+
     line_definition :location do |line|
       line.footer = true
       line.teaser = /.*LOCATION:/
@@ -22,7 +20,7 @@ module RequestLogAnalyzer::FileFormat
 
       line.capture(:query).as(:sql) # Hack to gather up fragments
     end
-    
+
     line_definition :query_fragment do |line|
       line.regexp = /^(?!.*LOG)\s*(.*)\s*/
       line.capture(:query_fragment)
@@ -30,14 +28,12 @@ module RequestLogAnalyzer::FileFormat
 
     report do |analyze|
       analyze.timespan
-      analyze.hourly_spread      
-      analyze.duration :query_time, :category => :query, :title => 'Query time'
+      analyze.hourly_spread
+      analyze.duration :query_time, category: :query, title: 'Query time'
     end
-  
-    class Request < RequestLogAnalyzer::Request
 
-      def convert_sql(value, definition)
-        
+    class Request < RequestLogAnalyzer::Request
+      def convert_sql(value, _definition)
         # Recreate the full SQL query by joining all the previous parts and this last line
         sql = every(:query_fragment).join("\n") + value
 
@@ -52,7 +48,7 @@ module RequestLogAnalyzer::FileFormat
         sql.gsub!(/(:int,)+:int/, ':ints')                                # replace multiple ints by a list
         sql.gsub!(/(:string,)+:string/, ':strings')                       # replace multiple strings by a list
 
-        return sql.lstrip.rstrip
+        sql.lstrip.rstrip
       end
 
       def host
@@ -60,9 +56,9 @@ module RequestLogAnalyzer::FileFormat
       end
 
       # Convert the timestamp to an integer
-      def convert_timestamp(value, definition)
+      def convert_timestamp(value, _definition)
         _, y, m, d, h, i, s = value.split(/(\d\d)-(\d\d)-(\d\d)\s+(\d?\d):(\d\d):(\d\d)/)
-        ('20%s%s%s%s%s%s' % [y,m,d,h.rjust(2, '0'),i,s]).to_i
+        ('20%s%s%s%s%s%s' % [y, m, d, h.rjust(2, '0'), i, s]).to_i
       end
     end
   end

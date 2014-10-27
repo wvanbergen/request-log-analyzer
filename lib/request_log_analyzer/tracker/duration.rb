@@ -1,5 +1,4 @@
 module RequestLogAnalyzer::Tracker
-
   # Analyze the duration of a specific attribute
   #
   # === Options
@@ -20,7 +19,6 @@ module RequestLogAnalyzer::Tracker
   #  EmployeeController#index.html [GET]            |    5802 |  1477.32s |     0.25s
   #  .............
   class Duration < NumericValue
-
     # Check if duration and catagory option have been received,
     def prepare
       options[:value] = options[:duration] if options[:duration]
@@ -38,10 +36,10 @@ module RequestLogAnalyzer::Tracker
     def display_value(time)
       case time
       when nil       then '-'
-      when 0...1     then "%0ims" % (time*1000)
-      when 1...60    then "%0.02fs" % time
-      when 60...3600 then "%dm%02ds" % [time / 60, (time % 60).round]
-      else                "%dh%02dm%02ds" % [time / 3600, (time % 3600) / 60, (time % 60).round]
+      when 0...1     then '%0ims' % (time * 1000)
+      when 1...60    then '%0.02fs' % time
+      when 60...3600 then '%dm%02ds' % [time / 60, (time % 60).round]
+      else                '%dh%02dm%02ds' % [time / 3600, (time % 3600) / 60, (time % 60).round]
       end
     end
 

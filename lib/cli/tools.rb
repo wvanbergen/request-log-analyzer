@@ -6,27 +6,24 @@ module CommandLine
     # If it is not possible to to so, it returns the default_width.
     # <tt>default_width</tt> Defaults to 81
     def terminal_width(default_width = 81, out = STDOUT)
-
+      tiocgwinsz = 0x5413
+      data = [0, 0, 0, 0].pack('SSSS')
+      if !RUBY_PLATFORM.include?('java') && out.ioctl(tiocgwinsz, data) >= 0 # JRuby crashes on ioctl
+        _, cols, _, _ = data.unpack('SSSS')
+        fail unless cols > 0
+        cols
+      else
+        fail
+      end
+    rescue
       begin
-        tiocgwinsz = 0x5413
-        data = [0, 0, 0, 0].pack("SSSS")
-        if !RUBY_PLATFORM.include?('java') && out.ioctl(tiocgwinsz, data) >= 0 # JRuby crashes on ioctl
-          _, cols, _, _ = data.unpack("SSSS")
-          raise unless cols > 0
-          cols
-        else
-          raise
+        IO.popen('stty -a 2>&1') do |pipe|
+          column_line = pipe.find { |line| /(\d+) columns/ =~ line }
+          fail unless column_line
+          Regexp.last_match[1].to_i
         end
       rescue
-        begin
-          IO.popen('stty -a 2>&1') do |pipe|
-            column_line = pipe.detect { |line| /(\d+) columns/ =~ line }
-            raise unless column_line
-            $1.to_i
-          end
-        rescue
-          default_width
-        end
+        default_width
       end
     end
 
@@ -40,14 +37,14 @@ module CommandLine
         if File.directory?('./lib/tasks/')
           task_file = File.expand_path('../../tasks/request_log_analyzer.rake', File.dirname(__FILE__))
           FileUtils.copy(task_file, './lib/tasks/request_log_analyze.rake')
-          puts "Installed rake tasks."
-          puts "To use, run: rake rla:report"
+          puts 'Installed rake tasks.'
+          puts 'To use, run: rake rla:report'
         else
-          puts "Cannot find /lib/tasks folder. Are you in your Rails directory?"
-          puts "Installation aborted."
+          puts 'Cannot find /lib/tasks folder. Are you in your Rails directory?'
+          puts 'Installation aborted.'
         end
       else
-        raise "Cannot perform this install type! (#{install_type.to_s})"
+        fail "Cannot perform this install type! (#{install_type})"
       end
     end
   end

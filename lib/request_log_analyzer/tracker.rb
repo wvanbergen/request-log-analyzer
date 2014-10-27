@@ -1,5 +1,4 @@
 module RequestLogAnalyzer::Tracker
-
   # Base Tracker class. All other trackers inherit from this class
   #
   # Accepts the following options:
@@ -10,7 +9,6 @@ module RequestLogAnalyzer::Tracker
   #
   # For example :if => lambda { |request| request[:duration] && request[:duration] > 1.0 }
   class Base
-
     attr_reader :options
 
     # Initialize the class
@@ -21,7 +19,7 @@ module RequestLogAnalyzer::Tracker
     # * <tt>:if</tt> Handle request if this proc is true for the handled request.
     # * <tt>:unless</tt> Handle request if this proc is false for the handled request.
     # * <tt>:line_type</tt> Line type this tracker will accept.
-    def initialize(options ={})
+    def initialize(options = {})
       @options = options
       setup_should_update_checks!
     end
@@ -29,20 +27,20 @@ module RequestLogAnalyzer::Tracker
     # Sets up the tracker's should_update? checks.
     def setup_should_update_checks!
       @should_update_checks = []
-      @should_update_checks.push( lambda { |request| request.has_line_type?(options[:line_type]) } ) if options[:line_type]
+      @should_update_checks.push(lambda { |request| request.has_line_type?(options[:line_type]) }) if options[:line_type]
       @should_update_checks.push(options[:if]) if options[:if].respond_to?(:call)
-      @should_update_checks.push( lambda { |request| request[options[:if]] }) if options[:if].kind_of?(Symbol)
-      @should_update_checks.push( lambda { |request| !options[:unless].call(request) }) if options[:unless].respond_to?(:call)
-      @should_update_checks.push( lambda { |request| !request[options[:unless]] }) if options[:unless].kind_of?(Symbol)
+      @should_update_checks.push(lambda { |request| request[options[:if]] }) if options[:if].is_a?(Symbol)
+      @should_update_checks.push(lambda { |request| !options[:unless].call(request) }) if options[:unless].respond_to?(:call)
+      @should_update_checks.push(lambda { |request| !request[options[:unless]] }) if options[:unless].is_a?(Symbol)
     end
-    
-    # Creates a lambda expression to return a static field from a request. If the 
+
+    # Creates a lambda expression to return a static field from a request. If the
     # argument already is a lambda exprssion, it will simply return the argument.
     def create_lambda(arg)
       case arg
       when Proc   then arg
       when Symbol then lambda { |request| request[arg] }
-      else raise "Canot create a lambda expression from this argument: #{arg.inspect}!"
+      else fail "Canot create a lambda expression from this argument: #{arg.inspect}!"
       end
     end
 
@@ -52,7 +50,7 @@ module RequestLogAnalyzer::Tracker
 
     # Will be called with each request.
     # <tt>request</tt> The request to track data in.
-    def update(request)
+    def update(_request)
     end
 
     # Hook things that need to be done after running here.
@@ -77,7 +75,7 @@ module RequestLogAnalyzer::Tracker
     # Defaults to self.inspect
     # <tt>output</tt> The output object the report will be passed to.
     def report(output)
-      output << self.inspect
+      output << inspect
       output << "\n"
     end
 

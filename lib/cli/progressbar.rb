@@ -10,9 +10,9 @@
 
 module CommandLine
   class ProgressBar
-    VERSION = "0.9"
+    VERSION = '0.9'
 
-    def initialize (title, total, out = STDERR)
+    def initialize(title, total, out = STDERR)
       @title = title
       @total = total
       @out = out
@@ -30,17 +30,18 @@ module CommandLine
       show
     end
 
-    attr_reader   :title
-    attr_reader   :current
-    attr_reader   :total
+    attr_reader :title
+    attr_reader :current
+    attr_reader :total
     attr_accessor :start_time
 
     private
+
     def fmt_bar
       bar_width = do_percentage * @terminal_width / 100
-      sprintf("[%s%s]",
+      sprintf('[%s%s]',
               @bar_mark * bar_width,
-              " " *  (@terminal_width - bar_width))
+              ' ' *  (@terminal_width - bar_width))
     end
 
     def fmt_percentage
@@ -53,59 +54,59 @@ module CommandLine
 
     def fmt_stat_for_file_transfer
       if @finished_p then
-        sprintf("%s %s %s", bytes, transfer_rate, elapsed)
+        sprintf('%s %s %s', bytes, transfer_rate, elapsed)
       else
-        sprintf("%s %s %s", bytes, transfer_rate, eta)
+        sprintf('%s %s %s', bytes, transfer_rate, eta)
       end
     end
 
     def fmt_title
-      @title[0,(@title_width - 1)] + ":"
+      @title[0, (@title_width - 1)] + ':'
     end
 
-    def convert_bytes (bytes)
+    def convert_bytes(bytes)
       if bytes < 1024
-        sprintf("%6dB", bytes)
+        sprintf('%6dB', bytes)
       elsif bytes < 1024 * 1000 # 1000kb
-        sprintf("%5.1fKB", bytes.to_f / 1024)
+        sprintf('%5.1fKB', bytes.to_f / 1024)
       elsif bytes < 1024 * 1024 * 1000  # 1000mb
-        sprintf("%5.1fMB", bytes.to_f / 1024 / 1024)
+        sprintf('%5.1fMB', bytes.to_f / 1024 / 1024)
       else
-        sprintf("%5.1fGB", bytes.to_f / 1024 / 1024 / 1024)
+        sprintf('%5.1fGB', bytes.to_f / 1024 / 1024 / 1024)
       end
     end
 
     def transfer_rate
       bytes_per_second = @current.to_f / (Time.now - @start_time)
-      sprintf("%s/s", convert_bytes(bytes_per_second))
+      sprintf('%s/s', convert_bytes(bytes_per_second))
     end
 
     def bytes
       convert_bytes(@current)
     end
 
-    def format_time (t)
+    def format_time(t)
       t = t.to_i
       sec = t % 60
       min  = (t / 60) % 60
       hour = t / 3600
-      sprintf("%02d:%02d:%02d", hour, min, sec);
+      sprintf('%02d:%02d:%02d', hour, min, sec)
     end
 
     # ETA stands for Estimated Time of Arrival.
     def eta
       if @current == 0
-        "ETA:  --:--:--"
+        'ETA:  --:--:--'
       else
         elapsed = Time.now - @start_time
-        eta = elapsed * @total / @current - elapsed;
-        sprintf("ETA:  %s", format_time(eta))
+        eta = elapsed * @total / @current - elapsed
+        sprintf('ETA:  %s', format_time(eta))
       end
     end
 
     def elapsed
       elapsed = Time.now - @start_time
-      sprintf("Time: %s", format_time(elapsed))
+      sprintf('Time: %s', format_time(elapsed))
     end
 
     def eol
@@ -122,7 +123,7 @@ module CommandLine
 
     def show
       arguments = @format_arguments.map do |method|
-        method = sprintf("fmt_%s", method)
+        method = sprintf('fmt_%s', method)
         send(method)
       end
       line = sprintf(@format, *arguments)
@@ -158,9 +159,10 @@ module CommandLine
     end
 
     public
+
     def clear
       @out.print "\r"
-      @out.print(" " * (CommandLine::Tools.terminal_width(80) - 1))
+      @out.print(' ' * (CommandLine::Tools.terminal_width(80) - 1))
       @out.print "\r"
     end
 
@@ -178,27 +180,23 @@ module CommandLine
       @format_arguments = [:title, :percentage, :bar, :stat_for_file_transfer]
     end
 
-    def format= (format)
-      @format = format
-    end
+    attr_writer :format
 
-    def format_arguments= (arguments)
-      @format_arguments = arguments
-    end
+    attr_writer :format_arguments
 
     def halt
       @finished_p = true
       show
     end
 
-    def inc (step = 1)
+    def inc(step = 1)
       @current += step
       @current = @total if @current > @total
       show_if_needed
       @previous = @current
     end
 
-    def set (count)
+    def set(count)
       count = 0 if count < 0
       count = @total if count > @total
 

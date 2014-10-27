@@ -1,5 +1,4 @@
 module RequestLogAnalyzer::Tracker
-
   # Determines the datetime of the first request and the last request
   # Also determines the amount of days inbetween these.
   #
@@ -18,13 +17,12 @@ module RequestLogAnalyzer::Tracker
   #  Last request:         2008-07-20 06:18:06
   #  Total time analyzed:  7 days
   class Timespan < Base
-
     attr_reader :first, :last
 
     # Check if timestamp field is set in the options.
     def prepare
       options[:field] ||= :timestamp
-      @first, @last = 99999999999999, 0
+      @first, @last = 99_999_999_999_999, 0
     end
 
     # Check if the timestamp in the request and store it.
@@ -56,9 +54,9 @@ module RequestLogAnalyzer::Tracker
     def report(output)
       output.title(options[:title]) if options[:title]
 
-      if @last > 0 && @first < 99999999999999
-        output.with_style(:cell_separator => false) do
-          output.table({:width => 20}, {}) do |rows|
+      if @last > 0 && @first < 99_999_999_999_999
+        output.with_style(cell_separator: false) do
+          output.table({ width: 20 }, {}) do |rows|
             rows << ['First request:', first_timestamp.strftime('%Y-%m-%d %H:%M:%I')]
             rows << ['Last request:',  last_timestamp.strftime('%Y-%m-%d %H:%M:%I')]
             rows << ['Total time analyzed:', "#{timespan.ceil} days"]
@@ -74,8 +72,7 @@ module RequestLogAnalyzer::Tracker
 
     # A hash that can be exported to YAML with the first and last timestamp encountered.
     def to_yaml_object
-      { :first => first_timestamp, :last  =>last_timestamp }
+      { first: first_timestamp, last: last_timestamp }
     end
-
   end
 end

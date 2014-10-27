@@ -1,5 +1,4 @@
 module RequestLogAnalyzer
-
   # The Logprocessor class is used to perform simple processing actions over log files.
   # It will go over the log file/stream line by line, pass the line to a processor and
   # write the result back to the output file or stream. The processor can alter the
@@ -11,7 +10,6 @@ module RequestLogAnalyzer
   #    sources. A compact, information packed log will remain/.
   #
   class LogProcessor
-
     attr_reader :mode, :options, :sources, :file_format
     attr_accessor :output_file
 
@@ -20,11 +18,10 @@ module RequestLogAnalyzer
     #    processing mode. Currently, only :strip is supported.
     # <tt>arguments</tt> The parsed command line arguments (a CommandLine::Arguments instance)
     def self.build(command, arguments)
-
       options = {
-          :discard_teaser_lines => arguments[:discard_teaser_lines],
-          :keep_junk_lines      => arguments[:keep_junk_lines],
-        }
+        discard_teaser_lines: arguments[:discard_teaser_lines],
+        keep_junk_lines: arguments[:keep_junk_lines]
+      }
 
       log_processor = RequestLogAnalyzer::LogProcessor.new(arguments[:format].to_sym, command, options)
       log_processor.output_file = arguments[:output] if arguments[:output]
@@ -33,7 +30,7 @@ module RequestLogAnalyzer
         log_processor.sources << input
       end
 
-      return log_processor
+      log_processor
     end
 
     # Initializes a new LogProcessor instance.
@@ -60,7 +57,7 @@ module RequestLogAnalyzer
     # <tt>io</tt> The IO instance to process.
     def process_io(io)
       case mode
-        when :strip;     io.each_line { |line| @output << strip_line(line) }
+        when :strip then     io.each_line { |line| @output << strip_line(line) }
       end
     end
 
@@ -68,7 +65,7 @@ module RequestLogAnalyzer
     # found, an empty line is returned, which will strip the line from the output.
     # <tt>line</tt> The line to strip
     def strip_line(line)
-      file_format.line_definitions.any? { |name, definition| definition =~ line } ? line : ""
+      file_format.line_definitions.any? { |_name, definition| definition =~ line } ? line : ''
     end
 
     # Runs the log processing by setting up the output stream and iterating over all the
@@ -82,9 +79,9 @@ module RequestLogAnalyzer
       end
 
       @sources.each do |source|
-        if source.kind_of?(String) && File.exist?(source)
+        if source.is_a?(String) && File.exist?(source)
           process_file(source)
-        elsif source.kind_of?(IO)
+        elsif source.is_a?(IO)
           process_io(source)
         elsif ['-', 'STDIN'].include?(source)
           process_io($stdin)
@@ -92,8 +89,7 @@ module RequestLogAnalyzer
       end
 
     ensure
-      @output.close if @output.kind_of?(File)
+      @output.close if @output.is_a?(File)
     end
   end
-
 end

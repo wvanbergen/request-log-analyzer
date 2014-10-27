@@ -1,5 +1,4 @@
 class DatabaseConsole
-
   IRB = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb'
 
   def initialize(arguments)
@@ -7,7 +6,7 @@ class DatabaseConsole
   end
 
   def run!
-    libraries = ['irb/completion', 'rubygems','cli/database_console_init']
+    libraries = ['irb/completion', 'rubygems', 'cli/database_console_init']
     libaries_string = libraries.map { |l| "-r #{l}" }.join(' ')
 
     ENV['RLA_DBCONSOLE_DATABASE'] = @arguments[:database]
@@ -22,4 +21,3 @@ class DatabaseConsole
     exec("#{IRB} #{libaries_string} --simple-prompt")
   end
 end
-

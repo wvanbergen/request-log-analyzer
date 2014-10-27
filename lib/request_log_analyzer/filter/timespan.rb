@@ -1,11 +1,9 @@
 module RequestLogAnalyzer::Filter
-
   # Reject all requests not in given timespan
   # Options
   # * <tt>:after</tt> Only keep requests after this DateTime.
   # * <tt>:before</tt> Only keep requests before this DateTime.
   class Timespan < Base
-
     attr_reader :before, :after
 
     def initialize(file_format, options = {})
@@ -14,7 +12,6 @@ module RequestLogAnalyzer::Filter
       super(file_format, options)
       setup_filter
     end
-
 
     # Convert the timestamp to the correct formats for quick timestamp comparisons.
     # These are stored in the before and after attr_reader fields.
@@ -38,8 +35,7 @@ module RequestLogAnalyzer::Filter
         return request
       end
 
-      return nil
+      nil
     end
   end
-
 end

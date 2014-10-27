@@ -1,7 +1,5 @@
 module CommandLine
-
   class Option
-
     attr_reader :name, :alias
     attr_reader :parameter_count
     attr_reader :default_value
@@ -18,7 +16,7 @@ module CommandLine
     def initialize(name, definition = {})
       @name            = CommandLine::Option.rewrite(name)
       @alias           = definition[:alias] ? definition[:alias].to_sym : nil
-      @required        = definition.has_key?(:required) && definition[:required] == true
+      @required        = definition.key?(:required) && definition[:required] == true
       @parameter_count = definition[:parameters] || 1
       @multiple        = definition[:multiple]   || false
       @default_value   = definition[:default]    || false
@@ -29,7 +27,7 @@ module CommandLine
         return true
       elsif @parameter_count == 1
         parameter = arguments_parser.next_parameter
-        raise CommandLine::ParameterExpected, self if parameter.nil?
+        fail CommandLine::ParameterExpected, self if parameter.nil?
         return parameter
       elsif @parameter_count == :any
         parameters = []
@@ -39,9 +37,9 @@ module CommandLine
         return parameters
       else
         parameters = []
-        @parameter_count.times do |n|
+        @parameter_count.times do |_n|
           parameter = arguments_parser.next_parameter
-          raise CommandLine::ParameterExpected, self if parameter.nil?
+          fail CommandLine::ParameterExpected, self if parameter.nil?
           parameters << parameter
         end
         return parameters
@@ -87,10 +85,8 @@ module CommandLine
   end
 
   class Arguments
-
     class Definition
-
-      ENDLESS_PARAMETERS = 99999
+      ENDLESS_PARAMETERS = 99_999
 
       attr_reader :commands, :options, :parameters
 
@@ -103,10 +99,10 @@ module CommandLine
 
       def [](option_name)
         option_symbol = CommandLine::Option.rewrite(option_name)
-        if the_option = @options.detect { |(_, odef)| odef =~ option_symbol }
+        if the_option = @options.find { |(_, odef)| odef =~ option_symbol }
           the_option[1]
         else
-          raise CommandLine::UnknownOption, option_name
+          fail CommandLine::UnknownOption, option_name
         end
       end
 
@@ -114,11 +110,9 @@ module CommandLine
         @parameters = count_specifier..ENDLESS_PARAMETERS
       end
 
-      def parameters=(count_specifier)
-        @parameters = count_specifier
-      end
+      attr_writer :parameters
 
-      alias :files= :parameters=
+      alias_method :files=, :parameters=
 
       def option(name, options = {})
         clo = CommandLine::Option.new(name, options)
@@ -126,10 +120,10 @@ module CommandLine
       end
 
       def switch(name, switch_alias = nil)
-        option(name, :alias => switch_alias, :parameters => 0)
+        option(name, alias: switch_alias, parameters: 0)
       end
 
-      def command(name, &block)
+      def command(name, &_block)
         command_definition = Definition.new(self)
         yield(command_definition) if block_given?
         @commands[CommandLine::Option.rewrite(name)] = command_definition
@@ -140,7 +134,7 @@ module CommandLine
       end
     end
 
-    OPTION_REGEXP  = /^\-\-([A-Za-z0-9-]+)$/;
+    OPTION_REGEXP  = /^\-\-([A-Za-z0-9-]+)$/
     ALIASES_REGEXP = /^\-([A-Aa-z0-9]+)$/
 
     attr_reader :definition
@@ -150,7 +144,7 @@ module CommandLine
     def self.parse(tokens = $*, &block)
       cla = Arguments.new
       cla.define(&block)
-      return cla.parse!(tokens)
+      cla.parse!(tokens)
     end
 
     def initialize
@@ -159,12 +153,12 @@ module CommandLine
       @current_definition = @definition
     end
 
-    def define(&block)
+    def define(&_block)
       yield(@definition)
     end
 
     def [](option)
-      if the_option = @options.detect { |(key, _)| key =~ option }
+      if the_option = @options.find { |(key, _)| key =~ option }
         the_option[1]
       else
         @current_definition[option].default_value
@@ -173,13 +167,13 @@ module CommandLine
 
     def next_token
       @current_token = @tokens.shift
-      return @current_token
+      @current_token
     end
 
     def next_parameter
       parameter_candidate = @tokens.first
       parameter = (parameter_candidate.nil? || OPTION_REGEXP =~ parameter_candidate || ALIASES_REGEXP =~ parameter_candidate) ? nil : @tokens.shift
-      return parameter
+      parameter
     end
 
     def parse!(tokens)
@@ -200,8 +194,8 @@ module CommandLine
           @command = CommandLine::Option.rewrite(@current_token)
         else
           case @current_token
-            when ALIASES_REGEXP; handle_alias_expansion($1)
-            when OPTION_REGEXP;  handle_option($1)
+            when ALIASES_REGEXP then handle_alias_expansion(Regexp.last_match[1])
+            when OPTION_REGEXP then  handle_option(Regexp.last_match[1])
             else;                handle_other_parameter(@current_token)
           end
           @first_token = false
@@ -211,24 +205,24 @@ module CommandLine
 
       validate_arguments!
 
-      return self
+      self
     end
 
     protected
 
     def prepare_result!
-      multiple_options = Hash[*@current_definition.options.select { |name, o| o.multiple? }.flatten]
-      multiple_options.each { |name, definition| @options[definition] = [] }
+      multiple_options = Hash[*@current_definition.options.select { |_name, o| o.multiple? }.flatten]
+      multiple_options.each { |_name, definition| @options[definition] = [] }
     end
 
     def validate_arguments!
       if @current_definition.parameters && !(@current_definition.parameters === @parameters.length)
-        raise CommandLine::ParametersOutOfRange.new(@current_definition.parameters, @parameters.length)
+        fail CommandLine::ParametersOutOfRange.new(@current_definition.parameters, @parameters.length)
       end
 
-      required_options = Hash[*@current_definition.options.select { |name, o| o.required? }.flatten]
+      required_options = Hash[*@current_definition.options.select { |_name, o| o.required? }.flatten]
       required_options.each do |name, definition|
-        raise CommandLine::RequiredOptionMissing, definition unless self[name]
+        fail CommandLine::RequiredOptionMissing, definition unless self[name]
       end
     end
 
@@ -237,7 +231,7 @@ module CommandLine
         if option_definition = @current_definition[alias_char]
           @tokens.unshift(option_definition.to_option)
         else
-          raise CommandLine::UnknownOption, alias_char
+          fail CommandLine::UnknownOption, alias_char
         end
       end
     end
@@ -248,7 +242,7 @@ module CommandLine
 
     def handle_option(option_name)
       option_definition = @current_definition[option_name]
-      raise CommandLine::UnknownOption, option_name if option_definition.nil?
+      fail CommandLine::UnknownOption, option_name if option_definition.nil?
 
       if option_definition.multiple?
         @options[option_definition] << option_definition.parse(self)
@@ -256,7 +250,6 @@ module CommandLine
         @options[option_definition] = option_definition.parse(self)
       end
     end
-
   end
 
   # Commandline parsing errors and exceptions
@@ -273,7 +266,7 @@ module CommandLine
   # Missing a required file
   class ParametersOutOfRange < CommandLine::Error
     def initialize(expected, actual)
-      if expected.kind_of?(Range)
+      if expected.is_a?(Range)
         if expected.end == CommandLine::Arguments::Definition::ENDLESS_PARAMETERS
           super("The command expected at least #{expected.begin} parameters, but found #{actual}!")
         else

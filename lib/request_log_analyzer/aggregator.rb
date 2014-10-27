@@ -1,9 +1,7 @@
 module RequestLogAnalyzer::Aggregator
-
   # The base class of an aggregator. This class provides the interface to which
   # every aggregator should comply (by simply subclassing this class).
   class Base
-
     attr_reader :options, :source
 
     # Intializes a new RequestLogAnalyzer::Aggregator::Base instance
@@ -20,7 +18,7 @@ module RequestLogAnalyzer::Aggregator
 
     # The aggregate function is called for every request.
     # Implement the aggregating functionality in this method
-    def aggregate(request)
+    def aggregate(_request)
     end
 
     # The finalize function is called after all sources are parsed and no more
@@ -29,18 +27,17 @@ module RequestLogAnalyzer::Aggregator
     end
 
     # The warning method is called if the parser eits a warning.
-    def warning(type, message, lineno)
+    def warning(_type, _message, _lineno)
     end
 
     # The report function is called at the end. Implement any result reporting
     # in this function.
-    def report(output)
+    def report(_output)
     end
 
     # The source_change function gets called when handling a source is started or finished.
-    def source_change(change, filename)
+    def source_change(_change, _filename)
     end
-
   end
 end
 

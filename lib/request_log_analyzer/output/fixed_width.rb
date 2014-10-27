@@ -1,22 +1,19 @@
 # coding: utf-8
 module RequestLogAnalyzer::Output
-
   # Fixed Width output class.
   # Outputs a fixed width ASCII or UF8 report.
   class FixedWidth < Base
-
     # Mixin module. Will disable any colorizing.
     module Monochrome
-      def colorize(text, *options)
+      def colorize(text, *_options)
         text
       end
     end
 
     # Colorize module
     module Color
-
-      STYLES = { :normal => 0, :bold => 1, :underscore => 4, :blink => 5, :inverse => 7, :concealed => 8 }
-      COLORS = { :black  => 0, :blue => 4, :green => 2, :cyan => 6, :red => 1, :purple => 5, :brown => 3, :white => 7 }
+      STYLES = { normal: 0, bold: 1, underscore: 4, blink: 5, inverse: 7, concealed: 8 }
+      COLORS = { black: 0, blue: 4, green: 2, cyan: 6, red: 1, purple: 5, brown: 3, white: 7 }
 
       # Colorize text
       # <tt>text</tt> The text to colorize
@@ -28,36 +25,34 @@ module RequestLogAnalyzer::Output
       #
       # Returns ASCII colored string
       def colorize(text, *options)
-
         font_style       = ''
         foreground_color = '0'
         background_color = ''
 
         options.each do |option|
-          if option.kind_of?(Symbol)
+          if option.is_a?(Symbol)
             foreground_color = "3#{COLORS[option]}" if COLORS.include?(option)
             font_style       = "#{STYLES[option]};" if STYLES.include?(option)
-          elsif option.kind_of?(Hash)
+          elsif option.is_a?(Hash)
             option.each do |key, value|
               case key
-              when :color;      foreground_color = "3#{COLORS[value]}"  if COLORS.include?(value)
-              when :background; background_color = "4#{COLORS[value]};" if COLORS.include?(value)
-              when :on;         background_color = "4#{COLORS[value]};" if COLORS.include?(value)
-              when :style;      font_style       = "#{STYLES[value]};"  if STYLES.include?(value)
+              when :color then      foreground_color = "3#{COLORS[value]}"  if COLORS.include?(value)
+              when :background then background_color = "4#{COLORS[value]};" if COLORS.include?(value)
+              when :on then         background_color = "4#{COLORS[value]};" if COLORS.include?(value)
+              when :style then      font_style       = "#{STYLES[value]};"  if STYLES.include?(value)
               end
             end
           end
         end
-        return "\e[#{background_color}#{font_style}#{foreground_color}m#{text}\e[0m"
+        "\e[#{background_color}#{font_style}#{foreground_color}m#{text}\e[0m"
       end
-
     end
 
     attr_reader :characters
 
     CHARACTERS = {
-      :ascii => { :horizontal_line => '-', :vertical_line => '|', :block => '=' },
-      :utf   => { :horizontal_line => '━', :vertical_line => '┃', :block => '░' }
+      ascii: { horizontal_line: '-', vertical_line: '|', block: '=' },
+      utf: { horizontal_line: '━', vertical_line: '┃', block: '░' }
     }
 
     # Initialize a report
@@ -82,7 +77,7 @@ module RequestLogAnalyzer::Output
       @io << str
     end
 
-    alias :<< :print
+    alias_method :<<, :print
 
     # Write a string to the output object with a newline at the end.
     # <tt>str</tt> The string to write.
@@ -116,8 +111,8 @@ module RequestLogAnalyzer::Output
 
     # Generate a header for a report
     def header
-      if io.kind_of?(File)
-        puts colorize("Request-log-analyzer summary report", :white, :bold)
+      if io.is_a?(File)
+        puts colorize('Request-log-analyzer summary report', :white, :bold)
         line(:green)
         puts "Version #{RequestLogAnalyzer::VERSION} - written by Willem van Bergen and Bart ten Brinke"
         puts "Website: #{link('http://github.com/wvanbergen/request-log-analyzer')}"
@@ -127,7 +122,7 @@ module RequestLogAnalyzer::Output
     # Generate a footer for a report
     def footer
       puts
-      puts "Need an expert to analyze your application?"
+      puts 'Need an expert to analyze your application?'
       puts "Mail to #{link('contact@railsdoctors.com')} or visit us at #{link('http://railsdoctors.com')}."
       line(:green)
       puts "Thanks for using #{colorize('request-log-analyzer', :white, :bold)}!"
@@ -136,13 +131,12 @@ module RequestLogAnalyzer::Output
     # Generate a report table and push it into the output object.
     # <tt>*colums<tt> Columns hash
     # <tt>&block</tt>: A block yeilding the rows.
-    def table(*columns, &block)
-
-      rows = Array.new
+    def table(*columns, &_block)
+      rows = []
       yield(rows)
 
       # determine maximum cell widths
-      max_cell_widths = rows.inject(Array.new(columns.length, 0)) do |result, row|
+      max_cell_widths = rows.reduce(Array.new(columns.length, 0)) do |result, row|
         lengths = row.map { |column| column.to_s.length }
         result.each_with_index { |length, index| result[index] = ([length, lengths[index]].max rescue length) }
       end
@@ -164,7 +158,7 @@ module RequestLogAnalyzer::Output
       end
 
       if column_widths.include?(nil)
-        width_left = options[:width] - ((columns.length - 1) * (style[:cell_separator] ? 3 : 1)) - column_widths.compact.inject(0) { |sum, col| sum + col}
+        width_left = options[:width] - ((columns.length - 1) * (style[:cell_separator] ? 3 : 1)) - column_widths.compact.reduce(0) { |sum, col| sum + col }
         column_widths[column_widths.index(nil)] = width_left
       end
 
@@ -214,6 +208,5 @@ module RequestLogAnalyzer::Output
         puts row_values.join(style[:cell_separator] ? " #{characters[:vertical_line]} " : ' ')
       end
     end
-
   end
 end

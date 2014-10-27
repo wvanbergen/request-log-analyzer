@@ -8,6 +8,6 @@ describe DummyInheritedFromRails3 do
   subject { RequestLogAnalyzer::FileFormat.load(DummyInheritedFromRails3) }
 
   it { should be_well_formed }
-  it { should have(11).report_trackers }
+  it { subject.report_trackers.length.should == 11 }
 
 end

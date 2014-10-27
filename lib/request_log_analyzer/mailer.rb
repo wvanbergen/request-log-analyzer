@@ -1,8 +1,6 @@
 module RequestLogAnalyzer
-
   # Mail report to a specified emailaddress
   class Mailer
-
     attr_accessor :data, :to, :host, :port
 
     # Initialize a mailer
@@ -23,7 +21,7 @@ module RequestLogAnalyzer
       @port    = 25
       @options = options
       @host, @port = host.split(':') if @host.include?(':')
-      @data    = []      
+      @data    = []
     end
 
     # Send all data in @data to the email address used during initialization.
@@ -32,10 +30,10 @@ module RequestLogAnalyzer
       from          = @options[:from]        || 'contact@railsdoctors.com'
       from_alias    = @options[:from_alias]  || 'Request-log-analyzer reporter'
       to_alias      = @options[:to_alias]    || to
-      subject       = @options[:subject]     || "Request log analyzer report - generated on #{Time.now.to_s}"
-      content_type  = ""
-      content_type  = 'Content-Type: text/html; charset="ISO-8859-1";' if @data.map{|l| l.include?('html')}.include?(true)
-    msg = <<END_OF_MESSAGE
+      subject       = @options[:subject]     || "Request log analyzer report - generated on #{Time.now}"
+      content_type  = ''
+      content_type  = 'Content-Type: text/html; charset="ISO-8859-1";' if @data.map { |l| l.include?('html') }.include?(true)
+      msg = <<END_OF_MESSAGE
 From: #{from_alias} <#{from}>
 To: #{to_alias} <#{@to}>
 Subject: #{subject}
@@ -50,16 +48,15 @@ END_OF_MESSAGE
         end
       end
 
-      return [msg, from, to] 
+      [msg, from, to]
     end
 
-    def << string
+    def <<(string)
       data << string
     end
 
-    def puts string
+    def puts(string)
       data << string
     end
-
   end
 end

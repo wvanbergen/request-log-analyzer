@@ -1,19 +1,17 @@
 # Module for generating output
 module RequestLogAnalyzer::Output
-
   # Loads a Output::Base subclass instance.
   def self.load(file_format, *args)
-    
     klass = nil
-    if file_format.kind_of?(RequestLogAnalyzer::Output::Base)
+    if file_format.is_a?(RequestLogAnalyzer::Output::Base)
       # this already is a file format! return itself
       return file_format
 
-    elsif file_format.kind_of?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::Output::Base)
+    elsif file_format.is_a?(Class) && file_format.ancestors.include?(RequestLogAnalyzer::Output::Base)
       # a usable class is provided. Use this format class.
       klass = file_format
 
-    elsif file_format.kind_of?(String) && File.exist?(file_format)
+    elsif file_format.is_a?(String) && File.exist?(file_format)
       # load a format from a ruby file
       require file_format
       const = RequestLogAnalyzer.to_camelcase(File.basename(file_format, '.rb'))
@@ -22,7 +20,7 @@ module RequestLogAnalyzer::Output
       elsif Object.const_defined?(const)
         klass = Object.const_get(const)
       else
-        raise "Cannot load class #{const} from #{file_format}!"
+        fail "Cannot load class #{const} from #{file_format}!"
       end
 
     else
@@ -31,16 +29,15 @@ module RequestLogAnalyzer::Output
     end
 
     # check the returned klass to see if it can be used
-    raise "Could not load a file format from #{file_format.inspect}" if klass.nil?
-    raise "Invalid FileFormat class" unless klass.kind_of?(Class) && klass.ancestors.include?(RequestLogAnalyzer::Output::Base)
+    fail "Could not load a file format from #{file_format.inspect}" if klass.nil?
+    fail 'Invalid FileFormat class' unless klass.is_a?(Class) && klass.ancestors.include?(RequestLogAnalyzer::Output::Base)
 
     klass.create(*args) # return an instance of the class
   end
-  
+
   # Base Class used for generating output for reports.
   # All output should inherit fromt this class.
   class Base
-
     attr_accessor :io, :options, :style
 
     # Initialize a report
@@ -49,9 +46,9 @@ module RequestLogAnalyzer::Output
     def initialize(io, options = {})
       @io      = io
       @options = options
-      @style   = options[:style] || { :cell_separator => true, :table_border => false }
+      @style   = options[:style] || { cell_separator: true, table_border: false }
     end
-    
+
     def report_tracker(tracker)
       tracker.report(self)
     end
@@ -74,7 +71,7 @@ module RequestLogAnalyzer::Output
 
     def slice_results(array)
       return array if options[:amount] == :all
-      return array.slice(0, options[:amount]) # otherwise
+      array.slice(0, options[:amount]) # otherwise
     end
 
     # Generate a report table and push it into the output object.
@@ -98,10 +95,11 @@ module RequestLogAnalyzer::Output
     #   end
     # end
     #
-    def table(*columns, &block)
+    def table(*_columns, &_block)
     end
 
     protected
+
     # Check if a given table defination hash includes a header (title)
     # <tt>columns</tt> The columns hash
     def table_has_header?(columns)
