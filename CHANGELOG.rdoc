@@ -5,7 +5,7 @@ please add an entry to the "Not yet released" section in this document.
 
 == Not yet released
 
-* Nothing yet!
+* Fix syntax error while parsing parameter line with file upload (Michael Stark)
 
 == Request-log-analyzer 1.13 release cycle
 
