@@ -13,3 +13,4 @@ Gemfile.lock
 /.bundle/
 *.rbc
 _site/
+.idea
