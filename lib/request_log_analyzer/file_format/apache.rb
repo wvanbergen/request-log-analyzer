@@ -46,7 +46,7 @@ module RequestLogAnalyzer::FileFormat
       'T' => { nil => { :regexp => '(\d+(?:\.\d+)?|-)', :captures => [{:name => :duration, :type => :duration, :unit => :sec}] } },
       't' => { nil => { :regexp => "\\[(#{APACHE_TIMESTAMP})?\\]", :captures => [{:name => :timestamp, :type => :timestamp}] } },
       's' => { nil => { :regexp => '(\d{3})', :captures => [{:name => :http_status, :type => :integer}] } },
-      'u' => { nil => { :regexp => '(\w+|-)', :captures => [{:name => :user, :type => :nillable_string}] } },
+      'u' => { nil => { :regexp => '(\/\S*|-)', :captures => [{:name => :user, :type => :nillable_string}] } },
       'U' => { nil => { :regexp => '(\/\S*)', :captures => [{:name => :path, :type => :string}] } },
       'r' => { nil => { :regexp => '([A-Z]+) (\S+) HTTP\/(\d+(?:\.\d+)*)', :captures => [{:name => :http_method, :type => :string},
                        {:name => :path, :type => :path}, {:name => :http_version, :type => :string}]} },
