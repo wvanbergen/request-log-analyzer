@@ -61,6 +61,11 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
       subject.should parse_line(line).as(:parameters).and_capture(params: { action: 'cached', controller: 'cached' })
     end
 
+    it 'parses a :parameters line with file upload correctly' do
+      line = 'Parameters: {"utf8"=>"✓", "authenticity_token"=>"eqHyMOSSzw35utH4nN+l28mRMdsHUbRxqh+hSMjag0w=", "user"=>{"photo"=>#<ActionDispatch::Http::UploadedFile:0x000000068fb190 @original_filename="IMG_2228.JPG", @content_type="image/jpeg", @headers="Content-Disposition: form-data; name=\"user[photo]\"; filename=\"IMG_2228.JPG\"\r\nContent-Type: image/jpeg\r\n", @tempfile=#<File:/tmp/RackMultipart20141010-19270-zah6b7>>}, "commit"=>"speichern"}'
+      subject.should parse_line(line).as(:parameters).and_capture(:params => {:utf8 => "\u2713", :authenticity_token => "eqHyMOSSzw35utH4nN+l28mRMdsHUbRxqh+hSMjag0w=", :user => {"photo"=>"ActionDispatch::Http::UploadedFile:0x000000068fb190 @original_filename=\"IMG_2228.JPG\", @content_type=\"image/jpeg\", @headers=\"Content-Disposition: form-data; name=\"user[photo]\"; filename=\"IMG_2228.JPG\"\r\nContent-Type: image/jpeg\r\n\", @tempfile=\"File:/tmp/RackMultipart20141010-19270-zah6b7\""}, :commit => "speichern"})
+    end
+
     it 'should parse :completed lines correctly' do
       line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms)'
       subject.should parse_line(line).as(:completed).and_capture(
