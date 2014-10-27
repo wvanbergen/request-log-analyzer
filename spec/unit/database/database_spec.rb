@@ -16,7 +16,7 @@ describe RequestLogAnalyzer::Database do
       # FileFormat-agnostic classes
       default_orm_class_names.each do |const|
         it "should create the default #{const} constant" do
-          RequestLogAnalyzer::Database.const_defined?(const).should be_true
+          RequestLogAnalyzer::Database.const_defined?(const).should == true
         end
 
         it "should create the default #{const} class inheriting from ActiveRecord::Base and RequestLogAnalyzer::Database::Base" do
@@ -27,7 +27,7 @@ describe RequestLogAnalyzer::Database do
       # Some Fileformat-specific classes
       ['CompletedLine', 'ProcessingLine'].each do |const|
         it "should create the #{const} constant" do
-          Object.const_defined?(const).should be_true
+          Object.const_defined?(const).should == true
         end
 
         it "should create the #{const} class inheriting from ActiveRecord::Base and RequestLogAnalyzer::Database::Base" do
@@ -77,7 +77,7 @@ describe RequestLogAnalyzer::Database do
 
       it "should create the #{(name.to_s + '_line').camelize} class for #{name.inspect} lines" do
         @database.send :create_database_schema!
-        Object.const_defined?("#{name}_line".camelize).should be_true
+        Object.const_defined?("#{name}_line".camelize).should == true
       end
 
       it "should create the #{name.to_s + '_lines'} table for the parsed #{name.inspect} lines" do
@@ -123,7 +123,7 @@ describe RequestLogAnalyzer::Database do
 
     it "should define the class in the ORM module" do
       @database.load_activerecord_class(:test_lines)
-      Object.const_defined?('TestLine').should be_true
+      Object.const_defined?('TestLine').should == true
     end
 
     it "should add the class to the line_classes array of the database" do

@@ -16,13 +16,13 @@ describe RequestLogAnalyzer::Source::LogParser do
 
     it "should set the :source for every parsed line" do
       @log_parser.parse_file(log_fixture(:rails_22)) do |request|
-        request.lines.all? { |line| line[:source] == log_fixture(:rails_22) }.should be_true
+        request.lines.all? { |line| line[:source] == log_fixture(:rails_22) }.should == true
       end
     end
 
     it "should set the :lineno for every parsed line" do
       @log_parser.parse_file(log_fixture(:rails_22)) do |request|
-        request.lines.all? { |line| line.has_key?(:lineno) }.should be_true
+        request.lines.all? { |line| line.has_key?(:lineno) }.should == true
       end
     end
 
@@ -39,7 +39,7 @@ describe RequestLogAnalyzer::Source::LogParser do
 
     it "should parse all request values when spanned over multiple files" do
       @log_parser.parse_files([log_fixture(:multiple_files_1), log_fixture(:multiple_files_2)]) do |request|
-        request.lines.should have(4).items
+        request.lines.length.should be 4
         request[:request_no].should == 1
         request[:test_capture].should == "Testing is amazing" # Note the custom converter
       end
@@ -113,7 +113,7 @@ describe RequestLogAnalyzer::Source::LogParser do
         @log_parser.parsed_lines.should > 0
       end
     end
-  
+
     if `which unzip` != ""
       it "should parse a rails zipped log file" do
         @log_parser.should_receive(:handle_request).once

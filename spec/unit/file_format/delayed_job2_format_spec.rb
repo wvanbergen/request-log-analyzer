@@ -6,17 +6,17 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob2 do
 
   it { should be_well_formed }
   it { should have_line_definition(:job_lock).capturing(:timestamp, :job, :host, :pid) }
-  it { should have_line_definition(:job_completed).capturing(:timestamp, :duration, :host, :pid) }  
-  it { should have(4).report_trackers }
-  
+  it { should have_line_definition(:job_completed).capturing(:timestamp, :duration, :host, :pid) }
+  it { should satisfy { |ff| ff.report_trackers.length == 4 } }
+
   describe '#parse_line' do
-    
+
     let(:job_lock_sample1)     { "2010-05-17T17:37:34+0000: * [Worker(delayed_job host:hostname.co.uk pid:11888)] acquired lock on S3FileJob" }
     let(:job_lock_sample2)     { "2010-05-17T17:37:34+0000: * [Worker(delayed_job.0 host:hostname.co.uk pid:11888)] acquired lock on S3FileJob" }
     let(:job_completed_sample) { '2010-05-17T17:37:35+0000: * [JOB] delayed_job host:hostname.co.uk pid:11888 completed after 1.0676' }
-    let(:starting_sample)      { '2010-05-17T17:36:44+0000: *** Starting job worker delayed_job host:hostname.co.uk pid:11888' } 
+    let(:starting_sample)      { '2010-05-17T17:36:44+0000: *** Starting job worker delayed_job host:hostname.co.uk pid:11888' }
     let(:summary_sample)       { '3 jobs processed at 0.3163 j/s, 0 failed ...' }
-    
+
     it { should parse_line(job_lock_sample1, 'with a single worker').as(:job_lock).and_capture(
                     :timestamp => 20100517173734, :job => 'S3FileJob', :host => 'hostname.co.uk', :pid => 11888) }
 
@@ -30,7 +30,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob2 do
     it { should_not parse_line(summary_sample, 'a summary line') }
     it { should_not parse_line('nonsense', 'a nonsense line') }
   end
-  
+
   describe '#parse_io' do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
 

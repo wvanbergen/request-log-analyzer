@@ -11,7 +11,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
 
     it "should create a list of captures for the values in the lines" do
-      line_definition.captures.should have(12).items
+      line_definition.captures.length.should == 12
     end
 
     it "should make it a header line" do
@@ -23,7 +23,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
     end
 
     it "should capture :duration" do
-      line_definition.captures?(:duration).should be_true
+      line_definition.captures?(:duration).should == true
     end
   end
 
@@ -50,7 +50,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
 
     it { should be_well_formed }
     it { should have_line_definition(:access).capturing(:timestamp, :remote_host, :bytes_sent, :http_method, :path, :http_version, :http_status) }
-    it { should have(8).report_trackers }
+    it { should satisfy { |ff| ff.report_trackers.length == 8 } }
   end
 
   context '"vhost_combined" access log parsing' do
@@ -72,7 +72,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
 
     it { should be_well_formed }
     it { should have_line_definition(:access).capturing(:remote_host, :remote_logname, :user, :timestamp, :http_status, :http_method, :http_version, :bytes_sent) }
-    it { should have(6).report_trackers }
+    it { should satisfy { |ff| ff.report_trackers.length == 6 } }
 
     describe '#parse_line' do
 
@@ -110,7 +110,7 @@ describe RequestLogAnalyzer::FileFormat::Apache do
 
     it { should be_well_formed }
     it { should have_line_definition(:access).capturing(:remote_host, :remote_logname, :user, :timestamp, :http_status, :http_method, :http_version, :bytes_sent, :referer, :user_agent) }
-    it { should have(8).report_trackers }
+    it { should satisfy { |ff| ff.report_trackers.length == 8 } }
 
     describe '#parse_line' do
       let(:sample1) { '69.41.0.45 - - [02/Sep/2009:12:02:40 +0200] "GET //phpMyAdmin/ HTTP/1.1" 404 209 "-" "Mozilla/4.0 (compatible; MSIE 6.0; Windows 98)"' }

@@ -5,10 +5,10 @@ describe RequestLogAnalyzer::FileFormat::Rails do
   describe '.create' do
 
     context 'without providing a lines argument' do
-      subject { RequestLogAnalyzer::FileFormat::Rails.create } 
+      subject { RequestLogAnalyzer::FileFormat::Rails.create }
 
       it { should be_well_formed }
-      it { should have(11).report_trackers }
+      it { should satisfy { |ff| ff.report_trackers.length >= 11 } }
 
       it "should parse the lines in the production set" do
         subject.line_definitions.should == RequestLogAnalyzer::FileFormat.load(:rails, 'production').line_definitions
@@ -19,8 +19,8 @@ describe RequestLogAnalyzer::FileFormat::Rails do
       subject {  RequestLogAnalyzer::FileFormat.load(:rails, 'minimal,failure') }
 
       it { should be_well_formed }
-      it { should have(10).report_trackers }
-      
+      it { should satisfy { |ff| ff.report_trackers.length >= 10 } }
+
       it { should have_line_definition(:processing) }
       it { should have_line_definition(:completed) }
       it { should have_line_definition(:failure) }
@@ -32,14 +32,14 @@ describe RequestLogAnalyzer::FileFormat::Rails do
         subject { RequestLogAnalyzer::FileFormat.load(:rails, constant) }
 
         it { should be_well_formed }
-        it { should have_at_least(9).report_trackers }
+        it { should satisfy { |ff| ff.report_trackers.length >= 9 } }
 
         it { should have_line_definition(:processing) }
         it { should have_line_definition(:completed) }
       end
     end
   end
-  
+
   subject { RequestLogAnalyzer::FileFormat.load(:rails, :all) }
 
   describe '#parse_line' do
@@ -50,7 +50,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
           line = prefix + 'Processing PeopleController#index (for 1.1.1.1 at 2008-08-14 21:16:30) [GET]'
           subject.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET', :ip => '1.1.1.1')
         end
-        
+
         it "should parse a :processing line correctly when it contains ipv6 localhost address" do
            line = prefix + 'Processing PeopleController#index (for ::1 at 2008-08-14 21:16:30) [GET]'
            subject.should parse_line(line).as(:processing).and_capture(:controller => 'PeopleController', :action => 'index', :timestamp => 20080814211630, :method => 'GET', :ip => '::1')
@@ -75,7 +75,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
           line = prefix + 'Completed in 597ms (View: 298 | 200 OK [http://shapado.com]'
           subject.should parse_line(line).as(:completed).and_capture(:duration => 0.597, :db => nil, :view => 0.298, :status => 200, :url => 'http://shapado.com')
         end
-        
+
         it "should parse a Rails 2.2 style :completed line without view" do
           line = prefix + "Completed in 148ms (DB: 0) | 302 Found [http://iwp-sod.hargray.org/login]"
           subject.should parse_line(line).as(:completed).and_capture(:duration => 0.148, :db => 0.0, :view => nil, :status => 302, :url => 'http://iwp-sod.hargray.org/login')
@@ -92,7 +92,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
         end
 
         it "should parse a :cache_hit line correctly with an proc instance reference" do
-          line = prefix + 'Filter chain halted as [#<ActionController::Filters::AroundFilter:0x2a9a923e38 @method=#<Proc:0x0000002a9818b3f8@/usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.5/lib/action_controller/caching/actions.rb:64>, @kind=:filter, @identifier=nil, @options={:unless=>nil, :if=>nil, :only=>#<Set: {"show"}>}>] did_not_yield.'          
+          line = prefix + 'Filter chain halted as [#<ActionController::Filters::AroundFilter:0x2a9a923e38 @method=#<Proc:0x0000002a9818b3f8@/usr/local/lib/ruby/gems/1.8/gems/actionpack-2.3.5/lib/action_controller/caching/actions.rb:64>, @kind=:filter, @identifier=nil, @options={:unless=>nil, :if=>nil, :only=>#<Set: {"show"}>}>] did_not_yield.'
           subject.should parse_line(line).as(:cache_hit)
         end
 
@@ -141,7 +141,7 @@ describe RequestLogAnalyzer::FileFormat::Rails do
     it "should parse a Rails 2.1 style log and find valid Rails requests without warnings" do
       log_parser.should_receive(:handle_request).exactly(4).times
       log_parser.should_not_receive(:warn)
-      log_parser.parse_file(log_fixture(:rails_1x))\
+      log_parser.parse_file(log_fixture(:rails_1x))
     end
 
     it "should parse a Rails 2.2 style log and find valid Rails requests without warnings" do

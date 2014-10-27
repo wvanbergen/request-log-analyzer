@@ -21,4 +21,8 @@ RSpec.configure do |config|
   config.include RequestLogAnalyzer::RSpec::Helpers
 
   config.extend RequestLogAnalyzer::RSpec::Macros
+
+  config.expect_with :rspec do |c|
+    c.syntax = :should
+  end
 end

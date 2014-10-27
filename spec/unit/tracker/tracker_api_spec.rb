@@ -51,57 +51,57 @@ describe RequestLogAnalyzer::Tracker::Base do
 
     it "should return true by default, when no checks are installed" do
       tracker = @tracker_class.new
-      tracker.should_update?(testing_format.request).should be_true
+      tracker.should_update?(testing_format.request).should == true
     end
 
     it "should return false if the line type is not in the request" do
       tracker = @tracker_class.new(:line_type => :not_there)
-      tracker.should_update?(request(:line_type => :different)).should be_false
+      tracker.should_update?(request(:line_type => :different)).should == false
     end
 
     it "should return true if the line type is in the request" do
       tracker = @tracker_class.new(:line_type => :there)
-      tracker.should_update?(request(:line_type => :there)).should be_true
+      tracker.should_update?(request(:line_type => :there)).should == true
     end
 
     it "should return true if a field name is given to :if and it is in the request" do
       tracker = @tracker_class.new(:if => :field)
-      tracker.should_update?(request(:field => 'anything')).should be_true
+      tracker.should_update?(request(:field => 'anything')).should == true
     end
 
     it "should return false if a field name is given to :if and it is not the request" do
       tracker = @tracker_class.new(:if => :field)
-      tracker.should_update?(request(:other_field => 'anything')).should be_false
+      tracker.should_update?(request(:other_field => 'anything')).should == false
     end
 
     it "should return false if a field name is given to :unless and it is in the request" do
       tracker = @tracker_class.new(:unless => :field)
-      tracker.should_update?(request(:field => 'anything')).should be_false
+      tracker.should_update?(request(:field => 'anything')).should == false
     end
 
     it "should return true if a field name is given to :unless and it is not the request" do
       tracker = @tracker_class.new(:unless => :field)
-      tracker.should_update?(request(:other_field => 'anything')).should be_true
+      tracker.should_update?(request(:other_field => 'anything')).should == true
     end
 
     it "should return the value of the block if one is given to the :if option" do
       tracker = @tracker_class.new(:if => lambda { |r| false } )
-      tracker.should_update?(request(:field => 'anything')).should be_false
+      tracker.should_update?(request(:field => 'anything')).should == false
     end
 
     it "should return the inverse value of the block if one is given to the :if option" do
       tracker = @tracker_class.new(:unless => lambda { |r| false } )
-      tracker.should_update?(request(:field => 'anything')).should be_true
+      tracker.should_update?(request(:field => 'anything')).should == true
     end
 
     it "should return false if any of the checks fail" do
       tracker = @tracker_class.new(:if => :field, :unless => lambda { |r| false }, :line_type => :not_present )
-      tracker.should_update?(request(:line_type => :present, :field => 'anything')).should be_false
+      tracker.should_update?(request(:line_type => :present, :field => 'anything')).should == false
     end
 
     it "should return true if all of the checks succeed" do
       tracker = @tracker_class.new(:if => :field, :unless => lambda { |r| false }, :line_type => :present )
-      tracker.should_update?(request(:line_type => :present, :field => 'anything')).should be_true
+      tracker.should_update?(request(:line_type => :present, :field => 'anything')).should == true
     end
 
 

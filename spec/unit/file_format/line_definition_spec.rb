@@ -12,11 +12,11 @@ describe RequestLogAnalyzer::LineDefinition do
   describe '#matches' do
 
     it "should return false on an unmatching line" do
-      subject.matches("nonmatching").should be_false
+      subject.matches("nonmatching").should == false
     end
 
     it "should return false when only the teaser matches" do
-      subject.matches("Testing LineDefinition").should be_false
+      subject.matches("Testing LineDefinition").should == false
     end
 
     it "should parse a line and capture the expected values" do
@@ -24,9 +24,9 @@ describe RequestLogAnalyzer::LineDefinition do
     end
 
     it "should know which names it can capture" do
-      subject.captures?(:what).should be_true
-      subject.captures?(:tries).should be_true
-      subject.captures?(:bogus).should be_false
+      subject.captures?(:what).should == true
+      subject.captures?(:tries).should == true
+      subject.captures?(:bogus).should == false
     end
   end
 
@@ -43,12 +43,12 @@ describe RequestLogAnalyzer::LineDefinition do
     end
 
     context 'when using :provides option' do
-      
-      subject { RequestLogAnalyzer::LineDefinition.new(:test, 
+
+      subject { RequestLogAnalyzer::LineDefinition.new(:test,
           :regexp   => /Hash\: (\{.+\})/,
-          :captures => [{ :name => :hash, :type => :hash, :provides => {:bar => :string}}]) 
-      } 
-      
+          :captures => [{ :name => :hash, :type => :hash, :provides => {:bar => :string}}])
+      }
+
       before do
         request.stub(:convert_value).with("{:bar=>'baz'}", anything).and_return(:bar => 'baz')
         request.stub(:convert_value).with('baz', anything).and_return('foo')
