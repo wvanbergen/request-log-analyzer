@@ -21,7 +21,7 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
       @database_inserter.prepare
     end
 
-    it "should set the file_format" do
+    it 'should set the file_format' do
       @database.should_receive(:file_format=).with(testing_format)
       @database_inserter.prepare
     end
@@ -48,34 +48,34 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
     context "using a #{name} database" do
 
       before(:each) do
-        @database_inserter = RequestLogAnalyzer::Aggregator::DatabaseInserter.new(@log_parser, :database => connection, :reset_database => true)
+        @database_inserter = RequestLogAnalyzer::Aggregator::DatabaseInserter.new(@log_parser, database: connection, reset_database: true)
         @database_inserter.prepare
 
-        @incomplete_request = testing_format.request( {:line_type => :first, :request_no => 564})
-        @completed_request  = testing_format.request( {:line_type => :first, :request_no => 564},
-                              {:line_type => :test, :test_capture => "awesome"},
-                              {:line_type => :test, :test_capture => "indeed"},
-                              {:line_type => :eval, :evaluated => { :greating => 'howdy'}, :greating => 'howdy' },
-                              {:line_type => :last, :request_no   => 564})
+        @incomplete_request = testing_format.request(line_type: :first, request_no: 564)
+        @completed_request  = testing_format.request({ line_type: :first, request_no: 564 },
+                                                     { line_type: :test, test_capture: 'awesome' },
+                                                     { line_type: :test, test_capture: 'indeed' },
+                                                     { line_type: :eval, evaluated: { greating: 'howdy' }, greating: 'howdy' },
+                                                     { line_type: :last, request_no: 564 })
       end
 
       after(:each) do
         @database_inserter.database.send :remove_orm_classes!
       end
 
-      it "should insert a record in the request table" do
-        lambda {
+      it 'should insert a record in the request table' do
+        lambda do
           @database_inserter.aggregate(@incomplete_request)
-        }.should change(RequestLogAnalyzer::Database::Request, :count).from(0).to(1)
+        end.should change(RequestLogAnalyzer::Database::Request, :count).from(0).to(1)
       end
 
-      it "should insert a record in the first_lines table" do
-        lambda {
+      it 'should insert a record in the first_lines table' do
+        lambda do
           @database_inserter.aggregate(@incomplete_request)
-        }.should change(@database_inserter.database.get_class(:first), :count).from(0).to(1)
+        end.should change(@database_inserter.database.get_class(:first), :count).from(0).to(1)
       end
 
-      it "should insert records in all relevant line tables" do
+      it 'should insert records in all relevant line tables' do
         @database_inserter.aggregate(@completed_request)
         request = RequestLogAnalyzer::Database::Request.first
         request.should satisfy { |r| r.test_lines.length == 2 }
@@ -84,9 +84,9 @@ describe RequestLogAnalyzer::Aggregator::DatabaseInserter do
         request.should satisfy { |r| r.last_lines.length == 1 }
       end
 
-      it "should log a warning in the warnings table" do
-        RequestLogAnalyzer::Database::Warning.should_receive(:create!).with(hash_including(:warning_type => 'test_warning'))
-        @database_inserter.warning(:test_warning, "Testing the warning system", 12)
+      it 'should log a warning in the warnings table' do
+        RequestLogAnalyzer::Database::Warning.should_receive(:create!).with(hash_including(warning_type: 'test_warning'))
+        @database_inserter.warning(:test_warning, 'Testing the warning system', 12)
       end
     end
   end

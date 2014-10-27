@@ -19,52 +19,56 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
   let(:sample_errors)    { 'haproxy[18113]: 127.0.0.1:34549 [15/Oct/2003:15:19:06.103] px-http px-http/<NOSRV> -1/-1/-1/-1/+50001 408 +2750 - - cR-- 2/2/2/0/+2 0/0 ""' }
 
   describe '#parse_line' do
-    it { should parse_line(sample_haproxy13, 'an haproxy 1.3 access line').and_capture(
-            :client_ip => '10.0.1.2',     :tq => 0.010,   :captured_request_cookie => nil,
-            :timestamp => 20090206121414, :tw => 0.000,   :captured_response_cookie => nil,
-            :frontend_name => 'http-in',  :tc => 0.030,   :clientside_persistence_cookie => nil,
-            :backend_name => 'static',    :tr => 0.069,   :serverside_persistence_cookie => nil,
-            :server_name => 'srv1',       :tt => 0.109,   :termination_event_code => nil,
-            :status_code => 200,          :actconn => 1,  :terminated_session_state => nil,
-            :bytes_read => 2750,          :feconn => 1,   :captured_request_headers => '{1wt.eu}',
-            :backend_queue => 0,          :beconn => 1,   :captured_response_headers => nil,
-            :retries => 0,                :srv_conn => 1, :srv_queue => 0,
-            :http_request => 'GET /index.html HTTP/1.1')
-    }
+    it do
+      should parse_line(sample_haproxy13, 'an haproxy 1.3 access line').and_capture(
+            client_ip: '10.0.1.2',     tq: 0.010,   captured_request_cookie: nil,
+            timestamp: 20_090_206_121_414, tw: 0.000,   captured_response_cookie: nil,
+            frontend_name: 'http-in',  tc: 0.030,   clientside_persistence_cookie: nil,
+            backend_name: 'static',    tr: 0.069,   serverside_persistence_cookie: nil,
+            server_name: 'srv1',       tt: 0.109,   termination_event_code: nil,
+            status_code: 200,          actconn: 1,  terminated_session_state: nil,
+            bytes_read: 2750,          feconn: 1,   captured_request_headers: '{1wt.eu}',
+            backend_queue: 0,          beconn: 1,   captured_response_headers: nil,
+            retries: 0,                srv_conn: 1, srv_queue: 0,
+            http_request: 'GET /index.html HTTP/1.1')
+    end
 
-    it { should parse_line(sample_haproxy12, 'an haproxy 1.2 access line').and_capture(
-            :client_ip => '127.0.0.1',    :tq => 0.000,         :captured_request_cookie => nil,
-            :timestamp => 20110315063645, :tw => 0.000,         :captured_response_cookie => nil,
-            :frontend_name => 'as-proxy', :tc => 0.000,         :clientside_persistence_cookie => 'N',
-            :server_name => 'mc-search-2',:tr => 0.730,         :serverside_persistence_cookie => 'N',
-            :status_code => 200,          :tt => 0.731,         :termination_event_code => nil,
-            :bytes_read => 29404,         :listener_conn => 54, :terminated_session_state => nil,
-            :backend_queue => 0,          :process_conn => 54,  :captured_request_headers => '{66.249.68.216}',
-            :srv_queue => 0,              :srv_conn => 2,       :captured_response_headers => nil,
-            :http_request => 'GET /neighbor/26014153 HTTP/1.0')
-    }
+    it do
+      should parse_line(sample_haproxy12, 'an haproxy 1.2 access line').and_capture(
+            client_ip: '127.0.0.1',    tq: 0.000,         captured_request_cookie: nil,
+            timestamp: 20_110_315_063_645, tw: 0.000,         captured_response_cookie: nil,
+            frontend_name: 'as-proxy', tc: 0.000,         clientside_persistence_cookie: 'N',
+            server_name: 'mc-search-2', tr: 0.730,         serverside_persistence_cookie: 'N',
+            status_code: 200,          tt: 0.731,         termination_event_code: nil,
+            bytes_read: 29_404,         listener_conn: 54, terminated_session_state: nil,
+            backend_queue: 0,          process_conn: 54,  captured_request_headers: '{66.249.68.216}',
+            srv_queue: 0,              srv_conn: 2,       captured_response_headers: nil,
+            http_request: 'GET /neighbor/26014153 HTTP/1.0')
+    end
 
-    it { should parse_line(sample_haproxy11, 'an haproxy 1.1 access line').and_capture(
-            :client_ip => '127.0.0.1',      :tq => 0.009,       :captured_request_cookie => nil,
-            :timestamp => 20031015083217,   :tc => 0.007,       :captured_response_cookie => nil,
-            :frontend_name => 'relais-http',:tr => 0.014,       :clientside_persistence_cookie => nil,
-            :server_name => 'Srv1',         :tt => 0.030,       :serverside_persistence_cookie => nil,
-            :status_code => 502,            :listener_conn => 2,:termination_event_code => 'P',
-            :bytes_read => 243,             :process_conn => 3, :terminated_session_state => 'H',
-            :captured_request_headers => nil,                   :captured_response_headers => nil,
-            :http_request => nil)
-    }
+    it do
+      should parse_line(sample_haproxy11, 'an haproxy 1.1 access line').and_capture(
+            client_ip: '127.0.0.1',      tq: 0.009,       captured_request_cookie: nil,
+            timestamp: 20_031_015_083_217,   tc: 0.007,       captured_response_cookie: nil,
+            frontend_name: 'relais-http', tr: 0.014,       clientside_persistence_cookie: nil,
+            server_name: 'Srv1',         tt: 0.030,       serverside_persistence_cookie: nil,
+            status_code: 502,            listener_conn: 2, termination_event_code: 'P',
+            bytes_read: 243,             process_conn: 3, terminated_session_state: 'H',
+            captured_request_headers: nil,                   captured_response_headers: nil,
+            http_request: nil)
+    end
 
-    it { should parse_line(sample_errors, 'a failed access line').and_capture(
-            :timestamp => 20031015151906, :tq => nil,    :captured_request_cookie => nil,
-            :server_name => '<NOSRV>',    :tw => nil,    :captured_response_cookie => nil,
-            :bytes_read => 2750,          :tc => nil,    :clientside_persistence_cookie => nil,
-            :retries => 2,                :tr => nil,    :serverside_persistence_cookie => nil,
-            :http_request => nil,         :tt => 50.001, :termination_event_code => 'c',
-                                                         :terminated_session_state => 'R',
-                                                         :captured_request_headers => nil,
-                                                         :captured_response_headers => nil)
-    }
+    it do
+      should parse_line(sample_errors, 'a failed access line').and_capture(
+            timestamp: 20_031_015_151_906, tq: nil,    captured_request_cookie: nil,
+            server_name: '<NOSRV>',    tw: nil,    captured_response_cookie: nil,
+            bytes_read: 2750,          tc: nil,    clientside_persistence_cookie: nil,
+            retries: 2,                tr: nil,    serverside_persistence_cookie: nil,
+            http_request: nil,         tt: 50.001, termination_event_code: 'c',
+                                                         terminated_session_state: 'R',
+                                                         captured_request_headers: nil,
+                                                         captured_response_headers: nil)
+    end
 
     it { should_not parse_line('nonsense') }
   end
@@ -73,7 +77,7 @@ describe RequestLogAnalyzer::FileFormat::Haproxy do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
     let(:snippet)    { log_snippet(sample_haproxy13, sample_haproxy12, sample_haproxy11, sample_errors, 'nonsense') }
 
-    it "should parse a log snippet without warnings" do
+    it 'should parse a log snippet without warnings' do
       log_parser.should_receive(:handle_request).exactly(4).times
       log_parser.should_not_receive(:warn)
       log_parser.parse_io(snippet)

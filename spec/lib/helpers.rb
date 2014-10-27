@@ -1,12 +1,11 @@
 module RequestLogAnalyzer::RSpec::Helpers
-
   # Create or return a new TestingFormat
   def testing_format
     @testing_format ||= TestingFormat.create
   end
 
   # Load a log file from the fixture folder
-  def log_fixture(name, extention = "log")
+  def log_fixture(name, extention = 'log')
     File.dirname(__FILE__) + "/../fixtures/#{name}.#{extention}"
   end
 
@@ -22,7 +21,7 @@ module RequestLogAnalyzer::RSpec::Helpers
 
   # Request loopback
   def request(fields, format = testing_format)
-    if fields.kind_of?(Array)
+    if fields.is_a?(Array)
       format.request(*fields)
     else
       format.request(fields)
@@ -33,7 +32,7 @@ module RequestLogAnalyzer::RSpec::Helpers
   # Used to call request-log-analyzer through binary
   def run(arguments)
     binary = "#{File.dirname(__FILE__)}/../../bin/request-log-analyzer"
-    arguments = arguments.join(' ') if arguments.kind_of?(Array)
+    arguments = arguments.join(' ') if arguments.is_a?(Array)
 
     output = []
     IO.popen("#{binary} #{arguments} 2>&1") do |pipe|
@@ -58,20 +57,20 @@ module RequestLogAnalyzer::RSpec::Helpers
   # Check if a given string can be found in the given file
   # Returns the line number if found, nil otherwise
   def find_string_in_file(string, file, options = {})
-    return nil unless File.exists?(file)
+    return nil unless File.exist?(file)
 
     line_counter = 0
 
-    File.open( file ) do |io|
-      io.each {|line|
+    File.open(file) do |io|
+      io.each do|line|
         line_counter += 1
         line.chomp!
 
         p line if options[:debug]
         return line_counter if line.include? string
-      }
+      end
     end
 
-    return nil
+    nil
   end
 end

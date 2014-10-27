@@ -2,12 +2,14 @@ require 'spec_helper'
 
 describe RequestLogAnalyzer::FileFormat::Rack do
 
-  subject { RequestLogAnalyzer::FileFormat.load(:rack)}
+  subject { RequestLogAnalyzer::FileFormat.load(:rack) }
   let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
 
   it { should be_well_formed }
-  it { should have_line_definition(:access).capturing(:remote_host, :user, :remote_logname,
-          :timestamp, :http_method, :path, :http_version, :http_status, :bytes_sent, :duration) }
+  it do
+    should have_line_definition(:access).capturing(:remote_host, :user, :remote_logname,
+                                                   :timestamp, :http_method, :path, :http_version, :http_status, :bytes_sent, :duration)
+  end
 
   it { should satisfy { |ff| ff.report_trackers.length == 7 } }
 
@@ -18,26 +20,29 @@ describe RequestLogAnalyzer::FileFormat::Rack do
 
   describe '#parse_line' do
 
-    it { should parse_line(sample1, 'a sample access line').and_capture(
-            :remote_host => '127.0.0.1', :timestamp => 20091123214747, :user => nil,
-            :http_status => 200,         :http_method => 'GET',        :http_version => '1.1',
-            :duration => 0.0024,         :bytes_sent => 3782,         :remote_logname => nil,
-            :path => '/css/stylesheet.css')
-    }
+    it do
+      should parse_line(sample1, 'a sample access line').and_capture(
+            remote_host: '127.0.0.1', timestamp: 20_091_123_214_747, user: nil,
+            http_status: 200,         http_method: 'GET',        http_version: '1.1',
+            duration: 0.0024,         bytes_sent: 3782,         remote_logname: nil,
+            path: '/css/stylesheet.css')
+    end
 
-    it { should parse_line(sample2, 'another sample access line').and_capture(
-            :remote_host => '127.0.0.1', :timestamp => 20090916074008, :user => nil,
-            :http_status => 500,         :http_method => 'GET',        :http_version => '1.1',
-            :duration => 0.0453,         :bytes_sent => 63183,         :remote_logname => nil,
-            :path => '/favicon.ico')
-    }
+    it do
+      should parse_line(sample2, 'another sample access line').and_capture(
+            remote_host: '127.0.0.1', timestamp: 20_090_916_074_008, user: nil,
+            http_status: 500,         http_method: 'GET',        http_version: '1.1',
+            duration: 0.0453,         bytes_sent: 63_183,         remote_logname: nil,
+            path: '/favicon.ico')
+    end
 
-    it { should parse_line(sample3, 'a third sample access line').and_capture(
-            :remote_host => '127.0.0.1', :timestamp => 20091001075810, :user => nil,
-            :http_status => 200,         :http_method => 'GET',        :http_version => '1.1',
-            :duration => 0.0045,         :bytes_sent => 1,             :remote_logname => nil,
-            :path => '/')
-    }
+    it do
+      should parse_line(sample3, 'a third sample access line').and_capture(
+            remote_host: '127.0.0.1', timestamp: 20_091_001_075_810, user: nil,
+            http_status: 200,         http_method: 'GET',        http_version: '1.1',
+            duration: 0.0045,         bytes_sent: 1,             remote_logname: nil,
+            path: '/')
+    end
 
     it { should_not parse_line(irrelevant, 'an irrelevant line') }
     it { should_not parse_line('nonsense', 'a nonsense line') }
@@ -46,7 +51,7 @@ describe RequestLogAnalyzer::FileFormat::Rack do
   describe '#parse_io' do
     let(:snippet) { log_snippet(irrelevant, sample1, sample2, sample3) }
 
-    it "shouldparse a snippet without warnings" do
+    it 'shouldparse a snippet without warnings' do
       log_parser.should_receive(:handle_request).exactly(3).times
       log_parser.should_not_receive(:warn)
       log_parser.parse_io(snippet)

@@ -25,7 +25,7 @@ describe RequestLogAnalyzer::Database do
       end
 
       # Some Fileformat-specific classes
-      ['CompletedLine', 'ProcessingLine'].each do |const|
+      %w(CompletedLine ProcessingLine).each do |const|
         it "should create the #{const} constant" do
           Object.const_defined?(const).should == true
         end
@@ -73,7 +73,7 @@ describe RequestLogAnalyzer::Database do
       end
     end
 
-    testing_format.line_definitions.each do |name, definition|
+    testing_format.line_definitions.each do |name, _definition|
 
       it "should create the #{(name.to_s + '_line').camelize} class for #{name.inspect} lines" do
         @database.send :create_database_schema!
@@ -106,27 +106,27 @@ describe RequestLogAnalyzer::Database do
 
     after(:each) { @database.remove_orm_classes! }
 
-    it "should call :subclass_from_table when a table name is given as string" do
+    it 'should call :subclass_from_table when a table name is given as string' do
       RequestLogAnalyzer::Database::Base.should_receive(:subclass_from_table).and_return(@mock_class)
       @database.load_activerecord_class('test_lines')
     end
 
-    it "should call :subclass_from_table when a table name is given as symbol" do
+    it 'should call :subclass_from_table when a table name is given as symbol' do
       RequestLogAnalyzer::Database::Base.should_receive(:subclass_from_table).and_return(@mock_class)
       @database.load_activerecord_class(:test_lines)
     end
 
-    it "should call :subclass_from_table when a LineDefinition is given" do
+    it 'should call :subclass_from_table when a LineDefinition is given' do
       RequestLogAnalyzer::Database::Base.should_receive(:subclass_from_line_definition).and_return(@mock_class)
       @database.load_activerecord_class(RequestLogAnalyzer::LineDefinition.new(:test))
     end
 
-    it "should define the class in the ORM module" do
+    it 'should define the class in the ORM module' do
       @database.load_activerecord_class(:test_lines)
       Object.const_defined?('TestLine').should == true
     end
 
-    it "should add the class to the line_classes array of the database" do
+    it 'should add the class to the line_classes array of the database' do
       @database.load_activerecord_class(:test_lines)
       @database.line_classes.should include(TestLine)
     end

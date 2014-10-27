@@ -28,15 +28,15 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
     let(:set_insertid_sample)           { 'SET insert_id=1250651725;' }
     let(:set_timestamp_insertid_sample) { 'SET timestamp=1250651725, insert_id=45674;' }
 
-    it { should parse_line(time_sample).as(:time).and_capture(:timestamp => 20091112081356) }
-    it { should parse_line(user_host_sample).as(:user_host).and_capture(:user => "admin", :host => 'db1', :ip => '10.0.0.1') }
-    it { should parse_line(user_host_wo_host_sample, 'without host').as(:user_host).and_capture(:user => "admin", :host => '', :ip => '10.0.0.1') }
-    it { should parse_line(user_host_wo_ip_sample, 'without IP').as(:user_host).and_capture(:user => "root", :host => 'localhost', :ip => "") }
-    it { should parse_line(float_query_statistics_sample, 'using floats').as(:query_statistics).and_capture(:query_time => 10.0, :lock_time => 0.0, :rows_sent => 1191307, :rows_examined => 1191307) }
-    it { should parse_line(int_query_statistics_sample, 'using integers').as(:query_statistics).and_capture(:query_time => 10.0, :lock_time => 0.0, :rows_sent => 1191307, :rows_examined => 1191307) }
-    it { should parse_line(partial_query_sample).as(:query_part).and_capture(:query_fragment => 'AND clients.index > 0') }
-    it { should parse_line(full_query_sample).as(:query).and_capture(:query => 'SELECT /*!:int SQL_NO_CACHE */ * FROM events') }
-    it { should parse_line(use_db_sample).as(:use_database).and_capture(:database => 'db') }
+    it { should parse_line(time_sample).as(:time).and_capture(timestamp: 20_091_112_081_356) }
+    it { should parse_line(user_host_sample).as(:user_host).and_capture(user: 'admin', host: 'db1', ip: '10.0.0.1') }
+    it { should parse_line(user_host_wo_host_sample, 'without host').as(:user_host).and_capture(user: 'admin', host: '', ip: '10.0.0.1') }
+    it { should parse_line(user_host_wo_ip_sample, 'without IP').as(:user_host).and_capture(user: 'root', host: 'localhost', ip: '') }
+    it { should parse_line(float_query_statistics_sample, 'using floats').as(:query_statistics).and_capture(query_time: 10.0, lock_time: 0.0, rows_sent: 1_191_307, rows_examined: 1_191_307) }
+    it { should parse_line(int_query_statistics_sample, 'using integers').as(:query_statistics).and_capture(query_time: 10.0, lock_time: 0.0, rows_sent: 1_191_307, rows_examined: 1_191_307) }
+    it { should parse_line(partial_query_sample).as(:query_part).and_capture(query_fragment: 'AND clients.index > 0') }
+    it { should parse_line(full_query_sample).as(:query).and_capture(query: 'SELECT /*!:int SQL_NO_CACHE */ * FROM events') }
+    it { should parse_line(use_db_sample).as(:use_database).and_capture(database: 'db') }
 
     it { should_not parse_line(set_timestamp_sample) }
     it { should_not parse_line(set_insertid_sample) }
@@ -46,7 +46,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
   describe '#parse_io' do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
 
-    it "should parse a single line query entry correctly" do
+    it 'should parse a single line query entry correctly' do
       fixture = <<-EOS
         # Time: 091112 18:13:56
         # User@Host: admin[admin] @ db1 [10.0.0.1]
@@ -59,7 +59,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       end
     end
 
-    it "should parse a multiline query entry correctly" do
+    it 'should parse a multiline query entry correctly' do
       fixture = <<-EOS
         # Time: 091112 18:13:56
         # User@Host: admin[admin] @ db1 [10.0.0.1]
@@ -71,12 +71,12 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       EOS
 
       log_parser.parse_string(fixture) do |request|
-        request[:query].should == "SELECT * FROM clients WHERE (:int=:int AND clients.valid_from < :date AND (clients.valid_to IS NULL or clients.valid_to > :date) AND clients.index > :int ) AND (clients.deleted_at IS NULL)"
+        request[:query].should == 'SELECT * FROM clients WHERE (:int=:int AND clients.valid_from < :date AND (clients.valid_to IS NULL or clients.valid_to > :date) AND clients.index > :int ) AND (clients.deleted_at IS NULL)'
       end
     end
 
-    it "should parse a request without timestamp correctly, without warnings" do
-        fixture = <<-EOS
+    it 'should parse a request without timestamp correctly, without warnings' do
+      fixture = <<-EOS
         # User@Host: admin[admin] @ db1 [10.0.0.1]
         # Query_time: 10  Lock_time: 0  Rows_sent: 1191307  Rows_examined: 1191307
         SELECT /*!40001 SQL_NO_CACHE */ * FROM `events`;
@@ -87,7 +87,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       log_parser.parse_string(fixture)
     end
 
-    it "should parse a query with context information correctly" do
+    it 'should parse a query with context information correctly' do
       fixture = <<-EOS
         # Time: 091112 18:13:56
         # User@Host: admin[admin] @ db1 [10.0.0.1]
@@ -102,7 +102,7 @@ describe RequestLogAnalyzer::FileFormat::Mysql do
       end
     end
 
-    it "should find 26 completed sloq query entries" do
+    it 'should find 26 completed sloq query entries' do
       log_parser.should_not_receive(:warn)
       log_parser.should_receive(:handle_request).exactly(26).times
       log_parser.parse_file(log_fixture(:mysql_slow_query))

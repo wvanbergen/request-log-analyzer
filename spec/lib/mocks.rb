@@ -1,5 +1,4 @@
 module RequestLogAnalyzer::RSpec::Mocks
-
   def mock_source
     source = double('RequestLogAnalyzer::Source::Base')
     source.stub(:file_format).and_return(testing_format)
@@ -15,10 +14,10 @@ module RequestLogAnalyzer::RSpec::Mocks
     source.stub(:finalize)
 
     source.stub(:each_request).
-      and_yield(testing_format.request(:field => 'value1')).
-      and_yield(testing_format.request(:field => 'value2'))
+      and_yield(testing_format.request(field: 'value1')).
+      and_yield(testing_format.request(field: 'value2'))
 
-    return source
+    source
   end
 
   def mock_io
@@ -26,7 +25,7 @@ module RequestLogAnalyzer::RSpec::Mocks
     mio.stub(:print)
     mio.stub(:puts)
     mio.stub(:write)
-    return mio
+    mio
   end
 
   def mock_output
@@ -36,7 +35,7 @@ module RequestLogAnalyzer::RSpec::Mocks
     output.stub(:footer)
     output.stub(:puts)
     output.stub(:<<)
-    output.stub(:colorize).and_return("Fancy text")
+    output.stub(:colorize).and_return('Fancy text')
     output.stub(:link)
     output.stub(:title)
     output.stub(:line)
@@ -45,7 +44,7 @@ module RequestLogAnalyzer::RSpec::Mocks
     output.stub(:io).and_return(mock_io)
     output.stub(:options).and_return({})
     output.stub(:slice_results) { |a| a }
-    return output
+    output
   end
 
   def mock_database(*stubs)
@@ -53,8 +52,8 @@ module RequestLogAnalyzer::RSpec::Mocks
     database.stub(:connect)
     database.stub(:disconnect)
     database.stub(:connection).and_return(mock_connection)
-    stubs.each { |s| database.stub(s)}
-    return database
+    stubs.each { |s| database.stub(s) }
+    database
   end
 
   def mock_connection
@@ -67,6 +66,6 @@ module RequestLogAnalyzer::RSpec::Mocks
     connection.stub(:table_exists?).and_return(false)
     connection.stub(:create_table).and_yield(table_creator).and_return(true)
     connection.stub(:table_creator).and_return(table_creator)
-    return connection
+    connection
   end
 end

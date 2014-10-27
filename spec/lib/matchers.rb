@@ -1,7 +1,5 @@
 module RequestLogAnalyzer::RSpec::Matchers
-
   class HasLineDefinition
-
     def initialize(line_type)
       @line_type = line_type.to_sym
       @captures  = []
@@ -9,11 +7,11 @@ module RequestLogAnalyzer::RSpec::Matchers
 
     def and_capture(*captures)
       @captures += captures
-      return self
+      self
     end
-    
+
     alias_method :capturing, :and_capture
-    
+
     def description
       description = "have a #{@line_type.inspect} line definition"
       description << " that captures #{@captures.join(', ')}" unless @captures.empty?
@@ -21,7 +19,7 @@ module RequestLogAnalyzer::RSpec::Matchers
     end
 
     def matches?(file_format)
-      file_format = file_format.create if file_format.kind_of?(Class)
+      file_format = file_format.create if file_format.is_a?(Class)
       if ld = file_format.line_definitions[@line_type]
         @captures.all? { |c| ld.all_captured_variables.include?(c) }
       else
@@ -31,7 +29,6 @@ module RequestLogAnalyzer::RSpec::Matchers
   end
 
   class ParseLine
-    
     def initialize(line, line_description = nil)
       @line      = line
       @captures  = {}
@@ -41,39 +38,37 @@ module RequestLogAnalyzer::RSpec::Matchers
 
     def line_description
       @full_line_description ||= if @line_description
-        if @line_type && @line_description =~ /^(?:with|without|having|using) /
-          "a #{@line_type.inspect} line #{@line_description}"
-        else
-          @line_description
-        end
-      elsif @line_type 
-        "a #{@line_type.inspect} line"
+                                   if @line_type && @line_description =~ /^(?:with|without|having|using) /
+                                     "a #{@line_type.inspect} line #{@line_description}"
+                                   else
+                                     @line_description
+                                   end
+      elsif @line_type
+                                   "a #{@line_type.inspect} line"
       else
         "line #{@line.inspect}"
       end
     end
 
-    def failure_message
-      @failure_message
-    end
+    attr_reader :failure_message
 
     def as(line_type)
       @line_type = line_type
-      return self
+      self
     end
-    
+
     def and_capture(captures)
       @captures = captures
-      return self
+      self
     end
-    
+
     alias_method :capturing, :and_capture
 
     def fail(message)
       @failure_message = message
-      return false
+      false
     end
-    
+
     def description
       description = "parse #{line_description}"
       description << " as line type #{@line_type.inspect}" if @line_type
@@ -93,13 +88,13 @@ module RequestLogAnalyzer::RSpec::Matchers
           return fail("The line should match the #{@line_type.inspect} line definition, but matched #{@line_hash[:line_definition].name.inspect} instead.")
         end
       else
-        return fail("The line did not match any line definition.")
+        return fail('The line did not match any line definition.')
       end
     end
   end
 
   def have_line_definition(line_type)
-    return HasLineDefinition.new(line_type)
+    HasLineDefinition.new(line_type)
   end
 
   def parse_line(line, line_description = nil)

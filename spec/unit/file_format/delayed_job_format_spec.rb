@@ -18,10 +18,10 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
     let(:job_failed_sample)      { "* [JOB] BackgroundJob::ThumbnailSaver failed with ActiveRecord::RecordNotFound: Couldn't find Design with ID=20413443 - 1 failed attempts" }
     let(:summary_sample)         { '1 jobs processed at 1.0834 j/s, 0 failed ...' }
 
-    it { should parse_line(job_lock_sample).as(:job_lock).and_capture(:job => 'BackgroundJob::ThumbnailSaver') }
-    it { should parse_line(job_completed_sample).as(:job_completed).and_capture(:duration => 0.7932, :completed_job => 'BackgroundJob::ThumbnailSaver') }
-    it { should parse_line(job_lock_failed_sample).as(:job_lock_failed).and_capture(:locked_job => 'BackgroundJob::ThumbnailSaver') }
-    it { should parse_line(job_failed_sample).as(:job_failed).and_capture(:attempts => 1, :failed_job => 'BackgroundJob::ThumbnailSaver', :exception => 'ActiveRecord::RecordNotFound') }
+    it { should parse_line(job_lock_sample).as(:job_lock).and_capture(job: 'BackgroundJob::ThumbnailSaver') }
+    it { should parse_line(job_completed_sample).as(:job_completed).and_capture(duration: 0.7932, completed_job: 'BackgroundJob::ThumbnailSaver') }
+    it { should parse_line(job_lock_failed_sample).as(:job_lock_failed).and_capture(locked_job: 'BackgroundJob::ThumbnailSaver') }
+    it { should parse_line(job_failed_sample).as(:job_failed).and_capture(attempts: 1, failed_job: 'BackgroundJob::ThumbnailSaver', exception: 'ActiveRecord::RecordNotFound') }
 
     it { should_not parse_line(summary_sample, 'a summary line') }
     it { should_not parse_line('nonsense', 'a nonsense line') }
@@ -30,7 +30,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
   describe '#parse_io' do
     let(:log_parser) { RequestLogAnalyzer::Source::LogParser.new(subject) }
 
-    it "should parse a batch of completed jobs without warnings" do
+    it 'should parse a batch of completed jobs without warnings' do
       fragment = log_snippet(<<-EOLOG)
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver
           * [JOB] BackgroundJob::ThumbnailSaver completed after 0.9114
@@ -44,7 +44,7 @@ describe RequestLogAnalyzer::FileFormat::DelayedJob do
       log_parser.parse_io(fragment)
     end
 
-    it "should parse a batch with a failed job without warnings" do
+    it 'should parse a batch with a failed job without warnings' do
       fragment = log_snippet(<<-EOLOG)
           * [JOB] acquiring lock on BackgroundJob::ThumbnailSaver
           * [JOB] BackgroundJob::ThumbnailSaver completed after 1.0627
