@@ -127,6 +127,20 @@ module RequestLogAnalyzer::FileFormat
           time_as_str.to_i
         end
       end
+
+
+      def sanitize_parameters(parameter_string)
+        parameter_string.force_encoding("UTF-8")
+          .gsub(/#</, '"')
+          .gsub(/>, \"/, '", "')
+          .gsub(/>>}/, '\""}') # #< ... >>}
+          .gsub(/>>, \"/, '\"", "') # #< ... >>, "
+          .gsub(/", @/, '\", @') # #< ... @content_type="image/jpeg", @ ... >>
+          .gsub(/="/, '=\"') # #< ... filename="IMG_2228.JPG" Content-Type: image/jpeg", ... >>
+          .gsub(/=\\", "/, '=", "') # redo "...hSMjag0w=\\",
+          .gsub(/=\\"}/, '="}') # redo "...hSMjag0w=\\"}
+          .gsub(/\\0/, '')
+      end
     end
   end
 end
