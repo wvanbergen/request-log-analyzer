@@ -58,7 +58,7 @@ module RequestLogAnalyzer
       # Converts :eval field, which should evaluate to a hash.
       def convert_eval(value, _capture_definition)
         eval(sanitize_parameters(value)).reduce({}) { |h, (k, v)| h[k.to_sym] = v; h }
-      rescue
+      rescue StandardError, SyntaxError
         nil
       end
 
