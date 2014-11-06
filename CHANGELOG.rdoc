@@ -21,8 +21,6 @@ please add an entry to the "Not yet released" section in this document.
 * Reintroduce class attribute inheritance to keep writing your own custom analyser based on an existing one simple.
 * Rubucop cleanup
 
-=== Version 1.13.2
-
 === Version 1.13.1
 
 * Adapt Delayed Job 4 Log format changes (Michael Stark)
