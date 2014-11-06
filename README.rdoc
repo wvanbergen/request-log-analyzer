@@ -33,5 +33,4 @@ Bergen (willem@railsdoctors.com) or Bart ten Brinke (bart@railsdoctors.com).
 * Project wiki at GitHub: http://github.com/wvanbergen/request-log-analyzer/wiki
 * Issue tracker at GitHub: http://github.com/wvanbergen/request-log-analyzer/issues
 * The Railsdoctors homepage: http://railsdoctors.com
-* Check out CONTRIBUTING.rdoc if you want to help out on this project.
-* This software is MIT licensed.
+* This software is MIT licensed. Check out CONTRIBUTING.rdoc if you want to help out on this project.
