@@ -5,9 +5,14 @@ please add an entry to the "Not yet released" section in this document.
 
 == Not yet released
 
-* Fix syntax error while parsing parameter line with file upload (Michael Stark)
+* Nothing yet!
 
 == Request-log-analyzer 1.13 release cycle
+
+=== Version 1.13.4
+
+* Catch SyntaxErrors when eval'ing lines.
+* Scrub parameter with file upload line in Rails requests, so it will parse successfully. (Michael Stark)
 
 === Version 1.13.3
 
