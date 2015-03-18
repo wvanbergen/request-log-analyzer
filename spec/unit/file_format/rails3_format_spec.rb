@@ -70,18 +70,18 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
     it 'should parse :completed lines correctly' do
       line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms)'
       subject.should parse_line(line).as(:completed).and_capture(
-          duration: 0.170, view: 0.078, db: 0.0482, status: 200)
+          duration: 0.170, view: 0.078, db: 0.0482, status: 200, status_string: "OK")
     end
 
     it 'should parse :completed lines correctly when ActiveRecord is not mentioned' do
       line = 'Completed 200 OK in 364ms (Views: 31.4ms)'
-      subject.should parse_line(line).as(:completed).and_capture(duration: 0.364, status: 200)
+      subject.should parse_line(line).as(:completed).and_capture(duration: 0.364, status: 200, status_string: "OK")
     end
 
     it 'should parse :completed lines correctly when other durations are specified' do
       line = 'Completed 200 OK in 384ms (Views: 222.0ms | ActiveRecord: 121.0ms | Sphinx: 0.0ms)'
       subject.should parse_line(line).as(:completed).and_capture(duration: 0.384, view: 0.222,
-          db: 0.121, status: 200)
+          db: 0.121, status: 200, status_string: "OK")
     end
 
     it 'should parse :routing_error lines correctly' do

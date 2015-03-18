@@ -41,9 +41,10 @@ module RequestLogAnalyzer::FileFormat
     line_definition :completed do |line|
       line.footer = true
       line.teaser = /Completed /
-      line.regexp = /Completed (\d+)? .*in (\d+(?:\.\d+)?)ms(?:[^\(]*\(Views: (\d+(?:\.\d+)?)ms .* ActiveRecord: (\d+(?:\.\d+)?)ms.*\))?/
+      line.regexp = /Completed (\d+)? (.*)? in (\d+(?:\.\d+)?)ms(?:[^\(]*\(Views: (\d+(?:\.\d+)?)ms .* ActiveRecord: (\d+(?:\.\d+)?)ms.*\))?/
 
       line.capture(:status).as(:integer)
+      line.capture(:status_string)
       line.capture(:duration).as(:duration, unit: :msec)
       line.capture(:view).as(:duration, unit: :msec)
       line.capture(:db).as(:duration, unit: :msec)
@@ -91,7 +92,7 @@ module RequestLogAnalyzer::FileFormat
 
       analyze.frequency category: REQUEST_CATEGORIZER, title: 'Most requested'
       analyze.frequency :method, title: 'HTTP methods'
-      analyze.frequency :status, title: 'HTTP statuses returned'
+      analyze.frequency category: lambda{ |x| "#{x[:status]} #{x[:status_string]}"}, title: 'HTTP statuses returned'
 
       analyze.duration :duration, category: REQUEST_CATEGORIZER, title: 'Request duration', line_type: :completed
       analyze.duration :partial_duration, category: :rendered_file, title: 'Partials rendering time', line_type: :rendered

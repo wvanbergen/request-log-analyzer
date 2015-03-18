@@ -9,6 +9,10 @@ please add an entry to the "Not yet released" section in this document.
 
 == Request-log-analyzer 1.13 release cycle
 
+=== Version 1.13.5
+
+* Report HTTP Status with Status String as reporting in the Rails log. For example report on "200 OK" instead of just "200"
+
 === Version 1.13.4
 
 * Catch SyntaxErrors when eval'ing lines.
