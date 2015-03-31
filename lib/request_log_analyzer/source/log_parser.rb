@@ -100,6 +100,7 @@ module RequestLogAnalyzer::Source
       return "#{nice_command} gunzip -c -d #{filename}" if filename.match(/\.tar.gz$/) || filename.match(/\.tgz$/) || filename.match(/\.gz$/)
       return "#{nice_command} bunzip2 -c -d #{filename}" if filename.match(/\.bz2$/)
       return "#{nice_command} unzip -p #{filename}" if filename.match(/\.zip$/)
+      return "#{nice_command} xz -c -d #{filename}" if filename.match(/\.xz$/)
 
       ''
     end
