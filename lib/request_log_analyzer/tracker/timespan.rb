@@ -45,6 +45,7 @@ module RequestLogAnalyzer::Tracker
 
     # Difference between last and first timestamp.
     def timespan
+      raise StandardError, "No requests tracked yet, cannot calculate timestamp" if @first == 99_999_999_999_999 && @last == 0
       last_timestamp - first_timestamp
     end
 
