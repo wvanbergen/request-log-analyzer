@@ -37,7 +37,7 @@ describe RequestLogAnalyzer::Tracker::Timespan do
   end
 
   it 'should raise an error when no timestamp is set' do
-    lambda { @tracker.timespan }.should raise_error
+    lambda { @tracker.timespan }.should raise_error(StandardError)
   end
 end
 

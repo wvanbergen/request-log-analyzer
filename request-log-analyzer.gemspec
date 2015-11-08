@@ -43,7 +43,7 @@ Gem::Specification.new do |gem|
     gem.add_development_dependency('activerecord-jdbcpostgresql-adapter')
   else
     gem.add_development_dependency('sqlite3')
-    gem.add_development_dependency('mysql2')
+    gem.add_development_dependency('mysql2', '~> 0.3.10')
     gem.add_development_dependency('pg')
   end
 
