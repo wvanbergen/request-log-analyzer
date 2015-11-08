@@ -1,12 +1,13 @@
+sudo: false
 language: ruby
 before_script:
   - mysql -e 'create database rla_test;'
   - psql -c 'create database rla_test;' -U postgres
 script: bundle exec rake
 rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.1.1
+  - "2.0"
+  - "2.1"
+  - "2.2"
   - ruby-head
   - jruby-19mode
   - jruby-head
