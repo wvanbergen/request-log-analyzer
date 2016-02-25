@@ -75,7 +75,7 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
 
     it 'should parse :completed lines correctly when ActiveRecord is not mentioned' do
       line = 'Completed 200 OK in 364ms (Views: 31.4ms)'
-      subject.should parse_line(line).as(:completed).and_capture(duration: 0.364, status: 200)
+      subject.should parse_line(line).as(:completed).and_capture(duration: 0.364, status: 200, view: 0.0314)
     end
 
     it 'should parse :completed lines correctly when other durations are specified' do
