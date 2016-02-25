@@ -211,6 +211,12 @@ module RequestLogAnalyzer::FileFormat
       line_definer.define_line(name, &block)
     end
 
+    def self.extend_line_definition(name, &block)
+      line_definition = line_definer.line_definitions[name]
+      raise StandardError.new("#{name} has not been defined as line definition. Use +line_definition+ to define it.") if line_definition.nil?
+      yield(line_definition)
+    end
+
     # Specifies multiple line definitions at once using a block
     def self.format_definition(&_block)
       if block_given?
