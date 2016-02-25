@@ -97,6 +97,7 @@ module RequestLogAnalyzer::FileFormat
       analyze.duration :partial_duration, category: :rendered_file, title: 'Partials rendering time', line_type: :rendered
       analyze.duration :view, category: REQUEST_CATEGORIZER, title: 'View rendering time', line_type: :completed
       analyze.duration :db, category: REQUEST_CATEGORIZER, title: 'Database time', line_type: :completed
+      analyze.duration :solr, category: REQUEST_CATEGORIZER, title: 'Solr time', line_type: :completed
 
       analyze.frequency category: REQUEST_CATEGORIZER, title: 'Process blockers (> 1 sec duration)',
         if: lambda { |request| request[:duration] && request[:duration] > 1.0 }
