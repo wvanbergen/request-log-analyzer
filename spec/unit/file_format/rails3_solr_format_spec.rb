@@ -1,11 +1,12 @@
 # encoding: utf-8
 require 'spec_helper'
 
-describe RequestLogAnalyzer::FileFormat::Rails3 do
+describe RequestLogAnalyzer::FileFormat::Rails3Solr do
 
-  subject { RequestLogAnalyzer::FileFormat.load(:rails3) }
+  subject { RequestLogAnalyzer::FileFormat.load(:rails3_solr) }
 
   it { should be_well_formed }
+
   it { should satisfy { |ff| ff.report_trackers.length == 11 } }
 
   describe '#parse_line' do
@@ -68,20 +69,25 @@ describe RequestLogAnalyzer::FileFormat::Rails3 do
     end
 
     it 'should parse :completed lines correctly' do
-      line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms)'
+      line = 'Completed 200 OK in 170ms (Views: 78.0ms | ActiveRecord: 48.2ms | Solr: 2.5ms)'
       subject.should parse_line(line).as(:completed).and_capture(
-          duration: 0.170, view: 0.078, db: 0.0482, status: 200)
+          duration: 0.170, view: 0.078, db: 0.0482, status: 200, solr: 0.0025)
     end
 
-    it 'should parse :completed lines correctly when ActiveRecord is not mentioned' do
+    it 'should parse :completed lines correctly when ActiveRecord and Solr are not mentioned' do
       line = 'Completed 200 OK in 364ms (Views: 31.4ms)'
       subject.should parse_line(line).as(:completed).and_capture(duration: 0.364, status: 200, view: 0.0314)
     end
 
+    it 'should parse :completed lines correctly when ActiveRecord is not mentioned' do
+      line = 'Completed 200 OK in 364ms (Views: 31.4ms | Solr: 8.5ms)'
+      subject.should parse_line(line).as(:completed).and_capture(duration: 0.364, status: 200, view: 0.0314, solr: 0.0085)
+    end
+
     it 'should parse :completed lines correctly when other durations are specified' do
-      line = 'Completed 200 OK in 384ms (Views: 222.0ms | ActiveRecord: 121.0ms | Sphinx: 0.0ms)'
+      line = 'Completed 200 OK in 384ms (Views: 222.0ms | ActiveRecord: 121.0ms | Solr: 2.8ms | Sphinx: 0.0ms)'
       subject.should parse_line(line).as(:completed).and_capture(duration: 0.384, view: 0.222,
-          db: 0.121, status: 200)
+          db: 0.121, status: 200, solr: 0.0028 )
     end
 
     it 'should parse :routing_error lines correctly' do

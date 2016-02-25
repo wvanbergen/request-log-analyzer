@@ -3,6 +3,7 @@ require 'request_log_analyzer/request'
 module RequestLogAnalyzer::FileFormat
   autoload :Rails,            'request_log_analyzer/file_format/rails'
   autoload :Rails3,           'request_log_analyzer/file_format/rails3'
+  autoload :Rails3Solr,       'request_log_analyzer/file_format/rails3_solr'
   autoload :RailsDevelopment, 'request_log_analyzer/file_format/rails_development'
   autoload :Oink,             'request_log_analyzer/file_format/oink'
   autoload :Rack,             'request_log_analyzer/file_format/rack'
@@ -208,6 +209,12 @@ module RequestLogAnalyzer::FileFormat
     # Specifies a single line defintions.
     def self.line_definition(name, &block)
       line_definer.define_line(name, &block)
+    end
+
+    def self.extend_line_definition(name, &block)
+      line_definition = line_definer.line_definitions[name]
+      raise StandardError.new("#{name} has not been defined as line definition. Use +line_definition+ to define it.") if line_definition.nil?
+      yield(line_definition)
     end
 
     # Specifies multiple line definitions at once using a block
