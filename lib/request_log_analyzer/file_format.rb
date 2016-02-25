@@ -3,6 +3,7 @@ require 'request_log_analyzer/request'
 module RequestLogAnalyzer::FileFormat
   autoload :Rails,            'request_log_analyzer/file_format/rails'
   autoload :Rails3,           'request_log_analyzer/file_format/rails3'
+  autoload :Rails3Solr,       'request_log_analyzer/file_format/rails3_solr'
   autoload :RailsDevelopment, 'request_log_analyzer/file_format/rails_development'
   autoload :Oink,             'request_log_analyzer/file_format/oink'
   autoload :Rack,             'request_log_analyzer/file_format/rack'
