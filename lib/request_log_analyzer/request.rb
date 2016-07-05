@@ -65,7 +65,7 @@ module RequestLogAnalyzer
       # Removes certain string sequences which would be problematic for eval.
       # TODO remove all characters not valid in ruby symbols
       def sanitize_parameters(parameter_string)
-        parameter_string.gsub(/#</, '"').gsub(/>,/, '", ').gsub(/\\0/, '')
+        parameter_string.gsub(/#</, '"').gsub(/>,/, '", ').gsub(/\\0/, '').gsub(/\\u/,'')
       end
 
       # Slow default method to parse timestamps.
