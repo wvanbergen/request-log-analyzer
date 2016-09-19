@@ -5,7 +5,7 @@ please add an entry to the "Not yet released" section in this document.
 
 == Not yet released
 
-* Nothing yet!
+* Added support for log files that are longer than 2gb
 
 == Request-log-analyzer 1.13 release cycle
 
