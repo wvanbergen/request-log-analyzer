@@ -5,7 +5,6 @@ require 'request_log_analyzer/version'
 
 Gem::Specification.new do |gem|
   gem.name    = "request-log-analyzer"
-  gem.rubyforge_project = 'r-l-a'
 
   gem.version = RequestLogAnalyzer::VERSION
 
@@ -50,8 +49,7 @@ Gem::Specification.new do |gem|
   gem.files = `git ls-files`.split($/)
   gem.test_files = gem.files.grep(%r{^(test|spec|features)/})
 
-  gem.executables = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.default_executable = 'request-log-analyzer'
+  gem.executables = ['request-log-analyzer']
   gem.bindir = 'bin'
   gem.require_paths = ["lib"]
 end
